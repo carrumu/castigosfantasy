@@ -70,21 +70,124 @@ export function renderFeed(container, callbacks) {
     }
   ];
 
-  // Load posts from localStorage or initialize defaults
-  let posts = JSON.parse(localStorage.getItem('CF_COMMUNITY_FEED') || 'null');
-  if (!posts) {
-    posts = DEFAULT_FEED;
-    localStorage.setItem('CF_COMMUNITY_FEED', JSON.stringify(posts));
-  }
+  // State variables for cache
+  let posts = [];
+  let likedIds = [];
 
   // Helper to retrieve liked posts
-  function getLikedPosts() {
-    return JSON.parse(localStorage.getItem('CF_LIKED_POSTS') || '[]');
+  async function loadLikedPosts() {
+    let ids = JSON.parse(localStorage.getItem('CF_LIKED_POSTS') || '[]');
+    if (isConfigured) {
+      try {
+        const currentUser = supabase.auth.user ? supabase.auth.user() : (await supabase.auth.getUser()).data.user;
+        if (currentUser) {
+          const { data: likesData } = await supabase
+            .from('feed_likes')
+            .select('post_id')
+            .eq('profile_id', currentUser.id);
+          
+          if (likesData) {
+            const dbLikedIds = likesData.map(l => l.post_id);
+            ids = [...new Set([...ids, ...dbLikedIds])];
+            localStorage.setItem('CF_LIKED_POSTS', JSON.stringify(ids));
+          }
+        }
+      } catch (err) {
+        console.warn("Could not load liked posts from Supabase:", err);
+      }
+    }
+    likedIds = ids;
+    return ids;
   }
 
   // Helper to save liked posts
-  function saveLikedPosts(likedIds) {
+  function saveLikedPosts(likedIdsVal) {
+    likedIds = likedIdsVal;
     localStorage.setItem('CF_LIKED_POSTS', JSON.stringify(likedIds));
+  }
+
+  async function loadPosts() {
+    if (isConfigured) {
+      try {
+        const { data: postsData, error: postsErr } = await supabase
+          .from('feed_posts')
+          .select(`
+            *,
+            comments:feed_comments(id, nickname, text, created_at)
+          `)
+          .order('created_at', { ascending: false });
+
+        if (postsErr) throw postsErr;
+
+        if (postsData && postsData.length > 0) {
+          posts = postsData.map(p => ({
+            id: p.id,
+            title: p.title,
+            nickname: p.nickname,
+            league: p.league,
+            platform: p.platform,
+            url: p.url,
+            description: p.description,
+            likes: p.likes,
+            createdAt: p.created_at,
+            comments: (p.comments || []).sort((a, b) => new Date(a.created_at) - new Date(b.created_at)).map(c => ({
+              id: c.id,
+              nickname: c.nickname,
+              text: c.text,
+              createdAt: c.created_at
+            })),
+            visibility: p.visibility
+          }));
+        } else {
+          // Seed mock posts
+          const insertList = DEFAULT_FEED.map(p => ({
+            title: p.title,
+            nickname: p.nickname,
+            league: p.league,
+            platform: p.platform,
+            url: p.url,
+            description: p.description,
+            likes: p.likes,
+            visibility: p.visibility || 'public'
+          }));
+
+          const { data: insertedData, error: insErr } = await supabase
+            .from('feed_posts')
+            .insert(insertList)
+            .select();
+
+          if (insErr) throw insErr;
+          
+          for (const post of insertedData) {
+            const originalPost = DEFAULT_FEED.find(x => x.title === post.title);
+            if (originalPost && originalPost.comments && originalPost.comments.length > 0) {
+              const commentsInsert = originalPost.comments.map(c => ({
+                post_id: post.id,
+                nickname: c.nickname,
+                text: c.text
+              }));
+              await supabase.from('feed_comments').insert(commentsInsert);
+            }
+          }
+
+          await loadPosts();
+        }
+      } catch (err) {
+        console.error("Error loading/seeding posts on Supabase:", err);
+        loadLocalPosts();
+      }
+    } else {
+      loadLocalPosts();
+    }
+  }
+
+  function loadLocalPosts() {
+    let localPosts = JSON.parse(localStorage.getItem('CF_COMMUNITY_FEED') || 'null');
+    if (!localPosts) {
+      localPosts = DEFAULT_FEED;
+      localStorage.setItem('CF_COMMUNITY_FEED', JSON.stringify(localPosts));
+    }
+    posts = localPosts;
   }
 
   // State variables
@@ -171,6 +274,8 @@ export function renderFeed(container, callbacks) {
         selectedLeague = userLeagues[0];
         activeLeagueName = userLeagues[0];
       }
+      await loadLikedPosts();
+      await loadPosts();
       renderView();
     } catch (err) {
       console.error("Failed loading user profile:", err);
@@ -523,14 +628,30 @@ export function renderFeed(container, callbacks) {
     // Hook Delete Post Buttons
     const deletePostBtns = container.querySelectorAll('.btn-delete-post');
     deletePostBtns.forEach(btn => {
-      btn.addEventListener('click', (e) => {
+      btn.addEventListener('click', async (e) => {
         e.preventDefault();
         const id = btn.getAttribute('data-id');
         if (confirm('¿Estás seguro de que quieres borrar tu castigo compartido? Esta acción no se puede deshacer.')) {
-          posts = posts.filter(p => p.id !== id);
-          localStorage.setItem('CF_COMMUNITY_FEED', JSON.stringify(posts));
-          showToast('Castigo eliminado', 'info');
-          renderView();
+          if (isConfigured) {
+            try {
+              const { error } = await supabase
+                .from('feed_posts')
+                .delete()
+                .eq('id', id);
+              if (error) throw error;
+              showToast('Castigo eliminado', 'info');
+              await loadPosts();
+              renderView();
+            } catch (err) {
+              console.error(err);
+              showToast('Error al eliminar de Supabase', 'error');
+            }
+          } else {
+            posts = posts.filter(p => p.id !== id);
+            localStorage.setItem('CF_COMMUNITY_FEED', JSON.stringify(posts));
+            showToast('Castigo eliminado', 'info');
+            renderView();
+          }
         }
       });
     });
@@ -548,7 +669,7 @@ export function renderFeed(container, callbacks) {
     // Hook comments form submission
     const commentForms = container.querySelectorAll('.add-comment-form');
     commentForms.forEach(cForm => {
-      cForm.addEventListener('submit', (e) => {
+      cForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const id = cForm.getAttribute('data-id');
         const input = cForm.querySelector('.comment-input');
@@ -567,9 +688,34 @@ export function renderFeed(container, callbacks) {
           createdAt: new Date().toISOString()
         };
 
-        if (!posts[postIndex].comments) posts[postIndex].comments = [];
-        posts[postIndex].comments.push(newComment);
-        localStorage.setItem('CF_COMMUNITY_FEED', JSON.stringify(posts));
+        if (isConfigured) {
+          try {
+            const currentUser = supabase.auth.user ? supabase.auth.user() : (await supabase.auth.getUser()).data.user;
+            const { data: dbComment, error: commentErr } = await supabase
+              .from('feed_comments')
+              .insert({
+                post_id: id,
+                nickname: userNickname,
+                profile_id: currentUser ? currentUser.id : null,
+                text: text
+              })
+              .select()
+              .single();
+
+            if (commentErr) throw commentErr;
+            newComment.id = dbComment.id;
+            newComment.createdAt = dbComment.created_at;
+            await loadPosts();
+          } catch (err) {
+            console.error(err);
+            showToast("Error al añadir comentario", "error");
+            return;
+          }
+        } else {
+          if (!posts[postIndex].comments) posts[postIndex].comments = [];
+          posts[postIndex].comments.push(newComment);
+          localStorage.setItem('CF_COMMUNITY_FEED', JSON.stringify(posts));
+        }
 
         showToast("Comentario añadido", "success");
         renderView();
@@ -646,7 +792,7 @@ export function renderFeed(container, callbacks) {
     // Handle form submission
     const form = container.querySelector('#add-feed-form');
     if (form) {
-      form.addEventListener('submit', (e) => {
+      form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const url = form.querySelector('#feed-url').value.trim();
         const description = form.querySelector('#feed-description').value.trim();
@@ -696,8 +842,39 @@ export function renderFeed(container, callbacks) {
           visibility
         };
 
-        posts.unshift(newPost);
-        localStorage.setItem('CF_COMMUNITY_FEED', JSON.stringify(posts));
+        if (isConfigured) {
+          try {
+            const currentUser = supabase.auth.user ? supabase.auth.user() : (await supabase.auth.getUser()).data.user;
+            const { data: dbPost, error: insertErr } = await supabase
+              .from('feed_posts')
+              .insert({
+                title,
+                nickname: userNickname,
+                profile_id: currentUser ? currentUser.id : null,
+                league,
+                platform,
+                url,
+                description,
+                visibility,
+                likes: 0
+              })
+              .select()
+              .single();
+
+            if (insertErr) throw insertErr;
+            newPost.id = dbPost.id;
+            newPost.createdAt = dbPost.created_at;
+            await loadPosts();
+          } catch (err) {
+            console.error(err);
+            showToast("Error al publicar en Supabase", "error");
+            return;
+          }
+        } else {
+          posts.unshift(newPost);
+          localStorage.setItem('CF_COMMUNITY_FEED', JSON.stringify(posts));
+        }
+
         isFormExpanded = false;
         showToast("Publicado en la comunidad", "success");
         renderView();
@@ -716,23 +893,55 @@ export function renderFeed(container, callbacks) {
   function hookLikeButtons(parent) {
     const likeButtons = parent.querySelectorAll('.btn-like-post');
     likeButtons.forEach(btn => {
-      btn.addEventListener('click', (e) => {
+      btn.addEventListener('click', async (e) => {
         e.preventDefault();
         const id = btn.getAttribute('data-id');
         const postIndex = posts.findIndex(p => p.id === id);
         if (postIndex === -1) return;
 
-        let likedIds = getLikedPosts();
+        let currentLikes = posts[postIndex].likes;
         if (likedIds.includes(id)) {
           likedIds = likedIds.filter(x => x !== id);
-          posts[postIndex].likes = Math.max(0, posts[postIndex].likes - 1);
+          currentLikes = Math.max(0, currentLikes - 1);
         } else {
           likedIds.push(id);
-          posts[postIndex].likes += 1;
+          currentLikes += 1;
+        }
+
+        if (isConfigured) {
+          try {
+            const currentUser = supabase.auth.user ? supabase.auth.user() : (await supabase.auth.getUser()).data.user;
+            if (currentUser) {
+              if (likedIds.includes(id)) {
+                await supabase
+                  .from('feed_likes')
+                  .insert({
+                    post_id: id,
+                    profile_id: currentUser.id
+                  });
+              } else {
+                await supabase
+                  .from('feed_likes')
+                  .delete()
+                  .eq('post_id', id)
+                  .eq('profile_id', currentUser.id);
+              }
+            }
+            await supabase
+              .from('feed_posts')
+              .update({ likes: currentLikes })
+              .eq('id', id);
+
+            await loadPosts();
+          } catch (err) {
+            console.error(err);
+          }
+        } else {
+          posts[postIndex].likes = currentLikes;
+          localStorage.setItem('CF_COMMUNITY_FEED', JSON.stringify(posts));
         }
 
         saveLikedPosts(likedIds);
-        localStorage.setItem('CF_COMMUNITY_FEED', JSON.stringify(posts));
         renderView();
       });
     });
@@ -899,11 +1108,7 @@ export function renderFeed(container, callbacks) {
 
   // Simulates a bot reply after 3 seconds, mentioning the active user
   function simulateBotReply(postId) {
-    setTimeout(() => {
-      let currentPosts = JSON.parse(localStorage.getItem('CF_COMMUNITY_FEED') || '[]');
-      const postIndex = currentPosts.findIndex(p => p.id === postId);
-      if (postIndex === -1) return;
-      
+    setTimeout(async () => {
       const managersList = ["Paco G.", "Álvaro M.", "Santi K.", "Marta R.", "Luis T."].filter(m => m !== userNickname);
       const randomManager = managersList[Math.floor(Math.random() * managersList.length)];
       
@@ -923,11 +1128,43 @@ export function renderFeed(container, callbacks) {
         createdAt: new Date().toISOString()
       };
       
-      if (!currentPosts[postIndex].comments) currentPosts[postIndex].comments = [];
-      currentPosts[postIndex].comments.push(newComment);
-      
-      localStorage.setItem('CF_COMMUNITY_FEED', JSON.stringify(currentPosts));
-      posts = currentPosts;
+      if (isConfigured) {
+        try {
+          const { data: postExists } = await supabase
+            .from('feed_posts')
+            .select('id')
+            .eq('id', postId)
+            .maybeSingle();
+
+          if (!postExists) return;
+
+          const { data: dbComment } = await supabase
+            .from('feed_comments')
+            .insert({
+              post_id: postId,
+              nickname: randomManager,
+              text: randomPhrase
+            })
+            .select()
+            .single();
+
+          if (dbComment) {
+            newComment.id = dbComment.id;
+            newComment.createdAt = dbComment.created_at;
+          }
+          await loadPosts();
+        } catch (err) {
+          console.error("Error inserting bot reply on Supabase:", err);
+        }
+      } else {
+        let currentPosts = JSON.parse(localStorage.getItem('CF_COMMUNITY_FEED') || '[]');
+        const postIndex = currentPosts.findIndex(p => p.id === postId);
+        if (postIndex === -1) return;
+        if (!currentPosts[postIndex].comments) currentPosts[postIndex].comments = [];
+        currentPosts[postIndex].comments.push(newComment);
+        localStorage.setItem('CF_COMMUNITY_FEED', JSON.stringify(currentPosts));
+        posts = currentPosts;
+      }
       
       let count = parseInt(localStorage.getItem('CF_COMMUNITY_NOTIFICATIONS_COUNT') || '0', 10);
       localStorage.setItem('CF_COMMUNITY_NOTIFICATIONS_COUNT', (count + 1).toString());
