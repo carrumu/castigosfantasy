@@ -69,25 +69,37 @@ export function renderBufon(container, callbacks) {
   }
 
   function drawRaffleWinner(winnerNominee) {
-    const voters = [];
-    const managersList = ["Paco G.", "Álvaro M.", "Santi K.", "Luis T."].filter(m => m !== userNickname);
+    const activeDemoId = localStorage.getItem('CF_ACTIVE_DEMO_LEAGUE_ID') || 'DEMO-ASTURES';
+    const activeDemoName = localStorage.getItem(`CF_DEMO_LEAGUE_NAME_${activeDemoId}`) || "Liga Demo Astures";
     
-    nominees.forEach(n => {
-      let votesToDistribute = n.votes;
-      if (userVotedId == n.id) {
-        voters.push({ manager: userNickname, player: n.name });
-        votesToDistribute = Math.max(0, votesToDistribute - 1);
-      }
-      
-      const shuffledManagers = [...managersList].sort(() => 0.5 - Math.random());
-      for (let i = 0; i < votesToDistribute; i++) {
-        const manager = shuffledManagers[i % shuffledManagers.length];
-        voters.push({ manager, player: n.name });
-      }
-    });
+    const GLOBAL_USERS = [
+      { name: "Paco G.", league: activeDemoName },
+      { name: "Álvaro M.", league: activeDemoName },
+      { name: "Santi K.", league: activeDemoName },
+      { name: "Luis T.", league: activeDemoName },
+      { name: "Marta R.", league: "Liga Super Mánagers" },
+      { name: "Carlos P.", league: "Liga de los Vagos" },
+      { name: "Dani F.", league: "Liga La Pachanga" },
+      { name: "Sofía L.", league: "Liga Elite" },
+      { name: "Javi N.", league: "Liga Fantasy Sur" },
+      { name: "Andrés B.", league: "Liga Los Viciados" },
+      { name: "Elena H.", league: "Liga Primera División" }
+    ];
+
+    const participants = [...GLOBAL_USERS];
     
-    if (voters.length === 0) return null;
-    return voters[Math.floor(Math.random() * voters.length)];
+    // If user voted, add them to the page-wide raffle participants pool
+    if (userVotedId) {
+      participants.push({ name: userNickname, league: activeDemoName });
+    }
+
+    if (participants.length === 0) return null;
+    
+    const luckyWinner = participants[Math.floor(Math.random() * participants.length)];
+    return {
+      manager: `${luckyWinner.name} (${luckyWinner.league})`,
+      player: winnerNominee.name
+    };
   }
 
   function handleNominate(name, team, reason) {
@@ -142,15 +154,16 @@ export function renderBufon(container, callbacks) {
     });
 
     // Reset for next matchday
-    currentMatchday += 1;
-    nominees = [];
-    userVotedId = null;
     localStorage.removeItem(`CF_BUFON_VOTED_MATCHDAY_${currentMatchday}`);
     localStorage.removeItem('CF_USER_VOTED_BUFON_ID');
     localStorage.removeItem('CF_BUFON_VOTING_START_TIME');
+    currentMatchday += 1;
+    nominees = [];
+    userVotedId = null;
     
     saveState();
-    if (luckyVoter && (luckyVoter.manager === 'Tú' || luckyVoter.manager === userNickname)) {
+    const isUserWinner = luckyVoter && (luckyVoter.manager.includes('Tú') || (userNickname !== 'Tú' && luckyVoter.manager.includes(userNickname)));
+    if (isUserWinner) {
       callbacks.showToast(`¡Jornada cerrada! Has ganado el sorteo de la camiseta réplica de ${luckyVoter.player}`, "success");
     } else {
       callbacks.showToast(`Jornada cerrada. ¡El bufón de la jornada es ${winner.name}!`, "success");
@@ -177,6 +190,43 @@ export function renderBufon(container, callbacks) {
             <button id="close-matchday-btn" class="btn-primary btn-danger" style="font-size: 0.8rem; padding: 0.5rem 1rem; font-weight: 700;">
               ⚙️ Cerrar Jornada y Guardar
             </button>
+          </div>
+        </div>
+
+        <!-- Banner del Sorteo de Camiseta -->
+        <div class="card glass shadow-lg" style="
+          background: linear-gradient(135deg, rgba(var(--accent-rgb), 0.12) 0%, rgba(var(--primary-rgb), 0.08) 100%);
+          border: 1px solid rgba(var(--accent-rgb), 0.25);
+          box-shadow: 0 4px 20px rgba(var(--accent-rgb), 0.1);
+          padding: 1.25rem 1.5rem;
+          margin-bottom: 1.5rem;
+          border-radius: 16px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 1.5rem;
+          flex-wrap: wrap;
+        ">
+          <div style="flex-grow: 1; min-width: 250px;">
+            <h3 class="gradient-text-gold" style="font-size: 1.25rem; font-weight: 900; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.5rem;">
+              🎁 Sorteo Semanal de Camiseta Réplica
+            </h3>
+            <p style="font-size: 0.85rem; color: var(--text-light); line-height: 1.45;">
+              ¡Vota por el Bufón de la jornada y participa automáticamente! Sorteamos una camiseta réplica a la semana entre todos los mánagers de España que registren su voto. El ganador se anunciará al cerrar la jornada.
+            </p>
+          </div>
+          <div style="
+            background: rgba(255, 255, 255, 0.05);
+            border: 1.2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 0.6rem 1rem;
+            text-align: center;
+            white-space: nowrap;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+          ">
+            <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 0.15rem;">Premio de la Semana</span>
+            <span style="font-size: 1.05rem; color: var(--accent); font-weight: 800; display: block;">👕 Camiseta Oficial LaLiga</span>
+            <span style="font-size: 0.7rem; color: var(--text-muted); display: block; font-style: italic;">(Réplica Autorizada)</span>
           </div>
         </div>
 
@@ -347,7 +397,7 @@ export function renderBufon(container, callbacks) {
               <div style="display: flex; flex-direction: column; gap: 1rem;">
                 ${history.map(h => {
                   const hasRaffle = h.raffleWinner && h.rafflePlayer;
-                  const isUserWinner = hasRaffle && (h.raffleWinner === 'Tú' || h.raffleWinner === userNickname);
+                  const isUserWinner = hasRaffle && (h.raffleWinner.includes('Tú') || (userNickname !== 'Tú' && h.raffleWinner.includes(userNickname)));
                   return `
                     <div style="
                       border: 1px solid var(--border-color);
@@ -383,7 +433,7 @@ export function renderBufon(container, callbacks) {
                         ">
                           🎁 <strong>Sorteo Camiseta:</strong> 
                           <span style="color: ${isUserWinner ? 'var(--accent)' : 'var(--text-light)'}; font-weight: 700;">
-                            ${escapeHTML(h.raffleWinner)}
+                            @${escapeHTML(h.raffleWinner)}
                           </span> 
                           <span>(Réplica de ${escapeHTML(h.rafflePlayer)})</span>
                         </div>
