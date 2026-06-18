@@ -52,14 +52,14 @@ export function renderChallenges(container, callbacks) {
       <div class="container">
         <!-- Header -->
         <div style="margin-bottom: 1.5rem;">
-          <h1 class="gradient-text-green" style="font-size: 1.65rem; font-weight: 900;">🔥 Reto Semanal</h1>
+          <h1 class="gradient-text-green" style="font-size: 1.65rem; font-weight: 900;">Reto Semanal</h1>
           <p style="font-size: 0.85rem; color: var(--text-muted);">Decide democráticamente qué penitencia tendrá que realizar el último de esta jornada.</p>
         </div>
 
         <div class="dashboard-grid">
           <!-- Columna Izquierda: Votaciones -->
           <div class="card glass pitch-card" style="margin-bottom: 0;">
-            <h2 class="card-title gradient-text-gold">🗳️ Votación en Curso</h2>
+            <h2 class="card-title gradient-text-gold">Votación en Curso</h2>
             <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;">Elige la putada de esta semana. El perdedor tendrá que cumplir la más votada.</p>
             
             <div style="display: flex; flex-direction: column; gap: 1.25rem;" id="poll-container">
@@ -115,7 +115,7 @@ export function renderChallenges(container, callbacks) {
           <div style="display: flex; flex-direction: column; gap: 1.5rem;">
             <!-- Cuenta atrás -->
             <div class="card glass">
-              <h3 class="card-title" style="font-size: 1.05rem; margin-bottom: 0.75rem;">⏳ Cierre de Votación</h3>
+              <h3 class="card-title" style="font-size: 1.05rem; margin-bottom: 0.75rem;">Cierre de Votación</h3>
               <div style="display: flex; justify-content: space-around; text-align: center; background: rgba(0,0,0,0.2); padding: 0.85rem; border-radius: 12px; border: 1px solid var(--border-color);">
                 <div>
                   <div id="days" style="font-size: 1.5rem; font-weight: 800; color: var(--accent);">00</div>
@@ -144,7 +144,7 @@ export function renderChallenges(container, callbacks) {
 
             <!-- Muro de Piques -->
             <div class="card glass" style="display: flex; flex-direction: column; max-height: 350px;">
-              <h3 class="card-title" style="font-size: 1.05rem; margin-bottom: 0.5rem;">💬 Muro de Piques</h3>
+              <h3 class="card-title" style="font-size: 1.05rem; margin-bottom: 0.5rem;">Muro de Piques</h3>
               <div id="piques-list" style="flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 0.6rem; padding-right: 0.25rem; margin-bottom: 1rem; min-height: 120px;">
                 ${piques.map(p => `
                   <div style="background: rgba(255,255,255,0.01); border: 1px solid var(--border-color); padding: 0.6rem 0.8rem; border-radius: 8px; font-size: 0.85rem;">
@@ -159,7 +159,7 @@ export function renderChallenges(container, callbacks) {
               <form id="pique-form" style="display: flex; gap: 0.5rem; border-top: 1px solid var(--border-color); padding-top: 0.75rem;">
                 <input type="text" id="pique-sender" class="input-field" placeholder="Apodo" style="width: 30%; padding: 0.5rem;" required />
                 <input type="text" id="pique-text" class="input-field" placeholder="Escribe un pique..." style="flex-grow: 1; padding: 0.5rem;" required />
-                <button type="submit" class="btn-primary" style="width: auto; padding: 0.5rem 0.75rem; font-size: 0.85rem;">💬</button>
+                <button type="submit" class="btn-primary" style="width: auto; padding: 0.5rem 0.75rem; font-size: 0.85rem;">Enviar</button>
               </form>
             </div>
 

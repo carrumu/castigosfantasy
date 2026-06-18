@@ -197,7 +197,7 @@ export function renderRoulette(container, callbacks) {
         ${pendingRecord ? `
           <div class="supabase-banner" style="background: rgba(var(--accent-rgb), 0.1); border-color: rgba(var(--accent-rgb), 0.3); margin-bottom: 1.25rem;">
             <div class="supabase-banner-text" style="color: var(--text-light);">
-              🎯 Tirada pendiente para <strong>${pendingRecord.display_name}</strong> (Jornada ${pendingRecord.matchday_number}). ¡Gira la ruleta para asignarle su castigo!
+              Tirada pendiente para <strong>${pendingRecord.display_name}</strong> (Jornada ${pendingRecord.matchday_number}). ¡Gira la ruleta para asignarle su castigo!
             </div>
           </div>
         ` : ''}
@@ -205,7 +205,7 @@ export function renderRoulette(container, callbacks) {
         <div class="roulette-grid">
           <!-- Columna Izquierda: Componente Ruleta -->
           <div class="card glass roulette-container" style="margin-bottom: 0;">
-            <h2 class="card-title gradient-text-gold">🎡 Ruleta de Castigos</h2>
+            <h2 class="card-title gradient-text-gold">Ruleta de Castigos</h2>
             <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem; text-align: center;">
               El azar dictará sentencia. Hay <strong>${punishments.length}</strong> castigos cargados en tu liga.
             </p>
@@ -216,14 +216,14 @@ export function renderRoulette(container, callbacks) {
               <canvas id="wheel-canvas" class="wheel-canvas" width="500" height="500"></canvas>
             </div>
 
-            <button id="spin-btn" class="btn-primary" style="max-width: 200px;">💥 ¡GIRAR! 💥</button>
+            <button id="spin-btn" class="btn-primary" style="max-width: 200px;">¡GIRAR!</button>
           </div>
 
           <!-- Columna Derecha: Personalizar e Historial -->
           <div style="display: flex; flex-direction: column; gap: 1.5rem;">
             <!-- Personalizar Castigos -->
             <div class="card glass" style="margin-bottom: 0;">
-              <h2 class="card-title">⚙️ Personalizar Castigos</h2>
+              <h2 class="card-title">Personalizar Castigos</h2>
               <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">Añade o elimina castigos a la lista oficial de tu liga.</p>
               
               <form id="add-punishment-form" style="margin-bottom: 1.5rem;">
@@ -253,7 +253,7 @@ export function renderRoulette(container, callbacks) {
 
             <!-- Historial de Castigos -->
             <div class="card glass pitch-card" style="margin-bottom: 0; flex-grow: 1;">
-              <h2 class="card-title gradient-text-green">📜 Historial de Sentencias</h2>
+              <h2 class="card-title gradient-text-green">Historial de Sentencias</h2>
               <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem;">Castigos aplicados a los perdedores en las jornadas jugadas.</p>
               
               <div class="history-list" style="max-height: 250px; overflow-y: auto;">
@@ -268,7 +268,7 @@ export function renderRoulette(container, callbacks) {
                       <span class="history-date">Jornada ${item.matchday_number} (${item.amount_owed}€)</span>
                     </div>
                     <div style="font-weight: 700; color: var(--accent); margin-top: 0.25rem; font-size: 0.95rem;">
-                      ⚡ ${item.punishments?.name || 'Castigo Desconocido'}
+                      ${item.punishments?.name || 'Castigo Desconocido'}
                     </div>
                     ${item.punishments?.description ? `
                       <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.15rem;">
@@ -290,11 +290,11 @@ export function renderRoulette(container, callbacks) {
       <div class="modal-overlay" id="result-modal">
         <div class="modal-content glass">
           <div class="modal-header">
-            <h3 class="gradient-text-gold" style="font-weight: 800; font-size: 1.3rem;">⚡ ¡Castigo Sentenciado!</h3>
+            <h3 class="gradient-text-gold" style="font-weight: 800; font-size: 1.3rem;">¡Castigo Sentenciado!</h3>
             <button class="modal-close" id="close-resmodal-btn">✕</button>
           </div>
           <div class="modal-body" style="text-align: center;">
-            <div style="font-size: 4rem; margin-bottom: 1rem; animation: bounce 1s infinite alternate;">🎁</div>
+            <div style="font-size: 4rem; margin-bottom: 1rem; animation: bounce 1s infinite alternate;"></div>
             <h2 id="result-title" style="color: var(--accent); font-size: 1.4rem; font-weight: 900; margin-bottom: 0.5rem;"></h2>
             <p id="result-desc" style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.4; margin-bottom: 1.5rem;"></p>
             

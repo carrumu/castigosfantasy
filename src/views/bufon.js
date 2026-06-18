@@ -180,7 +180,7 @@ export function renderBufon(container, callbacks) {
         <div style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: start; flex-wrap: wrap; gap: 1rem;">
           <div>
             <h1 class="gradient-text-gold" style="font-size: 1.65rem; font-weight: 900; display: flex; align-items: center; gap: 0.5rem;">
-              🤡 El Bufón de la Jornada
+              El Bufón de la Jornada
             </h1>
             <p style="font-size: 0.85rem; color: var(--text-muted);">
               Votación democrática al futbolista de LaLiga con la actuación más cómica o desastrosa en la <strong>Jornada ${currentMatchday}</strong>.
@@ -188,7 +188,7 @@ export function renderBufon(container, callbacks) {
           </div>
           <div>
             <button id="close-matchday-btn" class="btn-primary btn-danger" style="font-size: 0.8rem; padding: 0.5rem 1rem; font-weight: 700;">
-              ⚙️ Cerrar Jornada y Guardar
+              Cerrar Jornada y Guardar
             </button>
           </div>
         </div>
@@ -209,7 +209,7 @@ export function renderBufon(container, callbacks) {
         ">
           <div style="flex-grow: 1; min-width: 250px;">
             <h3 class="gradient-text-gold" style="font-size: 1.25rem; font-weight: 900; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.5rem;">
-              🎁 Sorteo Semanal de Camiseta Réplica
+              Sorteo Semanal de Camiseta Réplica
             </h3>
             <p style="font-size: 0.85rem; color: var(--text-light); line-height: 1.45;">
               ¡Vota por el Bufón de la jornada y participa automáticamente! Sorteamos una camiseta réplica a la semana entre todos los mánagers de España que registren su voto. El ganador se anunciará al cerrar la jornada.
@@ -225,7 +225,7 @@ export function renderBufon(container, callbacks) {
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
           ">
             <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 0.15rem;">Premio de la Semana</span>
-            <span style="font-size: 1.05rem; color: var(--accent); font-weight: 800; display: block;">👕 Camiseta Oficial LaLiga</span>
+            <span style="font-size: 1.05rem; color: var(--accent); font-weight: 800; display: block;">Camiseta Oficial LaLiga</span>
             <span style="font-size: 0.7rem; color: var(--text-muted); display: block; font-style: italic;">(Réplica Autorizada)</span>
           </div>
         </div>
@@ -237,7 +237,7 @@ export function renderBufon(container, callbacks) {
             <!-- Votación -->
             <div class="card glass">
               <h2 class="card-title gradient-text-gold" style="font-size: 1.15rem; margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
-                <span>🗳️ Candidatos de la Jornada</span>
+                <span>Candidatos de la Jornada</span>
                 <span style="font-size: 0.8rem; font-weight: 500; color: var(--text-muted);">${totalVotes} votos totales</span>
               </h2>
 
@@ -255,20 +255,19 @@ export function renderBufon(container, callbacks) {
               ">
                 <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
                   <span style="font-weight: 700; color: var(--text-light); display: flex; align-items: center; gap: 0.35rem;">
-                    ⏱️ ${getRemainingTimeText()}
+                    ${getRemainingTimeText()}
                   </span>
                   <span style="color: var(--accent); font-weight: 700; font-size: 0.75rem; background: rgba(var(--accent-rgb), 0.08); padding: 0.15rem 0.45rem; border-radius: 4px; border: 1px solid rgba(var(--accent-rgb), 0.15);">
                     1 voto por mánager
                   </span>
                 </div>
                 <div style="color: var(--text-muted); line-height: 1.35; font-size: 0.75rem; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 0.35rem; margin-top: 0.15rem;">
-                  🎁 <strong>Sorteo Semanal:</strong> Al votar, participas automáticamente en el sorteo de una <strong>camiseta réplica</strong> del futbolista al que votes. ¡Sorteamos una camiseta a la semana!
+                  <strong>Sorteo Semanal:</strong> Al votar, participas automáticamente en el sorteo de una <strong>camiseta réplica</strong> del futbolista al que votes. ¡Sorteamos una camiseta a la semana!
                 </div>
               </div>
 
               ${nominees.length === 0 ? `
                 <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
-                  <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🤷‍♂️</div>
                   <p style="font-size: 0.9rem;">No hay nominados registrados en esta jornada todavía.</p>
                   <p style="font-size: 0.75rem; margin-top: 0.25rem;">Rellena el formulario de abajo para empezar las votaciones.</p>
                 </div>
@@ -351,7 +350,7 @@ export function renderBufon(container, callbacks) {
 
             <!-- Formulario Nominar -->
             <div class="card glass">
-              <h3 class="card-title" style="font-size: 1.05rem; margin-bottom: 0.25rem;">📢 Nominar un Candidato</h3>
+              <h3 class="card-title" style="font-size: 1.05rem; margin-bottom: 0.25rem;">Nominar un Candidato</h3>
               <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 1.25rem;">
                 ¿Algún futbolista la ha liado en la jornada? Añádelo al escarnio público.
               </p>
@@ -383,7 +382,7 @@ export function renderBufon(container, callbacks) {
           <!-- Columna Derecha: Histórico (Hall of Shame) -->
           <div class="card glass">
             <h2 class="card-title gradient-text-gold" style="font-size: 1.15rem; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem;">
-              👑 Salón de la Vergüenza
+              Salón de la Vergüenza
             </h2>
             <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1.25rem;">
               Bufones coronados oficialmente por tu liga en las jornadas anteriores de esta temporada.
@@ -415,7 +414,7 @@ export function renderBufon(container, callbacks) {
                         </span>
                       </div>
                       <h4 style="font-size: 0.95rem; font-weight: 800; margin-bottom: 0.25rem; color: var(--text-light);">
-                        🤡 ${h.name}
+                        ${h.name}
                       </h4>
                       <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.35; font-style: italic; margin-bottom: 0.5rem;">
                         "${h.reason}"
@@ -431,7 +430,7 @@ export function renderBufon(container, callbacks) {
                           align-items: center;
                           gap: 0.35rem;
                         ">
-                          🎁 <strong>Sorteo Camiseta:</strong> 
+                          <strong>Sorteo Camiseta:</strong> 
                           <span style="color: ${isUserWinner ? 'var(--accent)' : 'var(--text-light)'}; font-weight: 700;">
                             @${escapeHTML(h.raffleWinner)}
                           </span> 
@@ -449,7 +448,7 @@ export function renderBufon(container, callbacks) {
                             font-weight: 600;
                             text-align: center;
                           ">
-                            🎉 ¡Has ganado! Nos pondremos en contacto para el envío.
+                            ¡Has ganado! Nos pondremos en contacto para el envío.
                           </div>
                         ` : ''}
                       ` : ''}

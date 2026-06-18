@@ -80,26 +80,26 @@ function renderMainLayout(isGuest) {
 
         <nav class="sidebar-nav">
           <button class="nav-item ${currentView === 'dashboard' ? 'active' : ''}" id="nav-dash-btn">
-            <span>🏆</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.45 1-1 1H4v2h16v-2h-5c-.55 0-1-.45-1-1v-2.34"></path><path d="M12 2a6 6 0 0 0-6 6v5a6 6 0 0 0 12 0V8a6 6 0 0 0-6-6z"></path></svg>
             <span>Muro de la Vergüenza</span>
           </button>
           ${activeFeatures !== 'money' ? `
             <button class="nav-item ${currentView === 'roulette' ? 'active' : ''}" id="nav-wheel-btn">
-              <span>🎡</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;"><circle cx="12" cy="12" r="10"></circle><path d="M12 2v20"></path><path d="M2 12h20"></path><path d="m19.07 4.93-14.14 14.14"></path><path d="m4.93 4.93 14.14 14.14"></path></svg>
               <span>Ruleta de Castigos</span>
             </button>
           ` : ''}
           <button class="nav-item ${currentView === 'challenges' ? 'active' : ''}" id="nav-challenges-btn">
-            <span>🔥</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path></svg>
             <span>Reto Semanal</span>
           </button>
           <button class="nav-item ${currentView === 'bufon' ? 'active' : ''}" id="nav-bufon-btn">
-            <span>🤡</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;"><path d="M2 4 5 12h14l3-8-7 4-3-6-3 6-7-4z"></path><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7H5z"></path></svg>
             <span>El Bufón</span>
           </button>
           <button class="nav-item ${currentView === 'feed' ? 'active' : ''}" id="nav-feed-btn" style="position: relative; display: flex; align-items: center; justify-content: space-between; width: 100%;">
             <div style="display: flex; align-items: center; gap: 0.75rem;">
-              <span>📸</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
               <span>Comunidad</span>
             </div>
             ${notificationsCount > 0 ? `
@@ -117,7 +117,7 @@ function renderMainLayout(isGuest) {
             ` : ''}
           </button>
           <button class="nav-item ${currentView === 'minigame' ? 'active' : ''}" id="nav-minigame-btn">
-            <span>🎮</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;"><line x1="6" y1="12" x2="10" y2="12"></line><line x1="8" y1="10" x2="8" y2="14"></line><line x1="15" y1="13" x2="15.01" y2="13"></line><line x1="18" y1="11" x2="18.01" y2="11"></line><rect x="2" y="6" width="20" height="12" rx="3"></rect></svg>
             <span>Adivinar Jugador</span>
           </button>
         </nav>
@@ -182,7 +182,7 @@ function renderMainLayout(isGuest) {
         <!-- Banner de Modo Demo -->
         ${isGuest ? `
           <div class="demo-banner">
-            🎮 <strong>Modo Demo Activo:</strong> Estás probando la app en local sin cuenta. 
+            <strong>Modo Demo Activo:</strong> Estás probando la app en local sin cuenta. 
             <a href="#" id="banner-login-link">Registra tu Liga Real</a>
           </div>
         ` : ''}
@@ -549,7 +549,7 @@ function showSupportModal() {
           </div>
 
           <button type="submit" class="btn-primary" style="font-weight: 700; padding: 0.7rem; font-size: 0.95rem;">
-            ✉️ Enviar Consulta
+            Enviar Consulta
           </button>
         </form>
 
@@ -558,7 +558,7 @@ function showSupportModal() {
           <div style="display: flex; gap: 0.5rem; width: 100%;">
             <input type="text" readonly class="input-field" value="soporte@castigosfantasy.com" style="text-align: center; font-weight: 700; background: rgba(0,0,0,0.15); padding: 0.5rem;" />
             <button id="copy-support-email-btn" class="btn-secondary" style="width: auto; padding: 0.5rem 1rem; font-size: 0.85rem; white-space: nowrap;">
-              📋 Copiar
+              Copiar
             </button>
           </div>
         </div>

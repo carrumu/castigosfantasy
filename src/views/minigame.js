@@ -504,7 +504,7 @@ export function renderMinigame(container, callbacks) {
         <!-- Header Info -->
         <div style="width: 100%; text-align: center; margin-bottom: 1rem; position: relative;">
           <h1 class="gradient-text-green" style="font-size: 1.6rem; font-weight: 900; margin-bottom: 0.25rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
-            ⚽ Adivina el Jugador
+            Adivina el Jugador
             ${currentStreak > 0 ? `
               <span class="streak-badge" style="
                 font-size: 0.95rem; 
@@ -519,7 +519,7 @@ export function renderMinigame(container, callbacks) {
                 font-weight: 700;
                 vertical-align: middle;
                 animation: pulseBadge 2s infinite ease-in-out;
-              ">🔥 ${currentStreak}</span>
+              ">Racha: ${currentStreak}</span>
             ` : ''}
           </h1>
           <p style="font-size: 0.8rem; color: var(--text-muted);">
@@ -529,12 +529,12 @@ export function renderMinigame(container, callbacks) {
           <!-- Mode switches & stats icon -->
           <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-top: 0.75rem; gap: 0.5rem;">
             <div>
-              <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">⚠️ Solo un intento al día</span>
+              <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">Solo un intento al día</span>
             </div>
             
             <div style="display: flex; gap: 0.5rem;">
               <button id="show-stats-btn" class="btn-secondary" style="font-size: 0.75rem; padding: 0.4rem 0.75rem; border-radius: 8px;" title="Ver Estadísticas">
-                📊 Estadísticas
+                Estadísticas
               </button>
             </div>
           </div>

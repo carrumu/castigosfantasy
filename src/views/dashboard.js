@@ -170,7 +170,7 @@ export function renderDashboard(container, callbacks) {
       <div class="container">
         <div style="text-align: center; margin-bottom: 2rem;">
           <h1 class="logo gradient-text-gold" style="justify-content: center; font-size: 2rem; margin-bottom: 0.5rem;">
-            ⚽ ¡Bienvenido, Míster!
+            ¡Bienvenido, Míster!
           </h1>
           <p style="color: var(--text-muted);">Para empezar a picar a tus amigos, debes crear una liga privada o unirte a una existente.</p>
         </div>
@@ -186,9 +186,9 @@ export function renderDashboard(container, callbacks) {
             <div class="form-group">
               <label for="new-league-features">Funcionalidades Activas</label>
               <select id="new-league-features" class="input-field">
-                <option value="both">🎡 Ruleta + 💰 Registro de Deudas (Ambos)</option>
-                <option value="wheel">🎡 Solo Ruleta de Castigos (Sin deudas)</option>
-                <option value="money">💰 Solo Registro de Deudas/Bote (Sin ruleta)</option>
+                <option value="both">Ruleta + Registro de Deudas (Ambos)</option>
+                <option value="wheel">Solo Ruleta de Castigos (Sin deudas)</option>
+                <option value="money">Solo Registro de Deudas/Bote (Sin ruleta)</option>
               </select>
             </div>
             <button type="submit" class="btn-primary" id="btn-create">Crear Liga</button>
@@ -459,20 +459,20 @@ export function renderDashboard(container, callbacks) {
         <!-- Banner de Liga -->
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
           <div>
-            <h1 class="gradient-text-green" style="font-size: 1.6rem; font-weight: 900;">🏆 ${currentLeague.name}</h1>
+            <h1 class="gradient-text-green" style="font-size: 1.6rem; font-weight: 900;">${currentLeague.name}</h1>
             <p style="font-size: 0.85rem; color: var(--text-muted);">
-              Código de Invitación: <strong style="color: var(--accent-gold); cursor: pointer;" id="copy-invite-code" title="Copiar código">${currentLeague.invite_code} 📋</strong>
+              Código de Invitación: <strong style="color: var(--accent-gold); cursor: pointer;" id="copy-invite-code" title="Copiar código">${currentLeague.invite_code} (Copiar)</strong>
             </p>
           </div>
          <div style="display: flex; gap: 0.5rem; align-items: center;">
             ${isGuest ? `
               <button class="header-action-btn btn-danger" id="btn-exit-demo-league" title="Cambiar de Liga Demo" style="padding: 0.65rem 1rem; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 0.4rem;">
-                🚪 Cambiar Liga
+                Cambiar Liga
               </button>
             ` : ''}
             ${(isGuest || isAdmin) ? `
               <button class="header-action-btn" id="btn-league-settings" title="Configurar Liga" style="padding: 0.65rem 1rem; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 0.4rem; border-color: var(--border-color-glow);">
-                ⚙️ Ajustar Liga
+                Ajustar Liga
               </button>
             ` : ''}
           </div>
@@ -481,7 +481,7 @@ export function renderDashboard(container, callbacks) {
         <div class="dashboard-grid" style="grid-template-columns: ${features === 'wheel' ? '1fr 1fr' : ''};">
           <!-- Muro de la Vergüenza -->
           <div class="card glass pitch-card" style="margin-bottom: 0;">
-            <h2 class="card-title gradient-text-gold">💀 Muro de la Vergüenza</h2>
+            <h2 class="card-title gradient-text-gold">Muro de la Vergüenza</h2>
             <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem;">
               ${features === 'wheel' ? 'Ranking acumulado del que más veces ha quedado último.' : 'Ranking del que más debe al bote común y más veces ha sido último.'}
             </p>
@@ -563,11 +563,11 @@ export function renderDashboard(container, callbacks) {
       <div class="modal-overlay" id="loser-modal">
         <div class="modal-content glass">
           <div class="modal-header">
-            <h3 class="gradient-text-gold" style="font-weight: 800; font-size: 1.25rem;">🤫 Pique de la Jornada</h3>
+            <h3 class="gradient-text-gold" style="font-weight: 800; font-size: 1.25rem;">Pique de la Jornada</h3>
             <button class="modal-close" id="close-modal-btn">✕</button>
           </div>
           <div class="modal-body" style="text-align: center;">
-            <div style="font-size: 3rem; margin-bottom: 1rem;">🤦‍♂️</div>
+            <div style="font-size: 3rem; margin-bottom: 1rem;"></div>
             <p id="modal-desc" style="font-size: 1rem; margin-bottom: 1rem;"></p>
             
             <div class="pique-box">
@@ -577,7 +577,7 @@ export function renderDashboard(container, callbacks) {
 
             <div style="margin-top: 2rem; display: flex; flex-direction: column; gap: 0.75rem;">
               ${features !== 'money' ? `
-                <button class="btn-primary" id="go-to-wheel-btn">🔥 Girar Ruleta de Castigos</button>
+                <button class="btn-primary" id="go-to-wheel-btn">Girar Ruleta de Castigos</button>
               ` : ''}
               <button class="btn-secondary" id="stay-dashboard-btn">${features === 'money' ? 'Entendido' : 'Cerrar'}</button>
             </div>
@@ -589,7 +589,7 @@ export function renderDashboard(container, callbacks) {
       <div class="modal-overlay" id="league-settings-modal">
         <div class="modal-content glass">
           <div class="modal-header">
-            <h3 class="gradient-text-gold" style="font-weight: 800; font-size: 1.25rem;">⚙️ Ajustes de la Liga</h3>
+            <h3 class="gradient-text-gold" style="font-weight: 800; font-size: 1.25rem;">Ajustes de la Liga</h3>
             <button class="modal-close" id="close-settings-modal-btn">✕</button>
           </div>
           <div class="modal-body">
@@ -601,9 +601,9 @@ export function renderDashboard(container, callbacks) {
               <div class="form-group">
                 <label for="edit-league-features">Funcionalidades Activas</label>
                 <select id="edit-league-features" class="input-field">
-                  <option value="both" ${features === 'both' ? 'selected' : ''}>🎡 Ruleta + 💰 Registro de Deudas (Ambos)</option>
-                  <option value="wheel" ${features === 'wheel' ? 'selected' : ''}>🎡 Solo Ruleta de Castigos (Sin deudas)</option>
-                  <option value="money" ${features === 'money' ? 'selected' : ''}>💰 Solo Registro de Deudas/Bote (Sin ruleta)</option>
+                  <option value="both" ${features === 'both' ? 'selected' : ''}>Ruleta + Registro de Deudas (Ambos)</option>
+                  <option value="wheel" ${features === 'wheel' ? 'selected' : ''}>Solo Ruleta de Castigos (Sin deudas)</option>
+                  <option value="money" ${features === 'money' ? 'selected' : ''}>Solo Registro de Deudas/Bote (Sin ruleta)</option>
                 </select>
               </div>
               <button type="submit" class="btn-primary" id="btn-save-settings" style="margin-top: 1.5rem;">
@@ -759,7 +759,7 @@ export function renderDashboard(container, callbacks) {
           statusBox.style.background = 'rgba(239, 68, 68, 0.1)';
           statusBox.style.border = '1px solid rgba(239, 68, 68, 0.3)';
           statusBox.style.color = '#fca5a5';
-          statusBox.innerHTML = `⚠️ <strong>Error de configuración:</strong> Configura tu Gemini API Key en Ajustes (icono ⚙️ en la cabecera) para poder usar la lectura por IA.`;
+          statusBox.innerHTML = `<strong>Error de configuración:</strong> Configura tu Gemini API Key en Ajustes (icono de ajustes en la cabecera) para poder usar la lectura por IA.`;
           screenshotInput.value = '';
           return;
         }
@@ -835,12 +835,12 @@ export function renderDashboard(container, callbacks) {
                 statusBox.style.background = 'rgba(var(--primary-rgb), 0.1)';
                 statusBox.style.border = '1px solid rgba(var(--primary-rgb), 0.3)';
                 statusBox.style.color = 'var(--text-light)';
-                statusBox.innerHTML = `🤖 <strong>IA detectó perdedor:</strong> Hemos marcado a <strong>${matchedMember.display_name}</strong> (leído como "${detectedLoserName}"). Confirma los datos o cámbialo si es incorrecto.`;
+                statusBox.innerHTML = `<strong>IA detectó perdedor:</strong> Hemos marcado a <strong>${matchedMember.display_name}</strong> (leído como "${detectedLoserName}"). Confirma los datos o cámbialo si es incorrecto.`;
               } else {
                 statusBox.style.background = 'rgba(var(--accent-rgb), 0.1)';
                 statusBox.style.border = '1px solid rgba(var(--accent-rgb), 0.3)';
                 statusBox.style.color = 'var(--text-light)';
-                statusBox.innerHTML = `⚠️ <strong>IA leyó perdedor:</strong> Se detectó a "${detectedLoserName}", pero no coincide con ningún miembro de tu liga. Selecciónalo manualmente.`;
+                statusBox.innerHTML = `<strong>IA leyó perdedor:</strong> Se detectó a "${detectedLoserName}", pero no coincide con ningún miembro de tu liga. Selecciónalo manualmente.`;
                 screenshotInput.value = '';
               }
 
@@ -849,7 +849,7 @@ export function renderDashboard(container, callbacks) {
               statusBox.style.background = 'rgba(239, 68, 68, 0.1)';
               statusBox.style.border = '1px solid rgba(239, 68, 68, 0.3)';
               statusBox.style.color = '#fca5a5';
-              statusBox.innerHTML = `❌ <strong>Error de análisis:</strong> ${innerErr.message}`;
+              statusBox.innerHTML = `<strong>Error de análisis:</strong> ${innerErr.message}`;
               screenshotInput.value = '';
             }
           };
@@ -858,7 +858,7 @@ export function renderDashboard(container, callbacks) {
           statusBox.style.background = 'rgba(239, 68, 68, 0.1)';
           statusBox.style.border = '1px solid rgba(239, 68, 68, 0.3)';
           statusBox.style.color = '#fca5a5';
-          statusBox.innerHTML = `❌ <strong>Error al cargar archivo:</strong> ${fileErr.message}`;
+          statusBox.innerHTML = `<strong>Error al cargar archivo:</strong> ${fileErr.message}`;
           screenshotInput.value = '';
         }
       });

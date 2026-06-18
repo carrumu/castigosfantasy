@@ -21,7 +21,7 @@ export function renderAuth(container, callbacks) {
       container.innerHTML = `
         <div class="container" style="display: flex; align-items: center; justify-content: center; min-height: 80vh;">
           <div class="card glass pitch-card" style="width: 100%; max-width: 420px;">
-            <h2 class="card-title gradient-text-gold">⚙️ Ajustes de Ligas & APIs</h2>
+            <h2 class="card-title gradient-text-gold">Ajustes de Ligas & APIs</h2>
             
             <div style="margin-bottom: 1.5rem; font-size: 0.9rem; padding: 0.75rem; background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 8px;">
               <span style="color: var(--text-muted);">Sesión iniciada como:</span><br>
