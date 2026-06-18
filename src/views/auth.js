@@ -25,7 +25,7 @@ export function renderAuth(container, callbacks) {
             
             <div style="margin-bottom: 1.5rem; font-size: 0.9rem; padding: 0.75rem; background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 8px;">
               <span style="color: var(--text-muted);">Sesión iniciada como:</span><br>
-              <strong style="color: var(--primary-green);">${user.email}</strong>
+              <strong style="color: var(--primary);">${user.email}</strong>
             </div>
 
             <form id="settings-form">
@@ -134,7 +134,7 @@ export function renderAuth(container, callbacks) {
       <div class="container" style="display: flex; align-items: center; justify-content: center; min-height: 80vh;">
         <div class="card glass pitch-card" style="width: 100%; max-width: 400px;">
             <div style="display: flex; flex-direction: column; align-items: center; margin-bottom: 1rem;">
-              <img src="/logo.png" alt="CastigoFantasy Logo" style="width: 90px; height: 90px; border-radius: 16px; object-fit: cover; border: 2px solid var(--border-color-glow); margin-bottom: 0.75rem; box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);" />
+              <img src="/logo.png" alt="CastigoFantasy Logo" style="width: 90px; height: 90px; border-radius: 16px; object-fit: cover; border: 2px solid var(--border-color-glow); margin-bottom: 0.75rem; box-shadow: 0 0 20px rgba(var(--primary-rgb), 0.2);" />
               <h1 class="logo gradient-text-green" style="justify-content: center; font-size: 1.9rem; font-weight: 900; margin-bottom: 0.25rem;">
                 CastigoFantasy
               </h1>
@@ -164,8 +164,29 @@ export function renderAuth(container, callbacks) {
             </button>
           </form>
 
+          <div class="social-divider">o continuar con</div>
+
+          <div class="social-login-container">
+            <button type="button" id="google-login-btn" class="btn-social btn-google">
+              <svg width="18" height="18" viewBox="0 0 18 18">
+                <path fill="#4285F4" d="M17.64 9.2c0-.63-.06-1.25-.16-1.84H9v3.47h4.84c-.21 1.12-.84 2.07-1.8 2.7v2.24h2.9c1.7-1.57 2.7-3.88 2.7-6.57z"/>
+                <path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.23l-2.9-2.24c-.8.54-1.84.87-3.06.87-2.35 0-4.35-1.59-5.06-3.73H.95v2.3C2.43 15.89 5.5 18 9 18z"/>
+                <path fill="#FBBC05" d="M3.94 10.67c-.18-.54-.28-1.12-.28-1.67s.1-1.13.28-1.67V5.03H.95C.34 6.22 0 7.57 0 9s.34 2.78.95 3.97l2.99-2.3z"/>
+                <path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58C13.47.8 11.43 0 9 0 5.5 0 2.43 2.11.95 5.03l2.99 2.3c.71-2.14 2.71-3.75 5.06-3.75z"/>
+              </svg>
+              Google
+            </button>
+            
+            <button type="button" id="apple-login-btn" class="btn-social btn-apple">
+              <svg width="16" height="16" viewBox="0 0 18 18" fill="currentColor">
+                <path d="M15.56 10.3c-.04-2.16 1.76-3.2 1.84-3.26-1.01-1.48-2.58-1.68-3.13-1.72-1.33-.14-2.61.78-3.28.78-.68 0-1.74-.77-2.85-.75-1.46.02-2.81.85-3.56 2.16-1.52 2.63-.39 6.51 1.09 8.65.72 1.04 1.58 2.21 2.7 2.17 1.08-.04 1.49-.7 2.8-.7s1.68.7 2.8.67c1.14-.02 1.9-.1 2.62-1.15.83-1.22 1.17-2.4 1.19-2.47-.02-.01-2.3-1.04-2.32-3.09zm-2.02-6.52c.6-1.14 1.38-2.16 1.25-3.18-.89.04-1.97.6-2.61 1.35-.54.63-1.01 1.66-.88 2.67.99.08 2.01-.47 2.24-.84z"/>
+              </svg>
+              Apple
+            </button>
+          </div>
+
           <div style="text-align: center; margin-top: 1.25rem; display: flex; flex-direction: column; gap: 0.5rem; align-items: center;">
-            <button id="toggle-mode-btn" style="background: transparent; border: none; color: var(--primary-green); font-family: var(--font-sans); font-weight: 600; cursor: pointer; font-size: 0.9rem;">
+            <button id="toggle-mode-btn" style="background: transparent; border: none; color: var(--primary); font-family: var(--font-sans); font-weight: 600; cursor: pointer; font-size: 0.9rem;">
               ${isLoginMode ? '¿No tienes cuenta? Regístrate' : '¿Ya tienes cuenta? Inicia sesión'}
             </button>
             <button id="back-to-demo-btn" style="background: transparent; border: none; color: var(--text-muted); font-family: var(--font-sans); font-weight: 500; cursor: pointer; font-size: 0.85rem; text-decoration: underline;">
@@ -179,6 +200,42 @@ export function renderAuth(container, callbacks) {
     const form = container.querySelector('#auth-form');
     const toggleBtn = container.querySelector('#toggle-mode-btn');
     const backBtn = container.querySelector('#back-to-demo-btn');
+
+    const googleBtn = container.querySelector('#google-login-btn');
+    if (googleBtn) {
+      googleBtn.addEventListener('click', async () => {
+        try {
+          const { error } = await supabase.auth.signInWithOAuth({
+            provider: 'google',
+            options: {
+              redirectTo: window.location.origin
+            }
+          });
+          if (error) throw error;
+        } catch (err) {
+          console.error(err);
+          callbacks.showToast(err.message || 'Error al conectar con Google', 'error');
+        }
+      });
+    }
+
+    const appleBtn = container.querySelector('#apple-login-btn');
+    if (appleBtn) {
+      appleBtn.addEventListener('click', async () => {
+        try {
+          const { error } = await supabase.auth.signInWithOAuth({
+            provider: 'apple',
+            options: {
+              redirectTo: window.location.origin
+            }
+          });
+          if (error) throw error;
+        } catch (err) {
+          console.error(err);
+          callbacks.showToast(err.message || 'Error al conectar con Apple', 'error');
+        }
+      });
+    }
 
     toggleBtn.addEventListener('click', () => {
       isLoginMode = !isLoginMode;

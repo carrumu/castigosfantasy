@@ -419,7 +419,7 @@ export function renderMinigame(container, callbacks) {
           ${won ? '🎉 ¡Has acertado!' : '😢 Fin de la partida'}
         </h2>
         <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.25rem;">
-          El jugador secreto era: <strong style="color: var(--accent-gold); font-size: 1.1rem; letter-spacing: 1px;">${secretPlayer}</strong>
+          El jugador secreto era: <strong style="color: var(--accent); font-size: 1.1rem; letter-spacing: 1px;">${secretPlayer}</strong>
         </p>
 
         <!-- Stats Grid -->
@@ -456,7 +456,7 @@ export function renderMinigame(container, callbacks) {
                   <div style="flex-grow: 1; background: rgba(255,255,255,0.03); height: 18px; border-radius: 4px; overflow: hidden; position: relative;">
                     <div style="
                       width: ${percent}%; 
-                      background: ${isCurrentAttempt ? 'var(--primary-green)' : '#4b5563'}; 
+                      background: ${isCurrentAttempt ? 'var(--primary)' : '#4b5563'}; 
                       height: 100%; 
                       display: flex; 
                       align-items: center; 
@@ -508,14 +508,14 @@ export function renderMinigame(container, callbacks) {
             ${currentStreak > 0 ? `
               <span class="streak-badge" style="
                 font-size: 0.95rem; 
-                background: rgba(245, 158, 11, 0.12); 
-                color: var(--accent-gold); 
+                background: rgba(var(--accent-rgb), 0.12); 
+                color: var(--accent); 
                 padding: 0.15rem 0.5rem; 
                 border-radius: 20px; 
                 display: inline-flex; 
                 align-items: center; 
                 gap: 0.2rem; 
-                border: 1px solid rgba(245, 158, 11, 0.25);
+                border: 1px solid rgba(var(--accent-rgb), 0.25);
                 font-weight: 700;
                 vertical-align: middle;
                 animation: pulseBadge 2s infinite ease-in-out;
@@ -543,11 +543,11 @@ export function renderMinigame(container, callbacks) {
         <!-- Banner de partida terminada -->
         ${gameStatus !== 'IN_PROGRESS' ? `
           <div class="card glass" style="width: 100%; padding: 1.25rem; text-align: center; margin-bottom: 1.25rem; border: 1px solid var(--border-color-glow);">
-            <h3 style="font-size: 1.05rem; margin-bottom: 0.35rem; color: ${gameStatus === 'WON' ? 'var(--primary-green)' : 'var(--danger)'};">
+            <h3 style="font-size: 1.05rem; margin-bottom: 0.35rem; color: ${gameStatus === 'WON' ? 'var(--primary)' : 'var(--danger)'};">
               ${gameStatus === 'WON' ? '🎉 ¡Enhorabuena! Has acertado.' : '😢 Has agotado tus 6 intentos.'}
             </h3>
             <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
-              El jugador de hoy era: <strong style="color: var(--accent-gold); letter-spacing: 0.5px;">${secretPlayer}</strong>. Vuelve mañana para un nuevo reto.
+              El jugador de hoy era: <strong style="color: var(--accent); letter-spacing: 0.5px;">${secretPlayer}</strong>. Vuelve mañana para un nuevo reto.
             </p>
             <button id="banner-share-btn" class="btn-primary" style="font-size: 0.8rem; padding: 0.5rem 1rem; margin: 0 auto; display: flex; align-items: center; gap: 0.5rem; justify-content: center;">
               <span>📋 Compartir Resultado</span>
@@ -644,8 +644,8 @@ export function renderMinigame(container, callbacks) {
                     border-radius: 6px;
                     border: none;
                     background: ${
-                      state === 'correct' ? 'var(--primary-green)' :
-                      state === 'present' ? 'var(--accent-gold)' :
+                      state === 'correct' ? 'var(--primary)' :
+                      state === 'present' ? 'var(--accent)' :
                       state === 'absent' ? '#272d31' :
                       '#3c444a'
                     };

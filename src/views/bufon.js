@@ -6,6 +6,7 @@
  * @param {Function} callbacks.showToast 
  */
 export function renderBufon(container, callbacks) {
+  const isGuest = callbacks.isGuest;
   
   // Default Initial Data
   const DEFAULT_NOMINEES = [
@@ -162,7 +163,7 @@ export function renderBufon(container, callbacks) {
                     return `
                       <div class="card" style="
                         background: rgba(255, 255, 255, 0.01); 
-                        border: 1px solid ${isVoted ? 'var(--accent-gold)' : 'var(--border-color)'}; 
+                        border: 1px solid ${isVoted ? 'var(--accent)' : 'var(--border-color)'}; 
                         padding: 1.25rem; 
                         margin: 0; 
                         position: relative; 
@@ -176,7 +177,7 @@ export function renderBufon(container, callbacks) {
                           top: 0; 
                           bottom: 0; 
                           width: ${percent}%; 
-                          background: rgba(245, 158, 11, 0.04); 
+                          background: rgba(var(--accent-rgb), 0.04); 
                           transition: width 0.6s ease; 
                           pointer-events: none; 
                           z-index: 1;
@@ -185,7 +186,7 @@ export function renderBufon(container, callbacks) {
                         <div style="position: relative; z-index: 2; display: flex; justify-content: space-between; align-items: start; gap: 1rem;">
                           <div style="flex-grow: 1;">
                             <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
-                              <h4 style="font-size: 1.1rem; font-weight: 800; color: ${isVoted ? 'var(--accent-gold)' : 'var(--text-light)'};">
+                              <h4 style="font-size: 1.1rem; font-weight: 800; color: ${isVoted ? 'var(--accent)' : 'var(--text-light)'};">
                                 ${n.name}
                               </h4>
                               <span style="font-size: 0.7rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); padding: 0.15rem 0.4rem; border-radius: 4px; color: var(--text-muted); font-weight: 600;">
@@ -195,7 +196,7 @@ export function renderBufon(container, callbacks) {
                             <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.4;">${n.reason}</p>
                           </div>
                           <div style="text-align: right; min-width: 80px;">
-                            <span style="font-weight: 800; font-size: 1.2rem; color: var(--accent-gold);">${percent}%</span>
+                            <span style="font-weight: 800; font-size: 1.2rem; color: var(--accent);">${percent}%</span>
                             <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.1rem;">${n.votes} votos</div>
                           </div>
                         </div>
@@ -203,13 +204,13 @@ export function renderBufon(container, callbacks) {
                         <div style="margin-top: 1rem; display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 2;">
                           <!-- Bar track visual slider -->
                           <div style="flex-grow: 1; height: 6px; background: rgba(255, 255, 255, 0.05); border-radius: 3px; margin-right: 1.5rem; overflow: hidden;">
-                            <div style="height: 100%; width: ${percent}%; background: ${isVoted ? 'var(--accent-gold)' : 'var(--text-muted)'}; border-radius: 3px; transition: width 0.6s ease;"></div>
+                            <div style="height: 100%; width: ${percent}%; background: ${isVoted ? 'var(--accent)' : 'var(--text-muted)'}; border-radius: 3px; transition: width 0.6s ease;"></div>
                           </div>
 
                           <button class="btn-vote-bufon" data-id="${n.id}" style="
-                            background: ${isVoted ? 'var(--accent-gold)' : 'rgba(255, 255, 255, 0.05)'};
-                            color: ${isVoted ? '#000' : 'var(--text-light)'};
-                            border: 1px solid ${isVoted ? 'var(--accent-gold)' : 'var(--border-color)'};
+                            background: ${isVoted ? 'var(--accent)' : 'rgba(255, 255, 255, 0.05)'};
+                            color: ${isVoted ? '#fff' : 'var(--text-light)'};
+                            border: 1px solid ${isVoted ? 'var(--accent)' : 'var(--border-color)'};
                             font-family: var(--font-sans);
                             font-weight: 800;
                             font-size: 0.75rem;
@@ -278,13 +279,13 @@ export function renderBufon(container, callbacks) {
                   <div style="
                     border: 1px solid var(--border-color);
                     background: rgba(0,0,0,0.15);
-                    border-left: 3px solid var(--accent-gold);
+                    border-left: 3px solid var(--accent);
                     border-radius: 0 10px 10px 0;
                     padding: 0.85rem 1rem;
                     font-size: 0.85rem;
                   ">
                     <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
-                      <strong style="color: var(--accent-gold);">Jornada ${h.matchday}</strong>
+                      <strong style="color: var(--accent);">Jornada ${h.matchday}</strong>
                       <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700;">
                         ${h.team}
                       </span>
@@ -307,6 +308,11 @@ export function renderBufon(container, callbacks) {
     // Hook Vote buttons
     container.querySelectorAll('.btn-vote-bufon').forEach(btn => {
       btn.addEventListener('click', () => {
+        if (isGuest) {
+          callbacks.showToast('Inicia sesión para votar por el Bufón de la jornada', 'warning');
+          callbacks.onNavigate('auth');
+          return;
+        }
         const id = Number(btn.dataset.id);
         handleVote(id);
       });

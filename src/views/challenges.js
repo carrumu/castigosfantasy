@@ -67,19 +67,19 @@ export function renderChallenges(container, callbacks) {
                 const percent = totalVotes > 0 ? Math.round((item.votes / totalVotes) * 100) : 0;
                 const isThisVoted = userVotedId == item.id;
                 return `
-                  <div class="card" style="background: rgba(255, 255, 255, 0.02); border: 1px solid ${isThisVoted ? 'var(--primary-green)' : 'var(--border-color)'}; padding: 1.25rem; margin: 0; position: relative; overflow: hidden; border-radius: 12px;">
+                  <div class="card" style="background: rgba(255, 255, 255, 0.02); border: 1px solid ${isThisVoted ? 'var(--primary)' : 'var(--border-color)'}; padding: 1.25rem; margin: 0; position: relative; overflow: hidden; border-radius: 12px;">
                     <!-- Background fill for visual progress bar -->
-                    <div style="position: absolute; left: 0; top: 0; bottom: 0; width: ${percent}%; background: rgba(16, 185, 129, 0.04); transition: width 0.6s ease; pointer-events: none; z-index: 1;"></div>
+                    <div style="position: absolute; left: 0; top: 0; bottom: 0; width: ${percent}%; background: rgba(var(--primary-rgb), 0.04); transition: width 0.6s ease; pointer-events: none; z-index: 1;"></div>
                     
                     <div style="position: relative; z-index: 2; display: flex; justify-content: space-between; align-items: start; gap: 1rem;">
                       <div style="flex-grow: 1;">
-                        <h4 style="font-size: 1.05rem; font-weight: 700; color: ${isThisVoted ? 'var(--primary-green)' : 'var(--text-light)'}; margin-bottom: 0.25rem;">
+                        <h4 style="font-size: 1.05rem; font-weight: 700; color: ${isThisVoted ? 'var(--primary)' : 'var(--text-light)'}; margin-bottom: 0.25rem;">
                           ${item.title}
                         </h4>
                         <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.4;">${item.desc}</p>
                       </div>
                       <div style="text-align: right; min-width: 80px;">
-                        <span style="font-weight: 800; font-size: 1.15rem; color: var(--primary-green);">${percent}%</span>
+                        <span style="font-weight: 800; font-size: 1.15rem; color: var(--primary);">${percent}%</span>
                         <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.1rem;">${item.votes} votos</div>
                       </div>
                     </div>
@@ -87,13 +87,13 @@ export function renderChallenges(container, callbacks) {
                     <div style="margin-top: 1rem; display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 2;">
                       <!-- Visual progress bar slider -->
                       <div style="flex-grow: 1; height: 6px; background: rgba(255, 255, 255, 0.05); border-radius: 3px; margin-right: 1.5rem; overflow: hidden;">
-                        <div style="height: 100%; width: ${percent}%; background: ${isThisVoted ? 'var(--primary-green)' : 'var(--text-muted)'}; border-radius: 3px; transition: width 0.6s ease;"></div>
+                        <div style="height: 100%; width: ${percent}%; background: ${isThisVoted ? 'var(--primary)' : 'var(--text-muted)'}; border-radius: 3px; transition: width 0.6s ease;"></div>
                       </div>
                       
                       <button class="btn-vote" data-id="${item.id}" style="
-                        background: ${isThisVoted ? 'var(--primary-green)' : 'rgba(255, 255, 255, 0.05)'};
+                        background: ${isThisVoted ? 'var(--primary)' : 'rgba(255, 255, 255, 0.05)'};
                         color: ${isThisVoted ? '#fff' : 'var(--text-light)'};
-                        border: 1px solid ${isThisVoted ? 'var(--primary-green)' : 'var(--border-color)'};
+                        border: 1px solid ${isThisVoted ? 'var(--primary)' : 'var(--border-color)'};
                         font-family: var(--font-sans);
                         font-weight: 700;
                         font-size: 0.75rem;
@@ -118,22 +118,22 @@ export function renderChallenges(container, callbacks) {
               <h3 class="card-title" style="font-size: 1.05rem; margin-bottom: 0.75rem;">⏳ Cierre de Votación</h3>
               <div style="display: flex; justify-content: space-around; text-align: center; background: rgba(0,0,0,0.2); padding: 0.85rem; border-radius: 12px; border: 1px solid var(--border-color);">
                 <div>
-                  <div id="days" style="font-size: 1.5rem; font-weight: 800; color: var(--accent-gold);">00</div>
+                  <div id="days" style="font-size: 1.5rem; font-weight: 800; color: var(--accent);">00</div>
                   <div style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase;">Días</div>
                 </div>
                 <div style="font-size: 1.5rem; font-weight: 800; color: var(--border-color-glow);">:</div>
                 <div>
-                  <div id="hours" style="font-size: 1.5rem; font-weight: 800; color: var(--accent-gold);">00</div>
+                  <div id="hours" style="font-size: 1.5rem; font-weight: 800; color: var(--accent);">00</div>
                   <div style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase;">Hrs</div>
                 </div>
                 <div style="font-size: 1.5rem; font-weight: 800; color: var(--border-color-glow);">:</div>
                 <div>
-                  <div id="minutes" style="font-size: 1.5rem; font-weight: 800; color: var(--accent-gold);">00</div>
+                  <div id="minutes" style="font-size: 1.5rem; font-weight: 800; color: var(--accent);">00</div>
                   <div style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase;">Min</div>
                 </div>
                 <div style="font-size: 1.5rem; font-weight: 800; color: var(--border-color-glow);">:</div>
                 <div>
-                  <div id="seconds" style="font-size: 1.5rem; font-weight: 800; color: var(--primary-green);">00</div>
+                  <div id="seconds" style="font-size: 1.5rem; font-weight: 800; color: var(--primary);">00</div>
                   <div style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase;">Seg</div>
                 </div>
               </div>
@@ -149,7 +149,7 @@ export function renderChallenges(container, callbacks) {
                 ${piques.map(p => `
                   <div style="background: rgba(255,255,255,0.01); border: 1px solid var(--border-color); padding: 0.6rem 0.8rem; border-radius: 8px; font-size: 0.85rem;">
                     <div style="display: flex; justify-content: space-between; margin-bottom: 0.15rem;">
-                      <strong style="color: var(--primary-green);">${p.sender}</strong>
+                      <strong style="color: var(--primary);">${p.sender}</strong>
                       <span style="font-size: 0.7rem; color: var(--text-muted);">${p.time}</span>
                     </div>
                     <p style="color: var(--text-light); font-style: italic;">"${p.text}"</p>
@@ -168,10 +168,10 @@ export function renderChallenges(container, callbacks) {
               <h3 class="card-title" style="font-size: 1.05rem; margin-bottom: 1rem;">📋 Historial de Penitencias</h3>
               <div style="display: flex; flex-direction: column; gap: 0.75rem;">
                 ${DEFAULT_HISTORY.map(h => `
-                  <div style="border-left: 2.5px solid var(--accent-gold); padding: 0.5rem 0.75rem; background: rgba(0,0,0,0.1); border-radius: 0 8px 8px 0; font-size: 0.8rem;">
+                  <div style="border-left: 2.5px solid var(--accent); padding: 0.5rem 0.75rem; background: rgba(0,0,0,0.1); border-radius: 0 8px 8px 0; font-size: 0.8rem;">
                     <div style="display: flex; justify-content: space-between; margin-bottom: 0.15rem;">
                       <strong>Jornada ${h.matchday}</strong>
-                      <span style="color: var(--accent-gold); font-weight: 700;">Perdedor: ${h.loser}</span>
+                      <span style="color: var(--accent); font-weight: 700;">Perdedor: ${h.loser}</span>
                     </div>
                     <p style="color: var(--text-muted); line-height: 1.3;">Reto: ${h.dare}</p>
                   </div>
@@ -186,6 +186,11 @@ export function renderChallenges(container, callbacks) {
     // Hook Vote Buttons
     container.querySelectorAll('.btn-vote').forEach(button => {
       button.addEventListener('click', (e) => {
+        if (isGuest) {
+          callbacks.showToast('Inicia sesión para votar en los retos semanales', 'warning');
+          callbacks.onNavigate('auth');
+          return;
+        }
         const id = Number(e.target.dataset.id);
         
         if (userVotedId == id) {

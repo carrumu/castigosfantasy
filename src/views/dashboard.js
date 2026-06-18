@@ -202,7 +202,7 @@ export function renderDashboard(container, callbacks) {
           ${savedLeagues.length > 0 ? `
             <div class="form-group" style="margin-bottom: 1.25rem;">
               <label for="saved-leagues-select">📋 Mis Ligas Guardadas</label>
-              <select id="saved-leagues-select" class="input-field" style="background: rgba(16, 185, 129, 0.08); border-color: var(--border-color-glow);">
+              <select id="saved-leagues-select" class="input-field" style="background: rgba(var(--primary-rgb), 0.08); border-color: var(--border-color-glow);">
                 <option value="">-- Selecciona una liga anterior --</option>
                 ${savedLeagues.map((l, idx) => `
                   <option value="${idx}">${l.name} (${l.inviteCode})</option>
@@ -832,14 +832,14 @@ export function renderDashboard(container, callbacks) {
 
               if (matchedMember) {
                 loserSelect.value = matchedMember.profile_id;
-                statusBox.style.background = 'rgba(16, 185, 129, 0.1)';
-                statusBox.style.border = '1px solid rgba(16, 185, 129, 0.3)';
-                statusBox.style.color = '#a7f3d0';
+                statusBox.style.background = 'rgba(var(--primary-rgb), 0.1)';
+                statusBox.style.border = '1px solid rgba(var(--primary-rgb), 0.3)';
+                statusBox.style.color = 'var(--text-light)';
                 statusBox.innerHTML = `🤖 <strong>IA detectó perdedor:</strong> Hemos marcado a <strong>${matchedMember.display_name}</strong> (leído como "${detectedLoserName}"). Confirma los datos o cámbialo si es incorrecto.`;
               } else {
-                statusBox.style.background = 'rgba(245, 158, 11, 0.1)';
-                statusBox.style.border = '1px solid rgba(245, 158, 11, 0.3)';
-                statusBox.style.color = '#fde047';
+                statusBox.style.background = 'rgba(var(--accent-rgb), 0.1)';
+                statusBox.style.border = '1px solid rgba(var(--accent-rgb), 0.3)';
+                statusBox.style.color = 'var(--text-light)';
                 statusBox.innerHTML = `⚠️ <strong>IA leyó perdedor:</strong> Se detectó a "${detectedLoserName}", pero no coincide con ningún miembro de tu liga. Selecciónalo manualmente.`;
                 screenshotInput.value = '';
               }

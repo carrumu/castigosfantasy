@@ -13,6 +13,7 @@ const app = document.querySelector('#app');
 
 // State
 let currentView = 'dashboard'; // 'dashboard', 'roulette', 'challenges', or 'auth'
+let supportBubblePos = null; // { left, top }
 
 // Dynamic Toast Helper
 export function showToast(message, type = 'info') {
@@ -63,6 +64,7 @@ async function checkAuthAndRender() {
 
 function renderMainLayout(isGuest) {
   const activeFeatures = localStorage.getItem('CF_CURRENT_LEAGUE_FEATURES') || 'both';
+  const notificationsCount = parseInt(localStorage.getItem('CF_COMMUNITY_NOTIFICATIONS_COUNT') || '0', 10);
 
   app.innerHTML = `
     <div class="app-layout">
@@ -70,7 +72,7 @@ function renderMainLayout(isGuest) {
       <aside class="sidebar" id="app-sidebar">
         <div class="sidebar-header">
           <div class="logo gradient-text-green" style="cursor: pointer; display: flex; align-items: center; gap: 0.75rem;" id="logo-home">
-            <img src="/logo.png" alt="CastigoFantasy Logo" style="width: 52px; height: 52px; border-radius: 10px; object-fit: cover; border: 1.5px solid var(--border-color-glow); box-shadow: 0 0 10px rgba(16, 185, 129, 0.15);" />
+            <img src="/logo.png" alt="CastigoFantasy Logo" style="width: 52px; height: 52px; border-radius: 10px; object-fit: cover; border: 1.5px solid var(--border-color-glow); box-shadow: 0 0 10px rgba(var(--primary-rgb), 0.15);" />
             CastigoFantasy
           </div>
           <button class="sidebar-close-btn" id="sidebar-close-btn" aria-label="Cerrar menú">✕</button>
@@ -91,22 +93,37 @@ function renderMainLayout(isGuest) {
             <span>🔥</span>
             <span>Reto Semanal</span>
           </button>
-          <button class="nav-item ${currentView === 'minigame' ? 'active' : ''}" id="nav-minigame-btn">
-            <span>🎮</span>
-            <span>Adivinar Jugador</span>
-          </button>
           <button class="nav-item ${currentView === 'bufon' ? 'active' : ''}" id="nav-bufon-btn">
             <span>🤡</span>
             <span>El Bufón</span>
           </button>
-          <button class="nav-item ${currentView === 'feed' ? 'active' : ''}" id="nav-feed-btn">
-            <span>📸</span>
-            <span>Comunidad</span>
+          <button class="nav-item ${currentView === 'feed' ? 'active' : ''}" id="nav-feed-btn" style="position: relative; display: flex; align-items: center; justify-content: space-between; width: 100%;">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+              <span>📸</span>
+              <span>Comunidad</span>
+            </div>
+            ${notificationsCount > 0 ? `
+              <span class="notification-badge" style="
+                background: var(--accent);
+                color: #fff;
+                font-size: 0.7rem;
+                font-weight: 800;
+                padding: 0.15rem 0.45rem;
+                border-radius: 10px;
+                line-height: 1;
+                margin-left: auto;
+                box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.4);
+              ">+${notificationsCount}</span>
+            ` : ''}
+          </button>
+          <button class="nav-item ${currentView === 'minigame' ? 'active' : ''}" id="nav-minigame-btn">
+            <span>🎮</span>
+            <span>Adivinar Jugador</span>
           </button>
         </nav>
 
         <div class="sidebar-footer">
-          <span style="font-weight: 700; color: var(--primary-green);">Ligas Fútbol Fantasy</span>
+          <span style="font-weight: 700; color: var(--primary);">Ligas Fútbol Fantasy</span>
           <span class="sidebar-version">Versión 1.1.0</span>
         </div>
       </aside>
@@ -118,22 +135,45 @@ function renderMainLayout(isGuest) {
       <div class="main-content">
         <!-- Cabecera Superior -->
         <header class="top-header">
-          <button class="menu-toggle-btn" id="menu-toggle-btn" aria-label="Abrir menú">☰</button>
+          <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <button class="menu-toggle-btn" id="menu-toggle-btn" aria-label="Abrir menú">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+              </svg>
+            </button>
+            <div class="logo gradient-text-green" style="cursor: pointer; display: flex; align-items: center; gap: 0.5rem; font-size: 1.2rem; font-weight: 700; user-select: none;" id="header-logo-home">
+              <img src="/logo.png" alt="CastigoFantasy Logo" style="width: 32px; height: 32px; border-radius: 8px; border: 1.2px solid var(--border-color-glow);" />
+              CastigoFantasy
+            </div>
+          </div>
           
           <div class="header-right">
             ${isGuest ? `
-              <button class="header-action-btn" id="nav-reset-sb-btn" title="Ajustes de APIs" style="margin-right: 0.25rem;">
-                ⚙️
-              </button>
-              <button class="nav-btn-guest" id="nav-login-btn">
-                👤 Entrar / Registro
+              <button class="nav-btn-guest" id="nav-login-btn" style="display: flex; align-items: center; gap: 0.5rem; font-weight: 700; font-size: 0.85rem;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                  <polyline points="10 17 15 12 10 7"></polyline>
+                  <line x1="15" y1="12" x2="3" y2="12"></line>
+                </svg>
+                Login / Register
               </button>
             ` : `
-              <button class="header-action-btn" id="nav-reset-sb-btn" title="Ajustes de APIs">
-                ⚙️ Ajustes
+              <button class="header-action-btn" id="nav-reset-sb-btn" title="Ajustes de APIs" style="display: flex; align-items: center; gap: 0.4rem;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="3"></circle>
+                  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                </svg>
+                Settings
               </button>
-              <button class="header-action-btn btn-danger" id="nav-logout-btn" title="Cerrar Sesión">
-                Salir ✕
+              <button class="header-action-btn btn-danger" id="nav-logout-btn" title="Cerrar Sesión" style="display: flex; align-items: center; gap: 0.4rem;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                  <polyline points="16 17 21 12 16 7"></polyline>
+                  <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+                Logout
               </button>
             `}
           </div>
@@ -149,6 +189,14 @@ function renderMainLayout(isGuest) {
 
         <!-- Contenedor de la Vista Activa -->
         <main id="view-container" class="container"></main>
+      </div>
+
+      <!-- Burbuja Flotante de Soporte -->
+      <div id="draggable-support-bubble" class="support-bubble" title="Soporte y Ayuda">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0 0 2px rgba(0,0,0,0.5));">
+          <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+          <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
       </div>
     </div>
   `;
@@ -205,6 +253,8 @@ function renderMainLayout(isGuest) {
     });
   } else if (currentView === 'bufon') {
     renderBufon(viewContainer, {
+      isGuest,
+      onNavigate: navigate,
       showToast
     });
   } else if (currentView === 'feed') {
@@ -213,11 +263,22 @@ function renderMainLayout(isGuest) {
     });
   }
 
-  // Hook Navigation Elements (Cerrando el sidebar al hacer clic en móvil)
-  app.querySelector('#logo-home').addEventListener('click', () => {
-    closeSidebar();
-    navigate('dashboard');
-  });
+  // Hook Navigation Elements (Cerrando el sidebar al hacer clic en móvil/escritorio)
+  const homeBtn = app.querySelector('#logo-home');
+  if (homeBtn) {
+    homeBtn.addEventListener('click', () => {
+      closeSidebar();
+      navigate('dashboard');
+    });
+  }
+  
+  const headerHomeBtn = app.querySelector('#header-logo-home');
+  if (headerHomeBtn) {
+    headerHomeBtn.addEventListener('click', () => {
+      closeSidebar();
+      navigate('dashboard');
+    });
+  }
   app.querySelector('#nav-dash-btn').addEventListener('click', () => {
     closeSidebar();
     navigate('dashboard');
@@ -259,6 +320,7 @@ function renderMainLayout(isGuest) {
   if (feedBtn) {
     feedBtn.addEventListener('click', () => {
       closeSidebar();
+      localStorage.setItem('CF_COMMUNITY_NOTIFICATIONS_COUNT', '0');
       navigate('feed');
     });
   }
@@ -286,6 +348,121 @@ function renderMainLayout(isGuest) {
       closeSidebar();
       navigate('auth');
     });
+  }
+
+  // Draggable Support Bubble Logic
+  const bubble = app.querySelector('#draggable-support-bubble');
+  if (bubble) {
+    let isDragging = false;
+    let startX = 0;
+    let startY = 0;
+    let initialLeft = 0;
+    let initialTop = 0;
+    let hasMoved = false;
+
+    // Apply or compute position
+    if (supportBubblePos) {
+      bubble.style.position = 'fixed';
+      bubble.style.left = `${supportBubblePos.left}px`;
+      bubble.style.top = `${supportBubblePos.top}px`;
+      bubble.style.right = 'auto';
+      bubble.style.bottom = 'auto';
+    } else {
+      // Default position: bottom-right
+      const initLeft = window.innerWidth - 80;
+      const initTop = window.innerHeight - 80;
+      bubble.style.position = 'fixed';
+      bubble.style.left = `${initLeft}px`;
+      bubble.style.top = `${initTop}px`;
+      bubble.style.right = 'auto';
+      bubble.style.bottom = 'auto';
+      supportBubblePos = { left: initLeft, top: initTop };
+    }
+
+    const onStart = (clientX, clientY) => {
+      isDragging = true;
+      bubble.classList.add('dragging');
+      startX = clientX;
+      startY = clientY;
+      initialLeft = parseFloat(bubble.style.left) || 0;
+      initialTop = parseFloat(bubble.style.top) || 0;
+      hasMoved = false;
+    };
+
+    const onMove = (clientX, clientY) => {
+      if (!isDragging) return;
+      const dx = clientX - startX;
+      const dy = clientY - startY;
+      if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
+        hasMoved = true;
+      }
+      
+      let newLeft = initialLeft + dx;
+      let newTop = initialTop + dy;
+
+      // Keep within bounds
+      const minX = 10;
+      const maxX = window.innerWidth - bubble.offsetWidth - 10;
+      const minY = 10;
+      const maxY = window.innerHeight - bubble.offsetHeight - 10;
+
+      newLeft = Math.max(minX, Math.min(newLeft, maxX));
+      newTop = Math.max(minY, Math.min(newTop, maxY));
+
+      bubble.style.left = `${newLeft}px`;
+      bubble.style.top = `${newTop}px`;
+      
+      // Persist globally
+      supportBubblePos = { left: newLeft, top: newTop };
+    };
+
+    const onEnd = () => {
+      if (!isDragging) return;
+      isDragging = false;
+      bubble.classList.remove('dragging');
+      if (!hasMoved) {
+        // Open support modal
+        showSupportModal();
+      }
+    };
+
+    const onMouseMove = (e) => {
+      onMove(e.clientX, e.clientY);
+    };
+
+    const onMouseUp = () => {
+      onEnd();
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+    };
+
+    const onTouchMove = (e) => {
+      if (e.touches.length > 0) {
+        onMove(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    };
+
+    const onTouchEnd = () => {
+      onEnd();
+      document.removeEventListener('touchmove', onTouchMove);
+      document.removeEventListener('touchend', onTouchEnd);
+    };
+
+    // Attach drag triggers
+    bubble.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      onStart(e.clientX, e.clientY);
+      document.addEventListener('mousemove', onMouseMove);
+      document.addEventListener('mouseup', onMouseUp);
+    });
+
+    bubble.addEventListener('touchstart', (e) => {
+      if (e.touches.length > 0) {
+        onStart(e.touches[0].clientX, e.touches[0].clientY);
+        document.addEventListener('touchmove', onTouchMove, { passive: false });
+        document.addEventListener('touchend', onTouchEnd);
+      }
+    }, { passive: true });
   }
 }
 
@@ -317,5 +494,98 @@ if (isConfigured) {
   });
 }
 
+// Listen for notifications updates
+window.addEventListener('cf-notification-update', () => {
+  checkAuthAndRender();
+});
+
 // Start App
 checkAuthAndRender();
+
+// Support Modal Functionality
+function showSupportModal() {
+  let modal = document.querySelector('#support-modal');
+  if (modal) modal.remove();
+
+  modal = document.createElement('div');
+  modal.id = 'support-modal';
+  modal.className = 'modal-overlay active';
+  
+  let userEmail = '';
+  const storedUser = localStorage.getItem('sb-giieisavasjbijnvpsnw-auth-token');
+  if (storedUser) {
+    try {
+      userEmail = JSON.parse(storedUser)?.user?.email || '';
+    } catch {}
+  }
+
+  modal.innerHTML = `
+    <div class="modal-content glass" style="max-width: 500px; animation: slideDown 0.3s ease-out;">
+      <div class="modal-header">
+        <h3 class="gradient-text-green" style="font-weight: 800; font-size: 1.3rem; display: flex; align-items: center; gap: 0.5rem; color: var(--primary);">
+          📬 Soporte Técnico
+        </h3>
+        <button class="modal-close" id="close-support-btn">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem; line-height: 1.4;">
+          ¿Tienes alguna sugerencia, duda o problema con CastigoFantasy? Rellena el formulario o utiliza nuestro correo oficial. Responderemos a tu consulta en un plazo de 24 a 48 horas.
+        </p>
+
+        <form id="support-form" style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.25rem;">
+          <div class="form-group" style="margin-bottom: 0.75rem;">
+            <label for="support-email" style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.35rem; display: block; text-transform: uppercase;">Tu Correo Electrónico</label>
+            <input type="email" id="support-email" class="input-field" placeholder="ejemplo@correo.com" value="${userEmail}" required style="padding: 0.65rem 0.85rem;" />
+          </div>
+          
+          <div class="form-group" style="margin-bottom: 0.75rem;">
+            <label for="support-subject" style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.35rem; display: block; text-transform: uppercase;">Asunto</label>
+            <input type="text" id="support-subject" class="input-field" placeholder="Ej: Problema con la ruleta, Sugerencia de reto..." required style="padding: 0.65rem 0.85rem;" />
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0.75rem;">
+            <label for="support-message" style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.35rem; display: block; text-transform: uppercase;">Mensaje / Consulta</label>
+            <textarea id="support-message" class="input-field" rows="4" placeholder="Escribe aquí los detalles de tu consulta..." required style="resize: none; font-family: var(--font-sans); padding: 0.65rem 0.85rem;"></textarea>
+          </div>
+
+          <button type="submit" class="btn-primary" style="font-weight: 700; padding: 0.7rem; font-size: 0.95rem;">
+            ✉️ Enviar Consulta
+          </button>
+        </form>
+
+        <div style="border-top: 1px solid var(--border-color); padding-top: 1.25rem; display: flex; flex-direction: column; gap: 0.5rem; align-items: center;">
+          <span style="font-size: 0.8rem; color: var(--text-muted);">O escríbenos directamente a:</span>
+          <div style="display: flex; gap: 0.5rem; width: 100%;">
+            <input type="text" readonly class="input-field" value="soporte@castigosfantasy.com" style="text-align: center; font-weight: 700; background: rgba(0,0,0,0.15); padding: 0.5rem;" />
+            <button id="copy-support-email-btn" class="btn-secondary" style="width: auto; padding: 0.5rem 1rem; font-size: 0.85rem; white-space: nowrap;">
+              📋 Copiar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  // Close actions
+  const closeBtn = modal.querySelector('#close-support-btn');
+  closeBtn.addEventListener('click', () => modal.remove());
+
+  // Form submit
+  const form = modal.querySelector('#support-form');
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    showToast('Mensaje enviado con éxito. Responderemos a tu correo lo antes posible.', 'success');
+    modal.remove();
+  });
+
+  // Copy email action
+  const copyBtn = modal.querySelector('#copy-support-email-btn');
+  copyBtn.addEventListener('click', () => {
+    navigator.clipboard.writeText('soporte@castigosfantasy.com')
+      .then(() => showToast('Correo de soporte copiado al portapapeles', 'success'))
+      .catch(() => showToast('Error al copiar el correo', 'error'));
+  });
+}
+

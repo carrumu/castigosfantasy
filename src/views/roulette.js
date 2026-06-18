@@ -195,8 +195,8 @@ export function renderRoulette(container, callbacks) {
       <div class="container">
         <!-- Indicador de Tirada Pendiente -->
         ${pendingRecord ? `
-          <div class="supabase-banner" style="background: rgba(245, 158, 11, 0.1); border-color: rgba(245, 158, 11, 0.3); margin-bottom: 1.25rem;">
-            <div class="supabase-banner-text" style="color: #fef08a;">
+          <div class="supabase-banner" style="background: rgba(var(--accent-rgb), 0.1); border-color: rgba(var(--accent-rgb), 0.3); margin-bottom: 1.25rem;">
+            <div class="supabase-banner-text" style="color: var(--text-light);">
               🎯 Tirada pendiente para <strong>${pendingRecord.display_name}</strong> (Jornada ${pendingRecord.matchday_number}). ¡Gira la ruleta para asignarle su castigo!
             </div>
           </div>
@@ -267,7 +267,7 @@ export function renderRoulette(container, callbacks) {
                       <span class="history-loser">${item.profiles?.display_name || 'Entrenador'}</span>
                       <span class="history-date">Jornada ${item.matchday_number} (${item.amount_owed}€)</span>
                     </div>
-                    <div style="font-weight: 700; color: var(--accent-gold); margin-top: 0.25rem; font-size: 0.95rem;">
+                    <div style="font-weight: 700; color: var(--accent); margin-top: 0.25rem; font-size: 0.95rem;">
                       ⚡ ${item.punishments?.name || 'Castigo Desconocido'}
                     </div>
                     ${item.punishments?.description ? `
@@ -295,7 +295,7 @@ export function renderRoulette(container, callbacks) {
           </div>
           <div class="modal-body" style="text-align: center;">
             <div style="font-size: 4rem; margin-bottom: 1rem; animation: bounce 1s infinite alternate;">🎁</div>
-            <h2 id="result-title" style="color: var(--accent-gold); font-size: 1.4rem; font-weight: 900; margin-bottom: 0.5rem;"></h2>
+            <h2 id="result-title" style="color: var(--accent); font-size: 1.4rem; font-weight: 900; margin-bottom: 0.5rem;"></h2>
             <p id="result-desc" style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.4; margin-bottom: 1.5rem;"></p>
             
             <div style="border-top: 1px solid var(--border-color); padding-top: 1.25rem;">
@@ -419,10 +419,10 @@ export function renderRoulette(container, callbacks) {
     const arcLength = (2 * Math.PI) / punishments.length;
 
     const colors = [
-      '#10b981', // green
-      '#059669', // green dark
-      '#f59e0b', // gold
-      '#d97706', // gold dark
+      '#6366f1', // indigo
+      '#4f46e5', // indigo dark
+      '#f43f5e', // rose
+      '#db2777', // pink/rose dark
       '#1e293b', // charcoal
       '#0f172a'  // dark slate
     ];
