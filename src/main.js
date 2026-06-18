@@ -1,5 +1,6 @@
 import './style.css';
 import { supabase, isConfigured, clearSupabaseConfig } from './supabase';
+import { checkAndNotifyNewUser } from './utils/email';
 import { renderAuth } from './views/auth';
 import { renderDashboard } from './views/dashboard';
 import { renderRoulette } from './views/roulette';
@@ -52,6 +53,12 @@ async function checkAuthAndRender() {
     try {
       const session = supabase.auth.session ? supabase.auth.session() : null;
       user = session?.user || (supabase.auth.getUser ? (await supabase.auth.getUser()).data?.user : null);
+      if (user) {
+        // Asynchronously check and notify if this is a new OAuth or email sign up
+        checkAndNotifyNewUser(user).catch(err => {
+          console.error("Error al verificar/enviar notificación de nuevo usuario:", err);
+        });
+      }
     } catch (err) {
       console.warn("Could not check Supabase session, running as guest", err);
     }

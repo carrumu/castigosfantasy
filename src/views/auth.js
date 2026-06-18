@@ -1,4 +1,5 @@
 import { supabase, isConfigured, clearSupabaseConfig } from '../supabase';
+import { sendAdminNotification } from '../utils/email';
 
 /**
  * Renders the Authentication screen or Settings panel.
@@ -293,6 +294,11 @@ export function renderAuth(container, callbacks) {
             }
           });
           if (error) throw error;
+
+          // Send admin notification email asynchronously (do not block user registration UI)
+          sendAdminNotification(email, username, apodo).catch(err => {
+            console.error('Error al enviar email de notificación de admin:', err);
+          });
 
           if (data?.session) {
             callbacks.showToast('¡Cuenta creada y sesión iniciada!', 'success');

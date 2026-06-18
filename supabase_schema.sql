@@ -126,36 +126,4 @@ CREATE POLICY "Feed Comments Write" ON public.feed_comments FOR ALL USING (auth.
 CREATE POLICY "Feed Likes Read" ON public.feed_likes FOR SELECT USING (true);
 CREATE POLICY "Feed Likes Write" ON public.feed_likes FOR ALL USING (auth.role() = 'authenticated');
 
--- 9. Trigger para enviar notificación al administrador por cada registro usando pg_net
-CREATE OR REPLACE FUNCTION public.notify_admin_on_new_user()
-RETURNS trigger AS $$
-DECLARE
-  payload jsonb;
-BEGIN
-  payload := jsonb_build_object(
-    'from', 'CastigoFantasy <noreply@castigosfantasy.com>',
-    'to', 'castigosfantasy2005@gmail.com',
-    'subject', 'Nuevo Registro de Entrenador',
-    'html', '<h3>¡Nuevo registro en CastigoFantasy!</h3>' ||
-            '<p>Se ha registrado un nuevo entrenador en la plataforma:</p>' ||
-            '<ul>' ||
-            '  <li><strong>Nombre:</strong> ' || COALESCE(new.display_name, 'Sin nombre') || '</li>' ||
-            '  <li><strong>Apodo:</strong> ' || COALESCE(new.apodo, 'Sin apodo') || '</li>' ||
-            '  <li><strong>Fecha/Hora:</strong> ' || timezone('utc'::text, now()) || ' (UTC)</li>' ||
-            '</ul>'
-  );
 
-  PERFORM net.http_post(
-    url := 'https://api.resend.com/emails',
-    headers := '{"Content-Type": "application/json", "Authorization": "Bearer re_ZyCbKVQh_63jwXgxNQN4ETo4oXLAQwBks"}'::jsonb,
-    body := payload
-  );
-
-  RETURN new;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
-CREATE OR REPLACE TRIGGER on_profile_created_notify_admin
-  AFTER INSERT ON public.profiles
-  FOR EACH ROW
-  EXECUTE FUNCTION public.notify_admin_on_new_user();
