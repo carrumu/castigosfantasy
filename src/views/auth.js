@@ -9,8 +9,44 @@ import { supabase, isConfigured, clearSupabaseConfig } from '../supabase';
  */
 export function renderAuth(container, callbacks) {
   let isLoginMode = true;
+  let isVerificationPending = false;
 
   function render() {
+    if (isVerificationPending) {
+      container.innerHTML = `
+        <div class="container" style="display: flex; align-items: center; justify-content: center; min-height: 80vh;">
+          <div class="card glass pitch-card" style="width: 100%; max-width: 400px; text-align: center; padding: 2.25rem 2rem;">
+            <div style="background: rgba(var(--primary-rgb), 0.1); width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem auto; border: 1.5px solid var(--primary);">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                <polyline points="22,6 12,13 2,6"></polyline>
+              </svg>
+            </div>
+            
+            <h2 class="gradient-text-green" style="font-size: 1.5rem; font-weight: 900; margin-bottom: 0.75rem;">¡Revisa tu Email!</h2>
+            <p style="font-size: 0.9rem; color: var(--text-light); line-height: 1.55; margin-bottom: 1.5rem;">
+              Te hemos enviado un correo de verificación. Por favor, haz clic en el enlace para activar tu cuenta e iniciar sesión en la liga.
+            </p>
+            
+            <div class="alert-info-banner" style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.75rem; font-size: 0.75rem; color: var(--text-muted); line-height: 1.45; text-align: left; margin-bottom: 1.5rem;">
+              <strong>¿No lo encuentras?</strong> Revisa tu carpeta de <strong>correo no deseado (spam)</strong> o promociones. A veces puede tardar un par de minutos en llegar.
+            </div>
+            
+            <button id="back-to-login-btn" class="btn-primary" style="width: 100%;">
+              Volver a Iniciar Sesión
+            </button>
+          </div>
+        </div>
+      `;
+      
+      container.querySelector('#back-to-login-btn').addEventListener('click', () => {
+        isVerificationPending = false;
+        isLoginMode = true;
+        render();
+      });
+      return;
+    }
+
     // 1. --- Settings View for Authenticated Users ---
     const session = isConfigured && supabase.auth.session ? supabase.auth.session() : null;
     const user = session?.user;
@@ -144,8 +180,12 @@ export function renderAuth(container, callbacks) {
           <form id="auth-form">
             ${!isLoginMode ? `
               <div class="form-group">
-                <label for="username">Nombre de Entrenador (Ej: Paco G.)</label>
-                <input type="text" id="username" class="input-field" placeholder="Tu nombre en la liga" required />
+                <label for="username">Nombre Completo</label>
+                <input type="text" id="username" class="input-field" placeholder="Tu nombre completo" required />
+              </div>
+              <div class="form-group">
+                <label for="apodo">Apodo (Ej: Paco G.)</label>
+                <input type="text" id="apodo" class="input-field" placeholder="Tu apodo en la liga" required />
               </div>
             ` : ''}
             
@@ -175,13 +215,6 @@ export function renderAuth(container, callbacks) {
                 <path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58C13.47.8 11.43 0 9 0 5.5 0 2.43 2.11.95 5.03l2.99 2.3c.71-2.14 2.71-3.75 5.06-3.75z"/>
               </svg>
               Google
-            </button>
-            
-            <button type="button" id="apple-login-btn" class="btn-social btn-apple">
-              <svg width="16" height="16" viewBox="0 0 18 18" fill="currentColor">
-                <path d="M15.56 10.3c-.04-2.16 1.76-3.2 1.84-3.26-1.01-1.48-2.58-1.68-3.13-1.72-1.33-.14-2.61.78-3.28.78-.68 0-1.74-.77-2.85-.75-1.46.02-2.81.85-3.56 2.16-1.52 2.63-.39 6.51 1.09 8.65.72 1.04 1.58 2.21 2.7 2.17 1.08-.04 1.49-.7 2.8-.7s1.68.7 2.8.67c1.14-.02 1.9-.1 2.62-1.15.83-1.22 1.17-2.4 1.19-2.47-.02-.01-2.3-1.04-2.32-3.09zm-2.02-6.52c.6-1.14 1.38-2.16 1.25-3.18-.89.04-1.97.6-2.61 1.35-.54.63-1.01 1.66-.88 2.67.99.08 2.01-.47 2.24-.84z"/>
-              </svg>
-              Apple
             </button>
           </div>
 
@@ -219,23 +252,7 @@ export function renderAuth(container, callbacks) {
       });
     }
 
-    const appleBtn = container.querySelector('#apple-login-btn');
-    if (appleBtn) {
-      appleBtn.addEventListener('click', async () => {
-        try {
-          const { error } = await supabase.auth.signInWithOAuth({
-            provider: 'apple',
-            options: {
-              redirectTo: window.location.origin
-            }
-          });
-          if (error) throw error;
-        } catch (err) {
-          console.error(err);
-          callbacks.showToast(err.message || 'Error al conectar con Apple', 'error');
-        }
-      });
-    }
+
 
     toggleBtn.addEventListener('click', () => {
       isLoginMode = !isLoginMode;
@@ -262,13 +279,16 @@ export function renderAuth(container, callbacks) {
           callbacks.showToast('¡Bienvenido a los castigos!', 'success');
           callbacks.onAuthSuccess();
         } else {
-          const username = form.querySelector('#username').value;
+          const username = form.querySelector('#username').value.trim();
+          const apodo = form.querySelector('#apodo').value.trim();
           const { data, error } = await supabase.auth.signUp({
             email,
             password,
             options: {
+              emailRedirectTo: window.location.origin,
               data: {
-                display_name: username
+                display_name: username,
+                apodo: apodo
               }
             }
           });
@@ -278,8 +298,7 @@ export function renderAuth(container, callbacks) {
             callbacks.showToast('¡Cuenta creada y sesión iniciada!', 'success');
             callbacks.onAuthSuccess();
           } else {
-            callbacks.showToast('Registro completado. Revisa tu email para confirmar.', 'info');
-            isLoginMode = true;
+            isVerificationPending = true;
             render();
           }
         }
