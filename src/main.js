@@ -7,7 +7,6 @@ import { renderRoulette } from './views/roulette';
 import { renderChallenges } from './views/challenges';
 import { renderMinigame } from './views/minigame';
 import { renderBufon } from './views/bufon';
-import { renderFeed } from './views/feed';
 
 // Root elements
 const app = document.querySelector('#app');
@@ -103,25 +102,6 @@ function renderMainLayout(isGuest) {
           <button class="nav-item ${currentView === 'bufon' ? 'active' : ''}" id="nav-bufon-btn">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;"><path d="M2 4 5 12h14l3-8-7 4-3-6-3 6-7-4z"></path><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7H5z"></path></svg>
             <span>El Bufón</span>
-          </button>
-          <button class="nav-item ${currentView === 'feed' ? 'active' : ''}" id="nav-feed-btn" style="position: relative; display: flex; align-items: center; justify-content: space-between; width: 100%;">
-            <div style="display: flex; align-items: center; gap: 0.75rem;">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-              <span>Comunidad</span>
-            </div>
-            ${notificationsCount > 0 ? `
-              <span class="notification-badge" style="
-                background: var(--accent);
-                color: #fff;
-                font-size: 0.7rem;
-                font-weight: 800;
-                padding: 0.15rem 0.45rem;
-                border-radius: 10px;
-                line-height: 1;
-                margin-left: auto;
-                box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.4);
-              ">+${notificationsCount}</span>
-            ` : ''}
           </button>
           <button class="nav-item ${currentView === 'minigame' ? 'active' : ''}" id="nav-minigame-btn">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;"><line x1="6" y1="12" x2="10" y2="12"></line><line x1="8" y1="10" x2="8" y2="14"></line><line x1="15" y1="13" x2="15.01" y2="13"></line><line x1="18" y1="11" x2="18.01" y2="11"></line><rect x="2" y="6" width="20" height="12" rx="3"></rect></svg>
@@ -264,10 +244,6 @@ function renderMainLayout(isGuest) {
       onNavigate: navigate,
       showToast
     });
-  } else if (currentView === 'feed') {
-    renderFeed(viewContainer, {
-      showToast
-    });
   }
 
   // Hook Navigation Elements (Cerrando el sidebar al hacer clic en móvil/escritorio)
@@ -320,15 +296,6 @@ function renderMainLayout(isGuest) {
     bufonBtn.addEventListener('click', () => {
       closeSidebar();
       navigate('bufon');
-    });
-  }
-
-  const feedBtn = app.querySelector('#nav-feed-btn');
-  if (feedBtn) {
-    feedBtn.addEventListener('click', () => {
-      closeSidebar();
-      localStorage.setItem('CF_COMMUNITY_NOTIFICATIONS_COUNT', '0');
-      navigate('feed');
     });
   }
   

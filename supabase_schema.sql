@@ -66,37 +66,6 @@ CREATE TABLE IF NOT EXISTS public.matchday_records (
   created_at timestamp with time zone NOT NULL DEFAULT timezone('utc'::text, now())
 );
 
--- 6. Tabla del Muro de la Comunidad (feed_posts)
-CREATE TABLE IF NOT EXISTS public.feed_posts (
-  id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
-  title text NOT NULL,
-  nickname text NOT NULL,
-  profile_id uuid REFERENCES public.profiles(id) ON DELETE SET NULL,
-  league text,
-  platform text NOT NULL,
-  url text NOT NULL,
-  description text NOT NULL,
-  likes integer NOT NULL DEFAULT 0,
-  visibility text NOT NULL DEFAULT 'public',
-  created_at timestamp with time zone NOT NULL DEFAULT timezone('utc'::text, now())
-);
-
--- 7. Comentarios del Feed (feed_comments)
-CREATE TABLE IF NOT EXISTS public.feed_comments (
-  id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
-  post_id uuid NOT NULL REFERENCES public.feed_posts(id) ON DELETE CASCADE,
-  nickname text NOT NULL,
-  profile_id uuid REFERENCES public.profiles(id) ON DELETE SET NULL,
-  text text NOT NULL,
-  created_at timestamp with time zone NOT NULL DEFAULT timezone('utc'::text, now())
-);
-
--- 8. Likes del Feed (feed_likes)
-CREATE TABLE IF NOT EXISTS public.feed_likes (
-  post_id uuid NOT NULL REFERENCES public.feed_posts(id) ON DELETE CASCADE,
-  profile_id uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
-  PRIMARY KEY (post_id, profile_id)
-);
 
 -- Habilitar RLS en todas las tablas
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
@@ -104,9 +73,6 @@ ALTER TABLE public.leagues ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.league_members ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.punishments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.matchday_records ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.feed_posts ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.feed_comments ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.feed_likes ENABLE ROW LEVEL SECURITY;
 
 -- Políticas de Seguridad RLS Permisivas (Acceso público de lectura, escritura autenticada)
 CREATE POLICY "Public Read Profiles" ON public.profiles FOR SELECT USING (true);
@@ -117,13 +83,6 @@ CREATE POLICY "Authenticated Members" ON public.league_members FOR ALL USING (au
 CREATE POLICY "Authenticated Punishments" ON public.punishments FOR ALL USING (auth.role() = 'authenticated');
 CREATE POLICY "Authenticated Records" ON public.matchday_records FOR ALL USING (auth.role() = 'authenticated');
 
-CREATE POLICY "Feed Posts Read" ON public.feed_posts FOR SELECT USING (true);
-CREATE POLICY "Feed Posts Write" ON public.feed_posts FOR ALL USING (auth.role() = 'authenticated');
 
-CREATE POLICY "Feed Comments Read" ON public.feed_comments FOR SELECT USING (true);
-CREATE POLICY "Feed Comments Write" ON public.feed_comments FOR ALL USING (auth.role() = 'authenticated');
-
-CREATE POLICY "Feed Likes Read" ON public.feed_likes FOR SELECT USING (true);
-CREATE POLICY "Feed Likes Write" ON public.feed_likes FOR ALL USING (auth.role() = 'authenticated');
 
 
