@@ -31,162 +31,119 @@ export function renderRoulette(container, callbacks) {
     const pendingId = localStorage.getItem('CF_PENDING_RECORD_ID');
 
     if (isGuest) {
-      // 1. --- Guest Flow (localStorage) ---
-      
-      const activeDemoId = localStorage.getItem('CF_ACTIVE_DEMO_LEAGUE_ID') || 'DEMO-ASTURES';
-      // Load punishments
-      let storedPuns = localStorage.getItem(`CF_DEMO_PUNISHMENTS_${activeDemoId}`);
-      if (!storedPuns) {
-        storedPuns = JSON.stringify(DEFAULT_PUNISHMENTS);
-        localStorage.setItem(`CF_DEMO_PUNISHMENTS_${activeDemoId}`, storedPuns);
+      callbacks.showToast('Debes iniciar sesión para acceder a esta sección', 'warning');
+      callbacks.onNavigate('auth');
+      return;
+    }
+
+    try {
+      const currentUser = supabase.auth.user ? supabase.auth.user() : (await supabase.auth.getUser()).data.user;
+
+      // 1. Fetch user's leagues memberships
+      const { data: userLeagues, error: leaguesErr } = await supabase
+        .from('league_members')
+        .select('league_id')
+        .eq('profile_id', currentUser.id);
+
+      if (leaguesErr) throw leaguesErr;
+
+      if (!userLeagues || userLeagues.length === 0) {
+        localStorage.removeItem('CF_ACTIVE_LEAGUE_ID');
+        callbacks.showToast('No perteneces a ninguna liga todavía', 'info');
+        callbacks.onNavigate('select-league');
+        return;
       }
-      punishments = JSON.parse(storedPuns);
+
+      // 2. Resolve active league
+      let activeLeagueId = localStorage.getItem('CF_ACTIVE_LEAGUE_ID');
+      const hasActiveLeague = userLeagues.some(l => l.league_id === activeLeagueId);
+
+      if (!activeLeagueId || !hasActiveLeague) {
+        activeLeagueId = userLeagues[0].league_id;
+        localStorage.setItem('CF_ACTIVE_LEAGUE_ID', activeLeagueId);
+      }
+
+      currentLeagueId = activeLeagueId;
 
       // Load pending record if any
       if (pendingId) {
-        const storedRecords = JSON.parse(localStorage.getItem(`CF_DEMO_RECORDS_${activeDemoId}`) || '[]');
-        const rec = storedRecords.find(r => r.id === pendingId);
-        if (rec) {
-          const storedMembers = JSON.parse(localStorage.getItem(`CF_DEMO_MEMBERS_${activeDemoId}`) || '[]');
-          const loser = storedMembers.find(m => m.profile_id === rec.loser_profile_id);
-          pendingRecord = {
-            ...rec,
-            display_name: loser?.display_name || 'Entrenador'
-          };
-        }
-      }
-
-      // Load history (records with punishment_id assigned)
-      const storedRecords = JSON.parse(localStorage.getItem(`CF_DEMO_RECORDS_${activeDemoId}`) || '[]');
-      const storedMembers = JSON.parse(localStorage.getItem(`CF_DEMO_MEMBERS_${activeDemoId}`) || '[]');
-      
-      history = storedRecords
-        .filter(r => r.punishment_id !== null)
-        .map(r => {
-          const loser = storedMembers.find(m => m.profile_id === r.loser_profile_id);
-          const pun = punishments.find(p => p.id === r.punishment_id);
-          return {
-            id: r.id,
-            matchday_number: r.matchday_number,
-            amount_owed: r.amount_owed,
-            trash_talk_phrase: r.trash_talk_phrase,
-            created_at: r.created_at,
-            profiles: {
-              display_name: loser?.display_name || 'Entrenador'
-            },
-            punishments: {
-              name: pun?.name || 'Castigo Desconocido',
-              description: pun?.description || ''
-            }
-          };
-        });
-      
-      // Sort history descending by created_at
-      history.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-
-      renderView();
-    } else {
-      // 2. --- Supabase Flow ---
-      try {
-        const currentUser = supabase.auth.user ? supabase.auth.user() : (await supabase.auth.getUser()).data.user;
-
-        // Get user's league
-        const { data: memberData, error: memberErr } = await supabase
-          .from('league_members')
-          .select('league_id')
-          .eq('profile_id', currentUser.id)
-          .maybeSingle();
-
-        if (memberErr) throw memberErr;
-        if (!memberData) {
-          callbacks.showToast('Debes unirte a una liga primero', 'info');
-          callbacks.onNavigate('dashboard');
-          return;
-        }
-
-        currentLeagueId = memberData.league_id;
-
-        // Load pending record if any
-        if (pendingId) {
-          const { data: recData, error: recErr } = await supabase
-            .from('matchday_records')
-            .select(`
-              id,
-              matchday_number,
-              amount_owed,
-              loser_profile_id,
-              profiles:loser_profile_id (
-                display_name
-              )
-            `)
-            .eq('id', pendingId)
-            .single();
-
-          if (!recErr && recData) {
-            pendingRecord = {
-              id: recData.id,
-              matchday_number: recData.matchday_number,
-              amount_owed: recData.amount_owed,
-              display_name: recData.profiles?.display_name || 'Entrenador'
-            };
-          }
-        }
-
-        // Load punishments
-        const { data: punList, error: punErr } = await supabase
-          .from('punishments')
-          .select('*')
-          .eq('league_id', currentLeagueId);
-
-        if (punErr) throw punErr;
-
-        if (punList.length === 0) {
-          const insertList = DEFAULT_PUNISHMENTS.map(p => ({
-            league_id: currentLeagueId,
-            name: p.name,
-            description: p.description
-          }));
-
-          const { data: insertedData, error: insErr } = await supabase
-            .from('punishments')
-            .insert(insertList)
-            .select();
-          
-          if (insErr) throw insErr;
-          punishments = insertedData;
-        } else {
-          punishments = punList;
-        }
-
-        // Load history
-        const { data: histList, error: histErr } = await supabase
+        const { data: recData, error: recErr } = await supabase
           .from('matchday_records')
           .select(`
             id,
             matchday_number,
             amount_owed,
-            trash_talk_phrase,
-            created_at,
+            loser_profile_id,
             profiles:loser_profile_id (
               display_name
-            ),
-            punishments:punishment_id (
-              name,
-              description
             )
           `)
-          .eq('league_id', currentLeagueId)
-          .not('punishment_id', 'is', null)
-          .order('created_at', { ascending: false });
+          .eq('id', pendingId)
+          .single();
 
-        if (histErr) throw histErr;
-        history = histList;
-
-        renderView();
-      } catch (err) {
-        console.error(err);
-        callbacks.showToast('Error cargando la ruleta de castigos', 'error');
+        if (!recErr && recData) {
+          pendingRecord = {
+            id: recData.id,
+            matchday_number: recData.matchday_number,
+            amount_owed: recData.amount_owed,
+            display_name: recData.profiles?.display_name || 'Entrenador'
+          };
+        }
       }
+
+      // Load punishments
+      const { data: punList, error: punErr } = await supabase
+        .from('punishments')
+        .select('*')
+        .eq('league_id', currentLeagueId);
+
+      if (punErr) throw punErr;
+
+      if (punList.length === 0) {
+        const insertList = DEFAULT_PUNISHMENTS.map(p => ({
+          league_id: currentLeagueId,
+          name: p.name,
+          description: p.description
+        }));
+
+        const { data: insertedData, error: insErr } = await supabase
+          .from('punishments')
+          .insert(insertList)
+          .select();
+        
+        if (insErr) throw insErr;
+        punishments = insertedData;
+      } else {
+        punishments = punList;
+      }
+
+      // Load history
+      const { data: histList, error: histErr } = await supabase
+        .from('matchday_records')
+        .select(`
+          id,
+          matchday_number,
+          amount_owed,
+          trash_talk_phrase,
+          created_at,
+          profiles:loser_profile_id (
+            display_name
+          ),
+          punishments:punishment_id (
+            name,
+            description
+          )
+        `)
+        .eq('league_id', currentLeagueId)
+        .not('punishment_id', 'is', null)
+        .order('created_at', { ascending: false });
+
+      if (histErr) throw histErr;
+      history = histList;
+
+      renderView();
+    } catch (err) {
+      console.error(err);
     }
   }
 
@@ -327,36 +284,21 @@ export function renderRoulette(container, callbacks) {
       const name = addForm.querySelector('#new-pun-name').value.trim();
       const description = addForm.querySelector('#new-pun-desc').value.trim();
 
-      if (isGuest) {
-        // --- Guest Add ---
-        const newPun = {
-          id: `d-pun-${Math.random().toString(36).substring(2, 9)}`,
-          name,
-          description
-        };
-        const activeDemoId = localStorage.getItem('CF_ACTIVE_DEMO_LEAGUE_ID') || 'DEMO-ASTURES';
-        punishments.push(newPun);
-        localStorage.setItem(`CF_DEMO_PUNISHMENTS_${activeDemoId}`, JSON.stringify(punishments));
-        callbacks.showToast('Castigo añadido localmente', 'success');
-        loadData();
-      } else {
-        // --- Supabase Add ---
-        try {
-          const { error } = await supabase
-            .from('punishments')
-            .insert({
-              league_id: currentLeagueId,
-              name,
-              description
-            });
+      try {
+        const { error } = await supabase
+          .from('punishments')
+          .insert({
+            league_id: currentLeagueId,
+            name,
+            description
+          });
 
-          if (error) throw error;
-          callbacks.showToast('Castigo añadido con éxito', 'success');
-          loadData();
-        } catch (err) {
-          console.error(err);
-          callbacks.showToast('Error al añadir castigo', 'error');
-        }
+        if (error) throw error;
+        callbacks.showToast('Castigo añadido con éxito', 'success');
+        loadData();
+      } catch (err) {
+        console.error(err);
+        callbacks.showToast('Error al añadir castigo', 'error');
       }
     });
 
@@ -369,29 +311,19 @@ export function renderRoulette(container, callbacks) {
           return;
         }
 
-        if (isGuest) {
-          // --- Guest Delete ---
-          const activeDemoId = localStorage.getItem('CF_ACTIVE_DEMO_LEAGUE_ID') || 'DEMO-ASTURES';
-          punishments = punishments.filter(p => p.id !== id);
-          localStorage.setItem(`CF_DEMO_PUNISHMENTS_${activeDemoId}`, JSON.stringify(punishments));
-          callbacks.showToast('Castigo eliminado localmente', 'success');
-          loadData();
-        } else {
-          // --- Supabase Delete ---
-          try {
-            const { error } = await supabase
-              .from('punishments')
-              .delete()
-              .eq('id', id);
+      try {
+        const { error } = await supabase
+          .from('punishments')
+          .delete()
+          .eq('id', id);
 
-            if (error) throw error;
-            callbacks.showToast('Castigo eliminado', 'success');
-            loadData();
-          } catch (err) {
-            console.error(err);
-            callbacks.showToast('Error al eliminar castigo', 'error');
-          }
-        }
+        if (error) throw error;
+        callbacks.showToast('Castigo eliminado', 'success');
+        loadData();
+      } catch (err) {
+        console.error(err);
+        callbacks.showToast('Error al eliminar castigo', 'error');
+      }
       });
     });
 
@@ -489,35 +421,20 @@ export function renderRoulette(container, callbacks) {
       const loserName = pendingRecord ? pendingRecord.display_name : 'Entrenador Aleatorio';
       
       if (pendingRecord) {
-        if (isGuest) {
-          // --- Guest Save ---
-          const activeDemoId = localStorage.getItem('CF_ACTIVE_DEMO_LEAGUE_ID') || 'DEMO-ASTURES';
-          const storedRecords = JSON.parse(localStorage.getItem(`CF_DEMO_RECORDS_${activeDemoId}`) || '[]');
-          const idx = storedRecords.findIndex(r => r.id === pendingRecord.id);
-          if (idx !== -1) {
-            storedRecords[idx].punishment_id = winningPunishment.id;
-            localStorage.setItem(`CF_DEMO_RECORDS_${activeDemoId}`, JSON.stringify(storedRecords));
-          }
+        try {
+          const { error } = await supabase
+            .from('matchday_records')
+            .update({ punishment_id: winningPunishment.id })
+            .eq('id', pendingRecord.id);
+
+          if (error) throw error;
+          
           localStorage.removeItem('CF_PENDING_RECORD_ID');
           pendingRecord = null;
-          callbacks.showToast(`¡Castigo demo guardado para ${loserName}!`, 'success');
-        } else {
-          // --- Supabase Save ---
-          try {
-            const { error } = await supabase
-              .from('matchday_records')
-              .update({ punishment_id: winningPunishment.id })
-              .eq('id', pendingRecord.id);
-
-            if (error) throw error;
-            
-            localStorage.removeItem('CF_PENDING_RECORD_ID');
-            pendingRecord = null;
-            callbacks.showToast(`¡Castigo guardado para ${loserName}!`, 'success');
-          } catch (err) {
-            console.error(err);
-            callbacks.showToast('Error al guardar el castigo', 'error');
-          }
+          callbacks.showToast(`¡Castigo guardado para ${loserName}!`, 'success');
+        } catch (err) {
+          console.error(err);
+          callbacks.showToast('Error al guardar el castigo', 'error');
         }
       }
 

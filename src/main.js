@@ -7,12 +7,14 @@ import { renderRoulette } from './views/roulette';
 import { renderChallenges } from './views/challenges';
 import { renderMinigame } from './views/minigame';
 import { renderBufon } from './views/bufon';
+import { renderLanding } from './views/landing';
+import { renderSelectLeague } from './views/select-league';
 
 // Root elements
 const app = document.querySelector('#app');
 
 // State
-let currentView = 'dashboard'; // 'dashboard', 'roulette', 'challenges', or 'auth'
+let currentView = 'landing'; // 'landing', 'dashboard', 'roulette', 'challenges', or 'auth'
 let supportBubblePos = null; // { left, top }
 
 // Dynamic Toast Helper
@@ -65,6 +67,13 @@ async function checkAuthAndRender() {
 
   const isGuest = !user;
 
+  // Route Guard: restrict private views to authenticated users
+  const privateViews = ['dashboard', 'roulette', 'challenges', 'bufon', 'select-league'];
+  if (isGuest && privateViews.includes(currentView)) {
+    currentView = 'auth';
+    showToast('Debes iniciar sesión para acceder a esta sección', 'warning');
+  }
+
   renderMainLayout(isGuest);
 }
 
@@ -85,6 +94,16 @@ function renderMainLayout(isGuest) {
         </div>
 
         <nav class="sidebar-nav">
+          <button class="nav-item ${currentView === 'landing' ? 'active' : ''}" id="nav-landing-btn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+            <span>Inicio</span>
+          </button>
+          ${!isGuest ? `
+            <button class="nav-item ${currentView === 'select-league' ? 'active' : ''}" id="nav-select-league-btn">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+              <span>Cambiar Liga</span>
+            </button>
+          ` : ''}
           <button class="nav-item ${currentView === 'dashboard' ? 'active' : ''}" id="nav-dash-btn">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.45 1-1 1H4v2h16v-2h-5c-.55 0-1-.45-1-1v-2.34"></path><path d="M12 2a6 6 0 0 0-6 6v5a6 6 0 0 0 12 0V8a6 6 0 0 0-6-6z"></path></svg>
             <span>Muro de la Vergüenza</span>
@@ -211,9 +230,20 @@ function renderMainLayout(isGuest) {
   if (backdrop) backdrop.addEventListener('click', closeSidebar);
 
   // Route Views
-  if (currentView === 'auth') {
+  if (currentView === 'landing') {
+    renderLanding(viewContainer, {
+      onNavigate: navigate,
+      showToast
+    });
+  } else if (currentView === 'auth') {
     renderAuth(viewContainer, {
-      onAuthSuccess: () => navigate('dashboard'),
+      onAuthSuccess: () => navigate('select-league'),
+      showToast
+    });
+  } else if (currentView === 'select-league') {
+    renderSelectLeague(viewContainer, {
+      isGuest,
+      onNavigate: navigate,
       showToast
     });
   } else if (currentView === 'dashboard') {
@@ -251,7 +281,7 @@ function renderMainLayout(isGuest) {
   if (homeBtn) {
     homeBtn.addEventListener('click', () => {
       closeSidebar();
-      navigate('dashboard');
+      navigate('landing');
     });
   }
   
@@ -259,9 +289,26 @@ function renderMainLayout(isGuest) {
   if (headerHomeBtn) {
     headerHomeBtn.addEventListener('click', () => {
       closeSidebar();
-      navigate('dashboard');
+      navigate('landing');
     });
   }
+
+  const landingBtn = app.querySelector('#nav-landing-btn');
+  if (landingBtn) {
+    landingBtn.addEventListener('click', () => {
+      closeSidebar();
+      navigate('landing');
+    });
+  }
+
+  const selectLeagueBtn = app.querySelector('#nav-select-league-btn');
+  if (selectLeagueBtn) {
+    selectLeagueBtn.addEventListener('click', () => {
+      closeSidebar();
+      navigate('select-league');
+    });
+  }
+
   app.querySelector('#nav-dash-btn').addEventListener('click', () => {
     closeSidebar();
     navigate('dashboard');
@@ -450,7 +497,7 @@ async function handleLogout() {
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
     showToast('Sesión cerrada correctamente', 'success');
-    navigate('dashboard');
+    navigate('landing');
   } catch (err) {
     console.error(err);
     showToast('Error al cerrar sesión', 'error');
@@ -463,7 +510,7 @@ if (isConfigured) {
     if (event === 'SIGNED_IN') {
       checkAuthAndRender();
     } else if (event === 'SIGNED_OUT') {
-      navigate('dashboard');
+      navigate('landing');
     }
   });
 }

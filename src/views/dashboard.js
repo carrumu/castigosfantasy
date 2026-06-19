@@ -38,393 +38,97 @@ export function renderDashboard(container, callbacks) {
 
   async function loadData() {
     if (isGuest) {
-      // 1. Load Demo data from localStorage or create defaults
-      let activeDemoId = localStorage.getItem('CF_ACTIVE_DEMO_LEAGUE_ID');
+      callbacks.showToast('Debes iniciar sesión para acceder a esta sección', 'warning');
+      callbacks.onNavigate('auth');
+      return;
+    }
+
+    try {
+      const currentUser = supabase.auth.user ? supabase.auth.user() : (await supabase.auth.getUser()).data.user;
+
+      // 1. Fetch user's leagues memberships
+      const { data: userLeagues, error: leaguesErr } = await supabase
+        .from('league_members')
+        .select('league_id')
+        .eq('profile_id', currentUser.id);
+
+      if (leaguesErr) throw leaguesErr;
+
+      if (!userLeagues || userLeagues.length === 0) {
+        localStorage.removeItem('CF_ACTIVE_LEAGUE_ID');
+        callbacks.showToast('No perteneces a ninguna liga todavía', 'info');
+        callbacks.onNavigate('select-league');
+        return;
+      }
+
+      // 2. Resolve active league
+      let activeLeagueId = localStorage.getItem('CF_ACTIVE_LEAGUE_ID');
+      const hasActiveLeague = userLeagues.some(l => l.league_id === activeLeagueId);
+
+      if (!activeLeagueId || !hasActiveLeague) {
+        activeLeagueId = userLeagues[0].league_id;
+        localStorage.setItem('CF_ACTIVE_LEAGUE_ID', activeLeagueId);
+      }
+
+      // 3. Load active league member info
+      const { data: memberData, error: memberErr } = await supabase
+        .from('league_members')
+        .select('*')
+        .eq('profile_id', currentUser.id)
+        .eq('league_id', activeLeagueId)
+        .single();
+
+      if (memberErr) throw memberErr;
+      isAdmin = !!memberData.is_admin;
+
+      // 4. Load league details
+      const { data: leagueData, error: leagueErr } = await supabase
+        .from('leagues')
+        .select('*')
+        .eq('id', activeLeagueId)
+        .single();
+
+      if (leagueErr) throw leagueErr;
+      currentLeague = leagueData;
+
+      const features = currentLeague.features || 'both';
+      localStorage.setItem('CF_CURRENT_LEAGUE_FEATURES', features);
+
+      // 5. Get members
+      const { data: membersList, error: listErr } = await supabase
+        .from('league_members')
+        .select(`
+          profile_id,
+          is_admin,
+          profiles (
+            display_name,
+            avatar_url
+          )
+        `)
+        .eq('league_id', currentLeague.id);
+
+      if (listErr) throw listErr;
       
-      if (!activeDemoId) {
-        // Auto-generate default demo league on first run
-        const savedDemoLeagues = JSON.parse(localStorage.getItem('CF_SAVED_DEMO_LEAGUES') || '[]');
-        if (savedDemoLeagues.length === 0) {
-          activeDemoId = "DEMO-ASTURES";
-          localStorage.setItem('CF_ACTIVE_DEMO_LEAGUE_ID', activeDemoId);
-          localStorage.setItem(`CF_DEMO_LEAGUE_NAME_${activeDemoId}`, "Liga Demo Astures");
-          localStorage.setItem(`CF_DEMO_LEAGUE_FEATURES_${activeDemoId}`, "both");
-          localStorage.setItem(`CF_DEMO_MEMBERS_${activeDemoId}`, JSON.stringify(DEFAULT_DEMO_MEMBERS));
-          localStorage.setItem(`CF_DEMO_RECORDS_${activeDemoId}`, JSON.stringify(DEFAULT_DEMO_RECORDS));
-          
-          savedDemoLeagues.push({ inviteCode: activeDemoId, name: "Liga Demo Astures" });
-          localStorage.setItem('CF_SAVED_DEMO_LEAGUES', JSON.stringify(savedDemoLeagues));
-        } else {
-          renderNoLeague();
-          return;
-        }
-      }
+      members = membersList.map(m => ({
+        profile_id: m.profile_id,
+        display_name: m.profiles?.display_name || 'Desconocido',
+        avatar_url: m.profiles?.avatar_url || ''
+      }));
 
-      let leagueName = localStorage.getItem(`CF_DEMO_LEAGUE_NAME_${activeDemoId}`) || "Liga Demo";
+      // 6. Get records
+      const { data: recordsList, error: recErr } = await supabase
+        .from('matchday_records')
+        .select('*')
+        .eq('league_id', currentLeague.id);
 
-      let storedMembers = localStorage.getItem(`CF_DEMO_MEMBERS_${activeDemoId}`);
-      if (!storedMembers) {
-        storedMembers = JSON.stringify(DEFAULT_DEMO_MEMBERS);
-        localStorage.setItem(`CF_DEMO_MEMBERS_${activeDemoId}`, storedMembers);
-      }
-      members = JSON.parse(storedMembers);
-
-      let storedRecords = localStorage.getItem(`CF_DEMO_RECORDS_${activeDemoId}`);
-      if (!storedRecords) {
-        storedRecords = JSON.stringify(DEFAULT_DEMO_RECORDS);
-        localStorage.setItem(`CF_DEMO_RECORDS_${activeDemoId}`, storedRecords);
-      }
-      records = JSON.parse(storedRecords);
-
-      let leagueFeatures = localStorage.getItem(`CF_DEMO_LEAGUE_FEATURES_${activeDemoId}`) || 'both';
-
-      currentLeague = {
-        id: activeDemoId,
-        name: leagueName,
-        invite_code: activeDemoId,
-        features: leagueFeatures
-      };
-
-      localStorage.setItem('CF_CURRENT_LEAGUE_FEATURES', leagueFeatures);
-      isAdmin = true;
+      if (recErr) throw recErr;
+      records = recordsList;
 
       renderMainDashboard();
-    } else {
-      // 2. Real Supabase Flow
-      try {
-        const currentUser = supabase.auth.user ? supabase.auth.user() : (await supabase.auth.getUser()).data.user;
-        
-        // Get member info
-        const { data: memberData, error: memberErr } = await supabase
-          .from('league_members')
-          .select('*')
-          .eq('profile_id', currentUser.id)
-          .maybeSingle();
-
-        if (memberErr) throw memberErr;
-
-        if (!memberData) {
-          renderNoLeague();
-          return;
-        }
-
-        isAdmin = !!memberData.is_admin;
-
-        // Get league details
-        const { data: leagueData, error: leagueErr } = await supabase
-          .from('leagues')
-          .select('*')
-          .eq('id', memberData.league_id)
-          .single();
-
-        if (leagueErr) throw leagueErr;
-        currentLeague = leagueData;
-        
-        const features = currentLeague.features || 'both';
-        localStorage.setItem('CF_CURRENT_LEAGUE_FEATURES', features);
-
-        // Get members
-        const { data: membersList, error: listErr } = await supabase
-          .from('league_members')
-          .select(`
-            profile_id,
-            is_admin,
-            profiles (
-              display_name,
-              avatar_url
-            )
-          `)
-          .eq('league_id', currentLeague.id);
-
-        if (listErr) throw listErr;
-        
-        // Parse database structure to match uniform profiles layout
-        members = membersList.map(m => ({
-          profile_id: m.profile_id,
-          display_name: m.profiles?.display_name || 'Desconocido',
-          avatar_url: m.profiles?.avatar_url || ''
-        }));
-
-        // Get records
-        const { data: recordsList, error: recErr } = await supabase
-          .from('matchday_records')
-          .select('*')
-          .eq('league_id', currentLeague.id);
-
-        if (recErr) throw recErr;
-        records = recordsList;
-
-        renderMainDashboard();
-      } catch (err) {
-        console.error(err);
-        callbacks.showToast('Error cargando datos de la liga', 'error');
-      }
+    } catch (err) {
+      console.error(err);
+      callbacks.showToast('Error cargando datos de la liga', 'error');
     }
-  }
-
-  function renderNoLeague() {
-    const savedLeaguesKey = isGuest ? 'CF_SAVED_DEMO_LEAGUES' : 'CF_SAVED_SUPABASE_LEAGUES';
-    const savedLeagues = JSON.parse(localStorage.getItem(savedLeaguesKey) || '[]');
-
-    container.innerHTML = `
-      <div class="container">
-        <div style="text-align: center; margin-bottom: 2rem;">
-          <h1 class="logo gradient-text-gold" style="justify-content: center; font-size: 2rem; margin-bottom: 0.5rem;">
-            ¡Bienvenido, Míster!
-          </h1>
-          <p style="color: var(--text-muted);">Para empezar a picar a tus amigos, debes crear una liga privada o unirte a una existente.</p>
-        </div>
-
-        <div class="card glass pitch-card">
-          <h2 class="card-title gradient-text-green">${isGuest ? 'Crear una Liga Demo Nueva' : 'Crear una Liga Nueva'}</h2>
-          <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;">Crea el grupo de tu liga de fantasy y comparte el código con tus amigos.</p>
-          <form id="create-league-form">
-            <div class="form-group">
-              <label for="new-league-name">Nombre de la Liga (Ej: Liga Los Troncos)</label>
-              <input type="text" id="new-league-name" class="input-field" placeholder="Nombre de tu comunidad" required />
-            </div>
-            <div class="form-group">
-              <label for="new-league-features">Funcionalidades Activas</label>
-              <select id="new-league-features" class="input-field">
-                <option value="both">Ruleta + Registro de Deudas (Ambos)</option>
-                <option value="wheel">Solo Ruleta de Castigos (Sin deudas)</option>
-                <option value="money">Solo Registro de Deudas/Bote (Sin ruleta)</option>
-              </select>
-            </div>
-            <button type="submit" class="btn-primary" id="btn-create">Crear Liga</button>
-          </form>
-        </div>
-
-        <div class="card glass" style="margin-top: 1.5rem;">
-          <h2 class="card-title">${isGuest ? 'Unirse a una Liga Demo Existente' : 'Unirse a una Liga Existente'}</h2>
-          <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;">Introduce el código de invitación que te ha enviado el administrador de tu liga.</p>
-          
-          ${savedLeagues.length > 0 ? `
-            <div class="form-group" style="margin-bottom: 1.25rem;">
-              <label for="saved-leagues-select">📋 Mis Ligas Guardadas</label>
-              <select id="saved-leagues-select" class="input-field" style="background: rgba(var(--primary-rgb), 0.08); border-color: var(--border-color-glow);">
-                <option value="">-- Selecciona una liga anterior --</option>
-                ${savedLeagues.map((l, idx) => `
-                  <option value="${idx}">${l.name} (${l.inviteCode})</option>
-                `).join('')}
-              </select>
-            </div>
-          ` : ''}
-
-          <form id="join-league-form">
-            <div class="form-group">
-              <label for="join-code">Código de Invitación</label>
-              <input type="text" id="join-code" class="input-field" placeholder="Ej: AB12CD" style="text-transform: uppercase;" required />
-            </div>
-            <button type="submit" class="btn-secondary" id="btn-join">Unirse a Liga</button>
-          </form>
-        </div>
-      </div>
-    `;
-
-    // Hook saved leagues select
-    const savedLeaguesSelect = container.querySelector('#saved-leagues-select');
-    const joinForm = container.querySelector('#join-league-form');
-    if (savedLeaguesSelect && joinForm) {
-      savedLeaguesSelect.addEventListener('change', (e) => {
-        const idx = e.target.value;
-        if (idx !== "") {
-          const l = savedLeagues[Number(idx)];
-          joinForm.querySelector('#join-code').value = l.inviteCode;
-        } else {
-          joinForm.querySelector('#join-code').value = "";
-        }
-      });
-    }
-
-    // Hook Create Liga
-    const createForm = container.querySelector('#create-league-form');
-    createForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const btn = createForm.querySelector('#btn-create');
-      const name = createForm.querySelector('#new-league-name').value.trim();
-      const features = createForm.querySelector('#new-league-features').value;
-      const inviteCode = (isGuest ? "DEMO-" : "") + generateInviteCode();
-
-      btn.disabled = true;
-      btn.innerHTML = '<span class="spinner"></span>';
-
-      if (isGuest) {
-        // Create local demo league
-        localStorage.setItem(`CF_DEMO_LEAGUE_NAME_${inviteCode}`, name);
-        localStorage.setItem(`CF_DEMO_LEAGUE_FEATURES_${inviteCode}`, features);
-        localStorage.setItem(`CF_DEMO_MEMBERS_${inviteCode}`, JSON.stringify(DEFAULT_DEMO_MEMBERS));
-        localStorage.setItem(`CF_DEMO_RECORDS_${inviteCode}`, JSON.stringify(DEFAULT_DEMO_RECORDS));
-        
-        localStorage.setItem('CF_ACTIVE_DEMO_LEAGUE_ID', inviteCode);
-        
-        // Save to demo saved leagues list
-        let savedDemoLeagues = JSON.parse(localStorage.getItem('CF_SAVED_DEMO_LEAGUES') || '[]');
-        savedDemoLeagues.push({ inviteCode, name });
-        localStorage.setItem('CF_SAVED_DEMO_LEAGUES', JSON.stringify(savedDemoLeagues));
-
-        callbacks.showToast(`¡Liga Demo "${name}" creada!`, 'success');
-        loadData();
-        return;
-      }
-
-      try {
-        const currentUser = supabase.auth.user ? supabase.auth.user() : (await supabase.auth.getUser()).data.user;
-        const { data: newLeague, error: leagueErr } = await supabase
-          .from('leagues')
-          .insert({
-            name,
-            invite_code: inviteCode,
-            created_by: currentUser.id,
-            features: features
-          })
-          .select()
-          .single();
-
-        if (leagueErr) throw leagueErr;
-
-        // Save to Supabase saved leagues list
-        let savedSupabaseLeagues = JSON.parse(localStorage.getItem('CF_SAVED_SUPABASE_LEAGUES') || '[]');
-        savedSupabaseLeagues.push({ inviteCode, name });
-        localStorage.setItem('CF_SAVED_SUPABASE_LEAGUES', JSON.stringify(savedSupabaseLeagues));
-
-        const { error: memberErr } = await supabase
-          .from('league_members')
-          .insert({
-            league_id: newLeague.id,
-            profile_id: currentUser.id,
-            is_admin: true
-          });
-
-        if (memberErr) throw memberErr;
-
-        callbacks.showToast(`¡Liga "${name}" creada con éxito!`, 'success');
-        loadData();
-      } catch (err) {
-        // Fallback for databases lacking 'features' column
-        if (err.message && (err.message.includes('column') || err.message.includes('features') || err.code === '42703')) {
-          try {
-            const { data: newLeague, error: leagueErr2 } = await supabase
-              .from('leagues')
-              .insert({
-                name,
-                invite_code: inviteCode,
-                created_by: currentUser.id
-              })
-              .select()
-              .single();
-
-            if (leagueErr2) throw leagueErr2;
-
-            const { error: memberErr } = await supabase
-              .from('league_members')
-              .insert({
-                league_id: newLeague.id,
-                profile_id: currentUser.id,
-                is_admin: true
-              });
-
-            if (memberErr) throw memberErr;
-
-            callbacks.showToast(`¡Liga "${name}" creada! El ajuste de características requiere añadir la columna 'features' en tu Supabase.`, 'success');
-            loadData();
-          } catch (retryErr) {
-            console.error(retryErr);
-            callbacks.showToast('No se pudo crear la liga', 'error');
-            btn.disabled = false;
-            btn.innerHTML = 'Crear Liga';
-          }
-        } else {
-          console.error(err);
-          callbacks.showToast('No se pudo crear la liga', 'error');
-          btn.disabled = false;
-          btn.innerHTML = 'Crear Liga';
-        }
-      }
-    });
-
-    // Hook Join Liga
-    const joinLeagueForm = container.querySelector('#join-league-form');
-    joinLeagueForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const btn = joinLeagueForm.querySelector('#btn-join');
-      const code = joinLeagueForm.querySelector('#join-code').value.trim().toUpperCase();
-
-      btn.disabled = true;
-      btn.innerHTML = '<span class="spinner"></span>';
-
-      if (isGuest) {
-        // Find local demo league
-        const existsName = localStorage.getItem(`CF_DEMO_LEAGUE_NAME_${code}`);
-        if (!existsName) {
-          callbacks.showToast('Código de liga demo no encontrado o no válido', 'error');
-          btn.disabled = false;
-          btn.innerHTML = 'Unirse a Liga';
-          return;
-        }
-
-        localStorage.setItem('CF_ACTIVE_DEMO_LEAGUE_ID', code);
-
-        // Add to saved list if not exists
-        let savedDemoLeagues = JSON.parse(localStorage.getItem('CF_SAVED_DEMO_LEAGUES') || '[]');
-        if (!savedDemoLeagues.some(l => l.inviteCode === code)) {
-          savedDemoLeagues.push({ inviteCode: code, name: existsName });
-          localStorage.setItem('CF_SAVED_DEMO_LEAGUES', JSON.stringify(savedDemoLeagues));
-        }
-
-        callbacks.showToast(`¡Te has unido a la Liga Demo "${existsName}"!`, 'success');
-        loadData();
-        return;
-      }
-
-      try {
-        const currentUser = supabase.auth.user ? supabase.auth.user() : (await supabase.auth.getUser()).data.user;
-        const { data: targetLeague, error: findErr } = await supabase
-          .from('leagues')
-          .select('*')
-          .eq('invite_code', code)
-          .maybeSingle();
-
-        if (findErr) throw findErr;
-        if (!targetLeague) {
-          callbacks.showToast('Código de invitación no válido', 'error');
-          btn.disabled = false;
-          btn.innerHTML = 'Unirse a Liga';
-          return;
-        }
-
-        const { error: joinErr } = await supabase
-          .from('league_members')
-          .insert({
-            league_id: targetLeague.id,
-            profile_id: currentUser.id,
-            is_admin: false
-          });
-
-        if (joinErr) {
-          if (joinErr.code === '23505') {
-            callbacks.showToast('Ya formas parte de esta liga', 'info');
-          } else {
-            throw joinErr;
-          }
-        } else {
-          callbacks.showToast(`¡Te has unido a "${targetLeague.name}"!`, 'success');
-          
-          // Save to Supabase saved leagues list
-          let savedSupabaseLeagues = JSON.parse(localStorage.getItem('CF_SAVED_SUPABASE_LEAGUES') || '[]');
-          if (!savedSupabaseLeagues.some(l => l.inviteCode === code)) {
-            savedSupabaseLeagues.push({ inviteCode: code, name: targetLeague.name });
-            localStorage.setItem('CF_SAVED_SUPABASE_LEAGUES', JSON.stringify(savedSupabaseLeagues));
-          }
-        }
-        loadData();
-      } catch (err) {
-        console.error(err);
-        callbacks.showToast('Error al unirse a la liga', 'error');
-        btn.disabled = false;
-        btn.innerHTML = 'Unirse a Liga';
-      }
-    });
   }
 
   function renderMainDashboard() {
@@ -628,16 +332,6 @@ export function renderDashboard(container, callbacks) {
     // Hook settings modal triggers
     const settingsBtn = container.querySelector('#btn-league-settings');
     const settingsModal = container.querySelector('#league-settings-modal');
-    const exitDemoBtn = container.querySelector('#btn-exit-demo-league');
-
-    if (exitDemoBtn) {
-      exitDemoBtn.addEventListener('click', () => {
-        if (confirm('¿Quieres salir de esta liga demo y volver al menú principal?')) {
-          localStorage.removeItem('CF_ACTIVE_DEMO_LEAGUE_ID');
-          loadData();
-        }
-      });
-    }
 
     if (settingsBtn && settingsModal) {
       settingsBtn.addEventListener('click', () => {
@@ -662,69 +356,51 @@ export function renderDashboard(container, callbacks) {
           saveBtn.disabled = true;
           saveBtn.innerHTML = '<span class="spinner"></span>';
 
-          if (isGuest) {
-            const activeDemoId = localStorage.getItem('CF_ACTIVE_DEMO_LEAGUE_ID');
-            localStorage.setItem(`CF_DEMO_LEAGUE_NAME_${activeDemoId}`, newName);
-            localStorage.setItem(`CF_DEMO_LEAGUE_FEATURES_${activeDemoId}`, newFeatures);
-            localStorage.setItem('CF_CURRENT_LEAGUE_FEATURES', newFeatures);
-            
-            // Also update the name in CF_SAVED_DEMO_LEAGUES list
-            let savedLeagues = JSON.parse(localStorage.getItem('CF_SAVED_DEMO_LEAGUES') || '[]');
-            savedLeagues = savedLeagues.map(l => l.inviteCode === activeDemoId ? { ...l, name: newName } : l);
-            localStorage.setItem('CF_SAVED_DEMO_LEAGUES', JSON.stringify(savedLeagues));
+          try {
+            const { error } = await supabase
+              .from('leagues')
+              .update({
+                name: newName,
+                features: newFeatures
+              })
+              .eq('id', currentLeague.id);
 
-            callbacks.showToast('Cambios guardados con éxito en la demo', 'success');
+            if (error) throw error;
+
+            localStorage.setItem('CF_CURRENT_LEAGUE_FEATURES', newFeatures);
+            callbacks.showToast('Configuración de liga actualizada', 'success');
             settingsModal.classList.remove('active');
             setTimeout(() => {
               window.location.reload();
             }, 500);
-          } else {
-            try {
-              const { error } = await supabase
-                .from('leagues')
-                .update({
-                  name: newName,
-                  features: newFeatures
-                })
-                .eq('id', currentLeague.id);
+          } catch (err) {
+            // Fail-safe fallback if column 'features' doesn't exist
+            if (err.message && (err.message.includes('column') || err.message.includes('features') || err.code === '42703')) {
+              try {
+                const { error: nameErr } = await supabase
+                  .from('leagues')
+                  .update({
+                    name: newName
+                  })
+                  .eq('id', currentLeague.id);
 
-              if (error) throw error;
-
-              localStorage.setItem('CF_CURRENT_LEAGUE_FEATURES', newFeatures);
-              callbacks.showToast('Configuración de liga actualizada', 'success');
-              settingsModal.classList.remove('active');
-              setTimeout(() => {
-                window.location.reload();
-              }, 500);
-            } catch (err) {
-              // Fail-safe fallback if column 'features' doesn't exist
-              if (err.message && (err.message.includes('column') || err.message.includes('features') || err.code === '42703')) {
-                try {
-                  const { error: nameErr } = await supabase
-                    .from('leagues')
-                    .update({
-                      name: newName
-                    })
-                    .eq('id', currentLeague.id);
-
-                  if (nameErr) throw nameErr;
-                  callbacks.showToast('Nombre guardado. El cambio de características requiere añadir la columna "features" de tipo text a la tabla leagues en Supabase.', 'success');
-                  settingsModal.classList.remove('active');
-                  setTimeout(() => {
-                    window.location.reload();
-                  }, 2500);
-                } catch (retryErr) {
-                  console.error(retryErr);
-                  callbacks.showToast('Error al guardar cambios', 'error');
-                  saveBtn.disabled = false;
-                  saveBtn.innerHTML = 'Guardar Cambios';
-                }
-              } else {
-                console.error(err);
-                callbacks.showToast('Error al actualizar liga', 'error');
+                if (nameErr) throw nameErr;
+                callbacks.showToast('Nombre guardado. El cambio de características requiere añadir la columna "features" de tipo text a la tabla leagues en Supabase.', 'success');
+                settingsModal.classList.remove('active');
+                setTimeout(() => {
+                  window.location.reload();
+                }, 2500);
+              } catch (retryErr) {
+                console.error(retryErr);
+                callbacks.showToast('Error al guardar cambios', 'error');
                 saveBtn.disabled = false;
                 saveBtn.innerHTML = 'Guardar Cambios';
               }
+            } else {
+              console.error(err);
+              callbacks.showToast('Error al actualizar liga', 'error');
+              saveBtn.disabled = false;
+              saveBtn.innerHTML = 'Guardar Cambios';
             }
           }
         });
@@ -901,81 +577,43 @@ export function renderDashboard(container, callbacks) {
       btn.disabled = true;
       btn.innerHTML = '<span class="spinner"></span>';
 
-      if (isGuest) {
-        // --- Guest Flow (Save in localStorage) ---
-        setTimeout(() => {
-          lastRecordId = `d-rec-${Math.random().toString(36).substring(2, 9)}`;
-          const newRecord = {
-            id: lastRecordId,
+      try {
+        const currentUser = supabase.auth.user ? supabase.auth.user() : (await supabase.auth.getUser()).data.user;
+
+        const { data: recordData, error: insertErr } = await supabase
+          .from('matchday_records')
+          .insert({
+            league_id: currentLeague.id,
             matchday_number: matchday,
             loser_profile_id: loserId,
             amount_owed: amount,
-            punishment_id: null,
             trash_talk_phrase: trashPhrase,
-            created_at: new Date().toISOString()
-          };
+            recorded_by: currentUser.id
+          })
+          .select()
+          .single();
 
-          const activeDemoId = localStorage.getItem('CF_ACTIVE_DEMO_LEAGUE_ID');
-          const storedRecords = JSON.parse(localStorage.getItem(`CF_DEMO_RECORDS_${activeDemoId}`) || '[]');
-          storedRecords.push(newRecord);
-          localStorage.setItem(`CF_DEMO_RECORDS_${activeDemoId}`, JSON.stringify(storedRecords));
+        if (insertErr) throw insertErr;
 
-          // Set pending record for the wheel
-          localStorage.setItem('CF_PENDING_RECORD_ID', lastRecordId);
+        lastRecordId = recordData.id;
+        localStorage.setItem('CF_PENDING_RECORD_ID', lastRecordId);
 
-          if (features === 'wheel') {
-            modal.querySelector('#modal-desc').innerHTML = `¡Se ha registrado a <strong>${loserName}</strong> en el Muro como el último de la <strong>Jornada ${matchday}</strong>!`;
-          } else {
-            modal.querySelector('#modal-desc').innerHTML = `¡Se ha guardado el registro de la <strong>Jornada ${matchday}</strong> en la demo!<br><strong>${loserName}</strong> suma <strong>${amount.toFixed(2)}€</strong> de deuda.`;
-          }
-          modal.querySelector('#modal-phrase').innerText = trashPhrase;
-          modal.classList.add('active');
-
-          recordForm.reset();
-          btn.disabled = false;
-          btn.innerHTML = 'Guardar y Picar 🤫';
-        }, 300);
-
-      } else {
-        // --- Real Supabase Flow ---
-        try {
-          const currentUser = supabase.auth.user ? supabase.auth.user() : (await supabase.auth.getUser()).data.user;
-
-          const { data: recordData, error: insertErr } = await supabase
-            .from('matchday_records')
-            .insert({
-              league_id: currentLeague.id,
-              matchday_number: matchday,
-              loser_profile_id: loserId,
-              amount_owed: amount,
-              trash_talk_phrase: trashPhrase,
-              recorded_by: currentUser.id
-            })
-            .select()
-            .single();
-
-          if (insertErr) throw insertErr;
-
-          lastRecordId = recordData.id;
-          localStorage.setItem('CF_PENDING_RECORD_ID', lastRecordId);
-
-          if (features === 'wheel') {
-            modal.querySelector('#modal-desc').innerHTML = `¡Se ha registrado a <strong>${loserName}</strong> en el Muro como el último de la <strong>Jornada ${matchday}</strong>!`;
-          } else {
-            modal.querySelector('#modal-desc').innerHTML = `¡Se ha guardado el registro de la <strong>Jornada ${matchday}</strong>!<br><strong>${loserName}</strong> suma <strong>${amount.toFixed(2)}€</strong> de deuda.`;
-          }
-          modal.querySelector('#modal-phrase').innerText = trashPhrase;
-          modal.classList.add('active');
-
-          recordForm.reset();
-          btn.disabled = false;
-          btn.innerHTML = 'Guardar y Picar 🤫';
-        } catch (err) {
-          console.error(err);
-          callbacks.showToast('Error al registrar el perdedor', 'error');
-          btn.disabled = false;
-          btn.innerHTML = 'Guardar y Picar 🤫';
+        if (features === 'wheel') {
+          modal.querySelector('#modal-desc').innerHTML = `¡Se ha registrado a <strong>${loserName}</strong> en el Muro como el último de la <strong>Jornada ${matchday}</strong>!`;
+        } else {
+          modal.querySelector('#modal-desc').innerHTML = `¡Se ha guardado el registro de la <strong>Jornada ${matchday}</strong>!<br><strong>${loserName}</strong> suma <strong>${amount.toFixed(2)}€</strong> de deuda.`;
         }
+        modal.querySelector('#modal-phrase').innerText = trashPhrase;
+        modal.classList.add('active');
+
+        recordForm.reset();
+        btn.disabled = false;
+        btn.innerHTML = 'Guardar y Picar 🤫';
+      } catch (err) {
+        console.error(err);
+        callbacks.showToast('Error al registrar el perdedor', 'error');
+        btn.disabled = false;
+        btn.innerHTML = 'Guardar y Picar 🤫';
       }
     });
 
