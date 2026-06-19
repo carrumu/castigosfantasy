@@ -339,7 +339,6 @@ function renderMainLayout(isGuest) {
   const homeBtn = app.querySelector('#logo-home');
   if (homeBtn) {
     homeBtn.addEventListener('click', () => {
-      closeSidebar();
       navigate('inicio');
     });
   }
@@ -355,7 +354,6 @@ function renderMainLayout(isGuest) {
   const landingBtn = app.querySelector('#nav-landing-btn');
   if (landingBtn) {
     landingBtn.addEventListener('click', () => {
-      closeSidebar();
       navigate('inicio');
     });
   }
@@ -363,7 +361,6 @@ function renderMainLayout(isGuest) {
   const selectLeagueBtn = app.querySelector('#nav-select-league-btn');
   if (selectLeagueBtn) {
     selectLeagueBtn.addEventListener('click', () => {
-      closeSidebar();
       navigate('mis-ligas');
     });
   }
@@ -371,7 +368,6 @@ function renderMainLayout(isGuest) {
   const dashBtn = app.querySelector('#nav-dash-btn');
   if (dashBtn) {
     dashBtn.addEventListener('click', () => {
-      closeSidebar();
       navigate('muro');
     });
   }
@@ -379,7 +375,6 @@ function renderMainLayout(isGuest) {
   const wheelBtn = app.querySelector('#nav-wheel-btn');
   if (wheelBtn) {
     wheelBtn.addEventListener('click', () => {
-      closeSidebar();
       navigate('ruleta');
     });
   }
@@ -387,7 +382,6 @@ function renderMainLayout(isGuest) {
   const challengesBtn = app.querySelector('#nav-challenges-btn');
   if (challengesBtn) {
     challengesBtn.addEventListener('click', () => {
-      closeSidebar();
       navigate('retos');
     });
   }
@@ -395,7 +389,6 @@ function renderMainLayout(isGuest) {
   const minigameBtn = app.querySelector('#nav-minigame-btn');
   if (minigameBtn) {
     minigameBtn.addEventListener('click', () => {
-      closeSidebar();
       navigate('minijuego');
     });
   }
@@ -403,7 +396,6 @@ function renderMainLayout(isGuest) {
   const bufonBtn = app.querySelector('#nav-bufon-btn');
   if (bufonBtn) {
     bufonBtn.addEventListener('click', () => {
-      closeSidebar();
       navigate('bufon');
     });
   }
