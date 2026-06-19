@@ -15,7 +15,7 @@ export function renderSelectLeague(container, callbacks) {
   // Check auth
   if (isGuest) {
     callbacks.showToast('Debes iniciar sesión para acceder a las ligas', 'warning');
-    callbacks.onNavigate('auth');
+    callbacks.onNavigate('acceso');
     return;
   }
 
@@ -147,46 +147,70 @@ export function renderSelectLeague(container, callbacks) {
             `}
           </div>
 
-          <!-- Create / Join Grid -->
-          <div style="display: grid; grid-template-columns: 1fr; gap: 1.5rem;">
-            <!-- Unirse a una Liga -->
-            <div class="card glass">
-              <h2 class="card-title">🔑 Unirse a una Liga</h2>
-              <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem;">
-                Introduce el código de invitación que te ha enviado el administrador de tu liga.
-              </p>
-              
-              <form id="join-league-form" style="display: flex; flex-direction: column; gap: 1rem;">
-                <div class="form-group" style="margin-bottom: 0.5rem;">
-                  <label for="join-code">Código de Invitación</label>
-                  <input type="text" id="join-code" class="input-field" placeholder="Ej: AB12CD" style="text-transform: uppercase;" required />
-                </div>
-                <button type="submit" class="btn-secondary" id="btn-join">Unirse a la Liga</button>
-              </form>
-            </div>
+          <!-- Botones de Acción (Unirse / Crear) -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.25rem; margin-top: 1rem;">
+            <button id="btn-show-join" class="btn-secondary" style="padding: 1.5rem 1rem; font-weight: 800; font-size: 1.05rem; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.65rem; border-radius: 14px; cursor: pointer; transition: all var(--transition-fast); background: rgba(255, 255, 255, 0.02); border: 1.5px solid var(--border-color); box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+              <span style="font-size: 1.8rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.25));">🔑</span>
+              <span>Unirse a una Liga</span>
+            </button>
+            <button id="btn-show-create" class="btn-secondary" style="padding: 1.5rem 1rem; font-weight: 800; font-size: 1.05rem; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.65rem; border-radius: 14px; cursor: pointer; transition: all var(--transition-fast); background: rgba(255, 255, 255, 0.02); border: 1.5px solid var(--border-color-glow); color: var(--text-light); box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+              <span style="font-size: 1.8rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.25));">✨</span>
+              <span style="font-weight: 800; color: var(--accent-gold);">Crear Liga Nueva</span>
+            </button>
+          </div>
 
-            <!-- Crear una Liga -->
-            <div class="card glass pitch-card">
-              <h2 class="card-title gradient-text-gold">✨ Crear una Liga Nueva</h2>
-              <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem;">
-                Crea una comunidad privada, define los ajustes y comparte el código con tus amigos.
-              </p>
-              
-              <form id="create-league-form" style="display: flex; flex-direction: column; gap: 1rem;">
-                <div class="form-group" style="margin-bottom: 0.25rem;">
-                  <label for="new-league-name">Nombre de la Liga (Ej: Liga Los Troncos)</label>
-                  <input type="text" id="new-league-name" class="input-field" placeholder="Nombre de tu liga fantasy" required />
-                </div>
-                <div class="form-group" style="margin-bottom: 0.25rem;">
-                  <label for="new-league-features">Funcionalidades Activas</label>
-                  <select id="new-league-features" class="input-field">
-                    <option value="both">Ruleta + Registro de Deudas (Ambos)</option>
-                    <option value="wheel">Solo Ruleta de Castigos (Sin deudas)</option>
-                    <option value="money">Solo Registro de Deudas/Bote (Sin ruleta)</option>
-                  </select>
-                </div>
-                <button type="submit" class="btn-primary" id="btn-create">Crear Liga</button>
-              </form>
+          <!-- Contenedor de Formularios Desplegables en Modales -->
+          <!-- Modal Unirse a una Liga -->
+          <div id="modal-join-form" class="modal-overlay">
+            <div class="modal-content glass" style="border-color: rgba(255, 255, 255, 0.08);">
+              <div class="modal-header">
+                <h3 class="gradient-text-green" style="font-weight: 800; font-size: 1.25rem;">🔑 Unirse a una Liga</h3>
+                <button id="btn-close-join" class="modal-close" style="font-size: 1.25rem; font-weight: 700;">✕</button>
+              </div>
+              <div class="modal-body">
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem;">
+                  Introduce el código de invitación de 6 caracteres para entrar a la liga.
+                </p>
+                
+                <form id="join-league-form" style="display: flex; flex-direction: column; gap: 1rem;">
+                  <div class="form-group" style="margin-bottom: 0.5rem;">
+                    <label for="join-code">Código de Invitación</label>
+                    <input type="text" id="join-code" class="input-field" placeholder="Ej: AB12CD" style="text-transform: uppercase;" required />
+                  </div>
+                  <button type="submit" class="btn-secondary" id="btn-join" style="font-weight: 700;">Unirse a la Liga</button>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <!-- Modal Crear una Liga -->
+          <div id="modal-create-form" class="modal-overlay">
+            <div class="modal-content glass pitch-card" style="border-color: var(--border-color-glow);">
+              <div class="modal-header">
+                <h3 class="gradient-text-gold" style="font-weight: 800; font-size: 1.25rem;">✨ Crear una Liga Nueva</h3>
+                <button id="btn-close-create" class="modal-close" style="font-size: 1.25rem; font-weight: 700;">✕</button>
+              </div>
+              <div class="modal-body">
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem;">
+                  Define el nombre y las características para tu nueva comunidad de juego.
+                </p>
+                
+                <form id="create-league-form" style="display: flex; flex-direction: column; gap: 1rem;">
+                  <div class="form-group" style="margin-bottom: 0.25rem;">
+                    <label for="new-league-name">Nombre de la Liga (Ej: Liga Los Troncos)</label>
+                    <input type="text" id="new-league-name" class="input-field" placeholder="Nombre de tu liga fantasy" required />
+                  </div>
+                  <div class="form-group" style="margin-bottom: 0.25rem;">
+                    <label for="new-league-features">Funcionalidades Activas</label>
+                    <select id="new-league-features" class="input-field">
+                      <option value="both">Ruleta + Registro de Deudas (Ambos)</option>
+                      <option value="wheel">Solo Ruleta de Castigos (Sin deudas)</option>
+                      <option value="money">Solo Registro de Deudas/Bote (Sin ruleta)</option>
+                    </select>
+                  </div>
+                  <button type="submit" class="btn-primary" id="btn-create" style="font-weight: 700;">Crear Liga</button>
+                </form>
+              </div>
             </div>
           </div>
         </div>
@@ -205,9 +229,51 @@ export function renderSelectLeague(container, callbacks) {
         localStorage.setItem('CF_CURRENT_LEAGUE_FEATURES', features);
 
         callbacks.showToast(`Has seleccionado la liga "${name}"`, 'success');
-        callbacks.onNavigate('landing');
+        callbacks.onNavigate('menu-liga');
       });
     });
+
+    // Toggle Form Modals Logic
+    const btnShowJoin = container.querySelector('#btn-show-join');
+    const btnShowCreate = container.querySelector('#btn-show-create');
+    const modalJoinForm = container.querySelector('#modal-join-form');
+    const modalCreateForm = container.querySelector('#modal-create-form');
+    const btnCloseJoin = container.querySelector('#btn-close-join');
+    const btnCloseCreate = container.querySelector('#btn-close-create');
+
+    if (btnShowJoin && btnShowCreate) {
+      btnShowJoin.addEventListener('click', () => {
+        modalJoinForm.classList.add('active');
+      });
+
+      btnShowCreate.addEventListener('click', () => {
+        modalCreateForm.classList.add('active');
+      });
+    }
+
+    const closeJoin = () => {
+      modalJoinForm.classList.remove('active');
+    };
+
+    const closeCreate = () => {
+      modalCreateForm.classList.remove('active');
+    };
+
+    if (btnCloseJoin) btnCloseJoin.addEventListener('click', closeJoin);
+    if (btnCloseCreate) btnCloseCreate.addEventListener('click', closeCreate);
+
+    // Close on backdrop click
+    if (modalJoinForm) {
+      modalJoinForm.addEventListener('click', (e) => {
+        if (e.target === modalJoinForm) closeJoin();
+      });
+    }
+
+    if (modalCreateForm) {
+      modalCreateForm.addEventListener('click', (e) => {
+        if (e.target === modalCreateForm) closeCreate();
+      });
+    }
 
     // Hook Join Liga
     const joinForm = container.querySelector('#join-league-form');
@@ -261,7 +327,7 @@ export function renderSelectLeague(container, callbacks) {
         localStorage.setItem('CF_ACTIVE_LEAGUE_NAME', targetLeague.name);
         localStorage.setItem('CF_CURRENT_LEAGUE_FEATURES', targetLeague.features || 'both');
 
-        callbacks.onNavigate('landing');
+        callbacks.onNavigate('menu-liga');
       } catch (err) {
         console.error(err);
         callbacks.showToast('Error al unirse a la liga', 'error');
@@ -317,7 +383,7 @@ export function renderSelectLeague(container, callbacks) {
         localStorage.setItem('CF_ACTIVE_LEAGUE_NAME', newLeague.name);
         localStorage.setItem('CF_CURRENT_LEAGUE_FEATURES', newLeague.features || 'both');
 
-        callbacks.onNavigate('landing');
+        callbacks.onNavigate('menu-liga');
       } catch (err) {
         console.error(err);
         callbacks.showToast('No se pudo crear la liga', 'error');

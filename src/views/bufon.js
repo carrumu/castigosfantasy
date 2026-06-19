@@ -467,7 +467,7 @@ export function renderBufon(container, callbacks) {
       btn.addEventListener('click', () => {
         if (isGuest) {
           callbacks.showToast('Inicia sesión para votar por el Bufón de la jornada', 'warning');
-          callbacks.onNavigate('auth');
+          callbacks.onNavigate('acceso');
           return;
         }
         const id = Number(btn.dataset.id);

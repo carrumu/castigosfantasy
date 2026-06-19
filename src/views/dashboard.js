@@ -39,7 +39,7 @@ export function renderDashboard(container, callbacks) {
   async function loadData() {
     if (isGuest) {
       callbacks.showToast('Debes iniciar sesión para acceder a esta sección', 'warning');
-      callbacks.onNavigate('auth');
+      callbacks.onNavigate('acceso');
       return;
     }
 
@@ -57,7 +57,7 @@ export function renderDashboard(container, callbacks) {
       if (!userLeagues || userLeagues.length === 0) {
         localStorage.removeItem('CF_ACTIVE_LEAGUE_ID');
         callbacks.showToast('No perteneces a ninguna liga todavía', 'info');
-        callbacks.onNavigate('select-league');
+        callbacks.onNavigate('mis-ligas');
         return;
       }
 
@@ -169,6 +169,15 @@ export function renderDashboard(container, callbacks) {
             </p>
           </div>
          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            ${!isGuest ? `
+              <button class="header-action-btn btn-secondary" id="btn-back-to-hub" title="Volver al Menú" style="padding: 0.65rem 1rem; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 0.4rem; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color);">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="19" y1="12" x2="5" y2="12"></line>
+                  <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                Volver al Menú
+              </button>
+            ` : ''}
             ${isGuest ? `
               <button class="header-action-btn btn-danger" id="btn-exit-demo-league" title="Cambiar de Liga Demo" style="padding: 0.65rem 1rem; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 0.4rem;">
                 Cambiar Liga
@@ -328,6 +337,14 @@ export function renderDashboard(container, callbacks) {
         console.error(err);
       });
     });
+
+    // Hook Back to Hub Button
+    const backToHubBtn = container.querySelector('#btn-back-to-hub');
+    if (backToHubBtn) {
+      backToHubBtn.addEventListener('click', () => {
+        callbacks.onNavigate('menu-liga');
+      });
+    }
 
     // Hook settings modal triggers
     const settingsBtn = container.querySelector('#btn-league-settings');
@@ -628,7 +645,7 @@ export function renderDashboard(container, callbacks) {
     if (features !== 'money') {
       container.querySelector('#go-to-wheel-btn').addEventListener('click', () => {
         modal.classList.remove('active');
-        callbacks.onNavigate('roulette');
+        callbacks.onNavigate('ruleta');
       });
     }
   }

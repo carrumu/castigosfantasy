@@ -11,7 +11,7 @@ export function renderLanding(container, callbacks) {
   // Define the pages data
   const sections = [
     {
-      id: 'dashboard',
+      id: 'muro',
       title: 'Muro de la Vergüenza',
       description: 'Clasificación de deudas, deudas perdonadas y pagadas. Registra deudas e inmortaliza los castigos en el historial.',
       icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.45 1-1 1H4v2h16v-2h-5c-.55 0-1-.45-1-1v-2.34"></path><path d="M12 2a6 6 0 0 0-6 6v5a6 6 0 0 0 12 0V8a6 6 0 0 0-6-6z"></path></svg>`,
@@ -19,7 +19,7 @@ export function renderLanding(container, callbacks) {
       colorClass: 'color-dashboard'
     },
     ...(activeFeatures !== 'money' ? [{
-      id: 'roulette',
+      id: 'ruleta',
       title: 'Ruleta de Castigos',
       description: 'El azar decide tu destino. Haz girar la ruleta de la muerte para asignar un castigo aleatorio al perdedor de la jornada.',
       icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 2v20"></path><path d="M2 12h20"></path><path d="m19.07 4.93-14.14 14.14"></path><path d="m4.93 4.93 14.14 14.14"></path></svg>`,
@@ -27,7 +27,7 @@ export function renderLanding(container, callbacks) {
       colorClass: 'color-roulette'
     }] : []),
     {
-      id: 'challenges',
+      id: 'retos',
       title: 'Reto Semanal',
       description: 'Ver los retos activos de la semana, votar nuevas propuestas y evitar quedar en la cola para no ser castigado.',
       icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path></svg>`,
@@ -43,7 +43,7 @@ export function renderLanding(container, callbacks) {
       colorClass: 'color-bufon'
     },
     {
-      id: 'minigame',
+      id: 'minijuego',
       title: 'Adivinar Jugador',
       description: 'Ponte a prueba en el Wordle diario de fútbol. Tienes 6 intentos para adivinar el jugador misterioso de LaLiga.',
       icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="12" x2="10" y2="12"></line><line x1="8" y1="10" x2="8" y2="14"></line><line x1="15" y1="13" x2="15.01" y2="13"></line><line x1="18" y1="11" x2="18.01" y2="11"></line><rect x="2" y="6" width="20" height="12" rx="3"></rect></svg>`,
@@ -128,7 +128,7 @@ export function renderLanding(container, callbacks) {
   if (dashBtn) {
     dashBtn.addEventListener('click', () => {
       if (callbacks.onNavigate) {
-        callbacks.onNavigate('dashboard');
+        callbacks.onNavigate('muro');
       }
     });
   }
@@ -137,7 +137,7 @@ export function renderLanding(container, callbacks) {
   if (wheelBtn) {
     wheelBtn.addEventListener('click', () => {
       if (callbacks.onNavigate) {
-        callbacks.onNavigate('roulette');
+        callbacks.onNavigate('ruleta');
       }
     });
   }

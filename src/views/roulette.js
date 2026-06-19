@@ -14,6 +14,7 @@ export function renderRoulette(container, callbacks) {
   let punishments = [];
   let history = [];
   let currentLeagueId = null;
+  let currentLeague = null;
   let pendingRecord = null;
   let isSpinning = false;
 
@@ -32,7 +33,7 @@ export function renderRoulette(container, callbacks) {
 
     if (isGuest) {
       callbacks.showToast('Debes iniciar sesión para acceder a esta sección', 'warning');
-      callbacks.onNavigate('auth');
+      callbacks.onNavigate('acceso');
       return;
     }
 
@@ -50,7 +51,7 @@ export function renderRoulette(container, callbacks) {
       if (!userLeagues || userLeagues.length === 0) {
         localStorage.removeItem('CF_ACTIVE_LEAGUE_ID');
         callbacks.showToast('No perteneces a ninguna liga todavía', 'info');
-        callbacks.onNavigate('select-league');
+        callbacks.onNavigate('mis-ligas');
         return;
       }
 
@@ -64,6 +65,16 @@ export function renderRoulette(container, callbacks) {
       }
 
       currentLeagueId = activeLeagueId;
+
+      // 2.5 Load active league details
+      const { data: leagueData, error: leagueErr } = await supabase
+        .from('leagues')
+        .select('*')
+        .eq('id', currentLeagueId)
+        .single();
+
+      if (leagueErr) throw leagueErr;
+      currentLeague = leagueData;
 
       // Load pending record if any
       if (pendingId) {
@@ -150,6 +161,25 @@ export function renderRoulette(container, callbacks) {
   function renderView() {
     container.innerHTML = `
       <div class="container">
+        <!-- Banner de Liga -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+          <div>
+            <h1 class="gradient-text-green" style="font-size: 1.6rem; font-weight: 900;">${currentLeague.name}</h1>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">
+              Código de Invitación: <strong style="color: var(--accent-gold); cursor: pointer;" id="copy-invite-code" title="Copiar código">${currentLeague.invite_code} (Copiar)</strong>
+            </p>
+          </div>
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <button class="header-action-btn btn-secondary" id="btn-back-to-hub" title="Volver al Menú" style="padding: 0.65rem 1rem; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 0.4rem; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color);">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+              </svg>
+              Volver al Menú
+            </button>
+          </div>
+        </div>
+
         <!-- Indicador de Tirada Pendiente -->
         ${pendingRecord ? `
           <div class="supabase-banner" style="background: rgba(var(--accent-rgb), 0.1); border-color: rgba(var(--accent-rgb), 0.3); margin-bottom: 1.25rem;">
@@ -337,6 +367,26 @@ export function renderRoulette(container, callbacks) {
 
     container.querySelector('#close-resmodal-btn').addEventListener('click', finishSession);
     container.querySelector('#confirm-result-btn').addEventListener('click', finishSession);
+
+    // Hook Copy Invite Code
+    const copyBtn = container.querySelector('#copy-invite-code');
+    if (copyBtn) {
+      copyBtn.addEventListener('click', () => {
+        navigator.clipboard.writeText(currentLeague.invite_code).then(() => {
+          callbacks.showToast('Código copiado al portapapeles', 'success');
+        }).catch(err => {
+          console.error(err);
+        });
+      });
+    }
+
+    // Hook Back to Hub Button
+    const backToHubBtn = container.querySelector('#btn-back-to-hub');
+    if (backToHubBtn) {
+      backToHubBtn.addEventListener('click', () => {
+        callbacks.onNavigate('menu-liga');
+      });
+    }
   }
 
   // Draw wheel helper
