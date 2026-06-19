@@ -69,7 +69,7 @@ async function checkAuthAndRender() {
   const isGuest = !user;
 
   // Route Guard: restrict private views to authenticated users
-  const privateViews = ['muro', 'ruleta', 'retos', 'bufon', 'mis-ligas', 'menu-liga'];
+  const privateViews = ['muro', 'mis-ligas', 'menu-liga'];
   if (isGuest && privateViews.includes(currentView)) {
     history.replaceState({}, '', '/acceso');
     showToast('Debes iniciar sesión para acceder a esta sección', 'warning');
@@ -107,6 +107,11 @@ function renderMainLayout(isGuest) {
               <span>Mis Ligas</span>
             </button>
           ` : ''}
+
+          <button class="nav-item ${currentView === 'ruleta' ? 'active' : ''}" id="nav-wheel-btn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;"><circle cx="12" cy="12" r="10"></circle><path d="M12 2v20"></path><path d="M2 12h20"></path></svg>
+            <span>Ruleta</span>
+          </button>
 
           <button class="nav-item ${currentView === 'retos' ? 'active' : ''}" id="nav-challenges-btn">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path></svg>

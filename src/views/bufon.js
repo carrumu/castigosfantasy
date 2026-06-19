@@ -1,178 +1,566 @@
+import { supabase } from '../supabase';
+
 /**
  * Renders the "El Bufón" (Matchday's Worst Player) screen.
- * Allows members to nominate and vote for the worst performer of the matchday.
+ * Allows members to nominate and vote for the worst performer of the matchday in their leagues.
+ * Guests and users without leagues see a global read-only board.
  * @param {HTMLElement} container 
  * @param {Object} callbacks 
+ * @param {Function} callbacks.onNavigate
  * @param {Function} callbacks.showToast 
  */
 export function renderBufon(container, callbacks) {
   const isGuest = callbacks.isGuest;
   
-  // Default Initial Data
-  const DEFAULT_NOMINEES = [
-    { id: 1, name: "Amallah", team: "Real Valladolid", reason: "Expulsado en el minuto 15 por doble amarilla y cometió un penalti flagrante.", votes: 4 },
-    { id: 2, name: "Lejeune", team: "Rayo Vallecano", reason: "Marcó un gol en propia puerta de cabeza intentando despejar un córner.", votes: 8 },
-    { id: 3, name: "Marcão", team: "Sevilla FC", reason: "Expulsado a los 3 minutos de entrar al campo tras cometer una falta innecesaria.", votes: 3 }
-  ];
-
-  const DEFAULT_HISTORY = [
-    { matchday: 4, name: "Abdel Abqar", team: "Deportivo Alavés", reason: "Le pidió la camiseta a Mbappé en el descanso del partido cuando iban perdiendo 2-0 y fue sustituido por mal rendimiento." },
-    { matchday: 3, name: "Gerard Gumbau", team: "Rayo Vallecano", reason: "Dio un pase hacia atrás sin mirar que acabó regalando el gol de la victoria al equipo contrario en el minuto 92." }
-  ];
-
-  // Load state from local storage or set defaults
-  let nominees = JSON.parse(localStorage.getItem('CF_BUFON_NOMINEES') || 'null');
-  if (!nominees) {
-    nominees = DEFAULT_NOMINEES;
-    localStorage.setItem('CF_BUFON_NOMINEES', JSON.stringify(nominees));
-  }
-
-  let history = JSON.parse(localStorage.getItem('CF_BUFON_HISTORY') || 'null');
-  if (!history) {
-    history = DEFAULT_HISTORY;
-    localStorage.setItem('CF_BUFON_HISTORY', JSON.stringify(history));
-  }
-
-  let currentMatchday = Number(localStorage.getItem('CF_BUFON_CURRENT_MATCHDAY') || '5');
-  let userVotedId = localStorage.getItem(`CF_BUFON_VOTED_MATCHDAY_${currentMatchday}`) || null;
-
-  // Read active username
+  let nominees = [];
+  let history = [];
+  let currentMatchday = 5;
+  let userVotedId = null;
+  let votingStartTime = null;
   let userNickname = "Tú";
-  const storedUser = localStorage.getItem('sb-giieisavasjbijnvpsnw-auth-token');
-  if (storedUser) {
+  let activeLeagueId = localStorage.getItem('CF_ACTIVE_LEAGUE_ID');
+  let currentLeagueName = localStorage.getItem('CF_ACTIVE_LEAGUE_NAME') || '';
+  
+  // Tab state: 'league' or 'global'. If guest or no league, always show 'global'.
+  let activeTab = (isGuest || !activeLeagueId) ? 'global' : 'league';
+
+  async function ensureActiveLeague() {
+    if (!activeLeagueId && !isGuest) {
+      try {
+        const currentUser = supabase.auth.user ? supabase.auth.user() : (await supabase.auth.getUser()).data.user;
+        if (currentUser) {
+          const { data: memberList } = await supabase
+            .from('league_members')
+            .select(`
+              leagues (
+                id,
+                name
+              )
+            `)
+            .eq('profile_id', currentUser.id)
+            .limit(1);
+
+          if (memberList && memberList.length > 0 && memberList[0].leagues) {
+            activeLeagueId = memberList[0].leagues.id;
+            currentLeagueName = memberList[0].leagues.name;
+            localStorage.setItem('CF_ACTIVE_LEAGUE_ID', activeLeagueId);
+            localStorage.setItem('CF_ACTIVE_LEAGUE_NAME', currentLeagueName);
+            // Default to league tab now that they have an active league
+            activeTab = 'league';
+          }
+        }
+      } catch (err) {
+        console.error("Error ensuring active league:", err);
+      }
+    }
+  }
+
+  // Helper to compute countdown remaining time text
+  function getRemainingTimeText() {
+    if (!votingStartTime) return "24 horas (pendiente de inicio)";
+    const start = new Date(votingStartTime).getTime();
+    const end = start + (24 * 3600 * 1000);
+    const diff = end - Date.now();
+    if (diff <= 0) {
+      return "Votación finalizada (cierre pendiente)";
+    }
+    const hrs = Math.floor(diff / 3600000);
+    const mins = Math.floor((diff % 3600000) / 60000);
+    return `Tiempo restante: ${hrs}h ${mins}m`;
+  }
+
+  // Helper to get time value
+  function getRemainingTime() {
+    if (!votingStartTime) return 24 * 3600 * 1000;
+    const start = new Date(votingStartTime).getTime();
+    const end = start + (24 * 3600 * 1000);
+    return end - Date.now();
+  }
+
+  async function loadData() {
+    container.innerHTML = `
+      <div class="container" style="display: flex; justify-content: center; align-items: center; padding: 3rem 0;">
+        <span class="spinner" style="width: 40px; height: 40px;"></span>
+      </div>
+    `;
+
+    await ensureActiveLeague();
+
+    if (activeTab === 'global') {
+      await loadGlobalData();
+    } else {
+      await loadLeagueData();
+    }
+  }
+
+  async function loadGlobalData() {
     try {
-      const parsed = JSON.parse(storedUser);
-      const email = parsed?.user?.email || "";
-      if (email) userNickname = email.split('@')[0];
-    } catch {}
+      // 1. Fetch all nominees and join with league name
+      const { data: nomineesData, error: nomineesErr } = await supabase
+        .from('jester_nominees')
+        .select(`
+          id,
+          league_id,
+          matchday_number,
+          name,
+          team,
+          reason,
+          leagues (
+            name
+          )
+        `);
+
+      if (nomineesErr) throw nomineesErr;
+
+      // 2. Fetch all votes to count
+      const { data: votesData, error: votesErr } = await supabase
+        .from('jester_votes')
+        .select('nominee_id, league_id');
+
+      if (votesErr) throw votesErr;
+
+      // Calculate votes per nominee and total votes per league
+      const votesMap = {};
+      const leagueTotalVotes = {};
+
+      nomineesData.forEach(n => {
+        votesMap[n.id] = 0;
+        if (!leagueTotalVotes[n.league_id]) {
+          leagueTotalVotes[n.league_id] = 0;
+        }
+      });
+
+      votesData.forEach(v => {
+        if (votesMap[v.nominee_id] !== undefined) {
+          votesMap[v.nominee_id]++;
+        }
+        if (leagueTotalVotes[v.league_id] !== undefined) {
+          leagueTotalVotes[v.league_id]++;
+        }
+      });
+
+      // Group nominees by league
+      const leaguesGrouped = {};
+      nomineesData.forEach(n => {
+        const lId = n.league_id;
+        const lName = n.leagues?.name || "Liga de CastigoFantasy";
+        if (!leaguesGrouped[lId]) {
+          leaguesGrouped[lId] = {
+            id: lId,
+            name: lName,
+            matchday: n.matchday_number,
+            nominees: [],
+            totalVotes: leagueTotalVotes[lId] || 0
+          };
+        }
+        leaguesGrouped[lId].nominees.push({
+          id: n.id,
+          name: n.name,
+          team: n.team,
+          reason: n.reason,
+          votes: votesMap[n.id] || 0
+        });
+      });
+
+      // 3. Fetch global history
+      const { data: historyData, error: historyErr } = await supabase
+        .from('jester_history')
+        .select(`
+          matchday_number,
+          name,
+          team,
+          reason,
+          raffle_winner,
+          raffle_player,
+          leagues (
+            name
+          )
+        `)
+        .order('created_at', { ascending: false })
+        .limit(15);
+
+      if (historyErr) throw historyErr;
+
+      const globalHistory = historyData.map(h => ({
+        matchday: h.matchday_number,
+        name: h.name,
+        team: h.team,
+        reason: h.reason,
+        raffleWinner: h.raffle_winner,
+        rafflePlayer: h.raffle_player,
+        leagueName: h.leagues?.name || "Liga de CastigoFantasy"
+      }));
+
+      // Get user nickname for UI references
+      if (!isGuest) {
+        try {
+          const currentUser = supabase.auth.user ? supabase.auth.user() : (await supabase.auth.getUser()).data.user;
+          if (currentUser) {
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('apodo, display_name')
+              .eq('id', currentUser.id)
+              .maybeSingle();
+            userNickname = profile?.apodo || profile?.display_name || currentUser.email.split('@')[0];
+          }
+        } catch {}
+      }
+
+      renderGlobalView(leaguesGrouped, globalHistory);
+    } catch (err) {
+      console.error("Error loading global data:", err);
+      callbacks.showToast('Error al cargar la vista global del Bufón', 'error');
+    }
   }
 
-  function saveState() {
-    localStorage.setItem('CF_BUFON_NOMINEES', JSON.stringify(nominees));
-    localStorage.setItem('CF_BUFON_HISTORY', JSON.stringify(history));
-    localStorage.setItem('CF_BUFON_CURRENT_MATCHDAY', currentMatchday.toString());
+  async function loadLeagueData() {
+    if (!activeLeagueId) {
+      activeTab = 'global';
+      await loadGlobalData();
+      return;
+    }
+
+    try {
+      // 1. Load active league details (current jester matchday & voting start)
+      const { data: league, error: leagueErr } = await supabase
+        .from('leagues')
+        .select('name, jester_current_matchday, jester_voting_start')
+        .eq('id', activeLeagueId)
+        .single();
+      
+      if (leagueErr) throw leagueErr;
+      
+      currentLeagueName = league.name;
+      currentMatchday = league.jester_current_matchday || 5;
+      votingStartTime = league.jester_voting_start;
+
+      // 2. Load nominees for the current matchday
+      const { data: nomineesData, error: nomineesErr } = await supabase
+        .from('jester_nominees')
+        .select('*')
+        .eq('league_id', activeLeagueId)
+        .eq('matchday_number', currentMatchday);
+      
+      if (nomineesErr) throw nomineesErr;
+      
+      // 3. Load votes for these nominees in this matchday
+      const { data: votesData, error: votesErr } = await supabase
+        .from('jester_votes')
+        .select('*')
+        .eq('league_id', activeLeagueId)
+        .eq('matchday_number', currentMatchday);
+      
+      if (votesErr) throw votesErr;
+
+      // Map votes to nominees count
+      const votesMap = {};
+      nomineesData.forEach(n => {
+        votesMap[n.id] = 0;
+      });
+      votesData.forEach(v => {
+        if (votesMap[v.nominee_id] !== undefined) {
+          votesMap[v.nominee_id]++;
+        }
+      });
+
+      nominees = nomineesData.map(n => ({
+        id: n.id,
+        name: n.name,
+        team: n.team,
+        reason: n.reason,
+        votes: votesMap[n.id] || 0,
+        nominated_by: n.nominated_by
+      }));
+
+      // 4. Load history
+      const { data: historyData, error: historyErr } = await supabase
+        .from('jester_history')
+        .select('*')
+        .eq('league_id', activeLeagueId)
+        .order('matchday_number', { ascending: false });
+      
+      if (historyErr) throw historyErr;
+
+      history = historyData.map(h => ({
+        matchday: h.matchday_number,
+        name: h.name,
+        team: h.team,
+        reason: h.reason,
+        raffleWinner: h.raffle_winner,
+        rafflePlayer: h.raffle_player
+      }));
+
+      // 5. Get current user's vote and display name if logged in
+      if (!isGuest) {
+        const currentUser = supabase.auth.user ? supabase.auth.user() : (await supabase.auth.getUser()).data.user;
+        if (currentUser) {
+          // Get user nickname (apodo or display_name or email prefix)
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('apodo, display_name')
+            .eq('id', currentUser.id)
+            .maybeSingle();
+          
+          userNickname = profile?.apodo || profile?.display_name || currentUser.email.split('@')[0];
+
+          // Check if user voted
+          const userVote = votesData.find(v => v.profile_id === currentUser.id);
+          userVotedId = userVote ? userVote.nominee_id : null;
+        }
+      }
+
+      renderLeagueView();
+    } catch (err) {
+      console.error(err);
+      callbacks.showToast('Error al cargar datos de El Bufón', 'error');
+    }
   }
 
-  function handleVote(nomineeId) {
+  async function handleVote(nomineeId) {
+    if (isGuest) {
+      callbacks.showToast("Inicia sesión para votar por el Bufón de la jornada", "warning");
+      callbacks.onNavigate('acceso');
+      return;
+    }
+
     if (userVotedId) {
       callbacks.showToast("Ya has votado en esta jornada", "warning");
       return;
     }
-    nominees = nominees.map(n => n.id === nomineeId ? { ...n, votes: n.votes + 1 } : n);
-    userVotedId = nomineeId;
-    localStorage.setItem(`CF_BUFON_VOTED_MATCHDAY_${currentMatchday}`, nomineeId.toString());
-    localStorage.setItem('CF_USER_VOTED_BUFON_ID', nomineeId.toString());
 
-    saveState();
-    callbacks.showToast("¡Voto registrado! Participando en el sorteo de la camiseta.", "success");
-    renderView();
+    try {
+      const currentUser = supabase.auth.user ? supabase.auth.user() : (await supabase.auth.getUser()).data.user;
+      
+      const { error } = await supabase
+        .from('jester_votes')
+        .insert({
+          league_id: activeLeagueId,
+          matchday_number: currentMatchday,
+          profile_id: currentUser.id,
+          nominee_id: nomineeId
+        });
+
+      if (error) {
+        if (error.code === '23505') {
+          callbacks.showToast("Ya has votado en esta jornada", "warning");
+        } else {
+          throw error;
+        }
+      } else {
+        callbacks.showToast("¡Voto registrado! Participando en el sorteo de la camiseta.", "success");
+      }
+
+      await loadData();
+    } catch (err) {
+      console.error("Error al registrar voto:", err);
+      callbacks.showToast("Error al registrar el voto", "error");
+    }
   }
 
-  function drawRaffleWinner(winnerNominee) {
-    const activeDemoId = localStorage.getItem('CF_ACTIVE_DEMO_LEAGUE_ID') || 'DEMO-ASTURES';
-    const activeDemoName = localStorage.getItem(`CF_DEMO_LEAGUE_NAME_${activeDemoId}`) || "Liga Demo Astures";
-    
-    const GLOBAL_USERS = [
-      { name: "Paco G.", league: activeDemoName },
-      { name: "Álvaro M.", league: activeDemoName },
-      { name: "Santi K.", league: activeDemoName },
-      { name: "Luis T.", league: activeDemoName },
-      { name: "Marta R.", league: "Liga Super Mánagers" },
-      { name: "Carlos P.", league: "Liga de los Vagos" },
-      { name: "Dani F.", league: "Liga La Pachanga" },
-      { name: "Sofía L.", league: "Liga Elite" },
-      { name: "Javi N.", league: "Liga Fantasy Sur" },
-      { name: "Andrés B.", league: "Liga Los Viciados" },
-      { name: "Elena H.", league: "Liga Primera División" }
-    ];
+  async function drawRaffleWinner(winnerNominee) {
+    try {
+      // Get all voters for this matchday
+      const { data: voters, error } = await supabase
+        .from('jester_votes')
+        .select(`
+          profile_id,
+          profiles (
+            display_name,
+            apodo
+          )
+        `)
+        .eq('league_id', activeLeagueId)
+        .eq('matchday_number', currentMatchday);
 
-    const participants = [...GLOBAL_USERS];
-    
-    // If user voted, add them to the page-wide raffle participants pool
-    if (userVotedId) {
-      participants.push({ name: userNickname, league: activeDemoName });
+      if (error) throw error;
+
+      if (!voters || voters.length === 0) {
+        // Fallback: draw from league members
+        const { data: members, error: memErr } = await supabase
+          .from('league_members')
+          .select(`
+            profile_id,
+            profiles (
+              display_name,
+              apodo
+            )
+          `)
+          .eq('league_id', activeLeagueId);
+        
+        if (memErr) throw memErr;
+        if (!members || members.length === 0) return null;
+
+        const luckyMember = members[Math.floor(Math.random() * members.length)];
+        const name = luckyMember.profiles?.apodo || luckyMember.profiles?.display_name || "Mánager de la Liga";
+        return {
+          manager: `${name} (${currentLeagueName})`,
+          player: winnerNominee.name
+        };
+      }
+
+      const luckyVoter = voters[Math.floor(Math.random() * voters.length)];
+      const name = luckyVoter.profiles?.apodo || luckyVoter.profiles?.display_name || "Mánager de la Liga";
+      return {
+        manager: `${name} (${currentLeagueName})`,
+        player: winnerNominee.name
+      };
+    } catch (err) {
+      console.error("Error drawing raffle winner:", err);
+      return null;
+    }
+  }
+
+  async function handleNominate(name, team, reason) {
+    if (isGuest) {
+      callbacks.showToast("Inicia sesión para nominar candidatos", "warning");
+      callbacks.onNavigate('acceso');
+      return;
     }
 
-    if (participants.length === 0) return null;
-    
-    const luckyWinner = participants[Math.floor(Math.random() * participants.length)];
-    return {
-      manager: `${luckyWinner.name} (${luckyWinner.league})`,
-      player: winnerNominee.name
-    };
-  }
-
-  function handleNominate(name, team, reason) {
     if (nominees.length >= 6) {
       callbacks.showToast("Máximo 6 nominados permitidos por jornada para mantener el orden", "error");
       return;
     }
 
-    const newNominee = {
-      id: Date.now(),
-      name,
-      team,
-      reason,
-      votes: 0
-    };
+    try {
+      const currentUser = supabase.auth.user ? supabase.auth.user() : (await supabase.auth.getUser()).data.user;
 
-    nominees.push(newNominee);
-    
-    if (!localStorage.getItem('CF_BUFON_VOTING_START_TIME')) {
-      localStorage.setItem('CF_BUFON_VOTING_START_TIME', new Date().toISOString());
+      // 1. Insert nominee
+      const { error: nomErr } = await supabase
+        .from('jester_nominees')
+        .insert({
+          league_id: activeLeagueId,
+          matchday_number: currentMatchday,
+          name: name,
+          team: team,
+          reason: reason,
+          nominated_by: currentUser.id
+        });
+
+      if (nomErr) throw nomErr;
+
+      // 2. If it's the first nominee of the matchday, update voting start time in leagues table
+      if (nominees.length === 0 && !votingStartTime) {
+        const start = new Date().toISOString();
+        const { error: leagueErr } = await supabase
+          .from('leagues')
+          .update({ jester_voting_start: start })
+          .eq('id', activeLeagueId);
+        
+        if (leagueErr) {
+          console.warn("Could not update voting start time:", leagueErr);
+        }
+      }
+
+      callbacks.showToast("Nominado añadido a la jornada", "success");
+      await loadData();
+    } catch (err) {
+      console.error("Error al nominar:", err);
+      callbacks.showToast("Error al añadir nominado", "error");
     }
-
-    saveState();
-    callbacks.showToast("Nominado añadido a la jornada", "success");
-    renderView();
   }
 
-  function closeMatchday() {
+  async function closeMatchday() {
     if (nominees.length === 0) {
       callbacks.showToast("No hay nominados en esta jornada para cerrar", "error");
       return;
     }
 
-    // Find nominee with the highest votes
-    let winner = nominees[0];
-    nominees.forEach(n => {
-      if (n.votes > winner.votes) {
-        winner = n;
+    try {
+      // Find nominee with the highest votes
+      let winner = nominees[0];
+      nominees.forEach(n => {
+        if (n.votes > winner.votes) {
+          winner = n;
+        }
+      });
+
+      // Draw raffle winner
+      const luckyVoter = await drawRaffleWinner(winner);
+
+      // 1. Add winner to history
+      const { error: histErr } = await supabase
+        .from('jester_history')
+        .insert({
+          league_id: activeLeagueId,
+          matchday_number: currentMatchday,
+          name: winner.name,
+          team: winner.team,
+          reason: winner.reason,
+          raffle_winner: luckyVoter ? luckyVoter.manager : null,
+          raffle_player: luckyVoter ? luckyVoter.player : null
+        });
+
+      if (histErr) throw histErr;
+
+      // 2. Delete nominees for this matchday (which cascades to votes)
+      const { error: delErr } = await supabase
+        .from('jester_nominees')
+        .delete()
+        .eq('league_id', activeLeagueId)
+        .eq('matchday_number', currentMatchday);
+      
+      if (delErr) throw delErr;
+
+      // 3. Reset voting start time and increment matchday in leagues table
+      const nextMatchday = currentMatchday + 1;
+      const { error: leagueErr } = await supabase
+        .from('leagues')
+        .update({
+          jester_current_matchday: nextMatchday,
+          jester_voting_start: null
+        })
+        .eq('id', activeLeagueId);
+
+      if (leagueErr) throw leagueErr;
+
+      const isUserWinner = luckyVoter && (luckyVoter.manager.includes('Tú') || (userNickname !== 'Tú' && luckyVoter.manager.includes(userNickname)));
+      if (isUserWinner) {
+        callbacks.showToast(`¡Jornada cerrada! Has ganado el sorteo de la camiseta réplica de ${luckyVoter.player}`, "success");
+      } else {
+        callbacks.showToast(`Jornada cerrada. ¡El bufón de la jornada es ${winner.name}!`, "success");
       }
-    });
 
-    const luckyVoter = drawRaffleWinner(winner);
-
-    // Add winner to history
-    history.unshift({
-      matchday: currentMatchday,
-      name: winner.name,
-      team: winner.team,
-      reason: winner.reason,
-      raffleWinner: luckyVoter ? luckyVoter.manager : null,
-      rafflePlayer: luckyVoter ? luckyVoter.player : null
-    });
-
-    // Reset for next matchday
-    localStorage.removeItem(`CF_BUFON_VOTED_MATCHDAY_${currentMatchday}`);
-    localStorage.removeItem('CF_USER_VOTED_BUFON_ID');
-    localStorage.removeItem('CF_BUFON_VOTING_START_TIME');
-    currentMatchday += 1;
-    nominees = [];
-    userVotedId = null;
-    
-    saveState();
-    const isUserWinner = luckyVoter && (luckyVoter.manager.includes('Tú') || (userNickname !== 'Tú' && luckyVoter.manager.includes(userNickname)));
-    if (isUserWinner) {
-      callbacks.showToast(`¡Jornada cerrada! Has ganado el sorteo de la camiseta réplica de ${luckyVoter.player}`, "success");
-    } else {
-      callbacks.showToast(`Jornada cerrada. ¡El bufón de la jornada es ${winner.name}!`, "success");
+      await loadData();
+    } catch (err) {
+      console.error("Error closing matchday:", err);
+      callbacks.showToast("Error al cerrar la jornada", "error");
     }
-    renderView();
   }
 
-  function renderView() {
+  function renderLeagueView() {
     const totalVotes = nominees.reduce((sum, n) => sum + n.votes, 0);
+
+    // Tab Header HTML
+    const tabsHtml = `
+      <div style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
+        <button id="tab-league-btn" class="tab-btn" style="
+          background: rgba(var(--accent-rgb), 0.08);
+          color: var(--accent);
+          border: none;
+          border-bottom: 2px solid var(--accent);
+          padding: 0.5rem 1rem;
+          font-weight: 800;
+          cursor: pointer;
+          font-size: 0.85rem;
+          font-family: var(--font-sans);
+        ">
+          🏆 Mi Liga (${escapeHTML(currentLeagueName)})
+        </button>
+        <button id="tab-global-btn" class="tab-btn" style="
+          background: transparent;
+          color: var(--text-muted);
+          border: none;
+          padding: 0.5rem 1rem;
+          font-weight: 700;
+          cursor: pointer;
+          font-size: 0.85rem;
+          font-family: var(--font-sans);
+        ">
+          🌐 Vista Global (Todas las Ligas)
+        </button>
+      </div>
+    `;
 
     container.innerHTML = `
       <div class="container">
@@ -183,15 +571,19 @@ export function renderBufon(container, callbacks) {
               El Bufón de la Jornada
             </h1>
             <p style="font-size: 0.85rem; color: var(--text-muted);">
-              Votación democrática al futbolista de LaLiga con la actuación más cómica o desastrosa en la <strong>Jornada ${currentMatchday}</strong>.
+              Votación democrática al futbolista de LaLiga con la actuación más cómica o desastrosa en la <strong>Jornada ${currentMatchday}</strong> (${escapeHTML(currentLeagueName)}).
             </p>
           </div>
-          <div>
-            <button id="close-matchday-btn" class="btn-primary btn-danger" style="font-size: 0.8rem; padding: 0.5rem 1rem; font-weight: 700;">
-              Cerrar Jornada y Guardar
-            </button>
-          </div>
+          ${!isGuest ? `
+            <div>
+              <button id="close-matchday-btn" class="btn-primary btn-danger" style="font-size: 0.8rem; padding: 0.5rem 1rem; font-weight: 700;">
+                Cerrar Jornada y Guardar
+              </button>
+            </div>
+          ` : ''}
         </div>
+
+        ${tabsHtml}
 
         <!-- Banner del Sorteo de Camiseta -->
         <div class="card glass shadow-lg" style="
@@ -305,13 +697,13 @@ export function renderBufon(container, callbacks) {
                           <div style="flex-grow: 1;">
                             <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
                               <h4 style="font-size: 1.1rem; font-weight: 800; color: ${isVoted ? 'var(--accent)' : 'var(--text-light)'};">
-                                ${n.name}
+                                ${escapeHTML(n.name)}
                               </h4>
                               <span style="font-size: 0.7rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); padding: 0.15rem 0.4rem; border-radius: 4px; color: var(--text-muted); font-weight: 600;">
-                                ${n.team}
+                                ${escapeHTML(n.team)}
                               </span>
                             </div>
-                            <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.4;">${n.reason}</p>
+                            <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.4;">${escapeHTML(n.reason)}</p>
                           </div>
                           <div style="text-align: right; min-width: 80px;">
                             <span style="font-weight: 800; font-size: 1.2rem; color: var(--accent);">${percent}%</span>
@@ -410,14 +802,14 @@ export function renderBufon(container, callbacks) {
                       <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
                         <strong style="color: ${isUserWinner ? 'var(--accent)' : 'var(--primary)'};">Jornada ${h.matchday}</strong>
                         <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700;">
-                          ${h.team}
+                          ${escapeHTML(h.team)}
                         </span>
                       </div>
                       <h4 style="font-size: 0.95rem; font-weight: 800; margin-bottom: 0.25rem; color: var(--text-light);">
-                        ${h.name}
+                        ${escapeHTML(h.name)}
                       </h4>
                       <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.35; font-style: italic; margin-bottom: 0.5rem;">
-                        "${h.reason}"
+                        "${escapeHTML(h.reason)}"
                       </p>
                       ${hasRaffle ? `
                         <div style="
@@ -462,15 +854,306 @@ export function renderBufon(container, callbacks) {
       </div>
     `;
 
+    // Attach Jester specific event listeners
+    attachLeagueEvents();
+  }
+
+  function renderGlobalView(leaguesGrouped, globalHistory) {
+    // Generate tabs header HTML
+    let tabsHtml = '';
+    if (!isGuest && activeLeagueId) {
+      tabsHtml = `
+        <div style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
+          <button id="tab-league-btn" class="tab-btn" style="
+            background: transparent;
+            color: var(--text-muted);
+            border: none;
+            padding: 0.5rem 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-family: var(--font-sans);
+          ">
+            🏆 Mi Liga (${escapeHTML(currentLeagueName)})
+          </button>
+          <button id="tab-global-btn" class="tab-btn" style="
+            background: rgba(var(--accent-rgb), 0.08);
+            color: var(--accent);
+            border: none;
+            border-bottom: 2px solid var(--accent);
+            padding: 0.5rem 1rem;
+            font-weight: 800;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-family: var(--font-sans);
+          ">
+            🌐 Vista Global (Todas las Ligas)
+          </button>
+        </div>
+      `;
+    }
+
+    // Sidebar prompt card based on user state
+    let actionCardHtml = '';
+    if (isGuest) {
+      actionCardHtml = `
+        <div class="card glass" style="text-align: center; padding: 1.5rem; border: 1.2px dashed var(--border-color-glow);">
+          <span style="font-size: 1.8rem; display: block; margin-bottom: 0.5rem;">🎭</span>
+          <h3 class="gradient-text-gold" style="font-size: 1.05rem; font-weight: 800; margin-bottom: 0.35rem;">¿Quieres votar o nominar?</h3>
+          <p style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 1rem;">
+            La nominación y votación se realiza de manera privada dentro de cada liga fantasy. ¡Únete o crea la tuya!
+          </p>
+          <button id="go-to-login-btn" class="btn-primary" style="font-size: 0.8rem; padding: 0.55rem 1rem; font-weight: 700; width: 100%;">
+            Iniciar Sesión / Registrarse
+          </button>
+        </div>
+      `;
+    } else if (!activeLeagueId) {
+      actionCardHtml = `
+        <div class="card glass" style="text-align: center; padding: 1.5rem; border: 1.2px dashed var(--border-color-glow);">
+          <span style="font-size: 1.8rem; display: block; margin-bottom: 0.5rem;">🏆</span>
+          <h3 class="gradient-text-gold" style="font-size: 1.05rem; font-weight: 800; margin-bottom: 0.35rem;">Selecciona una Liga</h3>
+          <p style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 1rem;">
+            Para nominar y votar necesitas seleccionar tu liga activa o unirte a una nueva comunidad.
+          </p>
+          <button id="go-to-leagues-btn" class="btn-primary" style="font-size: 0.8rem; padding: 0.55rem 1rem; font-weight: 700; width: 100%;">
+            Ir a Mis Ligas
+          </button>
+        </div>
+      `;
+    } else {
+      actionCardHtml = `
+        <div class="card glass" style="text-align: center; padding: 1.5rem; border: 1.2px solid rgba(var(--primary-rgb), 0.2);">
+          <span style="font-size: 1.8rem; display: block; margin-bottom: 0.5rem;">⚡</span>
+          <h3 class="gradient-text-green" style="font-size: 1.05rem; font-weight: 800; margin-bottom: 0.35rem;">Estás en Modo Vista Global</h3>
+          <p style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 1rem;">
+            Para nominar futbolistas o emitir tu voto de esta jornada, cambia a la pestaña de tu liga.
+          </p>
+          <button id="switch-to-league-btn" class="btn-primary" style="font-size: 0.8rem; padding: 0.55rem 1rem; font-weight: 700; width: 100%;">
+            Ir a Mi Liga
+          </button>
+        </div>
+      `;
+    }
+
+    // Build the leagues nominees list HTML
+    let nomineesListHtml = '';
+    const leagueKeys = Object.keys(leaguesGrouped);
+    if (leagueKeys.length === 0) {
+      nomineesListHtml = `
+        <div style="text-align: center; padding: 3rem 1.5rem; color: var(--text-muted); background: rgba(0,0,0,0.1); border-radius: 12px; border: 1px dashed var(--border-color);">
+          <p style="font-size: 0.9rem;">No hay nominados activos en ninguna liga en este momento.</p>
+          <p style="font-size: 0.75rem; margin-top: 0.25rem;">Las votaciones se abrirán conforme los mánagers comiencen a nominar en sus respectivas comunidades.</p>
+        </div>
+      `;
+    } else {
+      nomineesListHtml = `
+        <div style="display: flex; flex-direction: column; gap: 1.75rem;">
+          ${leagueKeys.map(key => {
+            const leagueObj = leaguesGrouped[key];
+            return `
+              <div style="background: rgba(255,255,255,0.01); border: 1px solid var(--border-color); border-radius: 14px; padding: 1.25rem; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 0.5rem; flex-wrap: wrap; gap: 0.5rem;">
+                  <h3 class="gradient-text-green" style="font-size: 1.05rem; font-weight: 800;">
+                    🏆 Liga: ${escapeHTML(leagueObj.name)}
+                  </h3>
+                  <span style="font-size: 0.75rem; background: rgba(var(--accent-rgb), 0.08); border: 1px solid rgba(var(--accent-rgb), 0.2); padding: 0.15rem 0.5rem; border-radius: 4px; color: var(--accent); font-weight: 700;">
+                    Jornada ${leagueObj.matchday}
+                  </span>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                  ${leagueObj.nominees.map(n => {
+                    const percent = leagueObj.totalVotes > 0 ? Math.round((n.votes / leagueObj.totalVotes) * 100) : 0;
+                    return `
+                      <div class="card" style="
+                        background: rgba(0,0,0,0.15); 
+                        border: 1px solid var(--border-color); 
+                        padding: 1rem; 
+                        margin: 0; 
+                        position: relative; 
+                        overflow: hidden; 
+                        border-radius: 10px;
+                      ">
+                        <!-- Progress bar background fill -->
+                        <div style="
+                          position: absolute; 
+                          left: 0; 
+                          top: 0; 
+                          bottom: 0; 
+                          width: ${percent}%; 
+                          background: rgba(var(--primary-rgb), 0.03); 
+                          transition: width 0.6s ease; 
+                          pointer-events: none; 
+                          z-index: 1;
+                        "></div>
+
+                        <div style="position: relative; z-index: 2; display: flex; justify-content: space-between; align-items: start; gap: 1rem;">
+                          <div style="flex-grow: 1;">
+                            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+                              <h4 style="font-size: 1rem; font-weight: 800; color: var(--text-light);">
+                                ${escapeHTML(n.name)}
+                              </h4>
+                              <span style="font-size: 0.65rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); padding: 0.1rem 0.35rem; border-radius: 4px; color: var(--text-muted); font-weight: 600;">
+                                ${escapeHTML(n.team)}
+                              </span>
+                            </div>
+                            <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4;">${escapeHTML(n.reason)}</p>
+                          </div>
+                          <div style="text-align: right; min-width: 70px;">
+                            <span style="font-weight: 800; font-size: 1.1rem; color: var(--primary);">${percent}%</span>
+                            <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.1rem;">${n.votes} votos</div>
+                          </div>
+                        </div>
+
+                        <div style="margin-top: 0.75rem; display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 2;">
+                          <!-- Bar track visual slider -->
+                          <div style="flex-grow: 1; height: 5px; background: rgba(255, 255, 255, 0.05); border-radius: 3px; margin-right: 1.5rem; overflow: hidden;">
+                            <div style="height: 100%; width: ${percent}%; background: var(--text-muted); border-radius: 3px; transition: width 0.6s ease;"></div>
+                          </div>
+
+                          <button class="btn-global-vote-dummy" style="
+                            background: rgba(255, 255, 255, 0.02);
+                            color: var(--text-muted);
+                            border: 1px solid var(--border-color);
+                            font-family: var(--font-sans);
+                            font-weight: 700;
+                            font-size: 0.7rem;
+                            padding: 0.35rem 0.75rem;
+                            border-radius: 5px;
+                            cursor: pointer;
+                            transition: var(--transition-fast);
+                          ">
+                            Votar
+                          </button>
+                        </div>
+                      </div>
+                    `;
+                  }).join('')}
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `;
+    }
+
+    // Build history HTML
+    let historyHtml = '';
+    if (globalHistory.length === 0) {
+      historyHtml = `
+        <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
+          <p style="font-size: 0.85rem;">Ningún bufón coronado en el sistema todavía.</p>
+        </div>
+      `;
+    } else {
+      historyHtml = `
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+          ${globalHistory.map(h => {
+            const hasRaffle = h.raffleWinner && h.rafflePlayer;
+            return `
+              <div style="
+                border: 1px solid var(--border-color);
+                background: rgba(0,0,0,0.15);
+                border-left: 3px solid var(--primary);
+                border-radius: 0 10px 10px 0;
+                padding: 0.85rem 1rem;
+                font-size: 0.85rem;
+                margin-bottom: 0.25rem;
+              ">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem; flex-wrap: wrap; gap: 0.5rem;">
+                  <strong style="color: var(--primary);">Jornada ${h.matchday}</strong>
+                  <span style="font-size: 0.75rem; color: var(--accent); font-weight: 700;">
+                    Liga: ${escapeHTML(h.leagueName)}
+                  </span>
+                </div>
+                <h4 style="font-size: 0.95rem; font-weight: 800; margin-bottom: 0.25rem; color: var(--text-light);">
+                  ${escapeHTML(h.name)} <span style="font-size: 0.75rem; font-weight: 500; color: var(--text-muted);">(${escapeHTML(h.team)})</span>
+                </h4>
+                <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.35; font-style: italic; margin-bottom: 0.5rem;">
+                  "${escapeHTML(h.reason)}"
+                </p>
+                ${hasRaffle ? `
+                  <div style="
+                    border-top: 1px solid rgba(255,255,255,0.05);
+                    padding-top: 0.5rem;
+                    margin-top: 0.5rem;
+                    font-size: 0.75rem;
+                    color: var(--text-muted);
+                  ">
+                    <strong>Ganador Camiseta:</strong> 
+                    <span style="color: var(--text-light); font-weight: 700;">
+                      @${escapeHTML(h.raffleWinner)}
+                    </span> 
+                    <span>(Réplica de ${escapeHTML(h.rafflePlayer)})</span>
+                  </div>
+                ` : ''}
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `;
+    }
+
+    container.innerHTML = `
+      <div class="container">
+        <!-- Header -->
+        <div style="margin-bottom: 1.5rem;">
+          <h1 class="gradient-text-gold" style="font-size: 1.65rem; font-weight: 900; display: flex; align-items: center; gap: 0.5rem;">
+            El Bufón de la Corte 🌐
+          </h1>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">
+            Vista Global: Mira las nominaciones activas y los bufones coronados en todas las ligas. Para votar, entra en tu liga correspondiente.
+          </p>
+        </div>
+
+        ${tabsHtml}
+
+        <div class="dashboard-grid">
+          <!-- Columna Izquierda: Nominados por Ligas -->
+          <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+            <div class="card glass">
+              <h2 class="card-title gradient-text-gold" style="font-size: 1.15rem; margin-bottom: 1.25rem;">
+                Nominaciones Activas en la Plataforma
+              </h2>
+              ${nomineesListHtml}
+            </div>
+          </div>
+
+          <!-- Columna Derecha: Prompts e Historial -->
+          <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+            <!-- Prompt de Votación -->
+            ${actionCardHtml}
+
+            <!-- Salón de la Vergüenza Global -->
+            <div class="card glass">
+              <h2 class="card-title gradient-text-gold" style="font-size: 1.15rem; margin-bottom: 1.25rem;">
+                Salón de la Vergüenza Global
+              </h2>
+              ${historyHtml}
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Attach Global specific event listeners
+    attachGlobalEvents();
+  }
+
+  function attachLeagueEvents() {
+    // Hook Tab buttons
+    const tabGlobalBtn = container.querySelector('#tab-global-btn');
+    if (tabGlobalBtn) {
+      tabGlobalBtn.addEventListener('click', () => {
+        activeTab = 'global';
+        loadData();
+      });
+    }
+
     // Hook Vote buttons
     container.querySelectorAll('.btn-vote-bufon').forEach(btn => {
       btn.addEventListener('click', () => {
-        if (isGuest) {
-          callbacks.showToast('Inicia sesión para votar por el Bufón de la jornada', 'warning');
-          callbacks.onNavigate('acceso');
-          return;
-        }
-        const id = Number(btn.dataset.id);
+        const id = btn.dataset.id;
         handleVote(id);
       });
     });
@@ -493,6 +1176,11 @@ export function renderBufon(container, callbacks) {
     const closeBtn = container.querySelector('#close-matchday-btn');
     if (closeBtn) {
       closeBtn.addEventListener('click', () => {
+        if (isGuest) {
+          callbacks.showToast('Inicia sesión para cerrar la jornada', 'warning');
+          callbacks.onNavigate('acceso');
+          return;
+        }
         if (confirm(`¿Estás seguro de que quieres cerrar la Jornada ${currentMatchday}? Esto registrará al bufón ganador en el histórico y limpiará las nominaciones para la Jornada ${currentMatchday + 1}.`)) {
           closeMatchday();
         }
@@ -500,28 +1188,42 @@ export function renderBufon(container, callbacks) {
     }
   }
 
-  // Helper to compute countdown remaining time text
-  function getRemainingTimeText() {
-    const votingStartTime = localStorage.getItem('CF_BUFON_VOTING_START_TIME') || null;
-    if (!votingStartTime) return "24 horas (pendiente de inicio)";
-    const start = new Date(votingStartTime).getTime();
-    const end = start + (24 * 3600 * 1000);
-    const diff = end - Date.now();
-    if (diff <= 0) {
-      return "Votación finalizada (cierre pendiente)";
+  function attachGlobalEvents() {
+    // Hook Tab buttons
+    const tabLeagueBtn = container.querySelector('#tab-league-btn');
+    if (tabLeagueBtn) {
+      tabLeagueBtn.addEventListener('click', () => {
+        activeTab = 'league';
+        loadData();
+      });
     }
-    const hrs = Math.floor(diff / 3600000);
-    const mins = Math.floor((diff % 3600000) / 60000);
-    return `Tiempo restante: ${hrs}h ${mins}m`;
-  }
 
-  // Helper to get time value
-  function getRemainingTime() {
-    const votingStartTime = localStorage.getItem('CF_BUFON_VOTING_START_TIME') || null;
-    if (!votingStartTime) return 24 * 3600 * 1000;
-    const start = new Date(votingStartTime).getTime();
-    const end = start + (24 * 3600 * 1000);
-    return end - Date.now();
+    const loginBtn = container.querySelector('#go-to-login-btn');
+    if (loginBtn) loginBtn.addEventListener('click', () => callbacks.onNavigate('acceso'));
+
+    const leaguesBtn = container.querySelector('#go-to-leagues-btn');
+    if (leaguesBtn) leaguesBtn.addEventListener('click', () => callbacks.onNavigate('mis-ligas'));
+
+    const switchToLeagueBtn = container.querySelector('#switch-to-league-btn');
+    if (switchToLeagueBtn) {
+      switchToLeagueBtn.addEventListener('click', () => {
+        activeTab = 'league';
+        loadData();
+      });
+    }
+
+    // Dummy Vote Buttons Hook - show toast and redirect to login/leagues
+    container.querySelectorAll('.btn-global-vote-dummy').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (isGuest) {
+          callbacks.showToast('Inicia sesión y selecciona tu liga para poder votar', 'warning');
+          callbacks.onNavigate('acceso');
+        } else {
+          callbacks.showToast('Selecciona tu liga activa en la sección "Mis Ligas" para poder votar', 'warning');
+          callbacks.onNavigate('mis-ligas');
+        }
+      });
+    });
   }
 
   // Simple escaping function to prevent XSS
@@ -535,5 +1237,6 @@ export function renderBufon(container, callbacks) {
       .replace(/'/g, "&#039;");
   }
 
-  renderView();
+  // Load and display everything
+  loadData();
 }

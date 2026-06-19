@@ -2,6 +2,7 @@ import { supabase } from '../supabase';
 
 /**
  * Renders the Roulette screen (Wheel, Punishments list, Spin history).
+ * Supports both league database mode and free local mode for guests.
  * @param {HTMLElement} container 
  * @param {Object} callbacks 
  * @param {Function} callbacks.onNavigate 
@@ -28,12 +29,21 @@ export function renderRoulette(container, callbacks) {
     { id: 'd-pun-6', name: "Comprar una caja de donuts", description: "Traer donuts para desayunar el próximo lunes." }
   ];
 
+  let activeLeagueId = localStorage.getItem('CF_ACTIVE_LEAGUE_ID');
+
   async function loadData() {
     const pendingId = localStorage.getItem('CF_PENDING_RECORD_ID');
 
-    if (isGuest) {
-      callbacks.showToast('Debes iniciar sesión para acceder a esta sección', 'warning');
-      callbacks.onNavigate('acceso');
+    if (isGuest || !activeLeagueId) {
+      // Local mode - no database, fully stored in local storage
+      punishments = JSON.parse(localStorage.getItem('CF_LOCAL_ROULETTE_PUNISHMENTS') || 'null');
+      if (!punishments || punishments.length === 0) {
+        punishments = DEFAULT_PUNISHMENTS.map(p => ({ ...p }));
+        localStorage.setItem('CF_LOCAL_ROULETTE_PUNISHMENTS', JSON.stringify(punishments));
+      }
+      history = []; // No history card in local mode
+      currentLeague = { name: "Ruleta Libre", invite_code: "MODO-DEMO" };
+      renderView();
       return;
     }
 
@@ -50,16 +60,15 @@ export function renderRoulette(container, callbacks) {
 
       if (!userLeagues || userLeagues.length === 0) {
         localStorage.removeItem('CF_ACTIVE_LEAGUE_ID');
-        callbacks.showToast('No perteneces a ninguna liga todavía', 'info');
-        callbacks.onNavigate('mis-ligas');
+        callbacks.showToast('No perteneces a ninguna liga todavía. Te mostramos la ruleta en modo libre.', 'info');
+        activeLeagueId = null;
+        loadData();
         return;
       }
 
       // 2. Resolve active league
-      let activeLeagueId = localStorage.getItem('CF_ACTIVE_LEAGUE_ID');
       const hasActiveLeague = userLeagues.some(l => l.league_id === activeLeagueId);
-
-      if (!activeLeagueId || !hasActiveLeague) {
+      if (!hasActiveLeague) {
         activeLeagueId = userLeagues[0].league_id;
         localStorage.setItem('CF_ACTIVE_LEAGUE_ID', activeLeagueId);
       }
@@ -155,28 +164,47 @@ export function renderRoulette(container, callbacks) {
       renderView();
     } catch (err) {
       console.error(err);
+      callbacks.showToast('Error al conectar con la liga. Cargando modo libre en local.', 'warning');
+      activeLeagueId = null;
+      loadData();
     }
   }
 
   function renderView() {
+    const isLocalMode = isGuest || !activeLeagueId;
+
     container.innerHTML = `
       <div class="container">
         <!-- Banner de Liga -->
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
           <div>
-            <h1 class="gradient-text-green" style="font-size: 1.6rem; font-weight: 900;">${currentLeague.name}</h1>
-            <p style="font-size: 0.85rem; color: var(--text-muted);">
-              Código de Invitación: <strong style="color: var(--accent-gold); cursor: pointer;" id="copy-invite-code" title="Copiar código">${currentLeague.invite_code} (Copiar)</strong>
-            </p>
+            <h1 class="gradient-text-green" style="font-size: 1.6rem; font-weight: 900;">${escapeHTML(currentLeague.name)}</h1>
+            ${isLocalMode ? `
+              <p style="font-size: 0.85rem; color: var(--text-muted);">
+                Prueba la ruleta de castigos en local. Para usarla en tu liga real, inicia sesión.
+              </p>
+            ` : `
+              <p style="font-size: 0.85rem; color: var(--text-muted);">
+                Código de Invitación: <strong style="color: var(--accent-gold); cursor: pointer;" id="copy-invite-code" title="Copiar código">${escapeHTML(currentLeague.invite_code)} (Copiar)</strong>
+              </p>
+            `}
           </div>
           <div style="display: flex; gap: 0.5rem; align-items: center;">
-            <button class="header-action-btn btn-secondary" id="btn-back-to-hub" title="Volver al Menú" style="padding: 0.65rem 1rem; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 0.4rem; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color);">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="19" y1="12" x2="5" y2="12"></line>
-                <polyline points="12 19 5 12 12 5"></polyline>
-              </svg>
-              Volver al Menú
-            </button>
+            ${isLocalMode ? `
+              ${!isGuest ? `
+                <button class="header-action-btn btn-secondary" id="btn-back-to-selector" style="padding: 0.65rem 1rem; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 0.4rem; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color);">
+                  Ir a Mis Ligas
+                </button>
+              ` : ''}
+            ` : `
+              <button class="header-action-btn btn-secondary" id="btn-back-to-hub" title="Volver al Menú" style="padding: 0.65rem 1rem; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 0.4rem; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color);">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="19" y1="12" x2="5" y2="12"></line>
+                  <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                Volver al Menú
+              </button>
+            `}
           </div>
         </div>
 
@@ -184,7 +212,7 @@ export function renderRoulette(container, callbacks) {
         ${pendingRecord ? `
           <div class="supabase-banner" style="background: rgba(var(--accent-rgb), 0.1); border-color: rgba(var(--accent-rgb), 0.3); margin-bottom: 1.25rem;">
             <div class="supabase-banner-text" style="color: var(--text-light);">
-              Tirada pendiente para <strong>${pendingRecord.display_name}</strong> (Jornada ${pendingRecord.matchday_number}). ¡Gira la ruleta para asignarle su castigo!
+              Tirada pendiente para <strong>${escapeHTML(pendingRecord.display_name)}</strong> (Jornada ${pendingRecord.matchday_number}). ¡Gira la ruleta para asignarle su castigo!
             </div>
           </div>
         ` : ''}
@@ -194,7 +222,7 @@ export function renderRoulette(container, callbacks) {
           <div class="card glass roulette-container" style="margin-bottom: 0;">
             <h2 class="card-title gradient-text-gold">Ruleta de Castigos</h2>
             <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem; text-align: center;">
-              El azar dictará sentencia. Hay <strong>${punishments.length}</strong> castigos cargados en tu liga.
+              El azar dictará sentencia. Hay <strong>${punishments.length}</strong> castigos cargados.
             </p>
 
             <div class="wheel-wrapper">
@@ -211,7 +239,7 @@ export function renderRoulette(container, callbacks) {
             <!-- Personalizar Castigos -->
             <div class="card glass" style="margin-bottom: 0;">
               <h2 class="card-title">Personalizar Castigos</h2>
-              <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">Añade o elimina castigos a la lista oficial de tu liga.</p>
+              <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">Añade o elimina opciones de la ruleta local.</p>
               
               <form id="add-punishment-form" style="margin-bottom: 1.5rem;">
                 <div class="form-group">
@@ -229,8 +257,8 @@ export function renderRoulette(container, callbacks) {
                 ${punishments.map(p => `
                   <div class="item-row">
                     <div>
-                      <div style="font-weight: 700; font-size: 0.95rem;">${p.name}</div>
-                      ${p.description ? `<div style="font-size: 0.8rem; color: var(--text-muted);">${p.description}</div>` : ''}
+                      <div style="font-weight: 700; font-size: 0.95rem;">${escapeHTML(p.name)}</div>
+                      ${p.description ? `<div style="font-size: 0.8rem; color: var(--text-muted);">${escapeHTML(p.description)}</div>` : ''}
                     </div>
                     <button class="btn-secondary btn-danger delete-pun-btn" data-id="${p.id}" style="width: auto; padding: 0.4rem 0.6rem; font-size: 0.8rem; border-radius: 6px;">✕</button>
                   </div>
@@ -238,37 +266,39 @@ export function renderRoulette(container, callbacks) {
               </div>
             </div>
 
-            <!-- Historial de Castigos -->
-            <div class="card glass pitch-card" style="margin-bottom: 0; flex-grow: 1;">
-              <h2 class="card-title gradient-text-green">Historial de Sentencias</h2>
-              <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem;">Castigos aplicados a los perdedores en las jornadas jugadas.</p>
-              
-              <div class="history-list" style="max-height: 250px; overflow-y: auto;">
-                ${history.length === 0 ? `
-                  <div style="text-align: center; color: var(--text-muted); padding: 1.5rem 0;">
-                    Ningún castigo aplicado todavía. ¡Todos limpios!
-                  </div>
-                ` : history.map(item => `
-                  <div class="history-item">
-                    <div class="history-header">
-                      <span class="history-loser">${item.profiles?.display_name || 'Entrenador'}</span>
-                      <span class="history-date">Jornada ${item.matchday_number} (${item.amount_owed}€)</span>
+            <!-- Historial de Castigos (solo en modo liga) -->
+            ${isLocalMode ? '' : `
+              <div class="card glass pitch-card" style="margin-bottom: 0; flex-grow: 1;">
+                <h2 class="card-title gradient-text-green">Historial de Sentencias</h2>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem;">Castigos aplicados a los perdedores.</p>
+                
+                <div class="history-list" style="max-height: 250px; overflow-y: auto;">
+                  ${history.length === 0 ? `
+                    <div style="text-align: center; color: var(--text-muted); padding: 1.5rem 0;">
+                      Ningún castigo aplicado todavía. ¡Todos limpios!
                     </div>
-                    <div style="font-weight: 700; color: var(--accent); margin-top: 0.25rem; font-size: 0.95rem;">
-                      ${item.punishments?.name || 'Castigo Desconocido'}
-                    </div>
-                    ${item.punishments?.description ? `
-                      <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.15rem;">
-                        ${item.punishments.description}
+                  ` : history.map(item => `
+                    <div class="history-item">
+                      <div class="history-header">
+                        <span class="history-loser">${escapeHTML(item.profiles?.display_name || 'Entrenador')}</span>
+                        <span class="history-date">Jornada ${item.matchday_number} ${item.amount_owed ? `(${item.amount_owed}€)` : ''}</span>
                       </div>
-                    ` : ''}
-                    ${item.trash_talk_phrase ? `
-                      <div class="history-trash">${item.trash_talk_phrase}</div>
-                    ` : ''}
-                  </div>
-                `).join('')}
+                      <div style="font-weight: 700; color: var(--accent); margin-top: 0.25rem; font-size: 0.95rem;">
+                        ${escapeHTML(item.punishments?.name || 'Castigo Desconocido')}
+                      </div>
+                      ${item.punishments?.description ? `
+                        <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.15rem;">
+                          ${escapeHTML(item.punishments.description)}
+                        </div>
+                      ` : ''}
+                      ${item.trash_talk_phrase ? `
+                        <div class="history-trash">${escapeHTML(item.trash_talk_phrase)}</div>
+                      ` : ''}
+                    </div>
+                  `).join('')}
+                </div>
               </div>
-            </div>
+            `}
           </div>
         </div>
       </div>
@@ -309,51 +339,45 @@ export function renderRoulette(container, callbacks) {
 
     // Handle add punishment
     const addForm = container.querySelector('#add-punishment-form');
-    addForm.addEventListener('submit', async (e) => {
+    addForm.addEventListener('submit', (e) => {
       e.preventDefault();
       const name = addForm.querySelector('#new-pun-name').value.trim();
       const description = addForm.querySelector('#new-pun-desc').value.trim();
 
-      try {
-        const { error } = await supabase
-          .from('punishments')
-          .insert({
-            league_id: currentLeagueId,
-            name,
-            description
-          });
-
-        if (error) throw error;
-        callbacks.showToast('Castigo añadido con éxito', 'success');
+      if (isLocalMode) {
+        const newPun = {
+          id: 'local-pun-' + Date.now(),
+          name,
+          description
+        };
+        punishments.push(newPun);
+        localStorage.setItem('CF_LOCAL_ROULETTE_PUNISHMENTS', JSON.stringify(punishments));
+        callbacks.showToast('Castigo añadido a la ruleta local', 'success');
         loadData();
-      } catch (err) {
-        console.error(err);
-        callbacks.showToast('Error al añadir castigo', 'error');
+        return;
       }
+
+      addPunishmentRemote(name, description);
     });
 
     // Handle delete punishment
     container.querySelectorAll('.delete-pun-btn').forEach(btn => {
-      btn.addEventListener('click', async () => {
+      btn.addEventListener('click', () => {
         const id = btn.getAttribute('data-id');
         if (punishments.length <= 2) {
-          callbacks.showToast('Tu liga necesita tener al menos 2 castigos en la ruleta', 'error');
+          callbacks.showToast('La ruleta necesita tener al menos 2 castigos para girar', 'error');
           return;
         }
 
-      try {
-        const { error } = await supabase
-          .from('punishments')
-          .delete()
-          .eq('id', id);
+        if (isLocalMode) {
+          punishments = punishments.filter(p => p.id !== id);
+          localStorage.setItem('CF_LOCAL_ROULETTE_PUNISHMENTS', JSON.stringify(punishments));
+          callbacks.showToast('Castigo eliminado de tu ruleta local', 'success');
+          loadData();
+          return;
+        }
 
-        if (error) throw error;
-        callbacks.showToast('Castigo eliminado', 'success');
-        loadData();
-      } catch (err) {
-        console.error(err);
-        callbacks.showToast('Error al eliminar castigo', 'error');
-      }
+        deletePunishmentRemote(id);
       });
     });
 
@@ -386,6 +410,49 @@ export function renderRoulette(container, callbacks) {
       backToHubBtn.addEventListener('click', () => {
         callbacks.onNavigate('menu-liga');
       });
+    }
+
+    // Hook Back to Selector Button
+    const backToSelectorBtn = container.querySelector('#btn-back-to-selector');
+    if (backToSelectorBtn) {
+      backToSelectorBtn.addEventListener('click', () => {
+        callbacks.onNavigate('mis-ligas');
+      });
+    }
+  }
+
+  async function addPunishmentRemote(name, description) {
+    try {
+      const { error } = await supabase
+        .from('punishments')
+        .insert({
+          league_id: currentLeagueId,
+          name,
+          description
+        });
+
+      if (error) throw error;
+      callbacks.showToast('Castigo añadido con éxito', 'success');
+      loadData();
+    } catch (err) {
+      console.error(err);
+      callbacks.showToast('Error al añadir castigo', 'error');
+    }
+  }
+
+  async function deletePunishmentRemote(id) {
+    try {
+      const { error } = await supabase
+        .from('punishments')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      callbacks.showToast('Castigo eliminado', 'success');
+      loadData();
+    } catch (err) {
+      console.error(err);
+      callbacks.showToast('Error al eliminar castigo', 'error');
     }
   }
 
@@ -468,9 +535,10 @@ export function renderRoulette(container, callbacks) {
       isSpinning = false;
       spinBtn.disabled = false;
       
+      const isLocalMode = isGuest || !activeLeagueId;
       const loserName = pendingRecord ? pendingRecord.display_name : 'Entrenador Aleatorio';
       
-      if (pendingRecord) {
+      if (!isLocalMode && pendingRecord) {
         try {
           const { error } = await supabase
             .from('matchday_records')
@@ -486,6 +554,8 @@ export function renderRoulette(container, callbacks) {
           console.error(err);
           callbacks.showToast('Error al guardar el castigo', 'error');
         }
+      } else if (isLocalMode) {
+        callbacks.showToast(`¡Castigo local sentenciado!`, 'success');
       }
 
       // Show Result Modal
@@ -502,6 +572,17 @@ export function renderRoulette(container, callbacks) {
       }, 500);
 
     }, { once: true });
+  }
+
+  // Escape HTML to prevent XSS
+  function escapeHTML(str) {
+    if (!str) return '';
+    return str
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
   }
 
   loadData();

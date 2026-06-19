@@ -47,7 +47,7 @@ export function renderLeagueHub(container, callbacks) {
       </div>
 
       <!-- Hub Grid -->
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; margin-top: 1rem;">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-top: 1rem;">
         <!-- Card Muro de la Vergüenza -->
         <div id="card-go-dashboard" class="card glass" style="cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; border-radius: 16px; border: 1.5px solid var(--border-color); padding: 2rem 1.5rem; transition: all var(--transition-fast);">
           <div>
@@ -91,6 +91,18 @@ export function renderLeagueHub(container, callbacks) {
             ${leagueFeatures === 'money' ? 'No disponible' : 'Ir a la Ruleta'}
           </button>
         </div>
+
+        <!-- Card El Bufón de la Jornada -->
+        <div id="card-go-bufon" class="card glass" style="cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; border-radius: 16px; border: 1.5px solid var(--border-color); padding: 2rem 1.5rem; transition: all var(--transition-fast);">
+          <div>
+            <div style="font-size: 3rem; margin-bottom: 1rem; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));">🃏</div>
+            <h2 class="card-title gradient-text-gold" style="font-size: 1.5rem; font-weight: 900; margin-bottom: 0.75rem;">El Bufón</h2>
+            <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 1.5rem;">
+              Nominar y votar al futbolista de la jornada con peor actuación en tu liga y participar en el sorteo de la camiseta réplica.
+            </p>
+          </div>
+          <button class="btn-primary" style="pointer-events: none; font-weight: 700; width: 100%;">Votar Bufón</button>
+        </div>
       </div>
     </div>
   `;
@@ -98,6 +110,7 @@ export function renderLeagueHub(container, callbacks) {
   // Attach card hover styling manually to avoid bloating stylesheet
   const cardDash = container.querySelector('#card-go-dashboard');
   const cardRoulette = container.querySelector('#card-go-roulette');
+  const cardBufon = container.querySelector('#card-go-bufon');
 
   if (cardDash) {
     cardDash.addEventListener('mouseenter', () => {
@@ -128,6 +141,22 @@ export function renderLeagueHub(container, callbacks) {
     });
     cardRoulette.addEventListener('click', () => {
       callbacks.onNavigate('ruleta');
+    });
+  }
+
+  if (cardBufon) {
+    cardBufon.addEventListener('mouseenter', () => {
+      cardBufon.style.transform = 'translateY(-4px)';
+      cardBufon.style.borderColor = 'var(--accent)';
+      cardBufon.style.boxShadow = '0 8px 30px rgba(var(--accent-rgb), 0.15)';
+    });
+    cardBufon.addEventListener('mouseleave', () => {
+      cardBufon.style.transform = 'translateY(0)';
+      cardBufon.style.borderColor = 'var(--border-color)';
+      cardBufon.style.boxShadow = 'none';
+    });
+    cardBufon.addEventListener('click', () => {
+      callbacks.onNavigate('bufon');
     });
   }
 
