@@ -10,6 +10,7 @@ import { renderBufon } from './views/bufon';
 import { renderLanding } from './views/landing';
 import { renderSelectLeague } from './views/select-league';
 import { renderLeagueHub } from './views/league-hub';
+import { renderGenerator } from './views/generator';
 
 // Initialize Theme
 const savedTheme = localStorage.getItem('CF_THEME') || 'dark';
@@ -151,6 +152,13 @@ function renderMainLayout(isGuest) {
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;"><line x1="6" y1="12" x2="10" y2="12"></line><line x1="8" y1="10" x2="8" y2="14"></line><line x1="15" y1="13" x2="15.01" y2="13"></line><line x1="18" y1="11" x2="18.01" y2="11"></line><rect x="2" y="6" width="20" height="12" rx="3"></rect></svg>
             <span>Adivinar Jugador</span>
           </button>
+          <button class="nav-item ${currentView === 'generador' ? 'active' : ''}" id="nav-generator-btn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;">
+              <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path>
+              <path d="m5 3 1 2.5L8.5 6 6 7 5 9.5 4 7 1.5 6 4 5.5z"></path>
+            </svg>
+            <span>Generador</span>
+          </button>
         </nav>
 
         <div class="sidebar-footer" style="border-top: 1px solid var(--border-color); padding-top: 1rem;">
@@ -210,29 +218,21 @@ function renderMainLayout(isGuest) {
           
           <div class="header-right">
             ${isGuest ? `
-              <button class="nav-btn-guest" id="nav-login-btn" style="display: flex; align-items: center; gap: 0.5rem; font-weight: 700; font-size: 0.85rem;">
+              <button class="nav-btn-guest" id="nav-login-btn" style="display: flex; align-items: center; gap: 0.5rem; font-weight: 700; font-size: 0.85rem;" title="Login / Registro">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
-                  <polyline points="10 17 15 12 10 7"></polyline>
-                  <line x1="15" y1="12" x2="3" y2="12"></line>
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
                 </svg>
-                Login / Register
+                <span class="nav-btn-text">Login / Register</span>
               </button>
             ` : `
-              <button class="header-action-btn" id="nav-reset-sb-btn" title="Ajustes de APIs" style="display: flex; align-items: center; gap: 0.4rem;">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="12" cy="12" r="3"></circle>
-                  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-                </svg>
-                Settings
-              </button>
               <button class="header-action-btn btn-danger" id="nav-logout-btn" title="Cerrar Sesión" style="display: flex; align-items: center; gap: 0.4rem;">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
                   <polyline points="16 17 21 12 16 7"></polyline>
                   <line x1="21" y1="12" x2="9" y2="12"></line>
                 </svg>
-                Logout
+                <span class="nav-btn-text">Logout</span>
               </button>
             `}
           </div>
@@ -333,6 +333,11 @@ function renderMainLayout(isGuest) {
       onNavigate: navigate,
       showToast
     });
+  } else if (currentView === 'generador') {
+    renderGenerator(viewContainer, {
+      onNavigate: navigate,
+      showToast
+    });
   }
 
   // Hook Navigation Elements (Cerrando el sidebar al hacer clic en móvil/escritorio)
@@ -397,6 +402,13 @@ function renderMainLayout(isGuest) {
   if (bufonBtn) {
     bufonBtn.addEventListener('click', () => {
       navigate('bufon');
+    });
+  }
+
+  const generatorBtn = app.querySelector('#nav-generator-btn');
+  if (generatorBtn) {
+    generatorBtn.addEventListener('click', () => {
+      navigate('generador');
     });
   }
   

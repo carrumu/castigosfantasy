@@ -1759,3 +1759,204 @@ body.light-theme .slider-theme {
   color: var(--primary) !important;
   transform: scale(1.15);
 }
+
+@media (max-width: 768px) {
+  .nav-btn-guest .nav-btn-text,
+  .header-action-btn .nav-btn-text {
+    display: none;
+  }
+  .nav-btn-guest,
+  .header-action-btn {
+    padding: 0.55rem !important;
+    border-radius: 50% !important;
+    aspect-ratio: 1 / 1;
+    justify-content: center;
+    gap: 0 !important;
+  }
+}
+
+/* --- Color Classes for Generator Icons --- */
+.feature-icon-wrapper.color-generator {
+  background: rgba(139, 92, 246, 0.1);
+  color: #a78bfa;
+  border: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+.feature-card[data-view-id="generador"] .feature-badge {
+  background: rgba(139, 92, 246, 0.1);
+  color: #a78bfa;
+}
+
+/* --- Generator Page Layout & Component Styles --- */
+.generator-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (min-width: 768px) {
+  .generator-layout {
+    grid-template-columns: 0.8fr 1.2fr;
+  }
+}
+
+.generator-sidebar {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.filter-pills {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.filter-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.65rem 1rem;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: var(--text-muted);
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-align: left;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.filter-btn:hover {
+  background: var(--bg-item-hover);
+  color: var(--text-light);
+}
+
+.filter-btn.active {
+  background: var(--primary-glow);
+  border-color: var(--border-color-glow);
+  color: var(--primary);
+}
+
+.filter-btn-sub {
+  padding: 0.45rem 0.85rem;
+  background: var(--bg-item-light);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.filter-btn-sub:hover {
+  background: var(--bg-item-hover);
+  color: var(--text-light);
+}
+
+.filter-btn-sub.active {
+  background: var(--primary);
+  border-color: var(--primary-dark);
+  color: #ffffff;
+}
+
+.generator-deck {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.card-outer-wrapper {
+  perspective: 1000px;
+  width: 100%;
+}
+
+.generator-card {
+  position: relative;
+  width: 100%;
+  min-height: 270px;
+  padding: 2rem;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  overflow: hidden;
+}
+
+.card-inner-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at top right, rgba(var(--primary-rgb), 0.09) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.generator-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.card-badge-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 0.25rem 0.6rem;
+  background: var(--primary-glow);
+  color: var(--primary);
+  border-radius: 6px;
+  border: 1px solid rgba(var(--primary-rgb), 0.15);
+}
+
+/* Card Animations */
+@keyframes cardShuffleAnim {
+  0% {
+    transform: scale(1) rotate(0deg);
+  }
+  30% {
+    transform: scale(0.93) rotate(-3deg) translateY(12px);
+  }
+  70% {
+    transform: scale(1.05) rotate(3deg) translateY(-6px);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+@keyframes slotsSpinAnim {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+    filter: blur(0px);
+  }
+  50% {
+    transform: translateY(8px);
+    opacity: 0.7;
+    filter: blur(1px);
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+    filter: blur(0px);
+  }
+}
+
+.generator-card.shuffling {
+  animation: cardShuffleAnim 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.generator-card.slots-spinning {
+  animation: slotsSpinAnim 0.08s linear infinite;
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 25px rgba(var(--primary-rgb), 0.35);
+}
