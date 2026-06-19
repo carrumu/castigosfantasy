@@ -194,7 +194,7 @@ export function renderDashboard(container, callbacks) {
         <div class="dashboard-grid" style="grid-template-columns: ${features === 'wheel' ? '1fr 1fr' : ''};">
           <!-- Muro de la Vergüenza -->
           <div class="card glass pitch-card" style="margin-bottom: 0;">
-            <h2 class="card-title gradient-text-gold">Muro de la Vergüenza</h2>
+            <h2 class="card-title gradient-text-gold">💀 Muro de la Vergüenza</h2>
             <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem;">
               ${features === 'wheel' ? 'Ranking acumulado del que más veces ha quedado último.' : 'Ranking del que más debe al bote común y más veces ha sido último.'}
             </p>
@@ -223,7 +223,7 @@ export function renderDashboard(container, callbacks) {
 
           <!-- Registrar Último de la Jornada Form -->
           <div class="card glass" style="margin-bottom: 0;">
-            <h2 class="card-title">📝 Registrar Último</h2>
+            <h2 class="card-title">💀 Registrar Último</h2>
             <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
               ${features === 'wheel' ? 'Registra quién ha quedado último en esta jornada fantasy.' : 'Selecciona quién ha quedado último en esta jornada y cuánto debe al bote.'}
             </p>

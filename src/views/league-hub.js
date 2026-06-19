@@ -51,7 +51,7 @@ export function renderLeagueHub(container, callbacks) {
         <!-- Card Muro de la Vergüenza -->
         <div id="card-go-dashboard" class="card glass" style="cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; border-radius: 16px; border: 1.5px solid var(--border-color); padding: 2rem 1.5rem; transition: all var(--transition-fast);">
           <div>
-            <div style="font-size: 3rem; margin-bottom: 1rem; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));">📋</div>
+            <div style="font-size: 3rem; margin-bottom: 1rem; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));">💀</div>
             <h2 class="card-title gradient-text-gold" style="font-size: 1.5rem; font-weight: 900; margin-bottom: 0.75rem;">Muro de la Vergüenza</h2>
             <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 1.5rem;">
               Ver el ranking acumulado de la jornada, las deudas de los jugadores y registrar el farolillo rojo de la última jornada.
@@ -95,7 +95,7 @@ export function renderLeagueHub(container, callbacks) {
         <!-- Card El Bufón de la Jornada -->
         <div id="card-go-bufon" class="card glass" style="cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; border-radius: 16px; border: 1.5px solid var(--border-color); padding: 2rem 1.5rem; transition: all var(--transition-fast);">
           <div>
-            <div style="font-size: 3rem; margin-bottom: 1rem; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));">🃏</div>
+            <div style="font-size: 3rem; margin-bottom: 1rem; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));">🎭</div>
             <h2 class="card-title gradient-text-gold" style="font-size: 1.5rem; font-weight: 900; margin-bottom: 0.75rem;">El Bufón</h2>
             <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 1.5rem;">
               Nominar y votar al futbolista de la jornada con peor actuación en tu liga y participar en el sorteo de la camiseta réplica.

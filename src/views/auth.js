@@ -170,8 +170,8 @@ export function renderAuth(container, callbacks) {
     container.innerHTML = `
       <div class="container" style="display: flex; align-items: center; justify-content: center; min-height: 80vh;">
         <div class="card glass pitch-card" style="width: 100%; max-width: 400px;">
-            <div style="display: flex; flex-direction: column; align-items: center; margin-bottom: 1rem;">
-              <img src="/logo.png" alt="CastigoFantasy Logo" style="width: 90px; height: 90px; border-radius: 16px; object-fit: cover; border: 2px solid var(--border-color-glow); margin-bottom: 0.75rem; box-shadow: 0 0 20px rgba(var(--primary-rgb), 0.2);" />
+            <div style="display: flex; flex-direction: column; align-items: center; margin-bottom: 1rem; gap: 0.5rem;">
+              <span class="logo-icon" style="width: 114px; height: 82px;"></span>
               <h1 class="logo gradient-text-green" style="justify-content: center; font-size: 1.9rem; font-weight: 900; margin-bottom: 0.25rem;">
                 CastigoFantasy
               </h1>

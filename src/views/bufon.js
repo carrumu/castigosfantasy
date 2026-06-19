@@ -1,4 +1,4 @@
-import { supabase } from '../supabase';
+import { supabase, isConfigured } from '../supabase';
 
 /**
  * Renders the "El Bufón" (Matchday's Worst Player) screen.
@@ -12,6 +12,7 @@ import { supabase } from '../supabase';
 export function renderBufon(container, callbacks) {
   const isGuest = callbacks.isGuest;
   
+  let forceDemoMode = false;
   let nominees = [];
   let history = [];
   let currentMatchday = 5;
@@ -19,7 +20,51 @@ export function renderBufon(container, callbacks) {
   let votingStartTime = null;
   let userNickname = "Tú";
   let activeLeagueId = localStorage.getItem('CF_ACTIVE_LEAGUE_ID');
+  if (activeLeagueId === 'null' || activeLeagueId === 'undefined') {
+    activeLeagueId = null;
+  }
   let currentLeagueName = localStorage.getItem('CF_ACTIVE_LEAGUE_NAME') || '';
+  if (currentLeagueName === 'null' || currentLeagueName === 'undefined') {
+    currentLeagueName = '';
+  }
+
+  const DEFAULT_DEMO_NOMINEES = [
+    { id: 'd-nom-1', name: "Robert Lewandowski", team: "FC Barcelona", reason: "Falló tres mano a mano claros contra el portero y falló un penalti en el minuto 90.", votes: 14, nominated_by: "d-member-1" },
+    { id: 'd-nom-2', name: "Vinicius Jr.", team: "Real Madrid", reason: "Vio una tarjeta amarilla por protestar en el minuto 5 y luego fue expulsado por doble amarilla tras una simulación en el área.", votes: 18, nominated_by: "d-member-2" },
+    { id: 'd-nom-3', name: "Frenkie de Jong", team: "FC Barcelona", reason: "Marcó un autogol espectacular al intentar despejar de cabeza de espaldas a su portería.", votes: 6, nominated_by: "d-member-3" }
+  ];
+
+  const DEFAULT_DEMO_HISTORY = [
+    { matchday: 4, name: "Iago Aspas", team: "Celta de Vigo", reason: "Falló dos penaltis en la misma jornada y falló un gol sin portero.", raffleWinner: "Invitado (Liga Demo)", rafflePlayer: "Iago Aspas" },
+    { matchday: 3, name: "Antoine Griezmann", team: "Atlético de Madrid", reason: "Fue sustituido al descanso tras perder 15 balones y dar un pase de gol al rival.", raffleWinner: "Invitado (Liga Demo)", rafflePlayer: "Antoine Griezmann" },
+    { matchday: 2, name: "Alexander Sørloth", team: "Atlético de Madrid", reason: "Remató al palo tres veces seguidas estando a un metro de la línea de gol.", raffleWinner: "Invitado (Liga Demo)", rafflePlayer: "Alexander Sørloth" }
+  ];
+
+  function loadDemoData() {
+    forceDemoMode = true;
+    currentLeagueName = "Liga Demo Local";
+    currentMatchday = 5;
+    votingStartTime = new Date(Date.now() - 3600 * 4 * 1000).toISOString();
+
+    let demoNominees = JSON.parse(localStorage.getItem('CF_DEMO_JESTER_NOMINEES') || 'null');
+    if (!demoNominees) {
+      demoNominees = DEFAULT_DEMO_NOMINEES;
+      localStorage.setItem('CF_DEMO_JESTER_NOMINEES', JSON.stringify(demoNominees));
+    }
+    nominees = demoNominees;
+
+    let demoHistory = JSON.parse(localStorage.getItem('CF_DEMO_JESTER_HISTORY') || 'null');
+    if (!demoHistory) {
+      demoHistory = DEFAULT_DEMO_HISTORY;
+      localStorage.setItem('CF_DEMO_JESTER_HISTORY', JSON.stringify(demoHistory));
+    }
+    history = demoHistory;
+
+    userVotedId = localStorage.getItem('CF_DEMO_JESTER_USER_VOTE');
+    userNickname = "Invitado";
+    activeTab = 'league';
+    renderLeagueView();
+  }
   
   // Tab state: 'league' or 'global'. If guest or no league, always show 'global'.
   let activeTab = (isGuest || !activeLeagueId) ? 'global' : 'league';
@@ -84,12 +129,23 @@ export function renderBufon(container, callbacks) {
       </div>
     `;
 
-    await ensureActiveLeague();
+    if (!isConfigured || forceDemoMode) {
+      loadDemoData();
+      return;
+    }
 
-    if (activeTab === 'global') {
-      await loadGlobalData();
-    } else {
-      await loadLeagueData();
+    try {
+      await ensureActiveLeague();
+
+      if (activeTab === 'global') {
+        await loadGlobalData();
+      } else {
+        await loadLeagueData();
+      }
+    } catch (err) {
+      console.error("Error al inicializar la base de datos de El Bufón, activando modo Demo:", err);
+      forceDemoMode = true;
+      loadDemoData();
     }
   }
 
@@ -208,8 +264,9 @@ export function renderBufon(container, callbacks) {
 
       renderGlobalView(leaguesGrouped, globalHistory);
     } catch (err) {
-      console.error("Error loading global data:", err);
-      callbacks.showToast('Error al cargar la vista global del Bufón', 'error');
+      console.error("Error loading global data, falling back to Demo Mode:", err);
+      forceDemoMode = true;
+      loadDemoData();
     }
   }
 
@@ -311,12 +368,27 @@ export function renderBufon(container, callbacks) {
 
       renderLeagueView();
     } catch (err) {
-      console.error(err);
-      callbacks.showToast('Error al cargar datos de El Bufón', 'error');
+      console.error("Error loading league data, falling back to Demo Mode:", err);
+      forceDemoMode = true;
+      loadDemoData();
     }
   }
 
   async function handleVote(nomineeId) {
+    if (!isConfigured || forceDemoMode) {
+      if (userVotedId) {
+        callbacks.showToast("Ya has votado en esta jornada", "warning");
+        return;
+      }
+      userVotedId = nomineeId;
+      localStorage.setItem('CF_DEMO_JESTER_USER_VOTE', nomineeId);
+      nominees = nominees.map(n => n.id === nomineeId ? { ...n, votes: n.votes + 1 } : n);
+      localStorage.setItem('CF_DEMO_JESTER_NOMINEES', JSON.stringify(nominees));
+      callbacks.showToast("¡Voto registrado en modo Demo!", "success");
+      renderLeagueView();
+      return;
+    }
+
     if (isGuest) {
       callbacks.showToast("Inicia sesión para votar por el Bufón de la jornada", "warning");
       callbacks.onNavigate('acceso');
@@ -347,7 +419,7 @@ export function renderBufon(container, callbacks) {
           throw error;
         }
       } else {
-        callbacks.showToast("¡Voto registrado! Participando en el sorteo de la camiseta.", "success");
+        callbacks.showToast("¡Voto registrado con éxito!", "success");
       }
 
       await loadData();
@@ -411,6 +483,26 @@ export function renderBufon(container, callbacks) {
   }
 
   async function handleNominate(name, team, reason) {
+    if (!isConfigured || forceDemoMode) {
+      if (nominees.length >= 6) {
+        callbacks.showToast("Máximo 6 nominados permitidos por jornada", "error");
+        return;
+      }
+      const newNom = {
+        id: 'd-nom-' + Date.now(),
+        name,
+        team,
+        reason,
+        votes: 0,
+        nominated_by: 'd-member-guest'
+      };
+      nominees.push(newNom);
+      localStorage.setItem('CF_DEMO_JESTER_NOMINEES', JSON.stringify(nominees));
+      callbacks.showToast("Nominado añadido en modo Demo", "success");
+      renderLeagueView();
+      return;
+    }
+
     if (isGuest) {
       callbacks.showToast("Inicia sesión para nominar candidatos", "warning");
       callbacks.onNavigate('acceso');
@@ -461,6 +553,36 @@ export function renderBufon(container, callbacks) {
   }
 
   async function closeMatchday() {
+    if (!isConfigured || forceDemoMode) {
+      if (nominees.length === 0) {
+        callbacks.showToast("No hay nominados en esta jornada para cerrar", "error");
+        return;
+      }
+      let winner = nominees[0];
+      nominees.forEach(n => {
+        if (n.votes > winner.votes) {
+          winner = n;
+        }
+      });
+      const newHistory = {
+        matchday: currentMatchday,
+        name: winner.name,
+        team: winner.team,
+        reason: winner.reason,
+        raffleWinner: "Invitado (Liga Demo)",
+        rafflePlayer: winner.name
+      };
+      history.unshift(newHistory);
+      localStorage.setItem('CF_DEMO_JESTER_HISTORY', JSON.stringify(history));
+      nominees = [];
+      localStorage.setItem('CF_DEMO_JESTER_NOMINEES', JSON.stringify(nominees));
+      userVotedId = null;
+      localStorage.removeItem('CF_DEMO_JESTER_USER_VOTE');
+      callbacks.showToast(`¡Jornada demo cerrada! El bufón de la jornada es ${winner.name}`, "success");
+      loadDemoData();
+      return;
+    }
+
     if (nominees.length === 0) {
       callbacks.showToast("No hay nominados en esta jornada para cerrar", "error");
       return;
@@ -475,9 +597,6 @@ export function renderBufon(container, callbacks) {
         }
       });
 
-      // Draw raffle winner
-      const luckyVoter = await drawRaffleWinner(winner);
-
       // 1. Add winner to history
       const { error: histErr } = await supabase
         .from('jester_history')
@@ -487,8 +606,8 @@ export function renderBufon(container, callbacks) {
           name: winner.name,
           team: winner.team,
           reason: winner.reason,
-          raffle_winner: luckyVoter ? luckyVoter.manager : null,
-          raffle_player: luckyVoter ? luckyVoter.player : null
+          raffle_winner: null,
+          raffle_player: null
         });
 
       if (histErr) throw histErr;
@@ -514,12 +633,7 @@ export function renderBufon(container, callbacks) {
 
       if (leagueErr) throw leagueErr;
 
-      const isUserWinner = luckyVoter && (luckyVoter.manager.includes('Tú') || (userNickname !== 'Tú' && luckyVoter.manager.includes(userNickname)));
-      if (isUserWinner) {
-        callbacks.showToast(`¡Jornada cerrada! Has ganado el sorteo de la camiseta réplica de ${luckyVoter.player}`, "success");
-      } else {
-        callbacks.showToast(`Jornada cerrada. ¡El bufón de la jornada es ${winner.name}!`, "success");
-      }
+      callbacks.showToast(`Jornada cerrada. ¡El bufón de la jornada es ${winner.name}!`, "success");
 
       await loadData();
     } catch (err) {
@@ -585,42 +699,7 @@ export function renderBufon(container, callbacks) {
 
         ${tabsHtml}
 
-        <!-- Banner del Sorteo de Camiseta -->
-        <div class="card glass shadow-lg" style="
-          background: linear-gradient(135deg, rgba(var(--accent-rgb), 0.12) 0%, rgba(var(--primary-rgb), 0.08) 100%);
-          border: 1px solid rgba(var(--accent-rgb), 0.25);
-          box-shadow: 0 4px 20px rgba(var(--accent-rgb), 0.1);
-          padding: 1.25rem 1.5rem;
-          margin-bottom: 1.5rem;
-          border-radius: 16px;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 1.5rem;
-          flex-wrap: wrap;
-        ">
-          <div style="flex-grow: 1; min-width: 250px;">
-            <h3 class="gradient-text-gold" style="font-size: 1.25rem; font-weight: 900; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.5rem;">
-              Sorteo Semanal de Camiseta Réplica
-            </h3>
-            <p style="font-size: 0.85rem; color: var(--text-light); line-height: 1.45;">
-              ¡Vota por el Bufón de la jornada y participa automáticamente! Sorteamos una camiseta réplica a la semana entre todos los mánagers de España que registren su voto. El ganador se anunciará al cerrar la jornada.
-            </p>
-          </div>
-          <div style="
-            background: rgba(255, 255, 255, 0.05);
-            border: 1.2px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 0.6rem 1rem;
-            text-align: center;
-            white-space: nowrap;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-          ">
-            <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 0.15rem;">Premio de la Semana</span>
-            <span style="font-size: 1.05rem; color: var(--accent); font-weight: 800; display: block;">Camiseta Oficial LaLiga</span>
-            <span style="font-size: 0.7rem; color: var(--text-muted); display: block; font-style: italic;">(Réplica Autorizada)</span>
-          </div>
-        </div>
+        <!-- Sorteo de camiseta oculto de momento -->
 
         <div class="dashboard-grid">
           <!-- Columna Izquierda: Votación Activa & Formulario -->
@@ -633,7 +712,7 @@ export function renderBufon(container, callbacks) {
                 <span style="font-size: 0.8rem; font-weight: 500; color: var(--text-muted);">${totalVotes} votos totales</span>
               </h2>
 
-              <!-- Countdown & Raffle Info Banner -->
+              <!-- Countdown Banner -->
               <div style="
                 background: rgba(var(--primary-rgb), 0.06);
                 border: 1px solid rgba(var(--primary-rgb), 0.15);
@@ -652,9 +731,6 @@ export function renderBufon(container, callbacks) {
                   <span style="color: var(--accent); font-weight: 700; font-size: 0.75rem; background: rgba(var(--accent-rgb), 0.08); padding: 0.15rem 0.45rem; border-radius: 4px; border: 1px solid rgba(var(--accent-rgb), 0.15);">
                     1 voto por mánager
                   </span>
-                </div>
-                <div style="color: var(--text-muted); line-height: 1.35; font-size: 0.75rem; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 0.35rem; margin-top: 0.15rem;">
-                  <strong>Sorteo Semanal:</strong> Al votar, participas automáticamente en el sorteo de una <strong>camiseta réplica</strong> del futbolista al que votes. ¡Sorteamos una camiseta a la semana!
                 </div>
               </div>
 
@@ -787,20 +863,18 @@ export function renderBufon(container, callbacks) {
             ` : `
               <div style="display: flex; flex-direction: column; gap: 1rem;">
                 ${history.map(h => {
-                  const hasRaffle = h.raffleWinner && h.rafflePlayer;
-                  const isUserWinner = hasRaffle && (h.raffleWinner.includes('Tú') || (userNickname !== 'Tú' && h.raffleWinner.includes(userNickname)));
                   return `
                     <div style="
                       border: 1px solid var(--border-color);
-                      background: ${isUserWinner ? 'rgba(var(--accent-rgb), 0.05)' : 'rgba(0,0,0,0.15)'};
-                      border-left: 3px solid ${isUserWinner ? 'var(--accent)' : 'var(--primary)'};
+                      background: rgba(0,0,0,0.15);
+                      border-left: 3px solid var(--primary);
                       border-radius: 0 10px 10px 0;
                       padding: 0.85rem 1rem;
                       font-size: 0.85rem;
                       margin-bottom: 0.75rem;
                     ">
                       <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
-                        <strong style="color: ${isUserWinner ? 'var(--accent)' : 'var(--primary)'};">Jornada ${h.matchday}</strong>
+                        <strong style="color: var(--primary);">Jornada ${h.matchday}</strong>
                         <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700;">
                           ${escapeHTML(h.team)}
                         </span>
@@ -811,39 +885,6 @@ export function renderBufon(container, callbacks) {
                       <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.35; font-style: italic; margin-bottom: 0.5rem;">
                         "${escapeHTML(h.reason)}"
                       </p>
-                      ${hasRaffle ? `
-                        <div style="
-                          border-top: 1px solid rgba(255,255,255,0.05);
-                          padding-top: 0.5rem;
-                          margin-top: 0.5rem;
-                          font-size: 0.75rem;
-                          color: ${isUserWinner ? 'var(--text-light)' : 'var(--text-muted)'};
-                          display: flex;
-                          align-items: center;
-                          gap: 0.35rem;
-                        ">
-                          <strong>Sorteo Camiseta:</strong> 
-                          <span style="color: ${isUserWinner ? 'var(--accent)' : 'var(--text-light)'}; font-weight: 700;">
-                            @${escapeHTML(h.raffleWinner)}
-                          </span> 
-                          <span>(Réplica de ${escapeHTML(h.rafflePlayer)})</span>
-                        </div>
-                        ${isUserWinner ? `
-                          <div style="
-                            background: rgba(var(--accent-rgb), 0.1);
-                            border: 1px solid rgba(var(--accent-rgb), 0.2);
-                            border-radius: 4px;
-                            padding: 0.35rem 0.5rem;
-                            margin-top: 0.4rem;
-                            font-size: 0.7rem;
-                            color: var(--text-light);
-                            font-weight: 600;
-                            text-align: center;
-                          ">
-                            ¡Has ganado! Nos pondremos en contacto para el envío.
-                          </div>
-                        ` : ''}
-                      ` : ''}
                     </div>
                   `;
                 }).join('')}
@@ -1049,7 +1090,6 @@ export function renderBufon(container, callbacks) {
       historyHtml = `
         <div style="display: flex; flex-direction: column; gap: 1rem;">
           ${globalHistory.map(h => {
-            const hasRaffle = h.raffleWinner && h.rafflePlayer;
             return `
               <div style="
                 border: 1px solid var(--border-color);
@@ -1072,21 +1112,6 @@ export function renderBufon(container, callbacks) {
                 <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.35; font-style: italic; margin-bottom: 0.5rem;">
                   "${escapeHTML(h.reason)}"
                 </p>
-                ${hasRaffle ? `
-                  <div style="
-                    border-top: 1px solid rgba(255,255,255,0.05);
-                    padding-top: 0.5rem;
-                    margin-top: 0.5rem;
-                    font-size: 0.75rem;
-                    color: var(--text-muted);
-                  ">
-                    <strong>Ganador Camiseta:</strong> 
-                    <span style="color: var(--text-light); font-weight: 700;">
-                      @${escapeHTML(h.raffleWinner)}
-                    </span> 
-                    <span>(Réplica de ${escapeHTML(h.rafflePlayer)})</span>
-                  </div>
-                ` : ''}
               </div>
             `;
           }).join('')}

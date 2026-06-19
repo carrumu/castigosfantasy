@@ -11,6 +11,14 @@ import { renderLanding } from './views/landing';
 import { renderSelectLeague } from './views/select-league';
 import { renderLeagueHub } from './views/league-hub';
 
+// Initialize Theme
+const savedTheme = localStorage.getItem('CF_THEME') || 'dark';
+if (savedTheme === 'light') {
+  document.body.classList.add('light-theme');
+} else {
+  document.body.classList.remove('light-theme');
+}
+
 // Root elements
 const app = document.querySelector('#app');
 
@@ -89,8 +97,8 @@ function renderMainLayout(isGuest) {
       <!-- Sidebar de Navegación Lateral -->
       <aside class="sidebar" id="app-sidebar">
         <div class="sidebar-header">
-          <div class="logo gradient-text-green" style="cursor: pointer; display: flex; align-items: center; gap: 0.75rem;" id="logo-home">
-            <img src="/logo.png" alt="CastigoFantasy Logo" style="width: 52px; height: 52px; border-radius: 10px; object-fit: cover; border: 1.5px solid var(--border-color-glow); box-shadow: 0 0 10px rgba(var(--primary-rgb), 0.15);" />
+          <div class="logo gradient-text-green" style="cursor: pointer; display: flex; align-items: center; gap: 0.35rem;" id="logo-home">
+            <span class="logo-icon" style="width: 50px; height: 36px; flex-shrink: 0;"></span>
             CastigoFantasy
           </div>
           <button class="sidebar-close-btn" id="sidebar-close-btn" aria-label="Cerrar menú">✕</button>
@@ -114,11 +122,29 @@ function renderMainLayout(isGuest) {
           </button>
 
           <button class="nav-item ${currentView === 'retos' ? 'active' : ''}" id="nav-challenges-btn">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path></svg>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;">
+              <path d="M14.5 17.5 3 6V3h3l11.5 11.5"></path>
+              <path d="M13 19 19 13"></path>
+              <path d="m16 16 4 4"></path>
+              <path d="m19 21 2-2"></path>
+              <path d="M14.5 6.5 21 13v3h-3L6.5 14.5"></path>
+              <path d="M13 5 19 11"></path>
+              <path d="m8 16-4 4"></path>
+              <path d="m5 21 2-2"></path>
+            </svg>
             <span>Reto Semanal</span>
           </button>
           <button class="nav-item ${currentView === 'bufon' ? 'active' : ''}" id="nav-bufon-btn">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;"><path d="M2 4 5 12h14l3-8-7 4-3-6-3 6-7-4z"></path><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7H5z"></path></svg>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;">
+              <path d="M2 10s2.5-3 5-3 5 3 5 3V14s-2.5 3-5 3-5-3-5-3z"></path>
+              <path d="M12 10s2.5-3 5-3 5 3 5 3V14s-2.5 3-5 3-5-3-5-3z"></path>
+              <path d="M5 10c.5 0 1-.5 1-1"></path>
+              <path d="M8 10c-.5 0-1-.5-1-1"></path>
+              <path d="M5 12s1.5 1.5 3 0"></path>
+              <path d="M15 10c.5 0 1-.5 1-1"></path>
+              <path d="M18 10c-.5 0-1-.5-1-1"></path>
+              <path d="M15 12s1.5 1.5 3 0"></path>
+            </svg>
             <span>El Bufón</span>
           </button>
           <button class="nav-item ${currentView === 'minijuego' ? 'active' : ''}" id="nav-minigame-btn">
@@ -127,7 +153,35 @@ function renderMainLayout(isGuest) {
           </button>
         </nav>
 
-        <div class="sidebar-footer">
+        <div class="sidebar-footer" style="border-top: 1px solid var(--border-color); padding-top: 1rem;">
+          <div class="footer-widgets" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.85rem;">
+            <!-- Theme Toggle on the Left -->
+            <label class="switch-theme" title="Cambiar Tema (Día/Noche)">
+              <input type="checkbox" id="theme-toggle-checkbox" ${document.body.classList.contains('light-theme') ? 'checked' : ''}>
+              <span class="slider-theme"></span>
+            </label>
+            
+            <!-- Social Icons on the Right -->
+            <div class="social-icons" style="display: flex; gap: 0.75rem; align-items: center;">
+              <a href="#" class="social-link" title="Twitter / X" style="color: var(--text-muted); transition: var(--transition-fast); display: flex; align-items: center;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"></path>
+                </svg>
+              </a>
+              <a href="#" class="social-link" title="Instagram" style="color: var(--text-muted); transition: var(--transition-fast); display: flex; align-items: center;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                  <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                </svg>
+              </a>
+              <a href="#" class="social-link" title="TikTok" style="color: var(--text-muted); transition: var(--transition-fast); display: flex; align-items: center;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"></path>
+                </svg>
+              </a>
+            </div>
+          </div>
           <span style="font-weight: 700; color: var(--primary);">Ligas Fútbol Fantasy</span>
           <span class="sidebar-version">Versión 1.1.0</span>
         </div>
@@ -148,8 +202,8 @@ function renderMainLayout(isGuest) {
                 <line x1="3" y1="18" x2="21" y2="18"></line>
               </svg>
             </button>
-            <div class="logo gradient-text-green" style="cursor: pointer; display: flex; align-items: center; gap: 0.5rem; font-size: 1.2rem; font-weight: 700; user-select: none;" id="header-logo-home">
-              <img src="/logo.png" alt="CastigoFantasy Logo" style="width: 32px; height: 32px; border-radius: 8px; border: 1.2px solid var(--border-color-glow);" />
+            <div class="logo gradient-text-green" style="cursor: pointer; display: flex; align-items: center; gap: 0.25rem; font-size: 1.2rem; font-weight: 700; user-select: none;" id="header-logo-home">
+              <span class="logo-icon" style="width: 37px; height: 27px; flex-shrink: 0;"></span>
               CastigoFantasy
             </div>
           </div>
@@ -376,6 +430,20 @@ function renderMainLayout(isGuest) {
     settingsBtn.addEventListener('click', () => {
       closeSidebar();
       navigate('acceso');
+    });
+  }
+
+  // Theme toggle switch listener
+  const themeToggle = app.querySelector('#theme-toggle-checkbox');
+  if (themeToggle) {
+    themeToggle.addEventListener('change', () => {
+      if (themeToggle.checked) {
+        document.body.classList.add('light-theme');
+        localStorage.setItem('CF_THEME', 'light');
+      } else {
+        document.body.classList.remove('light-theme');
+        localStorage.setItem('CF_THEME', 'dark');
+      }
     });
   }
 

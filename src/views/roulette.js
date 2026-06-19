@@ -164,7 +164,6 @@ export function renderRoulette(container, callbacks) {
       renderView();
     } catch (err) {
       console.error(err);
-      callbacks.showToast('Error al conectar con la liga. Cargando modo libre en local.', 'warning');
       activeLeagueId = null;
       loadData();
     }

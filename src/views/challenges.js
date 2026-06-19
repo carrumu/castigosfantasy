@@ -18,14 +18,9 @@ export function renderChallenges(container, callbacks) {
   ];
 
   const DEFAULT_HISTORY = [
-    { matchday: 4, loser: "Luis T.", dare: "Llevar puesta una peluca de payaso durante toda la jornada de liga de fútbol en el bar." },
-    { matchday: 3, loser: "Paco G.", dare: "Cambiar la foto de perfil de WhatsApp por una foto graciosa de Torrente durante una semana completa." },
-    { matchday: 2, loser: "Álvaro M.", dare: "Hacer 50 flexiones seguidas grabadas en vídeo o pagar una ronda de cervezas a la liga." }
-  ];
-
-  const DEFAULT_PIQUES = [
-    { sender: "Paco G.", text: "¡Votad todos por la camiseta del rival! Quiero ver a Luis con la del Madrid 🤣", time: "Hace 2 horas" },
-    { sender: "Santi K.", text: "El himno cantado por Álvaro sería legendario... ¡voto por el karaoke de WhatsApp!", time: "Hace 5 horas" }
+    { matchday: 4, dare: "Llevar puesta una peluca de payaso durante toda la jornada de liga de fútbol en el bar." },
+    { matchday: 3, dare: "Cambiar la foto de perfil de WhatsApp por una foto graciosa de Torrente durante una semana completa." },
+    { matchday: 2, dare: "Hacer 50 flexiones seguidas grabadas en vídeo o pagar una ronda de cervezas a la liga." }
   ];
 
   // Load challenges from local storage or set defaults
@@ -33,13 +28,6 @@ export function renderChallenges(container, callbacks) {
   if (!challenges) {
     challenges = DEFAULT_CHALLENGES;
     localStorage.setItem('CF_CHALLENGES_DATA', JSON.stringify(challenges));
-  }
-
-  // Load piques
-  let piques = JSON.parse(localStorage.getItem('CF_CHALLENGES_PIQUES') || 'null');
-  if (!piques) {
-    piques = DEFAULT_PIQUES;
-    localStorage.setItem('CF_CHALLENGES_PIQUES', JSON.stringify(piques));
   }
 
   // Check if the current user has already voted
@@ -111,7 +99,7 @@ export function renderChallenges(container, callbacks) {
             </div>
           </div>
 
-          <!-- Columna Derecha: Timer, Historial & Piques -->
+          <!-- Columna Derecha: Timer & Historial -->
           <div style="display: flex; flex-direction: column; gap: 1.5rem;">
             <!-- Cuenta atrás -->
             <div class="card glass">
@@ -142,27 +130,6 @@ export function renderChallenges(container, callbacks) {
               </p>
             </div>
 
-            <!-- Muro de Piques -->
-            <div class="card glass" style="display: flex; flex-direction: column; max-height: 350px;">
-              <h3 class="card-title" style="font-size: 1.05rem; margin-bottom: 0.5rem;">Muro de Piques</h3>
-              <div id="piques-list" style="flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 0.6rem; padding-right: 0.25rem; margin-bottom: 1rem; min-height: 120px;">
-                ${piques.map(p => `
-                  <div style="background: rgba(255,255,255,0.01); border: 1px solid var(--border-color); padding: 0.6rem 0.8rem; border-radius: 8px; font-size: 0.85rem;">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.15rem;">
-                      <strong style="color: var(--primary);">${p.sender}</strong>
-                      <span style="font-size: 0.7rem; color: var(--text-muted);">${p.time}</span>
-                    </div>
-                    <p style="color: var(--text-light); font-style: italic;">"${p.text}"</p>
-                  </div>
-                `).reverse().join('')}
-              </div>
-              <form id="pique-form" style="display: flex; gap: 0.5rem; border-top: 1px solid var(--border-color); padding-top: 0.75rem;">
-                <input type="text" id="pique-sender" class="input-field" placeholder="Apodo" style="width: 30%; padding: 0.5rem;" required />
-                <input type="text" id="pique-text" class="input-field" placeholder="Escribe un pique..." style="flex-grow: 1; padding: 0.5rem;" required />
-                <button type="submit" class="btn-primary" style="width: auto; padding: 0.5rem 0.75rem; font-size: 0.85rem;">Enviar</button>
-              </form>
-            </div>
-
             <!-- Historial de Retos -->
             <div class="card glass">
               <h3 class="card-title" style="font-size: 1.05rem; margin-bottom: 1rem;">📋 Historial de Penitencias</h3>
@@ -171,7 +138,6 @@ export function renderChallenges(container, callbacks) {
                   <div style="border-left: 2.5px solid var(--accent); padding: 0.5rem 0.75rem; background: rgba(0,0,0,0.1); border-radius: 0 8px 8px 0; font-size: 0.8rem;">
                     <div style="display: flex; justify-content: space-between; margin-bottom: 0.15rem;">
                       <strong>Jornada ${h.matchday}</strong>
-                      <span style="color: var(--accent); font-weight: 700;">Perdedor: ${h.loser}</span>
                     </div>
                     <p style="color: var(--text-muted); line-height: 1.3;">Reto: ${h.dare}</p>
                   </div>
@@ -217,26 +183,7 @@ export function renderChallenges(container, callbacks) {
       });
     });
 
-    // Hook Pique Form
-    const piqueForm = container.querySelector('#pique-form');
-    if (piqueForm) {
-      piqueForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const sender = piqueForm.querySelector('#pique-sender').value.trim();
-        const text = piqueForm.querySelector('#pique-text').value.trim();
-        if (!sender || !text) return;
-
-        piques.push({
-          sender,
-          text,
-          time: "Hace 1 min"
-        });
-
-        localStorage.setItem('CF_CHALLENGES_PIQUES', JSON.stringify(piques));
-        callbacks.showToast('Mensaje de pique publicado', 'info');
-        renderView();
-      });
-    }
+    // Hook Pique Form removed
 
     // Initialize Countdown Timer
     startCountdown();
