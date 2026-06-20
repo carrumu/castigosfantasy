@@ -280,7 +280,6 @@ export function renderAuth(container, callbacks) {
         if (isLoginMode) {
           const { error } = await supabase.auth.signInWithPassword({ email, password });
           if (error) throw error;
-          callbacks.showToast('¡Bienvenido a los castigos!', 'success');
           callbacks.onAuthSuccess();
         } else {
           const username = form.querySelector('#username').value.trim();
@@ -304,7 +303,6 @@ export function renderAuth(container, callbacks) {
           });
 
           if (data?.session) {
-            callbacks.showToast('¡Cuenta creada y sesión iniciada!', 'success');
             callbacks.onAuthSuccess();
           } else {
             isVerificationPending = true;

@@ -12,7 +12,6 @@ export function renderLeagueHub(container, callbacks) {
   const isGuest = callbacks.isGuest;
 
   if (isGuest) {
-    callbacks.showToast('Debes iniciar sesión para acceder a esta sección', 'warning');
     callbacks.onNavigate('acceso');
     return;
   }

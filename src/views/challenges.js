@@ -153,7 +153,6 @@ export function renderChallenges(container, callbacks) {
     container.querySelectorAll('.btn-vote').forEach(button => {
       button.addEventListener('click', (e) => {
         if (isGuest) {
-          callbacks.showToast('Inicia sesión para votar en los retos semanales', 'warning');
           callbacks.onNavigate('acceso');
           return;
         }

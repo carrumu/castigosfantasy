@@ -38,7 +38,6 @@ export function renderDashboard(container, callbacks) {
 
   async function loadData() {
     if (isGuest) {
-      callbacks.showToast('Debes iniciar sesión para acceder a esta sección', 'warning');
       callbacks.onNavigate('acceso');
       return;
     }

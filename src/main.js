@@ -82,7 +82,6 @@ async function checkAuthAndRender() {
   const privateViews = ['muro', 'mis-ligas', 'menu-liga'];
   if (isGuest && privateViews.includes(currentView)) {
     history.replaceState({}, '', '/acceso');
-    showToast('Debes iniciar sesión para acceder a esta sección', 'warning');
     handleRouting();
     return;
   }

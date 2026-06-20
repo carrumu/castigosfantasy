@@ -390,7 +390,6 @@ export function renderBufon(container, callbacks) {
     }
 
     if (isGuest) {
-      callbacks.showToast("Inicia sesión para votar por el Bufón de la jornada", "warning");
       callbacks.onNavigate('acceso');
       return;
     }
@@ -504,7 +503,6 @@ export function renderBufon(container, callbacks) {
     }
 
     if (isGuest) {
-      callbacks.showToast("Inicia sesión para nominar candidatos", "warning");
       callbacks.onNavigate('acceso');
       return;
     }

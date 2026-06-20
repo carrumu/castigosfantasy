@@ -14,7 +14,6 @@ export function renderSelectLeague(container, callbacks) {
 
   // Check auth
   if (isGuest) {
-    callbacks.showToast('Debes iniciar sesión para acceder a las ligas', 'warning');
     callbacks.onNavigate('acceso');
     return;
   }
