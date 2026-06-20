@@ -2295,3 +2295,71 @@ body.light-theme .slider-theme {
   background: var(--primary-green);
   color: #000000;
 }
+
+/* Mobile Bottom Navigation Bar (Stitch design) */
+.mobile-bottom-nav {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .mobile-bottom-nav {
+    display: flex;
+    position: fixed;
+    bottom: 12px;
+    left: 12px;
+    right: 12px;
+    height: 68px;
+    background-color: var(--bg-sidebar);
+    border: 3px solid #000000;
+    border-radius: 16px;
+    box-shadow: 4px 4px 0px 0px #000000;
+    align-items: center;
+    justify-content: space-around;
+    padding: 0 8px;
+    z-index: 9999;
+  }
+  
+  .mobile-nav-item {
+    background: transparent;
+    border: 2px solid transparent;
+    border-radius: 12px;
+    color: var(--text-muted);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    flex: 1;
+    max-width: 80px;
+    height: 52px;
+  }
+  
+  .mobile-nav-item .material-symbols-outlined {
+    font-size: 22px;
+    margin-bottom: 2px;
+  }
+  
+  .mobile-nav-item .mobile-nav-label {
+    font-family: var(--font-sans);
+    font-weight: 800;
+    font-size: 9px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  
+  .mobile-nav-item.active {
+    background-color: rgba(var(--accent-rgb), 0.15);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .menu-toggle-btn {
+    display: none !important;
+  }
+
+  .main-content {
+    padding-bottom: 92px; /* Ensure content is not hidden behind the bar */
+  }
+}

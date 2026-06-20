@@ -11,6 +11,7 @@ import { renderLanding } from './views/landing';
 import { renderSelectLeague } from './views/select-league';
 import { renderLeagueHub } from './views/league-hub';
 import { renderGenerator } from './views/generator';
+import { renderComunidad } from './views/comunidad';
 
 // Initialize Theme
 const savedTheme = localStorage.getItem('CF_THEME') || 'dark';
@@ -219,6 +220,7 @@ function renderMainLayout(isGuest) {
             <button class="header-nav-link ${currentView === 'ruleta' ? 'active' : ''}" data-nav="ruleta">RULETA</button>
             <button class="header-nav-link ${currentView === 'retos' ? 'active' : ''}" data-nav="retos">RETOS</button>
             <button class="header-nav-link ${currentView === 'minijuego' ? 'active' : ''}" data-nav="minijuego">JUEGO</button>
+            <button class="header-nav-link ${currentView === 'comunidad' || currentView === 'bufon' ? 'active' : ''}" data-nav="comunidad">COMUNIDAD</button>
             <button class="header-nav-link ${currentView === 'mis-ligas' ? 'active' : ''}" data-nav="mis-ligas">MIS LIGAS</button>
           </nav>
           
@@ -246,6 +248,34 @@ function renderMainLayout(isGuest) {
         <!-- Contenedor de la Vista Activa -->
         <main id="view-container" class="container"></main>
       </div>
+
+      <!-- Navegación Inferior para Móvil -->
+      <nav class="mobile-bottom-nav">
+        <button class="mobile-nav-item ${currentView === 'inicio' ? 'active' : ''}" data-nav="inicio" title="Panel principal">
+          <span class="material-symbols-outlined">grid_view</span>
+          <span class="mobile-nav-label">PANEL</span>
+        </button>
+        <button class="mobile-nav-item ${currentView === 'ruleta' ? 'active' : ''}" data-nav="ruleta" title="Ruleta de sentencias">
+          <span class="material-symbols-outlined">casino</span>
+          <span class="mobile-nav-label">RULETA</span>
+        </button>
+        <button class="mobile-nav-item ${currentView === 'retos' ? 'active' : ''}" data-nav="retos" title="Reto semanal">
+          <span class="material-symbols-outlined">emoji_events</span>
+          <span class="mobile-nav-label">RETOS</span>
+        </button>
+        <button class="mobile-nav-item ${currentView === 'comunidad' || currentView === 'bufon' ? 'active' : ''}" data-nav="comunidad" title="Comunidad">
+          <span class="material-symbols-outlined">groups</span>
+          <span class="mobile-nav-label">COMUNIDAD</span>
+        </button>
+        <button class="mobile-nav-item ${currentView === 'minijuego' ? 'active' : ''}" data-nav="minijuego" title="Juego interactivo">
+          <span class="material-symbols-outlined">sports_esports</span>
+          <span class="mobile-nav-label">JUEGO</span>
+        </button>
+        <button class="mobile-nav-item ${currentView === 'mis-ligas' || currentView === 'menu-liga' ? 'active' : ''}" data-nav="mis-ligas" title="Mis ligas">
+          <span class="material-symbols-outlined">shield</span>
+          <span class="mobile-nav-label">LIGAS</span>
+        </button>
+      </nav>
 
       <!-- Burbuja Flotante de Soporte -->
       <div id="draggable-support-bubble" class="support-bubble" title="Soporte y Ayuda">
@@ -340,6 +370,11 @@ function renderMainLayout(isGuest) {
       onNavigate: navigate,
       showToast
     });
+  } else if (currentView === 'comunidad') {
+    renderComunidad(viewContainer, {
+      onNavigate: navigate,
+      showToast
+    });
   }
 
   // Hook Navigation Elements (Cerrando el sidebar al hacer clic en móvil/escritorio)
@@ -417,6 +452,15 @@ function renderMainLayout(isGuest) {
   // Bind Header Navigation Links (Desktop)
   const headerLinks = app.querySelectorAll('.header-nav-link');
   headerLinks.forEach(link => {
+    link.addEventListener('click', () => {
+      const view = link.dataset.nav;
+      navigate(view);
+    });
+  });
+
+  // Bind Mobile Bottom Navigation Links
+  const mobileNavLinks = app.querySelectorAll('.mobile-nav-item');
+  mobileNavLinks.forEach(link => {
     link.addEventListener('click', () => {
       const view = link.dataset.nav;
       navigate(view);

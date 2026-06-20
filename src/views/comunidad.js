@@ -1,0 +1,72 @@
+/**
+ * Renders the "Comunidad" (Community hub) screen.
+ * Allows users to choose between the Jester (El Bufón) and the upcoming Forum (Foro).
+ * @param {HTMLElement} container 
+ * @param {Object} callbacks 
+ * @param {Function} callbacks.onNavigate
+ */
+export function renderComunidad(container, callbacks) {
+  container.innerHTML = `
+    <div class="comunidad-container fade-in-up" style="padding: 1.5rem 1.25rem;">
+      <!-- Hero Header -->
+      <div style="margin-bottom: 2.5rem; text-align: center;">
+        <h1 class="gradient-text-gold" style="font-size: 2.2rem; font-weight: 900; font-family: var(--font-display); text-transform: uppercase; margin-bottom: 0.5rem; text-shadow: 2px 2px 0px #000000;">
+          Comunidad
+        </h1>
+        <p style="font-size: 0.95rem; color: var(--text-muted); max-width: 500px; margin: 0 auto; line-height: 1.4;">
+          El punto de encuentro de los mánagers de CastigoFantasy. Selecciona la sección a la que deseas acceder.
+        </p>
+      </div>
+
+      <!-- Options Grid -->
+      <div class="brutalist-grid-2" style="max-width: 900px; margin: 0 auto; gap: 2rem;">
+        
+        <!-- El Bufón Card (Active) -->
+        <article class="brutalist-card concrete-bg" id="comunidad-bufon-card" style="cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; min-height: 260px; position: relative;">
+          <div>
+            <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid #000000; padding-bottom: 0.75rem; margin-bottom: 1rem;">
+              <h2 style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 800; text-transform: uppercase;">El Bufón de la Corte</h2>
+              <span class="material-symbols-outlined" style="color: var(--accent); font-size: 2rem;">theater_comedy</span>
+            </div>
+            <p style="font-size: 0.95rem; color: var(--text-light); line-height: 1.5; margin-bottom: 1.5rem;">
+              Vota democráticamente por el peor jugador de la jornada en tu liga y propone ideas divertidas de castigos para tus amigos.
+            </p>
+          </div>
+          <button class="brutalist-btn" style="margin-top: auto; pointer-events: none; width: 100%;">
+            Entrar a la Corte <span class="material-symbols-outlined" style="font-size: 1.2rem;">chevron_right</span>
+          </button>
+        </article>
+
+        <!-- Foro Card (Próximamente) -->
+        <article class="brutalist-card" style="position: relative; opacity: 0.8; display: flex; flex-direction: column; justify-content: space-between; min-height: 260px; background: rgba(0,0,0,0.25);">
+          <div style="position: absolute; top: 1.25rem; right: 1.25rem; z-index: 10;">
+            <span class="brutalist-badge" style="transform: rotate(3deg); background: var(--bg-card); color: var(--accent); border-color: var(--accent);">PRÓXIMAMENTE</span>
+          </div>
+          <div>
+            <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid #000000; padding-bottom: 0.75rem; margin-bottom: 1rem;">
+              <h2 style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 800; text-transform: uppercase; color: var(--text-muted);">Foro de Mánagers</h2>
+              <span class="material-symbols-outlined" style="color: var(--text-muted); font-size: 2rem;">forum</span>
+            </div>
+            <p style="font-size: 0.95rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 1.5rem;">
+              Debates, estrategias de fichajes, quejas sobre arbitraje y compra-venta de jugadores con el resto de la comunidad.
+            </p>
+          </div>
+          <button class="brutalist-btn brutalist-btn-secondary" disabled style="margin-top: auto; opacity: 0.5; cursor: not-allowed; width: 100%;">
+            En Construcción <span class="material-symbols-outlined" style="font-size: 1.2rem;">lock</span>
+          </button>
+        </article>
+
+      </div>
+    </div>
+  `;
+
+  // Attach event listener
+  const bufonCard = container.querySelector('#comunidad-bufon-card');
+  if (bufonCard) {
+    bufonCard.addEventListener('click', () => {
+      if (callbacks.onNavigate) {
+        callbacks.onNavigate('bufon');
+      }
+    });
+  }
+}
