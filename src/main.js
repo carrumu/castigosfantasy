@@ -30,31 +30,8 @@ let supportBubblePos = null; // { left, top }
 
 // Dynamic Toast Helper
 export function showToast(message, type = 'info') {
-  let container = document.querySelector('.toast-container');
-  if (!container) {
-    container = document.createElement('div');
-    container.className = 'toast-container';
-    document.body.appendChild(container);
-  }
-
-  const toast = document.createElement('div');
-  toast.className = `toast ${type === 'error' ? 'toast-error' : ''}`;
-  toast.innerHTML = `
-    <span class="toast-message">${message}</span>
-    <button class="toast-close">✕</button>
-  `;
-
-  container.appendChild(toast);
-
-  // Close hook
-  const closeBtn = toast.querySelector('.toast-close');
-  closeBtn.addEventListener('click', () => toast.remove());
-
-  // Auto remove
-  setTimeout(() => {
-    toast.style.animation = 'fadeOut 0.3s forwards';
-    toast.addEventListener('animationend', () => toast.remove());
-  }, 4000);
+  // Disabled globally per user request
+  return;
 }
 
 // Router and View Renderer
