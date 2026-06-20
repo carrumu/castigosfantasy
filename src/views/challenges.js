@@ -12,9 +12,9 @@ export function renderChallenges(container, callbacks) {
 
   // Predefined Dares
   const DEFAULT_CHALLENGES = [
-    { id: 1, title: "👕 El Eterno Rival", desc: "Llevar la camiseta del máximo rival de tu equipo durante un día entero de trabajo/estudios (y subir foto de prueba).", votes: 8 },
-    { id: 2, title: "☕ El Camarero de la Liga", desc: "Pagarle un café o refresco a cada uno de los miembros de la liga la próxima vez que os veáis.", votes: 5 },
-    { id: 3, title: "🎤 El Cantante de WhatsApp", desc: "Grabar un audio de WhatsApp de al menos 1 minuto cantando a capela el himno del equipo del último clasificado con la mano en el pecho.", votes: 12 }
+    { id: 1, title: "El Eterno Rival", desc: "Llevar la camiseta del máximo rival de tu equipo durante un día entero de trabajo/estudios (y subir foto de prueba).", votes: 8 },
+    { id: 2, title: "El Camarero de la Liga", desc: "Pagarle un café o refresco a cada uno de los miembros de la liga la próxima vez que os veáis.", votes: 5 },
+    { id: 3, title: "El Cantante de WhatsApp", desc: "Grabar un audio de WhatsApp de al menos 1 minuto cantando a capela el himno del equipo del último clasificado con la mano en el pecho.", votes: 12 }
   ];
 
   const DEFAULT_HISTORY = [
@@ -25,7 +25,7 @@ export function renderChallenges(container, callbacks) {
 
   // Load challenges from local storage or set defaults
   let challenges = JSON.parse(localStorage.getItem('CF_CHALLENGES_DATA') || 'null');
-  if (!challenges) {
+  if (!challenges || challenges.some(c => c.title.includes('👕') || c.title.includes('☕') || c.title.includes('🎤'))) {
     challenges = DEFAULT_CHALLENGES;
     localStorage.setItem('CF_CHALLENGES_DATA', JSON.stringify(challenges));
   }
@@ -132,7 +132,7 @@ export function renderChallenges(container, callbacks) {
 
             <!-- Historial de Retos -->
             <div class="card glass">
-              <h3 class="card-title" style="font-size: 1.05rem; margin-bottom: 1rem;">📋 Historial de Penitencias</h3>
+              <h3 class="card-title" style="font-size: 1.05rem; margin-bottom: 1rem;">Historial de Penitencias</h3>
               <div style="display: flex; flex-direction: column; gap: 0.75rem;">
                 ${DEFAULT_HISTORY.map(h => `
                   <div style="border-left: 2.5px solid var(--accent); padding: 0.5rem 0.75rem; background: rgba(0,0,0,0.1); border-radius: 0 8px 8px 0; font-size: 0.8rem;">
