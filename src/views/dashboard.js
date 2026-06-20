@@ -1,6 +1,7 @@
 import { supabase } from '../supabase';
 import { getRandomPhrase } from '../utils/phrases';
 import { openLeagueSettings } from '../utils/league-options';
+import { openBiwengerLinkModal } from '../utils/biwenger-link-modal';
 
 /**
  * Renders the Main Dashboard (Leaderboard, Registering matchday loser).
@@ -18,6 +19,12 @@ export function renderDashboard(container, callbacks) {
   let records = [];
   let isAdmin = false;
   let currentUserId = null;
+
+  let activeTab = 'deudas'; // 'deudas', 'biwenger-general', 'biwenger-jornada'
+  let biwengerStandings = [];
+  let biwengerLoaded = false;
+  let biwengerLoadError = false;
+  let biwengerErrorMsg = '';
 
   // Default Mock Data for Guest / Demo Mode
   const DEFAULT_DEMO_MEMBERS = [
@@ -99,6 +106,7 @@ export function renderDashboard(container, callbacks) {
         .select(`
           profile_id,
           is_admin,
+          biwenger_user_name,
           profiles (
             apodo,
             display_name,
@@ -112,7 +120,8 @@ export function renderDashboard(container, callbacks) {
       members = membersList.map(m => ({
         profile_id: m.profile_id,
         display_name: m.profiles?.apodo || m.profiles?.display_name || 'Desconocido',
-        avatar_url: m.profiles?.avatar_url || ''
+        avatar_url: m.profiles?.avatar_url || '',
+        biwenger_user_name: m.biwenger_user_name || ''
       }));
 
       // 6. Get records
@@ -124,10 +133,284 @@ export function renderDashboard(container, callbacks) {
       if (recErr) throw recErr;
       records = recordsList;
 
+      // Start fetching Biwenger standings asynchronously
+      fetchBiwengerStandings();
+
       renderMainDashboard();
     } catch (err) {
       console.error(err);
       callbacks.showToast('Error cargando datos de la liga', 'error');
+    }
+  }
+
+  async function fetchBiwengerStandings() {
+    if (!currentLeague || currentLeague.sync_source !== 'biwenger') return;
+    
+    const email = currentLeague.biwenger_email;
+    const password = currentLeague.biwenger_password;
+    const bLeagueId = currentLeague.biwenger_league_id;
+
+    if (!email || !password || !bLeagueId) {
+      biwengerLoadError = true;
+      biwengerErrorMsg = 'Las credenciales de Biwenger no están configuradas en Ajustes.';
+      updateLeaderboardView();
+      return;
+    }
+
+    try {
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || localStorage.getItem('CF_SUPABASE_URL') || '';
+      const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || localStorage.getItem('CF_SUPABASE_ANON_KEY') || '';
+      
+      let token = supabaseAnonKey;
+      try {
+        const sessionData = await supabase.auth.getSession();
+        if (sessionData.data?.session?.access_token) {
+          token = sessionData.data.session.access_token;
+        }
+      } catch (_) {}
+
+      const res = await fetch(`${supabaseUrl}/functions/v1/biwenger-sync`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+          'apikey': supabaseAnonKey
+        },
+        body: JSON.stringify({ email, password, leagueId: bLeagueId })
+      });
+
+      if (res.status !== 200) {
+        const errText = await res.text();
+        let errMsg = `Error de conexión (Status ${res.status})`;
+        try {
+          const errJSON = JSON.parse(errText);
+          errMsg = errJSON.error || errJSON.message || errMsg;
+        } catch (_) {}
+        throw new Error(errMsg);
+      }
+
+      const syncData = await res.json();
+      const users = syncData.data?.users || [];
+      const standings = syncData.data?.standings || [];
+
+      biwengerStandings = standings.map(s => {
+        const u = users.find(user => user.id === s.id) || {};
+        return {
+          id: s.id,
+          name: u.name || 'Entrenador',
+          points: s.points || 0,
+          lastPoints: s.lastPoints || 0,
+          position: s.position || 1
+        };
+      });
+
+      biwengerLoaded = true;
+      biwengerLoadError = false;
+      updateLeaderboardView();
+    } catch (err) {
+      console.error('Error loading Biwenger standings:', err);
+      biwengerLoadError = true;
+      biwengerErrorMsg = err.message || 'Error de conexión con Biwenger.';
+      updateLeaderboardView();
+    }
+  }
+
+  function updateLeaderboardView() {
+    const contentArea = container.querySelector('#leaderboard-content-area');
+    if (!contentArea) return;
+
+    if (activeTab === 'deudas') {
+      const leaderboard = members.map(m => {
+        const userRecords = records.filter(r => r.loser_profile_id === m.profile_id);
+        const totalOwed = userRecords.reduce((sum, r) => sum + Number(r.amount_owed), 0);
+        const countLast = userRecords.length;
+        return {
+          profile_id: m.profile_id,
+          name: m.display_name,
+          avatar: m.avatar_url,
+          totalOwed,
+          countLast
+        };
+      });
+
+      leaderboard.sort((a, b) => b.totalOwed - a.totalOwed || b.countLast - a.countLast);
+
+      if (leaderboard.length === 0) {
+        contentArea.innerHTML = `
+          <div style="text-align: center; color: var(--text-muted); padding: 1.5rem 0;">
+            Nadie es el último todavía. ¡Buena jornada para todos!
+          </div>
+        `;
+        return;
+      }
+
+      contentArea.innerHTML = leaderboard.map((item, idx) => {
+        const memberObj = members.find(m => m.profile_id === item.profile_id);
+        const biwengerPart = (currentLeague?.sync_source === 'biwenger' && memberObj?.biwenger_user_name) 
+          ? `<span style="font-size: 0.72rem; color: var(--text-muted); font-weight: normal; margin-left: 0.35rem;">(${memberObj.biwenger_user_name})</span>`
+          : '';
+
+        return `
+          <div class="leaderboard-item rank-${idx + 1}">
+            <div class="leaderboard-rank">${idx + 1}</div>
+            <div class="leaderboard-info">
+              <div class="leaderboard-name" style="display: flex; align-items: center; flex-wrap: wrap;">
+                ${item.name} ${biwengerPart}
+              </div>
+              <div class="leaderboard-stats">Último puesto: <strong>${item.countLast}</strong> veces</div>
+            </div>
+            <div class="leaderboard-debt">
+              <div class="debt-amount">${item.totalOwed.toFixed(2)}€</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+    } else if (activeTab === 'biwenger-general' || activeTab === 'biwenger-jornada') {
+      if (biwengerLoadError) {
+        contentArea.innerHTML = `
+          <div style="text-align: center; color: var(--danger); padding: 1.5rem 0; font-size: 0.85rem;">
+            ⚠️ ${biwengerErrorMsg}<br>
+            <button id="btn-retry-biwenger" class="btn-secondary" style="margin-top: 0.75rem; font-size: 0.75rem; padding: 0.4rem 0.75rem; width: auto; display: inline-block;">Reintentar</button>
+          </div>
+        `;
+        const retryBtn = contentArea.querySelector('#btn-retry-biwenger');
+        if (retryBtn) {
+          retryBtn.addEventListener('click', () => {
+            biwengerLoadError = false;
+            biwengerErrorMsg = '';
+            updateLeaderboardView();
+            fetchBiwengerStandings();
+          });
+        }
+        return;
+      }
+
+      if (!biwengerLoaded) {
+        contentArea.innerHTML = `
+          <div style="text-align: center; padding: 2rem 0;">
+            <span class="spinner" style="width:32px;height:32px;display:inline-block;"></span>
+            <p style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--text-muted);">Cargando clasificación de Biwenger...</p>
+          </div>
+        `;
+        return;
+      }
+
+      if (biwengerStandings.length === 0) {
+        contentArea.innerHTML = `
+          <div style="text-align: center; color: var(--text-muted); padding: 1.5rem 0;">
+            No hay datos disponibles en la liga de Biwenger.
+          </div>
+        `;
+        return;
+      }
+
+      const isGeneral = activeTab === 'biwenger-general';
+      const sortField = isGeneral ? 'points' : 'lastPoints';
+
+      const sortedBiwenger = [...biwengerStandings].sort((a, b) => b[sortField] - a[sortField]);
+
+      let minLastPoints = Infinity;
+      if (!isGeneral) {
+        minLastPoints = Math.min(...biwengerStandings.map(s => s.lastPoints));
+      }
+
+      const linkedMemberIds = new Set();
+      
+      const biwengerRows = sortedBiwenger.map(s => {
+        const matchedMember = members.find(m => 
+          m.biwenger_user_name && 
+          m.biwenger_user_name.toLowerCase().trim() === s.name.toLowerCase().trim()
+        );
+
+        if (matchedMember) {
+          linkedMemberIds.add(matchedMember.profile_id);
+          return {
+            type: 'linked',
+            biwengerName: s.name,
+            localName: matchedMember.display_name,
+            score: s[sortField],
+            isColista: !isGeneral && s.lastPoints === minLastPoints,
+            profile_id: matchedMember.profile_id
+          };
+        } else {
+          return {
+            type: 'biwenger-only',
+            biwengerName: s.name,
+            localName: null,
+            score: s[sortField],
+            isColista: !isGeneral && s.lastPoints === minLastPoints
+          };
+        }
+      });
+
+      const unlinkedMembers = members.filter(m => !linkedMemberIds.has(m.profile_id));
+
+      let rowsHtml = '';
+      
+      biwengerRows.forEach((row, idx) => {
+        const rank = idx + 1;
+        const scoreText = `${row.score} pts`;
+        let rowClass = `leaderboard-item rank-${rank}`;
+        if (row.isColista) {
+          rowClass += ' colista-highlight';
+        }
+
+        let nameHtml = '';
+        if (row.type === 'linked') {
+          nameHtml = `
+            <div class="leaderboard-name" style="display: flex; align-items: center; flex-wrap: wrap;">
+              ${row.localName}
+              <span style="font-size: 0.72rem; color: var(--text-muted); font-weight: normal; margin-left: 0.35rem;">(${row.biwengerName})</span>
+            </div>
+          `;
+        } else {
+          nameHtml = `
+            <div class="leaderboard-name" style="display: flex; align-items: center; flex-wrap: wrap; color: var(--text-muted);">
+              ${row.biwengerName}
+              <span style="font-size: 0.72rem; color: var(--accent-gold); font-weight: normal; margin-left: 0.35rem;">(Sin mánager vinculado - ¡vincúlate!)</span>
+            </div>
+          `;
+        }
+
+        rowsHtml += `
+          <div class="${rowClass}">
+            <div class="leaderboard-rank">${rank}</div>
+            <div class="leaderboard-info">
+              ${nameHtml}
+              <div class="leaderboard-stats">${isGeneral ? 'Puntuación Total' : 'Puntos Jornada'}</div>
+            </div>
+            <div class="leaderboard-debt">
+              <div class="debt-amount" style="font-size: 1.1rem; font-weight: 800;">${scoreText}</div>
+            </div>
+          </div>
+        `;
+      });
+
+      unlinkedMembers.forEach(m => {
+        const isSelf = m.profile_id === currentUserId;
+        const linkActionHtml = isSelf 
+          ? `<button class="btn-link-biwenger-inline" style="background: none; border: none; color: var(--accent); font-weight: bold; cursor: pointer; text-decoration: underline; font-size: 0.72rem; padding: 0; margin-left: 0.35rem;">¡Vincúlate aquí!</button>`
+          : `(Pídele que se vincule)`;
+
+        rowsHtml += `
+          <div class="leaderboard-item" style="border: 1.5px dashed var(--border-color); background: rgba(255, 255, 255, 0.01); opacity: 0.85;">
+            <div class="leaderboard-rank" style="background: rgba(255,255,255,0.03); color: var(--text-muted);">--</div>
+            <div class="leaderboard-info">
+              <div class="leaderboard-name" style="display: flex; align-items: center; flex-wrap: wrap;">
+                ${m.display_name}
+                <span style="font-size: 0.72rem; color: var(--accent-gold); font-weight: 500; margin-left: 0.35rem;">⚠️ Sin vincular ${linkActionHtml}</span>
+              </div>
+              <div class="leaderboard-stats">Mánager de CastigosFantasy no asociado a Biwenger</div>
+            </div>
+            <div class="leaderboard-debt">
+              <div class="debt-amount" style="font-size: 0.8rem; color: var(--text-muted); font-weight: normal;">-</div>
+            </div>
+          </div>
+        `;
+      });
+
+      contentArea.innerHTML = rowsHtml;
     }
   }
 
@@ -188,24 +471,17 @@ export function renderDashboard(container, callbacks) {
             <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem;">
               Ranking del que más debe al bote común y más veces ha sido último.
             </p>
+
+            ${(currentLeague && currentLeague.sync_source === 'biwenger') ? `
+              <div class="biwenger-tabs" style="display: flex; gap: 0.5rem; margin-bottom: 1.25rem; background: rgba(0, 0, 0, 0.2); padding: 0.25rem; border-radius: 8px; border: 1.5px solid var(--border-color);">
+                <button class="btn-select-league ${activeTab === 'deudas' ? 'is-active' : ''}" id="tab-deudas" style="font-size: 0.72rem; padding: 0.4rem 0.65rem; width: auto; flex-grow: 1; text-transform: uppercase; font-weight: 800;">Deudas</button>
+                <button class="btn-select-league ${activeTab === 'biwenger-general' ? 'is-active' : ''}" id="tab-biwenger-general" style="font-size: 0.72rem; padding: 0.4rem 0.65rem; width: auto; flex-grow: 1; text-transform: uppercase; font-weight: 800;">B. General</button>
+                <button class="btn-select-league ${activeTab === 'biwenger-jornada' ? 'is-active' : ''}" id="tab-biwenger-jornada" style="font-size: 0.72rem; padding: 0.4rem 0.65rem; width: auto; flex-grow: 1; text-transform: uppercase; font-weight: 800;">B. Jornada</button>
+              </div>
+            ` : ''}
             
-            <div class="leaderboard-list">
-              ${leaderboard.length === 0 ? `
-                <div style="text-align: center; color: var(--text-muted); padding: 1.5rem 0;">
-                  Nadie es el último todavía. ¡Buena jornada para todos!
-                </div>
-              ` : leaderboard.map((item, idx) => `
-                <div class="leaderboard-item rank-${idx + 1}">
-                  <div class="leaderboard-rank">${idx + 1}</div>
-                  <div class="leaderboard-info">
-                    <div class="leaderboard-name">${item.name}</div>
-                    <div class="leaderboard-stats">Último puesto: <strong>${item.countLast}</strong> veces</div>
-                  </div>
-                  <div class="leaderboard-debt">
-                    <div class="debt-amount">${item.totalOwed.toFixed(2)}€</div>
-                  </div>
-                </div>
-              `).join('')}
+            <div class="leaderboard-list" id="leaderboard-content-area">
+              <!-- Cargado dinámicamente -->
             </div>
           </div>
 
@@ -282,6 +558,43 @@ export function renderDashboard(container, callbacks) {
 
 
     `;
+
+    // Initial render of the leaderboard view
+    updateLeaderboardView();
+
+    // Hook Biwenger Tabs click events
+    if (currentLeague && currentLeague.sync_source === 'biwenger') {
+      const tabDeudas = container.querySelector('#tab-deudas');
+      const tabGeneral = container.querySelector('#tab-biwenger-general');
+      const tabJornada = container.querySelector('#tab-biwenger-jornada');
+
+      const setTabActive = (tabId) => {
+        activeTab = tabId;
+        [tabDeudas, tabGeneral, tabJornada].forEach(btn => {
+          if (btn) btn.classList.remove('is-active');
+        });
+        if (tabId === 'deudas' && tabDeudas) tabDeudas.classList.add('is-active');
+        if (tabId === 'biwenger-general' && tabGeneral) tabGeneral.classList.add('is-active');
+        if (tabId === 'biwenger-jornada' && tabJornada) tabJornada.classList.add('is-active');
+        updateLeaderboardView();
+      };
+
+      tabDeudas?.addEventListener('click', () => setTabActive('deudas'));
+      tabGeneral?.addEventListener('click', () => setTabActive('biwenger-general'));
+      tabJornada?.addEventListener('click', () => setTabActive('biwenger-jornada'));
+    }
+
+    // Hook inline link click delegation
+    const contentArea = container.querySelector('#leaderboard-content-area');
+    contentArea?.addEventListener('click', (e) => {
+      const linkBtn = e.target.closest('.btn-link-biwenger-inline');
+      if (linkBtn) {
+        e.preventDefault();
+        openBiwengerLinkModal(currentLeague.id, currentUserId, callbacks, () => {
+          loadData();
+        });
+      }
+    });
 
     // Hook Copy Invite Code
     const copyBtn = container.querySelector('#copy-invite-code');

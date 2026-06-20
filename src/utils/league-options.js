@@ -108,14 +108,49 @@ export async function openLeagueSettings(leagueId, callbacks) {
     bodyEl.style.padding = '1.5rem';
     bodyEl.innerHTML = `
       ${isAdmin ? `
-        <!-- Vista de Admin: Ajustar Nombre -->
-        <form id="league-settings-form" style="margin-bottom: 1.75rem;">
-          <div class="form-group" style="margin-bottom: 1rem;">
+        <!-- Vista de Admin: Ajustes de la Liga -->
+        <form id="league-settings-form" style="margin-bottom: 1.75rem; display: flex; flex-direction: column; gap: 1rem;">
+          <div class="form-group" style="margin-bottom: 0;">
             <label for="edit-league-name" style="color: var(--text-light); font-weight: 700; font-size: 0.8rem; display: block; margin-bottom: 0.35rem;">Nombre de la Liga</label>
             <input type="text" id="edit-league-name" class="input-field" value="${leagueData.name}" required style="border: 1.5px solid var(--border-color-glow); font-weight: 700; background: var(--bg-input); width: 100%; padding: 0.65rem 0.85rem;" />
           </div>
-          <button type="submit" class="btn-primary" id="btn-save-settings" style="width: 100%; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; padding: 0.65rem 1rem; border: 2px solid #000000; box-shadow: 2px 2px 0px #000000; cursor: pointer;">
-            Guardar Nombre
+
+          <div class="form-group" style="margin-bottom: 0;">
+            <label style="color: var(--text-light); font-weight: 700; font-size: 0.8rem; display: block; margin-bottom: 0.35rem;">Tipo de Liga / Sincronización</label>
+            <div style="display: flex; gap: 1rem; background: rgba(255,255,255,0.02); padding: 0.55rem 0.75rem; border-radius: 6px; border: 1.5px solid var(--border-color-glow);">
+              <label style="display: flex; align-items: center; gap: 0.35rem; color: var(--text-light); font-size: 0.78rem; cursor: pointer; font-weight: 600;">
+                <input type="radio" name="edit-league-type" value="manual" ${leagueData.sync_source !== 'biwenger' ? 'checked' : ''} style="accent-color: var(--accent);" />
+                Manual (Fantasy)
+              </label>
+              <label style="display: flex; align-items: center; gap: 0.35rem; color: var(--text-light); font-size: 0.78rem; cursor: pointer; font-weight: 600;">
+                <input type="radio" name="edit-league-type" value="biwenger" ${leagueData.sync_source === 'biwenger' ? 'checked' : ''} style="accent-color: var(--accent);" />
+                Biwenger 🔄
+              </label>
+            </div>
+          </div>
+
+          <!-- Fields to configure Biwenger credentials -->
+          <div id="edit-biwenger-fields" style="display: ${leagueData.sync_source === 'biwenger' ? 'flex' : 'none'}; flex-direction: column; gap: 0.75rem; border-top: 1.5px dashed var(--border-color-glow); padding-top: 0.75rem; margin-top: 0.15rem;">
+            <span style="font-size: 0.72rem; color: var(--accent-gold); font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Automatización Biwenger</span>
+            
+            <div class="form-group" style="margin-bottom: 0;">
+              <label for="edit-biwenger-league-id" style="color: var(--text-light); font-weight: 700; font-size: 0.75rem; display: block; margin-bottom: 0.25rem;">Código de Liga Biwenger</label>
+              <input type="text" id="edit-biwenger-league-id" class="input-field" value="${leagueData.biwenger_league_id || ''}" placeholder="Ej: cwRzHsqCc6nx" style="border: 1.5px solid var(--border-color-glow); font-weight: 700; background: var(--bg-input); width: 100%; padding: 0.55rem 0.75rem;" />
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 0;">
+              <label for="edit-biwenger-email" style="color: var(--text-light); font-weight: 700; font-size: 0.75rem; display: block; margin-bottom: 0.25rem;">Correo de Biwenger</label>
+              <input type="email" id="edit-biwenger-email" class="input-field" value="${leagueData.biwenger_email || ''}" placeholder="ejemplo@correo.com" style="border: 1.5px solid var(--border-color-glow); font-weight: 700; background: var(--bg-input); width: 100%; padding: 0.55rem 0.75rem;" />
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 0;">
+              <label for="edit-biwenger-password" style="color: var(--text-light); font-weight: 700; font-size: 0.75rem; display: block; margin-bottom: 0.25rem;">Contraseña de Biwenger</label>
+              <input type="password" id="edit-biwenger-password" class="input-field" placeholder="Dejar en blanco para no cambiar" style="border: 1.5px solid var(--border-color-glow); font-weight: 700; background: var(--bg-input); width: 100%; padding: 0.55rem 0.75rem;" />
+            </div>
+          </div>
+
+          <button type="submit" class="btn-primary" id="btn-save-settings" style="width: 100%; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; padding: 0.65rem 1rem; border: 2px solid #000000; box-shadow: 2px 2px 0px #000000; cursor: pointer; background: var(--accent); color: #000;">
+            Guardar Ajustes
           </button>
         </form>
       ` : `
@@ -134,6 +169,25 @@ export async function openLeagueSettings(leagueId, callbacks) {
           <button id="copy-invite-code-btn" class="btn-secondary" style="width: auto; padding: 0.4rem 0.85rem; font-size: 0.75rem; font-weight: 700; border: 2.5px solid #000000; box-shadow: 2px 2px 0px #000000; cursor: pointer;">Copiar</button>
         </div>
       </div>
+
+      <!-- Vincular Usuario Biwenger (Solo si la liga es de tipo Biwenger) -->
+      ${leagueData.sync_source === 'biwenger' ? `
+        <div style="margin-bottom: 1.75rem; background: rgba(222, 237, 0, 0.02); padding: 1rem; border-radius: 10px; border: 1.5px solid var(--border-color-glow);">
+          <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px; display: block; margin-bottom: 0.5rem;">🔗 Vincular tu usuario de Biwenger</span>
+          <p style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 0.75rem; line-height: 1.35;">
+            Selecciona tu participante de Biwenger para que las sincronizaciones te reconozcan automáticamente.
+          </p>
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <select id="user-biwenger-name-select" class="input-field" disabled style="border: 1.5px solid var(--border-color-glow); font-weight: 700; background: var(--bg-input); flex-grow: 1; padding: 0.5rem 0.75rem; font-size: 0.8rem; color: var(--text-light);">
+              <option value="">Cargando participantes de Biwenger...</option>
+            </select>
+            <button id="btn-save-user-biwenger" class="btn-primary" disabled style="width: auto; font-weight: 800; padding: 0.5rem 1rem; border: 2px solid #000; box-shadow: 1.5px 1.5px 0 #000; cursor: not-allowed; font-size: 0.8rem; background: var(--accent); color: #000; opacity: 0.5;">
+              Vincular
+            </button>
+          </div>
+          <p id="biwenger-link-error-msg" style="display: none; font-size: 0.7rem; color: var(--danger); margin-top: 0.5rem;"></p>
+        </div>
+      ` : ''}
 
       <!-- Acciones -->
       <div style="border-top: 1px dashed var(--border-color-glow); padding-top: 1.5rem; display: flex; flex-direction: column; gap: 0.85rem;">
@@ -185,21 +239,41 @@ export async function openLeagueSettings(leagueId, callbacks) {
       });
     });
 
-    // Hook Save settings (Admin name edit)
+    // Hook Save settings (Admin name/type/sync settings edit)
     const settingsForm = modal.querySelector('#league-settings-form');
     if (settingsForm) {
       settingsForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const saveBtn = settingsForm.querySelector('#btn-save-settings');
         const newName = settingsForm.querySelector('#edit-league-name').value.trim();
+        const newType = settingsForm.querySelector('input[name="edit-league-type"]:checked').value;
 
         saveBtn.disabled = true;
         saveBtn.innerHTML = '<span class="spinner"></span>';
 
         try {
+          const updatePayload = {
+            name: newName,
+            sync_source: newType
+          };
+
+          if (newType === 'biwenger') {
+            updatePayload.biwenger_email = settingsForm.querySelector('#edit-biwenger-email').value.trim();
+            updatePayload.biwenger_league_id = settingsForm.querySelector('#edit-biwenger-league-id').value.trim();
+            
+            const newPasswordVal = settingsForm.querySelector('#edit-biwenger-password').value.trim();
+            if (newPasswordVal) {
+              updatePayload.biwenger_password = newPasswordVal;
+            }
+          } else {
+            updatePayload.biwenger_email = null;
+            updatePayload.biwenger_password = null;
+            updatePayload.biwenger_league_id = null;
+          }
+
           const { error } = await supabase
             .from('leagues')
-            .update({ name: newName })
+            .update(updatePayload)
             .eq('id', leagueId);
 
           if (error) throw error;
@@ -219,6 +293,114 @@ export async function openLeagueSettings(leagueId, callbacks) {
           showToast('Error al actualizar liga', 'error');
           saveBtn.disabled = false;
           saveBtn.innerHTML = 'Guardar Nombre';
+        }
+      });
+    }
+
+    // Load Biwenger users in the background to populate the select
+    if (leagueData.sync_source === 'biwenger') {
+      const selectEl = modal.querySelector('#user-biwenger-name-select');
+      const saveBtn = modal.querySelector('#btn-save-user-biwenger');
+      const errorMsgEl = modal.querySelector('#biwenger-link-error-msg');
+
+      const emailVal = leagueData.biwenger_email;
+      const passVal = leagueData.biwenger_password;
+      const leagueIdVal = leagueData.biwenger_league_id;
+
+      if (!emailVal || !passVal || !leagueIdVal) {
+        if (selectEl) {
+          selectEl.innerHTML = '<option value="">-- Credenciales de Liga no configuradas --</option>';
+          selectEl.disabled = true;
+        }
+      } else {
+        (async () => {
+          try {
+            const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || localStorage.getItem('CF_SUPABASE_URL') || '';
+            const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || localStorage.getItem('CF_SUPABASE_ANON_KEY') || '';
+            
+            let token = supabaseAnonKey;
+            try {
+              const sessionData = await supabase.auth.getSession();
+              if (sessionData.data?.session?.access_token) {
+                token = sessionData.data.session.access_token;
+              }
+            } catch (_) {}
+
+            const res = await fetch(`${supabaseUrl}/functions/v1/biwenger-sync`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+                'apikey': supabaseAnonKey
+              },
+              body: JSON.stringify({ email: emailVal, password: passVal, leagueId: leagueIdVal })
+            });
+
+            if (res.status !== 200) throw new Error('No se pudo conectar con la API de Biwenger.');
+
+            const syncData = await res.json();
+            const biwengerUsers = syncData.data?.users || [];
+
+            if (selectEl) {
+              selectEl.innerHTML = '<option value="">-- Selecciona tu participante --</option>';
+              biwengerUsers.forEach(u => {
+                const opt = document.createElement('option');
+                opt.value = u.name;
+                opt.textContent = u.name;
+                if (memberData.biwenger_user_name === u.name) {
+                  opt.selected = true;
+                }
+                selectEl.appendChild(opt);
+              });
+              selectEl.disabled = false;
+              if (saveBtn) {
+                saveBtn.disabled = false;
+                saveBtn.style.cursor = 'pointer';
+                saveBtn.style.opacity = '1';
+              }
+            }
+          } catch (err) {
+            console.error(err);
+            if (selectEl) {
+              selectEl.innerHTML = '<option value="">-- Error al cargar participantes --</option>';
+              selectEl.disabled = true;
+            }
+            if (errorMsgEl) {
+              errorMsgEl.style.display = 'block';
+              errorMsgEl.textContent = 'Asegúrate de que el administrador haya configurado correctamente el código de liga y las credenciales de Biwenger en Ajustes.';
+            }
+          }
+        })();
+      }
+    }
+
+    // Hook Save User Biwenger Name
+    const saveUserBiwengerBtn = modal.querySelector('#btn-save-user-biwenger');
+    if (saveUserBiwengerBtn) {
+      saveUserBiwengerBtn.addEventListener('click', async () => {
+        const selectEl = modal.querySelector('#user-biwenger-name-select');
+        const inputVal = selectEl ? selectEl.value : '';
+
+        saveUserBiwengerBtn.disabled = true;
+        saveUserBiwengerBtn.innerHTML = '<span class="spinner" style="width:14px;height:14px;"></span>';
+
+        try {
+          const { error } = await supabase
+            .from('league_members')
+            .update({ biwenger_user_name: inputVal || null })
+            .eq('league_id', leagueId)
+            .eq('profile_id', currentUserId);
+
+          if (error) throw error;
+
+          showToast('Usuario de Biwenger vinculado correctamente', 'success');
+          memberData.biwenger_user_name = inputVal;
+        } catch (err) {
+          console.error(err);
+          showToast('Error al vincular usuario de Biwenger', 'error');
+        } finally {
+          saveUserBiwengerBtn.disabled = false;
+          saveUserBiwengerBtn.innerHTML = 'Vincular';
         }
       });
     }
