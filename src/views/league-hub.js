@@ -47,16 +47,17 @@ export function renderLeagueHub(container, callbacks) {
 
       <!-- Hub Grid -->
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-top: 1rem;">
-        <!-- Card Muro de la Vergüenza -->
+
+        <!-- Card Lista de Morosos -->
         <div id="card-go-dashboard" class="card glass" style="cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; border-radius: 16px; border: 1.5px solid var(--border-color); padding: 2rem 1.5rem; transition: all var(--transition-fast);">
           <div>
-            <div style="font-size: 3rem; margin-bottom: 1rem; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));">💀</div>
-            <h2 class="card-title gradient-text-gold" style="font-size: 1.5rem; font-weight: 900; margin-bottom: 0.75rem;">Muro de la Vergüenza</h2>
+            <div style="font-size: 3rem; margin-bottom: 1rem; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.25));">💀</div>
+            <h2 class="card-title gradient-text-gold" style="font-size: 1.5rem; font-weight: 900; margin-bottom: 0.75rem;">Lista de Morosos</h2>
             <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 1.5rem;">
               Ver el ranking acumulado de la jornada, las deudas de los jugadores y registrar el farolillo rojo de la última jornada.
             </p>
           </div>
-          <button class="btn-primary" style="pointer-events: none; font-weight: 700; width: 100%;">Entrar al Muro</button>
+          <button class="btn-primary" style="pointer-events: none; font-weight: 700; width: 100%;">Entrar a la Lista</button>
         </div>
 
         <!-- Card Ruleta de Castigos -->

@@ -587,7 +587,7 @@ body {
   gap: 0.5rem;
 }
 
-/* Muro de la Vergüenza Leaderboard */
+/* Lista de Morosos Leaderboard */
 .leaderboard-list {
   display: flex;
   flex-direction: column;

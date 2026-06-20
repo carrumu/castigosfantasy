@@ -35,11 +35,11 @@ export function renderLanding(container, callbacks) {
 
         <!-- Grid Content: Row 1 -->
         <div class="brutalist-grid-2">
-          <!-- Muro de la Vergüenza Card -->
+          <!-- Lista de Morosos Card -->
           <article class="brutalist-card concrete-bg cursor-pointer" data-view-id="muro">
             <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
               <span class="material-symbols-outlined" style="font-size: 2rem; color: var(--accent);">gavel</span>
-              <h2 style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 800; text-transform: uppercase;">Muro de la Vergüenza</h2>
+              <h2 style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 800; text-transform: uppercase;">Lista de Morosos</h2>
             </div>
             <p style="font-size: 0.95rem; color: var(--text-light); margin-bottom: 1.5rem;">Los últimos sentenciados que no lograron escapar del destino.</p>
             <ul style="list-style: none; display: flex; flex-direction: column; gap: 0.5rem; padding: 0;">

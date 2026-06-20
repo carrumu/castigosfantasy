@@ -191,9 +191,9 @@ export function renderDashboard(container, callbacks) {
         </div>
 
         <div class="dashboard-grid" style="grid-template-columns: ${features === 'wheel' ? '1fr 1fr' : ''};">
-          <!-- Muro de la Vergüenza -->
+          <!-- Lista de Morosos -->
           <div class="card glass pitch-card" style="margin-bottom: 0;">
-            <h2 class="card-title gradient-text-gold">💀 Muro de la Vergüenza</h2>
+            <h2 class="card-title gradient-text-gold">💀 Lista de Morosos</h2>
             <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem;">
               ${features === 'wheel' ? 'Ranking acumulado del que más veces ha quedado último.' : 'Ranking del que más debe al bote común y más veces ha sido último.'}
             </p>
@@ -615,7 +615,7 @@ export function renderDashboard(container, callbacks) {
         localStorage.setItem('CF_PENDING_RECORD_ID', lastRecordId);
 
         if (features === 'wheel') {
-          modal.querySelector('#modal-desc').innerHTML = `¡Se ha registrado a <strong>${loserName}</strong> en el Muro como el último de la <strong>Jornada ${matchday}</strong>!`;
+          modal.querySelector('#modal-desc').innerHTML = `¡Se ha registrado a <strong>${loserName}</strong> en la Lista de Morosos como el último de la <strong>Jornada ${matchday}</strong>!`;
         } else {
           modal.querySelector('#modal-desc').innerHTML = `¡Se ha guardado el registro de la <strong>Jornada ${matchday}</strong>!<br><strong>${loserName}</strong> suma <strong>${amount.toFixed(2)}€</strong> de deuda.`;
         }
