@@ -219,8 +219,8 @@ function renderMainLayout(isGuest) {
             <button class="header-nav-link ${currentView === 'inicio' ? 'active' : ''}" data-nav="inicio">INICIO</button>
             <button class="header-nav-link ${currentView === 'ruleta' ? 'active' : ''}" data-nav="ruleta">RULETA</button>
             <button class="header-nav-link ${currentView === 'retos' ? 'active' : ''}" data-nav="retos">RETOS</button>
-            <button class="header-nav-link ${currentView === 'minijuego' ? 'active' : ''}" data-nav="minijuego">JUEGO</button>
             <button class="header-nav-link ${currentView === 'comunidad' || currentView === 'bufon' ? 'active' : ''}" data-nav="comunidad">COMUNIDAD</button>
+            <button class="header-nav-link ${currentView === 'minijuego' ? 'active' : ''}" data-nav="minijuego">JUEGO</button>
             <button class="header-nav-link ${currentView === 'mis-ligas' ? 'active' : ''}" data-nav="mis-ligas">MIS LIGAS</button>
           </nav>
           
