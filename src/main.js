@@ -59,10 +59,10 @@ async function checkAuthAndRender() {
     return;
   }
 
-  renderMainLayout(isGuest);
+  renderMainLayout(isGuest, user);
 }
 
-function renderMainLayout(isGuest) {
+function renderMainLayout(isGuest, currentUser = null) {
   const notificationsCount = parseInt(localStorage.getItem('CF_COMMUNITY_NOTIFICATIONS_COUNT') || '0', 10);
 
   app.innerHTML = `
@@ -196,8 +196,12 @@ function renderMainLayout(isGuest) {
                 INICIAR SESIÓN
               </button>
             ` : `
-              <button class="header-action-btn btn-danger" id="nav-logout-btn" title="Cerrar Sesión">
-                LOGOUT
+              <button class="btn-profile-header" id="nav-profile-btn" title="Mi Perfil">
+                <svg class="btn-profile-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="8" r="4"></circle>
+                  <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"></path>
+                </svg>
+                <span class="btn-profile-label">MI PERFIL</span>
               </button>
             `}
           </div>
@@ -440,7 +444,10 @@ function renderMainLayout(isGuest) {
       });
     }
   } else {
-    app.querySelector('#nav-logout-btn').addEventListener('click', handleLogout);
+    const profileBtn = app.querySelector('#nav-profile-btn');
+    if (profileBtn) {
+      profileBtn.addEventListener('click', () => openProfileModal(currentUser));
+    }
   }
 
   const settingsBtn = app.querySelector('#nav-reset-sb-btn');
@@ -472,6 +479,134 @@ async function handleLogout() {
     console.error(err);
     showToast('Error al cerrar sesión', 'error');
   }
+}
+
+async function openProfileModal(user) {
+  // Remove any existing modal
+  const existing = document.querySelector('#profile-modal');
+  if (existing) existing.remove();
+
+  const modal = document.createElement('div');
+  modal.id = 'profile-modal';
+  modal.className = 'modal-overlay active';
+
+  const email = user?.email || '';
+  // Try to load apodo from profiles table
+  let currentApodo = user?.user_metadata?.apodo || email.split('@')[0];
+
+  modal.innerHTML = `
+    <div class="modal-content glass" style="max-width: 420px; width: 90%; border: 1.5px solid var(--border-color-glow); box-shadow: 0 10px 30px rgba(0,0,0,0.7), 0 0 20px rgba(222,237,0,0.15);">
+      <div class="modal-header" style="border-bottom: 1px solid var(--border-color-glow);">
+        <h3 class="gradient-text-gold" style="font-weight: 900; font-size: 1.35rem; font-family: var(--font-display); margin: 0;">Mi Perfil</h3>
+        <button class="modal-close" id="close-profile-modal" style="font-size: 1.2rem; background: none; border: none; color: var(--text-light); cursor: pointer;">✕</button>
+      </div>
+      <div class="modal-body" style="padding: 1.5rem;">
+        <!-- Info del usuario -->
+        <div style="background: rgba(222,237,0,0.04); border: 1.5px solid var(--border-color-glow); border-radius: 10px; padding: 1rem 1.25rem; margin-bottom: 1.5rem;">
+          <span style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px;">Correo electrónico</span>
+          <p style="margin: 0.25rem 0 0; font-size: 0.95rem; font-weight: 700; color: var(--text-light);">${email}</p>
+        </div>
+
+        <!-- Cambiar Apodo -->
+        <form id="profile-apodo-form">
+          <div class="form-group" style="margin-bottom: 1.25rem;">
+            <label for="profile-apodo-input" style="color: var(--text-light); font-weight: 700; font-size: 0.8rem; display: block; margin-bottom: 0.35rem;">Apodo / Nombre de entrenador</label>
+            <input
+              type="text"
+              id="profile-apodo-input"
+              class="input-field"
+              value="${currentApodo}"
+              maxlength="30"
+              placeholder="Tu apodo en la app"
+              style="border: 1.5px solid var(--border-color-glow); font-weight: 700; background: var(--bg-input); width: 100%; padding: 0.65rem 0.85rem;"
+            />
+          </div>
+          <button type="submit" id="btn-save-apodo" class="btn-select-league is-active" style="width: 100%; padding: 0.7rem; font-weight: 900; text-transform: uppercase; font-size: 0.85rem; box-shadow: 3px 3px 0px #000; cursor: pointer;">
+            Guardar Apodo
+          </button>
+        </form>
+
+        <!-- Cerrar Sesión -->
+        <div style="border-top: 1px dashed var(--border-color-glow); padding-top: 1.25rem; margin-top: 1.5rem;">
+          <button id="btn-profile-logout" class="btn-league-danger-solid" style="width: 100%; padding: 0.7rem; font-weight: 900; text-transform: uppercase; font-family: var(--font-display); cursor: pointer;">
+            Cerrar Sesión
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  const closeModal = () => modal.remove();
+  modal.querySelector('#close-profile-modal').addEventListener('click', closeModal);
+  modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+
+  // Load real apodo from Supabase profiles table
+  try {
+    if (user?.id) {
+      const { data } = await supabase
+        .from('profiles')
+        .select('apodo')
+        .eq('id', user.id)
+        .maybeSingle();
+      if (data?.apodo) {
+        modal.querySelector('#profile-apodo-input').value = data.apodo;
+      }
+    }
+  } catch (err) {
+    console.warn('No se pudo cargar el apodo del perfil:', err);
+  }
+
+  // Save apodo form
+  modal.querySelector('#profile-apodo-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const saveBtn = modal.querySelector('#btn-save-apodo');
+    const newApodo = modal.querySelector('#profile-apodo-input').value.trim();
+    if (!newApodo) return;
+
+    saveBtn.disabled = true;
+    saveBtn.innerHTML = '<span class="spinner"></span>';
+
+    try {
+      // Update apodo column in profiles table
+      const { error: profileErr } = await supabase
+        .from('profiles')
+        .update({ apodo: newApodo })
+        .eq('id', user.id);
+
+      if (profileErr) throw profileErr;
+
+      // Also update user_metadata apodo key
+      const { error: metaErr } = await supabase.auth.updateUser({
+        data: { apodo: newApodo }
+      });
+      if (metaErr) console.warn('No se pudo actualizar metadata:', metaErr);
+
+      saveBtn.innerHTML = '✓ Guardado';
+      saveBtn.style.background = '#10b981';
+      setTimeout(() => {
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = 'Guardar Apodo';
+        saveBtn.style.background = '';
+      }, 2000);
+    } catch (err) {
+      console.error(err);
+      saveBtn.disabled = false;
+      saveBtn.innerHTML = 'Error al guardar';
+      saveBtn.style.background = 'var(--danger)';
+      setTimeout(() => {
+        saveBtn.innerHTML = 'Guardar Apodo';
+        saveBtn.style.background = '';
+      }, 2000);
+    }
+  });
+
+  // Logout button
+  modal.querySelector('#btn-profile-logout').addEventListener('click', async () => {
+    closeModal();
+    await handleLogout();
+  });
 }
 
 // Listen for Auth Session changes

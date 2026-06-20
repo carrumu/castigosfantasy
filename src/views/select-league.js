@@ -73,12 +73,13 @@ export function renderSelectLeague(container, callbacks) {
     container.innerHTML = `
       <div class="container fade-in-up" style="max-width: 800px;">
         <!-- Header -->
-        <div style="text-align: center; margin-bottom: 2.5rem;">
-          <h1 class="gradient-text-gold" style="font-size: 2.2rem; font-weight: 900; margin-bottom: 0.5rem;">
-            🏆 Mis Ligas Fantasy
+        <div style="margin-bottom: 2.5rem;">
+          <span style="font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); font-family: var(--font-display);">Panel de Ligas</span>
+          <h1 class="gradient-text-green" style="font-family: var(--font-display); font-size: 2.4rem; font-weight: 900; text-transform: uppercase; letter-spacing: -1px; line-height: 1; margin: 0.15rem 0 0.6rem;">
+            Mis Ligas Fantasy
           </h1>
-          <p style="color: var(--text-muted); font-size: 0.95rem;">
-            Selecciona tu liga activa para ver la ruleta y la clasificación, o únete/crea una nueva comunidad.
+          <p style="color: var(--text-muted); font-size: 0.85rem; font-weight: 500; max-width: 500px; line-height: 1.4;">
+            Selecciona tu liga activa, únete con un código o crea una nueva comunidad.
           </p>
         </div>
 
