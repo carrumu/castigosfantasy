@@ -202,37 +202,37 @@ function renderMainLayout(isGuest) {
       <div class="main-content">
         <!-- Cabecera Superior -->
         <header class="top-header">
-          <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <div class="header-left" style="display: flex; align-items: center; gap: 0.75rem;">
             <button class="menu-toggle-btn" id="menu-toggle-btn" aria-label="Abrir menú">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="3" y1="12" x2="21" y2="12"></line>
                 <line x1="3" y1="6" x2="21" y2="6"></line>
                 <line x1="3" y1="18" x2="21" y2="18"></line>
               </svg>
             </button>
-            <div class="logo gradient-text-green" style="cursor: pointer; display: flex; align-items: center; gap: 0.25rem; font-size: 1.2rem; font-weight: 700; user-select: none;" id="header-logo-home">
-              <span class="logo-icon" style="width: 37px; height: 27px; flex-shrink: 0;"></span>
-              CastigoFantasy
+            <div class="logo text-primary" style="cursor: pointer; user-select: none; font-family: var(--font-display); font-weight: 900; font-size: 1.3rem;" id="header-logo-home">
+              CASTIGO FANTASY
             </div>
           </div>
           
+          <!-- Enlaces de navegación en cabecera (Escritorio) -->
+          <nav class="header-nav">
+            <button class="header-nav-link ${currentView === 'inicio' ? 'active' : ''}" data-nav="inicio">INICIO</button>
+            ${!isGuest ? `<button class="header-nav-link ${currentView === 'mis-ligas' ? 'active' : ''}" data-nav="mis-ligas">MIS LIGAS</button>` : ''}
+            <button class="header-nav-link ${currentView === 'muro' ? 'active' : ''}" data-nav="muro">MURO</button>
+            <button class="header-nav-link ${currentView === 'ruleta' ? 'active' : ''}" data-nav="ruleta">RULETA</button>
+            <button class="header-nav-link ${currentView === 'retos' ? 'active' : ''}" data-nav="retos">RETOS</button>
+            <button class="header-nav-link ${currentView === 'minijuego' ? 'active' : ''}" data-nav="minijuego">JUEGO</button>
+          </nav>
+          
           <div class="header-right">
             ${isGuest ? `
-              <button class="nav-btn-guest" id="nav-login-btn" style="display: flex; align-items: center; gap: 0.5rem; font-weight: 700; font-size: 0.85rem;" title="Login / Registro">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                  <circle cx="12" cy="7" r="4"></circle>
-                </svg>
-                <span class="nav-btn-text">Login / Register</span>
+              <button class="nav-btn-guest" id="nav-login-btn" title="Login / Registro">
+                LOGIN / REGISTER
               </button>
             ` : `
-              <button class="header-action-btn btn-danger" id="nav-logout-btn" title="Cerrar Sesión" style="display: flex; align-items: center; gap: 0.4rem;">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                  <polyline points="16 17 21 12 16 7"></polyline>
-                  <line x1="21" y1="12" x2="9" y2="12"></line>
-                </svg>
-                <span class="nav-btn-text">Logout</span>
+              <button class="header-action-btn btn-danger" id="nav-logout-btn" title="Cerrar Sesión">
+                LOGOUT
               </button>
             `}
           </div>
@@ -261,6 +261,11 @@ function renderMainLayout(isGuest) {
   `;
 
   const viewContainer = app.querySelector('#view-container');
+  if (currentView === 'inicio') {
+    viewContainer.className = 'container-brutalist';
+  } else {
+    viewContainer.className = 'container';
+  }
   const sidebar = app.querySelector('#app-sidebar');
   const backdrop = app.querySelector('#sidebar-backdrop');
   const menuToggle = app.querySelector('#menu-toggle-btn');
@@ -411,6 +416,15 @@ function renderMainLayout(isGuest) {
       navigate('generador');
     });
   }
+  
+  // Bind Header Navigation Links (Desktop)
+  const headerLinks = app.querySelectorAll('.header-nav-link');
+  headerLinks.forEach(link => {
+    link.addEventListener('click', () => {
+      const view = link.dataset.nav;
+      navigate(view);
+    });
+  });
   
   if (isGuest) {
     app.querySelector('#nav-login-btn').addEventListener('click', () => {

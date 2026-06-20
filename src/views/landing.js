@@ -7,125 +7,192 @@
 export function renderLanding(container, callbacks) {
   // Check active features from localStorage (same as main.js)
   const activeFeatures = localStorage.getItem('CF_CURRENT_LEAGUE_FEATURES') || 'both';
+  const showRuleta = activeFeatures !== 'money';
 
-  // Define the pages data
-  const sections = [
-    {
-      id: 'muro',
-      title: 'Muro de la Vergüenza',
-      description: 'Clasificación de deudas, deudas perdonadas y pagadas. Registra deudas e inmortaliza los castigos en el historial.',
-      icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.45 1-1 1H4v2h16v-2h-5c-.55 0-1-.45-1-1v-2.34"></path><path d="M12 2a6 6 0 0 0-6 6v5a6 6 0 0 0 12 0V8a6 6 0 0 0-6-6z"></path></svg>`,
-      badge: 'Liga',
-      colorClass: 'color-dashboard'
-    },
-    ...(activeFeatures !== 'money' ? [{
-      id: 'ruleta',
-      title: 'Ruleta de Castigos',
-      description: 'El azar decide tu destino. Haz girar la ruleta de la muerte para asignar un castigo aleatorio al perdedor de la jornada.',
-      icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 2v20"></path><path d="M2 12h20"></path><path d="m19.07 4.93-14.14 14.14"></path><path d="m4.93 4.93 14.14 14.14"></path></svg>`,
-      badge: 'Azar',
-      colorClass: 'color-roulette'
-    }] : []),
-    {
-      id: 'retos',
-      title: 'Reto Semanal',
-      description: 'Ver los retos activos de la semana, votar nuevas propuestas y evitar quedar en la cola para no ser castigado.',
-      icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path></svg>`,
-      badge: 'Retos',
-      colorClass: 'color-challenges'
-    },
-    {
-      id: 'bufon',
-      title: 'El Bufón de la Corte',
-      description: 'La comunidad manda. Propón castigos locos y graciosos para tus amigos, vota las ideas y condena al peor jugador.',
-      icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4 5 12h14l3-8-7 4-3-6-3 6-7-4z"></path><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7H5z"></path></svg>`,
-      badge: 'Votaciones',
-      colorClass: 'color-bufon'
-    },
-    {
-      id: 'minijuego',
-      title: 'Adivinar Jugador',
-      description: 'Ponte a prueba en el Wordle diario de fútbol. Tienes 6 intentos para adivinar el jugador misterioso de LaLiga.',
-      icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="12" x2="10" y2="12"></line><line x1="8" y1="10" x2="8" y2="14"></line><line x1="15" y1="13" x2="15.01" y2="13"></line><line x1="18" y1="11" x2="18.01" y2="11"></line><rect x="2" y="6" width="20" height="12" rx="3"></rect></svg>`,
-      badge: 'Diario',
-      colorClass: 'color-minigame'
-    },
-    {
-      id: 'generador',
-      title: 'Generador de Castigos',
-      description: 'Genera ideas de castigos graciosos y originales para los perdedores de tu comunidad. Filtra por categoría y nivel de maldad.',
-      icon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path>
-        <path d="m5 3 1 2.5L8.5 6 6 7 5 9.5 4 7 1.5 6 4 5.5z"></path>
-      </svg>`,
-      badge: 'Herramienta',
-      colorClass: 'color-generator'
-    }
-  ];
-
-  // Render HTML structure
+  // Render HTML structure matching the Stitch design
   container.innerHTML = `
-    <div class="landing-container fade-in-up">
-      <!-- Hero Section -->
-      <section class="landing-hero glass">
-        <div class="hero-badge">🏆 Temporada 2026 Activa</div>
-        <h1 class="hero-title">
-          Donde el fútbol fantasy se paga con <span class="gradient-text-green">Honor</span> (o Vergüenza)
-        </h1>
-        <p class="hero-subtitle">
-          Administra los castigos de tu comunidad, gira la ruleta de la muerte, vota por el Bufón del grupo y demuestra tus conocimientos futbolísticos diarios.
-        </p>
-        <div class="hero-actions">
-          <button class="btn-primary hero-btn-main" id="hero-go-dash">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.45 1-1 1H4v2h16v-2h-5c-.55 0-1-.45-1-1v-2.34"></path><path d="M12 2a6 6 0 0 0-6 6v5a6 6 0 0 0 12 0V8a6 6 0 0 0-6-6z"></path></svg>
-            Ver Clasificación
-          </button>
-          ${activeFeatures !== 'money' ? `
-            <button class="btn-secondary hero-btn-sec" id="hero-go-wheel">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 2v20"></path><path d="M2 12h20"></path><path d="m19.07 4.93-14.14 14.14"></path><path d="m4.93 4.93 14.14 14.14"></path></svg>
-              Girar Ruleta
-            </button>
-          ` : ''}
+    <div class="landing-layout-brutalist fade-in-up">
+      <!-- Columna izquierda: PUBLICIDAD -->
+      <aside class="brutalist-aside">
+        <div class="ad-card-left">
+          <div class="ad-label">PUB<br/>LICI<br/>DAD</div>
         </div>
-      </section>
+        <div class="ad-card-sponsor">
+          <span class="material-symbols-outlined" style="font-size: 3.5rem; margin-bottom: 0.75rem; color: #000000;">sports_football</span>
+          <p style="font-family: var(--font-sans); font-weight: 800; font-size: 0.9rem; text-transform: uppercase;">Patrocinador Oficial del Sufrimiento</p>
+        </div>
+      </aside>
 
-      <!-- Section Title -->
-      <div class="landing-section-header">
-        <h2 class="landing-section-title">🔮 Explora las Secciones</h2>
-        <p class="landing-section-desc">Selecciona una tarjeta para empezar a jugar o gestionar tu liga.</p>
-      </div>
+      <!-- Columna central: CONTENIDO PRINCIPAL -->
+      <main class="brutalist-main">
+        <!-- Hero Intro -->
+        <section class="brutalist-hero">
+          <h1 class="brutalist-hero-title">NO HAY PIEDAD</h1>
+          <p class="brutalist-hero-subtitle">
+            EL LUGAR DONDE LAS PROMESAS ROTAS Y LAS MALAS DECISIONES FANTASY SE PAGAN CON HUMILLACIÓN PÚBLICA. PREPÁRATE PARA EL CASTIGO.
+          </p>
+        </section>
 
-      <!-- Feature Cards Grid -->
-      <div class="features-grid">
-        ${sections.map(sec => `
-          <div class="feature-card glass cursor-pointer" data-view-id="${sec.id}">
-            <div class="feature-icon-wrapper ${sec.colorClass}">
-              ${sec.icon}
+        <!-- Grid Content: Row 1 -->
+        <div class="brutalist-grid-2">
+          <!-- Muro de la Vergüenza Card -->
+          <article class="brutalist-card concrete-bg cursor-pointer" data-view-id="muro">
+            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
+              <span class="material-symbols-outlined" style="font-size: 2rem; color: var(--accent);">gavel</span>
+              <h2 style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 800; text-transform: uppercase;">Muro de la Vergüenza</h2>
             </div>
-            <div class="feature-content">
-              <div class="feature-title-row">
-                <h3 class="feature-card-title">${sec.title}</h3>
-                <span class="feature-badge">${sec.badge}</span>
+            <p style="font-size: 0.95rem; color: var(--text-light); margin-bottom: 1.5rem;">Los últimos sentenciados que no lograron escapar del destino.</p>
+            <ul style="list-style: none; display: flex; flex-direction: column; gap: 0.5rem; padding: 0;">
+              <li style="background: var(--bg-obsidian); display: flex; justify-content: space-between; padding: 0.75rem 1rem; border: 3px solid #000000; border-left: 6px solid var(--danger);">
+                <span style="font-family: var(--font-sans); font-weight: 700; font-size: 0.8rem; color: var(--text-light);">PERDEDOR #142</span>
+                <span style="font-family: var(--font-sans); font-weight: 800; color: var(--danger); font-size: 0.8rem; text-transform: uppercase;">DEPILACIÓN</span>
+              </li>
+              <li style="background: var(--bg-obsidian); display: flex; justify-content: space-between; padding: 0.75rem 1rem; border: 3px solid #000000; border-left: 6px solid var(--danger);">
+                <span style="font-family: var(--font-sans); font-weight: 700; font-size: 0.8rem; color: var(--text-light);">PERDEDOR #141</span>
+                <span style="font-family: var(--font-sans); font-weight: 800; color: var(--danger); font-size: 0.8rem; text-transform: uppercase;">TATUAJE FALSO</span>
+              </li>
+            </ul>
+          </article>
+
+          ${showRuleta ? `
+            <!-- Ruleta de Castigos Card -->
+            <article class="brutalist-card cursor-pointer" data-view-id="ruleta" style="background: var(--primary-green); color: #000000; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
+              <h2 style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 900; text-transform: uppercase; margin-bottom: 1.5rem; line-height: 1;">Ruleta de Sentencias</h2>
+              
+              <!-- Mock Wheel Graphic -->
+              <div style="width: 120px; height: 120px; border-radius: 50%; border: 6px solid #000000; margin-bottom: 1.5rem; position: relative; overflow: hidden; background: #ffffff; box-shadow: inset 0px 0px 10px rgba(0,0,0,0.5);">
+                <div style="position: absolute; inset: 0; background: var(--danger); clip-path: polygon(50% 50%, 100% 0, 100% 100%);"></div>
+                <div style="position: absolute; inset: 0; background: #ffe16d; clip-path: polygon(50% 50%, 0 100%, 0 0);"></div>
+                <div style="position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 4px; height: 20px; background: #000000; z-index: 20;"></div>
+                <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 10;">
+                  <span style="font-family: var(--font-display); font-size: 2.5rem; font-weight: 900; color: #000000; opacity: 0.25;">?</span>
+                </div>
               </div>
-              <p class="feature-card-desc">${sec.description}</p>
-              <div class="feature-action-indicator">
-                <span>Entrar</span>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+
+              <button class="brutalist-btn brutalist-btn-black" id="landing-ruleta-btn">GIRAR</button>
+            </article>
+          ` : `
+            <!-- El Bufón de la Corte Card (Takes Ruleta's spot if disabled) -->
+            <article class="brutalist-card cursor-pointer" data-view-id="bufon" style="display: flex; flex-direction: column; gap: 1rem;">
+              <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid #000000; padding-bottom: 0.75rem; margin-bottom: 0.5rem;">
+                <h2 style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 800; text-transform: uppercase;">El Bufón de la Corte</h2>
+                <span class="material-symbols-outlined" style="color: var(--accent); font-size: 2rem;">theater_comedy</span>
               </div>
+              <p style="font-size: 0.95rem; color: var(--text-light); margin-bottom: 1.5rem; line-height: 1.4;">
+                La comunidad manda. Propón castigos graciosos para tus amigos, vota las ideas y condena al peor jugador.
+              </p>
+              <button class="brutalist-btn" id="landing-bufon-btn" style="margin-top: auto;">Proponer Castigo</button>
+            </article>
+          `}
+        </div>
+
+        <!-- Grid Content: Row 2 (Full Width) -->
+        <article class="brutalist-card cursor-pointer" data-view-id="retos" style="display: flex; flex-direction: column; gap: 1.5rem;">
+          <div style="position: absolute; top: 1.5rem; right: 1.5rem;">
+            <span class="brutalist-badge">NUEVO</span>
+          </div>
+          <div style="max-width: 85%;">
+            <h2 style="font-family: var(--font-display); font-size: 2rem; font-weight: 900; text-transform: uppercase; margin-bottom: 0.75rem; line-height: 1;">El Reto de la Semana</h2>
+            <p style="font-size: 1.05rem; color: var(--text-light); line-height: 1.5; border-left: 6px solid var(--primary-green); padding-left: 1rem; margin-bottom: 1.5rem;">
+              Sobrevive a la "Semana Infernal" sin usar a tu mariscal de campo titular. Si pierdes, te enfrentas al castigo supremo.
+            </p>
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+              <button class="brutalist-btn" style="width: auto; padding: 0.65rem 1.75rem;" id="landing-retos-btn-accept">Aceptar Reto</button>
+              <button class="brutalist-btn brutalist-btn-secondary" style="width: auto; padding: 0.65rem 1.75rem;" id="landing-retos-btn-details">Ver Detalles</button>
             </div>
           </div>
-        `).join('')}
-      </div>
-      
-      <!-- Footer Info -->
-      <div class="landing-footer glass">
-        <p>⚡ Diseñado para llevar la competitividad de Comunio, Futmondo, Biwenger y Fantasy Marca al siguiente nivel.</p>
-      </div>
+        </article>
+
+        <!-- Grid Content: Row 3 -->
+        <div class="brutalist-grid-2">
+          <!-- Adivina el Jugador Card -->
+          <article class="brutalist-card cursor-pointer" data-view-id="minijuego" style="display: flex; flex-direction: column; gap: 1rem; justify-content: space-between;">
+            <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid #000000; padding-bottom: 0.75rem; margin-bottom: 0.5rem;">
+              <h2 style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 800; text-transform: uppercase;">Adivina el Jugador</h2>
+              <span class="material-symbols-outlined" style="color: var(--accent); font-size: 2rem;">psychology</span>
+            </div>
+            
+            <!-- Mock Wordle Grid -->
+            <div>
+              <div class="wordle-row-mock">
+                <div class="wordle-cell-mock">P</div>
+                <div class="wordle-cell-mock correct">A</div>
+                <div class="wordle-cell-mock">T</div>
+                <div class="wordle-cell-mock">O</div>
+                <div class="wordle-cell-mock">S</div>
+              </div>
+              <div class="wordle-row-mock">
+                <div class="wordle-cell-mock"></div>
+                <div class="wordle-cell-mock"></div>
+                <div class="wordle-cell-mock"></div>
+                <div class="wordle-cell-mock"></div>
+                <div class="wordle-cell-mock"></div>
+              </div>
+            </div>
+
+            <!-- Mock Keyboard -->
+            <div>
+              <div class="keyboard-row-mock">
+                <span class="keyboard-key-mock">Q</span>
+                <span class="keyboard-key-mock">W</span>
+                <span class="keyboard-key-mock active">E</span>
+                <span class="keyboard-key-mock">R</span>
+                <span class="keyboard-key-mock">T</span>
+                <span class="keyboard-key-mock">Y</span>
+                <span class="keyboard-key-mock">U</span>
+                <span class="keyboard-key-mock">I</span>
+              </div>
+            </div>
+          </article>
+
+          <!-- Generador de Castigos Card -->
+          <article class="brutalist-card cursor-pointer" data-view-id="generador" style="display: flex; flex-direction: column; justify-content: space-between; gap: 1rem;">
+            <div>
+              <h2 style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 800; text-transform: uppercase; margin-bottom: 0.25rem;">Generador de Castigos</h2>
+              <span style="font-family: var(--font-sans); font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">Inteligencia Artificial del Dolor</span>
+            </div>
+
+            <div style="background: var(--bg-obsidian); border: 3px dashed #474832; padding: 1.25rem; text-align: center; min-height: 90px; display: flex; align-items: center; justify-content: center; margin: 0.5rem 0;">
+              <p style="font-family: var(--font-sans); font-size: 1.05rem; font-weight: 700; color: var(--primary-green);">"PASAR EL DÍA DISFRAZADO DE POLLO..."</p>
+            </div>
+
+            <button class="brutalist-btn" id="landing-generador-btn">
+              Generar Castigo <span class="material-symbols-outlined" style="font-size: 1.2rem;">bolt</span>
+            </button>
+          </article>
+        </div>
+
+        ${showRuleta ? `
+          <!-- Row 4 (Full Width): El Bufón (Only rendered if Ruleta is active, so we show all 5 modules) -->
+          <article class="brutalist-card cursor-pointer" data-view-id="bufon" style="display: flex; flex-direction: column; gap: 1rem;">
+            <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid #000000; padding-bottom: 0.75rem; margin-bottom: 0.5rem;">
+              <h2 style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 800; text-transform: uppercase;">El Bufón de la Corte</h2>
+              <span class="material-symbols-outlined" style="color: var(--accent); font-size: 2rem;">theater_comedy</span>
+            </div>
+            <p style="font-size: 0.95rem; color: var(--text-light); line-height: 1.4;">
+              La comunidad manda. Propón castigos graciosos y originales para tus amigos, vota las ideas del grupo y condena al peor jugador de la jornada.
+            </p>
+            <button class="brutalist-btn brutalist-btn-secondary" id="landing-bufon-btn" style="width: auto; padding: 0.65rem 1.75rem; margin-top: 0.5rem; align-self: flex-start;">Proponer Castigo</button>
+          </article>
+        ` : ''}
+      </main>
+
+      <!-- Columna derecha: PUBLICIDAD / ADVERTENCIAS -->
+      <aside class="brutalist-aside">
+        <div class="ad-card-warning">
+          <span class="material-symbols-outlined" style="font-size: 3.5rem; margin-bottom: 0.75rem; color: #ffffff;">warning</span>
+          <h3 style="font-family: var(--font-display); font-size: 1.2rem; font-weight: 800; text-transform: uppercase; margin-bottom: 0.5rem; line-height: 1.1;">Advertencia</h3>
+          <p style="font-size: 0.85rem; opacity: 0.9; line-height: 1.4;">El contenido de esta liga puede causar pérdida permanente de dignidad.</p>
+        </div>
+        <div class="ad-card-left" style="flex: 1;">
+          <div class="ad-label" style="transform: rotate(5deg);">ESPACIO<br/>DISPO<br/>NIBLE</div>
+        </div>
+      </aside>
     </div>
   `;
 
-  // Attach Event Listeners
-  const cardElements = container.querySelectorAll('.feature-card');
+  // Attach Event Listeners to cards
+  const cardElements = container.querySelectorAll('.brutalist-card');
   cardElements.forEach(card => {
     card.addEventListener('click', () => {
       const viewId = card.dataset.viewId;
@@ -135,21 +202,45 @@ export function renderLanding(container, callbacks) {
     });
   });
 
-  const dashBtn = container.querySelector('#hero-go-dash');
-  if (dashBtn) {
-    dashBtn.addEventListener('click', () => {
-      if (callbacks.onNavigate) {
-        callbacks.onNavigate('muro');
-      }
+  // Attach Event Listeners to inner buttons with stopPropagation
+  const ruletaBtn = container.querySelector('#landing-ruleta-btn');
+  if (ruletaBtn) {
+    ruletaBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (callbacks.onNavigate) callbacks.onNavigate('ruleta');
     });
   }
 
-  const wheelBtn = container.querySelector('#hero-go-wheel');
-  if (wheelBtn) {
-    wheelBtn.addEventListener('click', () => {
-      if (callbacks.onNavigate) {
-        callbacks.onNavigate('ruleta');
-      }
+  const bufonBtn = container.querySelector('#landing-bufon-btn');
+  if (bufonBtn) {
+    bufonBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (callbacks.onNavigate) callbacks.onNavigate('bufon');
+    });
+  }
+
+  const retosAcceptBtn = container.querySelector('#landing-retos-btn-accept');
+  if (retosAcceptBtn) {
+    retosAcceptBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (callbacks.onNavigate) callbacks.onNavigate('retos');
+    });
+  }
+
+  const retosDetailsBtn = container.querySelector('#landing-retos-btn-details');
+  if (retosDetailsBtn) {
+    retosDetailsBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (callbacks.onNavigate) callbacks.onNavigate('retos');
+    });
+  }
+
+  const generadorBtn = container.querySelector('#landing-generador-btn');
+  if (generadorBtn) {
+    generadorBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (callbacks.onNavigate) callbacks.onNavigate('generador');
     });
   }
 }
+
