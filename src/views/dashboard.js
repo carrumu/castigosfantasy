@@ -25,6 +25,7 @@ export function renderDashboard(container, callbacks) {
   let biwengerLoaded = false;
   let biwengerLoadError = false;
   let biwengerErrorMsg = '';
+  let biwengerRoundName = '';
 
   // Default Mock Data for Guest / Demo Mode
   const DEFAULT_DEMO_MEMBERS = [
@@ -192,6 +193,7 @@ export function renderDashboard(container, callbacks) {
       const syncData = await res.json();
       const users = syncData.data?.users || [];
       const standings = syncData.data?.standings || [];
+      biwengerRoundName = syncData.data?.round?.name || '';
 
       biwengerStandings = standings.map(s => {
         const u = users.find(user => user.id === s.id) || {};
@@ -378,7 +380,7 @@ export function renderDashboard(container, callbacks) {
             <div class="leaderboard-rank">${rank}</div>
             <div class="leaderboard-info">
               ${nameHtml}
-              <div class="leaderboard-stats">${isGeneral ? 'Puntuación Total' : 'Puntos Jornada'}</div>
+              <div class="leaderboard-stats">${isGeneral ? 'Puntuación Total' : `Puntos en ${biwengerRoundName || 'Jornada'}`}</div>
             </div>
             <div class="leaderboard-debt">
               <div class="debt-amount" style="font-size: 1.1rem; font-weight: 800;">${scoreText}</div>
