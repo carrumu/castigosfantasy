@@ -1,3 +1,4 @@
+
 /**
  * Renders the Herramientas hub page.
  * @param {HTMLElement} container
@@ -69,6 +70,7 @@ export function renderHerramientas(container, callbacks) {
           </div>
         </button>
 
+
       </div>
     </div>
   `;
@@ -80,4 +82,6 @@ export function renderHerramientas(container, callbacks) {
   container.querySelector('#tool-generador-btn').addEventListener('click', () => {
     if (callbacks.onNavigate) callbacks.onNavigate('generador');
   });
+
+
 }

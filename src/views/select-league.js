@@ -1,5 +1,6 @@
 import { supabase } from '../supabase';
 import { openLeagueSettings } from '../utils/league-options';
+import { openBiwengerLinkModal } from '../utils/biwenger-link-modal';
 
 /**
  * Renders the League Selection / Creation / Joining screen.
@@ -44,7 +45,7 @@ export function renderSelectLeague(container, callbacks) {
             id,
             name,
             invite_code,
-            features
+            sync_source
           )
         `)
         .eq('profile_id', currentUser.id);
@@ -198,6 +199,20 @@ export function renderSelectLeague(container, callbacks) {
                     <input type="text" id="new-league-name" class="input-field" placeholder="Nombre de tu liga fantasy" style="border: 1.5px solid var(--border-color-glow); font-weight: 700; background: var(--bg-input);" required />
                   </div>
 
+                  <div class="form-group" style="margin-bottom: 0.25rem;">
+                    <label style="color: var(--text-light); font-weight: 700; font-size: 0.8rem; display: block; margin-bottom: 0.4rem;">Tipo de Liga</label>
+                    <div style="display: flex; gap: 1.5rem; background: rgba(255,255,255,0.02); padding: 0.65rem 0.85rem; border-radius: 6px; border: 1.5px solid var(--border-color-glow);">
+                      <label style="display: flex; align-items: center; gap: 0.4rem; color: var(--text-light); font-size: 0.8rem; cursor: pointer; font-weight: 600;">
+                        <input type="radio" name="league-type" value="manual" checked style="accent-color: var(--accent);" />
+                        Liga Fantasy (Manual)
+                      </label>
+                      <label style="display: flex; align-items: center; gap: 0.4rem; color: var(--text-light); font-size: 0.8rem; cursor: pointer; font-weight: 600;">
+                        <input type="radio" name="league-type" value="biwenger" style="accent-color: var(--accent);" />
+                        Liga Biwenger
+                      </label>
+                    </div>
+                  </div>
+
                   <button type="submit" class="btn-primary" id="btn-create" style="font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Crear Liga</button>
                 </form>
               </div>
@@ -254,6 +269,8 @@ export function renderSelectLeague(container, callbacks) {
 
     const closeCreate = () => {
       modalCreateForm.classList.remove('active');
+      const createForm = container.querySelector('#create-league-form');
+      if (createForm) createForm.reset();
     };
 
     if (btnCloseJoin) btnCloseJoin.addEventListener('click', closeJoin);
@@ -323,7 +340,13 @@ export function renderSelectLeague(container, callbacks) {
         localStorage.setItem('CF_ACTIVE_LEAGUE_ID', targetLeague.id);
         localStorage.setItem('CF_ACTIVE_LEAGUE_NAME', targetLeague.name);
 
-        callbacks.onNavigate('menu-liga');
+        if (targetLeague.sync_source === 'biwenger' && targetLeague.biwenger_email) {
+          openBiwengerLinkModal(targetLeague.id, currentUser.id, callbacks, () => {
+            callbacks.onNavigate('menu-liga');
+          });
+        } else {
+          callbacks.onNavigate('menu-liga');
+        }
       } catch (err) {
         console.error(err);
         callbacks.showToast('Error al unirse a la liga', 'error');
@@ -339,6 +362,7 @@ export function renderSelectLeague(container, callbacks) {
       const btn = createForm.querySelector('#btn-create');
       const name = createForm.querySelector('#new-league-name').value.trim();
       const inviteCode = generateInviteCode();
+      const syncSource = createForm.querySelector('input[name="league-type"]:checked').value;
 
       btn.disabled = true;
       btn.innerHTML = '<span class="spinner"></span>';
@@ -352,7 +376,8 @@ export function renderSelectLeague(container, callbacks) {
           .insert({
             name,
             invite_code: inviteCode,
-            created_by: currentUser.id
+            created_by: currentUser.id,
+            sync_source: syncSource
           })
           .select()
           .single();

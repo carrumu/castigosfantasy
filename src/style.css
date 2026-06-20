@@ -656,6 +656,18 @@ body {
   border-color: var(--border-color-glow);
 }
 
+.leaderboard-item.colista-highlight {
+  border: 1.5px solid rgba(239, 68, 68, 0.6) !important;
+  background: rgba(239, 68, 68, 0.08) !important;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.2);
+}
+
+.leaderboard-item.colista-highlight:hover {
+  background: rgba(239, 68, 68, 0.12) !important;
+  border-color: rgba(239, 68, 68, 0.8) !important;
+}
+
+
 .leaderboard-rank {
   font-weight: 800;
   font-size: 1.2rem;
