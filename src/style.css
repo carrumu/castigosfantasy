@@ -2020,10 +2020,10 @@ body {
 
 .brutalist-hero-title {
   font-family: var(--font-display);
-  font-size: 3rem;
+  font-size: 2.1rem;
   font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: -2px;
+  letter-spacing: -1.2px;
   margin-bottom: 1rem;
   color: var(--primary);
   text-shadow: 3px 3px 0px #000000;
@@ -2031,7 +2031,8 @@ body {
 
 @media (min-width: 768px) {
   .brutalist-hero-title {
-    font-size: 5rem;
+    font-size: 3.4rem;
+    letter-spacing: -1.8px;
   }
 }
 
