@@ -582,7 +582,7 @@ function renderMainLayout(isGuest) {
 }
 
 function navigate(view) {
-  const newPath = '/' + view;
+  const newPath = view === 'inicio' ? '/' : '/' + view;
   if (window.location.pathname !== newPath) {
     history.pushState({}, '', newPath);
   }
@@ -620,7 +620,13 @@ window.addEventListener('cf-notification-update', () => {
 // Route parsing on load/change
 function handleRouting() {
   const path = window.location.pathname;
-  const view = path.replace(/^\//, '') || 'inicio';
+  let view = 'inicio';
+  
+  const parts = path.split('/').filter(p => p && p !== 'index.html');
+  if (parts.length > 0) {
+    view = parts[0];
+  }
+  
   currentView = view;
   checkAuthAndRender();
 }
@@ -628,12 +634,7 @@ function handleRouting() {
 window.addEventListener('popstate', handleRouting);
 
 // Start App: trigger routing on initial load
-if (window.location.pathname === '/') {
-  history.replaceState({}, '', '/inicio');
-  handleRouting();
-} else {
-  handleRouting();
-}
+handleRouting();
 
 // Support Modal Functionality
 function showSupportModal() {
