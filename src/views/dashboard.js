@@ -26,6 +26,7 @@ export function renderDashboard(container, callbacks) {
   let biwengerLoadError = false;
   let biwengerErrorMsg = '';
   let biwengerRoundName = '';
+  let biwengerSeasonRounds = []; // all season rounds from the competition
 
   // Default Mock Data for Guest / Demo Mode
   const DEFAULT_DEMO_MEMBERS = [
@@ -194,6 +195,7 @@ export function renderDashboard(container, callbacks) {
       const users = syncData.data?.users || [];
       const standings = syncData.data?.standings || [];
       biwengerRoundName = syncData.data?.round?.name || '';
+      biwengerSeasonRounds = syncData.data?.season_rounds || [];
 
       biwengerStandings = standings.map(s => {
         const u = users.find(user => user.id === s.id) || {};
@@ -209,6 +211,9 @@ export function renderDashboard(container, callbacks) {
       biwengerLoaded = true;
       biwengerLoadError = false;
       updateLeaderboardView();
+
+      // Detect finished rounds and cache colista data for admin banner
+      detectAndCacheFinishedRound();
     } catch (err) {
       console.error('Error loading Biwenger standings:', err);
       biwengerLoadError = true;
@@ -216,6 +221,247 @@ export function renderDashboard(container, callbacks) {
       updateLeaderboardView();
     }
   }
+
+  // --- Biwenger Round-End Detection ---
+  async function detectAndCacheFinishedRound() {
+    if (!currentLeague || currentLeague.sync_source !== 'biwenger') return;
+    if (biwengerSeasonRounds.length === 0 || biwengerStandings.length === 0) return;
+
+    // Find most recent finished round
+    const finishedRounds = biwengerSeasonRounds.filter(r => r.status === 'finished');
+    if (finishedRounds.length === 0) return;
+    const lastFinished = finishedRounds[finishedRounds.length - 1];
+
+    // Check if already saved in DB
+    const { data: existing } = await supabase
+      .from('matchday_records')
+      .select('id')
+      .eq('league_id', currentLeague.id)
+      .eq('biwenger_round_id', lastFinished.id)
+      .limit(1);
+
+    if (existing && existing.length > 0) {
+      // Already saved, clear any stale localStorage entry
+      localStorage.removeItem(`CF_PENDING_BW_ROUND_${currentLeague.id}`);
+      return;
+    }
+
+    // Detect colista (lowest lastPoints)
+    const minPts = Math.min(...biwengerStandings.map(s => s.lastPoints));
+    const colistaList = biwengerStandings.filter(s => s.lastPoints === minPts);
+    // Pick the one with the worst overall position in case of tie
+    const colista = colistaList.sort((a, b) => b.position - a.position)[0];
+
+    // Cache to localStorage so data survives even if next round starts and lastPoints changes
+    const cacheKey = `CF_PENDING_BW_ROUND_${currentLeague.id}`;
+    const existing_cache = localStorage.getItem(cacheKey);
+    // Only overwrite if round changed or not set yet
+    if (!existing_cache || JSON.parse(existing_cache).roundId !== lastFinished.id) {
+      localStorage.setItem(cacheKey, JSON.stringify({
+        roundId: lastFinished.id,
+        roundName: lastFinished.name || lastFinished.short || `Ronda ${lastFinished.id}`,
+        colistaName: colista.name,
+        colistaPts: colista.lastPoints,
+        isTie: colistaList.length > 1,
+        tieNames: colistaList.map(s => s.name)
+      }));
+    }
+
+    // Show admin banner if applicable
+    if (isAdmin) showJornadaBanner();
+  }
+
+  function showJornadaBanner() {
+    const cacheKey = `CF_PENDING_BW_ROUND_${currentLeague.id}`;
+    const cached = localStorage.getItem(cacheKey);
+    if (!cached) return;
+    const pending = JSON.parse(cached);
+
+    const existingBanner = container.querySelector('#jornada-close-banner');
+    if (existingBanner) return; // already shown
+
+    // Find linked member for colista
+    const matchedMember = members.find(m =>
+      m.biwenger_user_name &&
+      m.biwenger_user_name.toLowerCase().trim() === pending.colistaName.toLowerCase().trim()
+    );
+    const colistaLocalName = matchedMember ? matchedMember.display_name : null;
+    const colistaDisplay = colistaLocalName
+      ? `${colistaLocalName} <span style="color:var(--text-muted);font-size:0.8rem">(${pending.colistaName})</span>`
+      : `<span style="color:var(--accent-gold)">${pending.colistaName} ⚠️ sin vincular</span>`;
+
+    const banner = document.createElement('div');
+    banner.id = 'jornada-close-banner';
+    banner.style.cssText = `
+      background: linear-gradient(135deg, rgba(239,68,68,0.12), rgba(239,68,68,0.05));
+      border: 2px solid rgba(239,68,68,0.5);
+      border-radius: 10px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    `;
+    banner.innerHTML = `
+      <div style="display:flex;align-items:center;gap:0.75rem;flex:1;min-width:0;">
+        <span style="font-size:1.5rem">🔴</span>
+        <div>
+          <div style="font-weight:800;font-size:0.9rem;color:var(--text-light);margin-bottom:0.2rem;">
+            Jornada terminada: <span style="color:#f87171">${pending.roundName}</span>
+          </div>
+          <div style="font-size:0.82rem;color:var(--text-muted);">
+            Último: ${colistaDisplay} · ${pending.colistaPts} pts
+            ${pending.isTie ? `<span style="color:var(--accent-gold);margin-left:0.4rem">⚠️ Empate — elige quién paga</span>` : ''}
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;gap:0.5rem;flex-shrink:0;">
+        <button id="btn-confirm-jornada" style="
+          background: var(--danger); color: #fff; border: none; border-radius: 6px;
+          padding: 0.55rem 1rem; font-weight: 800; font-size: 0.8rem; cursor: pointer;
+          text-transform: uppercase; letter-spacing: 0.5px;
+        ">Cerrar Jornada</button>
+        <button id="btn-dismiss-jornada" style="
+          background: none; color: var(--text-muted); border: 1px solid var(--border-color);
+          border-radius: 6px; padding: 0.55rem 0.75rem; font-size: 0.75rem; cursor: pointer;
+        ">Ignorar</button>
+      </div>
+    `;
+
+    // Insert banner before dashboard-grid
+    const grid = container.querySelector('.dashboard-grid');
+    if (grid) grid.parentNode.insertBefore(banner, grid);
+
+    // Dismiss button
+    banner.querySelector('#btn-dismiss-jornada').addEventListener('click', () => {
+      banner.remove();
+    });
+
+    // Confirm button → open modal
+    banner.querySelector('#btn-confirm-jornada').addEventListener('click', () => {
+      openJornadaConfirmModal(pending, matchedMember);
+    });
+  }
+
+  function openJornadaConfirmModal(pending, defaultMember) {
+    // Remove any existing modal
+    const old = document.querySelector('#jornada-confirm-modal');
+    if (old) old.remove();
+
+    const maxMatchday = records.reduce((max, r) => r.matchday_number > max ? r.matchday_number : max, 0);
+    const nextMatchday = maxMatchday + 1;
+
+    // Build member options for select
+    const memberOptions = members.map(m => {
+      const bwMatch = m.biwenger_user_name &&
+        pending.tieNames.some(n => n.toLowerCase().trim() === m.biwenger_user_name.toLowerCase().trim());
+      return `<option value="${m.profile_id}" ${defaultMember?.profile_id === m.profile_id || (pending.isTie && bwMatch) ? 'selected' : ''}>${m.display_name}</option>`;
+    }).join('');
+
+    const modal = document.createElement('div');
+    modal.id = 'jornada-confirm-modal';
+    modal.style.cssText = `
+      position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 9999;
+      display: flex; align-items: center; justify-content: center; padding: 1rem;
+    `;
+    modal.innerHTML = `
+      <div style="
+        background: var(--bg-card); border: 2px solid rgba(239,68,68,0.4);
+        border-radius: 14px; padding: 1.75rem; max-width: 440px; width: 100%;
+      ">
+        <h3 style="font-weight:900;font-size:1.1rem;margin-bottom:0.25rem;">🔴 Cerrar Jornada</h3>
+        <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:1.25rem;">${pending.roundName} · ${pending.colistaPts} pts</p>
+
+        ${!defaultMember ? `<div style="background:rgba(222,237,0,0.08);border:1px solid rgba(222,237,0,0.3);border-radius:6px;padding:0.65rem 0.85rem;font-size:0.8rem;color:var(--accent-gold);margin-bottom:1rem;">
+          ⚠️ <strong>${pending.colistaName}</strong> no tiene mánager vinculado. Selecciona quién paga:
+        </div>` : ''}
+
+        <div style="display:grid;gap:0.75rem;">
+          <div>
+            <label style="font-size:0.78rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.35rem;display:block;">El Farolillo Rojo</label>
+            <select id="jornada-loser-select" style="width:100%;padding:0.6rem 0.75rem;background:var(--bg-input);border:1.5px solid var(--border-color-glow);border-radius:6px;color:var(--text-light);font-size:0.9rem;">
+              ${memberOptions}
+            </select>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+            <div>
+              <label style="font-size:0.78rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.35rem;display:block;">Jornada #</label>
+              <input type="number" id="jornada-num" value="${nextMatchday}" min="1" style="width:100%;padding:0.6rem 0.75rem;background:var(--bg-input);border:1.5px solid var(--border-color-glow);border-radius:6px;color:var(--text-light);font-size:0.9rem;" />
+            </div>
+            <div>
+              <label style="font-size:0.78rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.35rem;display:block;">Deuda (€)</label>
+              <input type="number" id="jornada-amount" value="2.00" min="0" step="0.5" style="width:100%;padding:0.6rem 0.75rem;background:var(--bg-input);border:1.5px solid var(--border-color-glow);border-radius:6px;color:var(--text-light);font-size:0.9rem;" />
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:0.75rem;margin-top:1.25rem;">
+          <button id="btn-jornada-save" style="
+            flex:1;background:var(--danger);color:#fff;border:none;border-radius:8px;
+            padding:0.75rem;font-weight:800;font-size:0.9rem;cursor:pointer;
+            text-transform:uppercase;letter-spacing:0.5px;
+          ">Confirmar y Guardar</button>
+          <button id="btn-jornada-cancel" style="
+            background:none;color:var(--text-muted);border:1px solid var(--border-color);
+            border-radius:8px;padding:0.75rem 1rem;font-size:0.85rem;cursor:pointer;
+          ">Cancelar</button>
+        </div>
+        <div id="jornada-save-error" style="display:none;color:#f87171;font-size:0.8rem;margin-top:0.5rem;"></div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+
+    modal.querySelector('#btn-jornada-cancel').addEventListener('click', () => modal.remove());
+    modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+
+    modal.querySelector('#btn-jornada-save').addEventListener('click', async () => {
+      const btn = modal.querySelector('#btn-jornada-save');
+      const errorEl = modal.querySelector('#jornada-save-error');
+      const loserId = modal.querySelector('#jornada-loser-select').value;
+      const matchday = Number(modal.querySelector('#jornada-num').value);
+      const amount = Number(modal.querySelector('#jornada-amount').value);
+
+      if (!loserId) { errorEl.style.display = 'block'; errorEl.textContent = 'Selecciona quién paga.'; return; }
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span>';
+      errorEl.style.display = 'none';
+
+      try {
+        const loserProfile = members.find(m => m.profile_id === loserId);
+        const trashPhrase = getRandomPhrase(loserProfile?.display_name || '', amount);
+
+        const { error: insertErr } = await supabase
+          .from('matchday_records')
+          .insert({
+            league_id: currentLeague.id,
+            matchday_number: matchday,
+            loser_profile_id: loserId,
+            amount_owed: amount,
+            biwenger_round_id: pending.roundId,
+            trash_talk_phrase: trashPhrase
+          });
+
+        if (insertErr) throw insertErr;
+
+        // Clear cache and remove banner
+        localStorage.removeItem(`CF_PENDING_BW_ROUND_${currentLeague.id}`);
+        container.querySelector('#jornada-close-banner')?.remove();
+        modal.remove();
+        callbacks.showToast(`¡Jornada cerrada! ${loserProfile?.display_name} queda registrado como moroso.`, 'success');
+        loadData();
+      } catch (err) {
+        console.error(err);
+        errorEl.style.display = 'block';
+        errorEl.textContent = `Error al guardar: ${err.message}`;
+        btn.disabled = false;
+        btn.innerHTML = 'Confirmar y Guardar';
+      }
+    });
+  }
+  // --- End Round-End Detection ---
 
   function updateLeaderboardView() {
     const contentArea = container.querySelector('#leaderboard-content-area');
