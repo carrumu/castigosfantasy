@@ -705,8 +705,8 @@ export function renderMinigame(container, callbacks) {
                 const isSpecial = key === 'ENTER' || key === 'BACK';
                 return `
                   <button class="keyboard-key ${state}" data-key="${key}" style="
-                    flex-grow: ${isSpecial ? 1.5 : 1};
-                    flex-shrink: 0;
+                    flex: ${isSpecial ? '1.5 1 0px' : '1 1 0px'};
+                    min-width: 0;
                     height: 55px;
                     border-radius: 6px;
                     background: ${
