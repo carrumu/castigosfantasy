@@ -110,12 +110,6 @@ function renderMainLayout(isGuest) {
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
             <span>Inicio</span>
           </button>
-          ${!isGuest ? `
-            <button class="nav-item ${currentView === 'mis-ligas' ? 'active' : ''}" id="nav-select-league-btn">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-              <span>Mis Ligas</span>
-            </button>
-          ` : ''}
 
           <button class="nav-item ${currentView === 'ruleta' ? 'active' : ''}" id="nav-wheel-btn">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;"><circle cx="12" cy="12" r="10"></circle><path d="M12 2v20"></path><path d="M2 12h20"></path></svg>
@@ -158,6 +152,10 @@ function renderMainLayout(isGuest) {
               <path d="m5 3 1 2.5L8.5 6 6 7 5 9.5 4 7 1.5 6 4 5.5z"></path>
             </svg>
             <span>Generador</span>
+          </button>
+          <button class="nav-item ${currentView === 'mis-ligas' ? 'active' : ''}" id="nav-select-league-btn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            <span>Mis Ligas</span>
           </button>
         </nav>
 
@@ -218,17 +216,16 @@ function renderMainLayout(isGuest) {
           <!-- Enlaces de navegación en cabecera (Escritorio) -->
           <nav class="header-nav">
             <button class="header-nav-link ${currentView === 'inicio' ? 'active' : ''}" data-nav="inicio">INICIO</button>
-            ${!isGuest ? `<button class="header-nav-link ${currentView === 'mis-ligas' ? 'active' : ''}" data-nav="mis-ligas">MIS LIGAS</button>` : ''}
-            <button class="header-nav-link ${currentView === 'muro' ? 'active' : ''}" data-nav="muro">MURO</button>
             <button class="header-nav-link ${currentView === 'ruleta' ? 'active' : ''}" data-nav="ruleta">RULETA</button>
             <button class="header-nav-link ${currentView === 'retos' ? 'active' : ''}" data-nav="retos">RETOS</button>
             <button class="header-nav-link ${currentView === 'minijuego' ? 'active' : ''}" data-nav="minijuego">JUEGO</button>
+            <button class="header-nav-link ${currentView === 'mis-ligas' ? 'active' : ''}" data-nav="mis-ligas">MIS LIGAS</button>
           </nav>
           
           <div class="header-right">
             ${isGuest ? `
-              <button class="nav-btn-guest" id="nav-login-btn" title="Login / Registro">
-                LOGIN / REGISTER
+              <button class="nav-btn-guest" id="nav-login-btn" title="Iniciar Sesión">
+                INICIAR SESIÓN
               </button>
             ` : `
               <button class="header-action-btn btn-danger" id="nav-logout-btn" title="Cerrar Sesión">
