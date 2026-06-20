@@ -169,14 +169,22 @@ export function renderAuth(container, callbacks) {
     // 3. --- Login / Signup Panel ---
     container.innerHTML = `
       <div class="container" style="display: flex; align-items: center; justify-content: center; min-height: 80vh;">
-        <div class="card glass pitch-card" style="width: 100%; max-width: 400px;">
-            <div style="display: flex; flex-direction: column; align-items: center; margin-bottom: 1rem; gap: 0.5rem;">
-              <span class="logo-icon" style="width: 114px; height: 82px;"></span>
-              <h1 class="logo gradient-text-green" style="justify-content: center; font-size: 1.9rem; font-weight: 900; margin-bottom: 0.25rem;">
-                CastigoFantasy
-              </h1>
+        <div class="card glass pitch-card" style="width: 100%; max-width: 350px; padding: 2rem 1.5rem;">
+            <div style="display: flex; align-items: center; justify-content: center; border: 2px solid var(--border-color); padding: 0.6rem 0.75rem; background: rgba(0,0,0,0.35); border-radius: 8px; margin-bottom: 1.5rem; width: 100%;">
+              <div style="display: flex; flex-direction: column; align-items: flex-start; line-height: 0.9;">
+                <h1 class="gradient-text-green" style="font-family: var(--font-display); font-size: 1.65rem; font-weight: 900; text-transform: uppercase; letter-spacing: -0.5px; margin: 0;">
+                  Castigo
+                </h1>
+                <h1 class="gradient-text-green" style="font-family: var(--font-display); font-size: 1.65rem; font-weight: 900; text-transform: uppercase; letter-spacing: -0.5px; margin: 0;">
+                  Fantasy
+                </h1>
+              </div>
+              <span class="logo-icon" style="width: 36px; height: 26px; flex-shrink: 0; margin-left: 0.75rem;"></span>
             </div>
-            <p style="color: var(--text-muted); font-size: 0.9rem;">Registra los piques y castigos de tu liga</p>
+            
+            <h2 style="font-family: var(--font-display); font-size: 1.25rem; font-weight: 800; text-transform: uppercase; margin-bottom: 1.25rem; text-align: center; color: var(--text-light);">
+              ${isLoginMode ? 'Inicio de Sesión' : 'Crear Cuenta'}
+            </h2>
 
           <form id="auth-form">
             ${!isLoginMode ? `
@@ -185,9 +193,10 @@ export function renderAuth(container, callbacks) {
                 <input type="text" id="username" class="input-field" placeholder="Tu nombre completo" required />
               </div>
               <div class="form-group">
-                <label for="apodo">Apodo (Ej: Paco G.)</label>
+                <label for="apodo">Apodo</label>
                 <input type="text" id="apodo" class="input-field" placeholder="Tu apodo en la liga" required />
               </div>
+
             ` : ''}
             
             <div class="form-group">

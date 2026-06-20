@@ -13,13 +13,9 @@ import { renderLeagueHub } from './views/league-hub';
 import { renderGenerator } from './views/generator';
 import { renderComunidad } from './views/comunidad';
 
-// Initialize Theme
-const savedTheme = localStorage.getItem('CF_THEME') || 'dark';
-if (savedTheme === 'light') {
-  document.body.classList.add('light-theme');
-} else {
-  document.body.classList.remove('light-theme');
-}
+// Initialize Theme (Force Dark Mode)
+document.body.classList.remove('light-theme');
+localStorage.removeItem('CF_THEME');
 
 // Root elements
 const app = document.querySelector('#app');
@@ -137,12 +133,7 @@ function renderMainLayout(isGuest) {
         </nav>
 
         <div class="sidebar-footer" style="border-top: 1px solid var(--border-color); padding-top: 1rem;">
-          <div class="footer-widgets" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.85rem;">
-            <!-- Theme Toggle on the Left -->
-            <label class="switch-theme" title="Cambiar Tema (Día/Noche)">
-              <input type="checkbox" id="theme-toggle-checkbox" ${document.body.classList.contains('light-theme') ? 'checked' : ''}>
-              <span class="slider-theme"></span>
-            </label>
+          <div class="footer-widgets" style="display: flex; align-items: center; justify-content: flex-end; margin-bottom: 0.85rem;">
             
             <!-- Social Icons on the Right -->
             <div class="social-icons" style="display: flex; gap: 0.75rem; align-items: center;">
@@ -461,19 +452,7 @@ function renderMainLayout(isGuest) {
     });
   }
 
-  // Theme toggle switch listener
-  const themeToggle = app.querySelector('#theme-toggle-checkbox');
-  if (themeToggle) {
-    themeToggle.addEventListener('change', () => {
-      if (themeToggle.checked) {
-        document.body.classList.add('light-theme');
-        localStorage.setItem('CF_THEME', 'light');
-      } else {
-        document.body.classList.remove('light-theme');
-        localStorage.setItem('CF_THEME', 'dark');
-      }
-    });
-  }
+
 }
 
 function navigate(view) {

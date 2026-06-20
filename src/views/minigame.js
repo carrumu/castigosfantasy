@@ -416,7 +416,7 @@ export function renderMinigame(container, callbacks) {
     modal.innerHTML = `
       <div class="modal-content glass" style="max-width: 450px; text-align: center; border: 1px solid var(--border-color-glow);">
         <h2 class="gradient-text-green" style="font-size: 1.6rem; margin-bottom: 0.5rem; font-weight: 800;">
-          ${won ? '🎉 ¡Has acertado!' : '😢 Fin de la partida'}
+          ${won ? '¡Has acertado!' : 'Fin de la partida'}
         </h2>
         <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.25rem;">
           El jugador secreto era: <strong style="color: var(--accent); font-size: 1.1rem; letter-spacing: 1px;">${secretPlayer}</strong>
@@ -432,9 +432,39 @@ export function renderMinigame(container, callbacks) {
             <div style="font-size: 1.5rem; font-weight: 800; color: var(--text-light);">${winRate}%</div>
             <div style="font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase;">Victorias</div>
           </div>
-          <div>
-            <div style="font-size: 1.5rem; font-weight: 800; color: var(--text-light);">${stats.currentStreak}</div>
+          <div style="position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            <div style="font-size: 1.5rem; font-weight: 800; color: var(--text-light);">
+              ${stats.currentStreak}
+            </div>
             <div style="font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase;">Racha Act.</div>
+            ${stats.currentStreak > 0 ? (() => {
+              let gradStart = '#b91c1c', gradEnd = '#facc15', fireGlow = 'rgba(249, 115, 22, 0.6)';
+              if (stats.currentStreak >= 5 && stats.currentStreak <= 20) {
+                gradStart = '#6d28d9'; gradEnd = '#ec4899'; fireGlow = 'rgba(168, 85, 247, 0.6)';
+              } else if (stats.currentStreak > 20) {
+                gradStart = '#047857'; gradEnd = '#a3e635'; fireGlow = 'rgba(34, 197, 94, 0.6)';
+              }
+              return `
+                <div class="streak-fire" style="
+                  position: absolute;
+                  top: -8px;
+                  right: 4px;
+                  width: 16px;
+                  height: 16px;
+                  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3)) drop-shadow(0 0 3px ${fireGlow});
+                ">
+                  <svg width="16" height="16" viewBox="0 0 24 24">
+                    <defs>
+                      <linearGradient id="modalFireGrad-${stats.currentStreak}" x1="0%" y1="100%" x2="0%" y2="0%">
+                        <stop offset="0%" stop-color="${gradStart}" />
+                        <stop offset="100%" stop-color="${gradEnd}" />
+                      </linearGradient>
+                    </defs>
+                    <path fill="url(#modalFireGrad-${stats.currentStreak})" d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>
+                  </svg>
+                </div>
+              `;
+            })() : ''}
           </div>
           <div>
             <div style="font-size: 1.5rem; font-weight: 800; color: var(--text-light);">${stats.maxStreak}</div>
@@ -475,7 +505,7 @@ export function renderMinigame(container, callbacks) {
 
         <div style="display: flex; gap: 0.75rem; justify-content: center;">
           <button id="modal-share-btn" class="btn-primary" style="flex-grow: 1; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
-            <span>📋 Compartir Resultado</span>
+            <span>Compartir Resultado</span>
           </button>
           <button id="modal-close-btn" class="btn-secondary" style="padding: 0.75rem 1.25rem;">
             Cerrar
@@ -503,25 +533,60 @@ export function renderMinigame(container, callbacks) {
         
         <!-- Header Info -->
         <div style="width: 100%; text-align: center; margin-bottom: 1rem; position: relative;">
-          <h1 class="gradient-text-green" style="font-size: 1.6rem; font-weight: 900; margin-bottom: 0.25rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+          <h1 class="gradient-text-green" style="font-size: 1.6rem; font-weight: 900; margin-bottom: 0.5rem;">
             Adivina el Jugador
-            ${currentStreak > 0 ? `
-              <span class="streak-badge" style="
-                font-size: 0.95rem; 
-                background: rgba(var(--accent-rgb), 0.12); 
-                color: var(--accent); 
-                padding: 0.15rem 0.5rem; 
-                border-radius: 20px; 
-                display: inline-flex; 
-                align-items: center; 
-                gap: 0.2rem; 
-                border: 1px solid rgba(var(--accent-rgb), 0.25);
-                font-weight: 700;
-                vertical-align: middle;
-                animation: pulseBadge 2s infinite ease-in-out;
-              ">Racha: ${currentStreak}</span>
-            ` : ''}
           </h1>
+          ${currentStreak > 0 ? (() => {
+            let gradStart = '#b91c1c', gradEnd = '#facc15', fireGlow = 'rgba(249, 115, 22, 0.6)';
+            if (currentStreak >= 5 && currentStreak <= 20) {
+              gradStart = '#6d28d9'; gradEnd = '#ec4899'; fireGlow = 'rgba(168, 85, 247, 0.6)';
+            } else if (currentStreak > 20) {
+              gradStart = '#047857'; gradEnd = '#a3e635'; fireGlow = 'rgba(34, 197, 94, 0.6)';
+            }
+            return `
+              <div class="streak-badge-container" style="margin-bottom: 0.85rem; position: relative; display: inline-block;">
+                <span class="streak-badge" style="
+                  position: relative;
+                  font-size: 0.8rem; 
+                  background: #deed00; 
+                  color: #000000; 
+                  padding: 0.35rem 0.75rem; 
+                  border-radius: 4px; 
+                  display: inline-flex; 
+                  align-items: center; 
+                  border: 2px solid #000000;
+                  box-shadow: 3px 3px 0px #000000;
+                  font-weight: 800;
+                  text-transform: uppercase;
+                  letter-spacing: 0.5px;
+                ">
+                  Racha: ${currentStreak} victorias
+                </span>
+                <div class="streak-fire" style="
+                  position: absolute;
+                  top: -11px;
+                  right: -4px; /* Moved slightly left to look more included */
+                  width: 22px;
+                  height: 22px;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  z-index: 10;
+                  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)) drop-shadow(0 0 5px ${fireGlow});
+                ">
+                  <svg width="22" height="22" viewBox="0 0 24 24">
+                    <defs>
+                      <linearGradient id="fireGrad-${currentStreak}" x1="0%" y1="100%" x2="0%" y2="0%">
+                        <stop offset="0%" stop-color="${gradStart}" />
+                        <stop offset="100%" stop-color="${gradEnd}" />
+                      </linearGradient>
+                    </defs>
+                    <path fill="url(#fireGrad-${currentStreak})" d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>
+                  </svg>
+                </div>
+              </div>
+            `;
+          })() : ''}
           <p style="font-size: 0.8rem; color: var(--text-muted);">
             Jugador del día <strong>#${dailyNumber}</strong> (LaLiga EA Sports)
           </p>
@@ -544,13 +609,13 @@ export function renderMinigame(container, callbacks) {
         ${gameStatus !== 'IN_PROGRESS' ? `
           <div class="card glass" style="width: 100%; padding: 1.25rem; text-align: center; margin-bottom: 1.25rem; border: 1px solid var(--border-color-glow);">
             <h3 style="font-size: 1.05rem; margin-bottom: 0.35rem; color: ${gameStatus === 'WON' ? 'var(--primary)' : 'var(--danger)'};">
-              ${gameStatus === 'WON' ? '🎉 ¡Enhorabuena! Has acertado.' : '😢 Has agotado tus 6 intentos.'}
+              ${gameStatus === 'WON' ? '¡Enhorabuena! Has acertado.' : 'Has agotado tus 6 intentos.'}
             </h3>
             <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
               El jugador de hoy era: <strong style="color: var(--accent); letter-spacing: 0.5px;">${secretPlayer}</strong>. Vuelve mañana para un nuevo reto.
             </p>
             <button id="banner-share-btn" class="btn-primary" style="font-size: 0.8rem; padding: 0.5rem 1rem; margin: 0 auto; display: flex; align-items: center; gap: 0.5rem; justify-content: center;">
-              <span>📋 Compartir Resultado</span>
+              <span>Compartir Resultado</span>
             </button>
           </div>
         ` : ''}
@@ -602,7 +667,7 @@ export function renderMinigame(container, callbacks) {
                       font-size: calc(1rem + 0.5vw);
                       font-weight: 800;
                       text-transform: uppercase;
-                      background: rgba(18, 24, 28, 0.4);
+                      background: rgba(255, 255, 255, 0.03);
                       user-select: none;
                       transition: border-color 0.1s ease;
                     ">${char}</div>
@@ -644,12 +709,15 @@ export function renderMinigame(container, callbacks) {
                     border-radius: 6px;
                     border: none;
                     background: ${
-                      state === 'correct' ? 'var(--primary)' :
-                      state === 'present' ? 'var(--accent)' :
-                      state === 'absent' ? '#272d31' :
-                      '#3c444a'
+                      state === 'correct' ? '#22c55e' :
+                      state === 'present' ? '#deed00' :
+                      state === 'absent' ? '#1a1a1a' :
+                      '#2a2a2a'
                     };
-                    color: var(--text-light);
+                    color: ${
+                      state === 'present' ? '#000000' :
+                      'var(--text-light)'
+                    };
                     font-family: var(--font-sans);
                     font-size: ${isSpecial ? '0.75rem' : '0.95rem'};
                     font-weight: 800;
