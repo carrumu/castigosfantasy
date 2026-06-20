@@ -29,6 +29,38 @@ export function renderLanding(container, callbacks) {
           <p class="brutalist-hero-subtitle">
             Sigue la jornada, vota al bufón y descubre quién debe pasar por caja esta semana.
           </p>
+          <div style="margin-top: 1.5rem;">
+            <button id="hero-create-league-btn" style="
+              font-family: var(--font-display);
+              font-weight: 900;
+              font-size: 1rem;
+              text-transform: uppercase;
+              letter-spacing: -0.5px;
+              background: var(--accent);
+              color: #000000;
+              border: 3px solid #000000;
+              padding: 0.75rem 2rem;
+              cursor: pointer;
+              box-shadow: 5px 5px 0px 0px #000000;
+              transition: transform 0.1s ease, box-shadow 0.1s ease;
+              display: inline-flex;
+              align-items: center;
+              gap: 0.5rem;
+            "
+            onmouseover="this.style.transform='translate(-2px,-2px)'; this.style.boxShadow='7px 7px 0px 0px #000000';"
+            onmouseout="this.style.transform=''; this.style.boxShadow='5px 5px 0px 0px #000000';"
+            onmousedown="this.style.transform='translate(3px,3px)'; this.style.boxShadow='0px 0px 0px #000000';"
+            onmouseup="this.style.transform='translate(-2px,-2px)'; this.style.boxShadow='7px 7px 0px 0px #000000';"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <line x1="19" y1="8" x2="19" y2="14"></line>
+                <line x1="22" y1="11" x2="16" y2="11"></line>
+              </svg>
+              Crea tu Liga
+            </button>
+          </div>
         </section>
 
         <!-- Grid Content: Row 1 -->
@@ -222,6 +254,13 @@ export function renderLanding(container, callbacks) {
     generadorBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       if (callbacks.onNavigate) callbacks.onNavigate('generador');
+    });
+  }
+
+  const heroCreateBtn = container.querySelector('#hero-create-league-btn');
+  if (heroCreateBtn) {
+    heroCreateBtn.addEventListener('click', () => {
+      if (callbacks.onNavigate) callbacks.onNavigate('mis-ligas');
     });
   }
 }

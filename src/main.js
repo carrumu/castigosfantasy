@@ -12,6 +12,7 @@ import { renderSelectLeague } from './views/select-league';
 import { renderLeagueHub } from './views/league-hub';
 import { renderGenerator } from './views/generator';
 import { renderComunidad } from './views/comunidad';
+import { renderHerramientas } from './views/herramientas';
 
 // Initialize Theme (Force Dark Mode)
 document.body.classList.remove('light-theme');
@@ -83,9 +84,9 @@ function renderMainLayout(isGuest, currentUser = null) {
             <span>Inicio</span>
           </button>
 
-          <button class="nav-item ${currentView === 'ruleta' ? 'active' : ''}" id="nav-wheel-btn">
+          <button class="nav-item ${currentView === 'herramientas' || currentView === 'ruleta' || currentView === 'generador' ? 'active' : ''}" id="nav-wheel-btn">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;"><circle cx="12" cy="12" r="10"></circle><path d="M12 2v20"></path><path d="M2 12h20"></path></svg>
-            <span>Ruleta</span>
+            <span>Herramientas</span>
           </button>
 
           <button class="nav-item ${currentView === 'retos' ? 'active' : ''}" id="nav-challenges-btn">
@@ -183,7 +184,7 @@ function renderMainLayout(isGuest, currentUser = null) {
           <!-- Enlaces de navegación en cabecera (Escritorio) -->
           <nav class="header-nav">
             <button class="header-nav-link ${currentView === 'inicio' ? 'active' : ''}" data-nav="inicio">INICIO</button>
-            <button class="header-nav-link ${currentView === 'ruleta' ? 'active' : ''}" data-nav="ruleta">RULETA</button>
+            <button class="header-nav-link ${currentView === 'herramientas' || currentView === 'ruleta' || currentView === 'generador' ? 'active' : ''}" data-nav="herramientas">HERRAMIENTAS</button>
             <button class="header-nav-link ${currentView === 'retos' ? 'active' : ''}" data-nav="retos">RETOS</button>
             <button class="header-nav-link ${currentView === 'comunidad' || currentView === 'bufon' ? 'active' : ''}" data-nav="comunidad">COMUNIDAD</button>
             <button class="header-nav-link ${currentView === 'minijuego' ? 'active' : ''}" data-nav="minijuego">JUEGO</button>
@@ -225,9 +226,9 @@ function renderMainLayout(isGuest, currentUser = null) {
           <span class="material-symbols-outlined">grid_view</span>
           <span class="mobile-nav-label">PANEL</span>
         </button>
-        <button class="mobile-nav-item ${currentView === 'ruleta' ? 'active' : ''}" data-nav="ruleta" title="Ruleta de sentencias">
+        <button class="mobile-nav-item ${currentView === 'herramientas' || currentView === 'ruleta' || currentView === 'generador' ? 'active' : ''}" data-nav="herramientas" title="Herramientas">
           <span class="material-symbols-outlined">casino</span>
-          <span class="mobile-nav-label">RULETA</span>
+          <span class="mobile-nav-label">HERRAM.</span>
         </button>
         <button class="mobile-nav-item ${currentView === 'retos' ? 'active' : ''}" data-nav="retos" title="Reto semanal">
           <span class="material-symbols-outlined">emoji_events</span>
@@ -306,6 +307,10 @@ function renderMainLayout(isGuest, currentUser = null) {
       onNavigate: navigate,
       showToast
     });
+  } else if (currentView === 'herramientas') {
+    renderHerramientas(viewContainer, {
+      onNavigate: navigate
+    });
   } else if (currentView === 'ruleta') {
     renderRoulette(viewContainer, {
       isGuest,
@@ -380,7 +385,7 @@ function renderMainLayout(isGuest, currentUser = null) {
   const wheelBtn = app.querySelector('#nav-wheel-btn');
   if (wheelBtn) {
     wheelBtn.addEventListener('click', () => {
-      navigate('ruleta');
+      navigate('herramientas');
     });
   }
 
