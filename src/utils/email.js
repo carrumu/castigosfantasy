@@ -31,37 +31,55 @@ export async function sendAdminNotification(email, username, apodo) {
   }
 
   const html = `
-    <div style="background-color: #090c15; color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; padding: 40px 20px; text-align: center; min-height: 100%;">
-      <div style="max-width: 500px; margin: 0 auto; background-color: #111625; border: 1px solid rgba(255,255,255,0.05); padding: 32px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4); text-align: left;">
-        <div style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 16px; margin-bottom: 20px;">
-          <h2 style="color: #10b981; font-size: 20px; font-weight: 800; margin: 0; display: inline-block; letter-spacing: -0.5px;">CastigoFantasy</h2>
-          <span style="float: right; background-color: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2); color: #10b981; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; text-transform: uppercase;">Nuevo Míster</span>
+    <div style="background-color: #0b0f19; color: #f8fafc; font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 40px 20px; text-align: center; min-height: 100%;">
+      <div style="max-width: 500px; margin: 0 auto; background-color: #121826; border: 3px solid #000000; padding: 0; box-shadow: 8px 8px 0px #000000; text-align: left;">
+        
+        <!-- Header Banner -->
+        <div style="background-color: #e2b13c; color: #000000; padding: 20px 24px; border-bottom: 3px solid #000000;">
+          <h2 style="margin: 0; font-size: 20px; font-weight: 950; text-transform: uppercase; letter-spacing: -0.5px; display: inline-block;">
+            CastigoFantasy
+          </h2>
+          <span style="float: right; background-color: #000000; color: #e2b13c; font-size: 10px; font-weight: 900; padding: 4px 10px; border: 1.5px solid #000000; text-transform: uppercase; letter-spacing: 0.5px;">
+            Nuevo Míster
+          </span>
           <div style="clear: both;"></div>
         </div>
-        <p style="color: #94a3b8; font-size: 14px; margin-top: 0; line-height: 1.5;">Se ha unido un nuevo entrenador a la plataforma. Aquí tienes los detalles del registro:</p>
-        <div style="background-color: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 20px; margin: 24px 0;">
-          <table style="width: 100%; border-collapse: collapse;">
-            <tr>
-              <td style="padding: 10px 0; color: #64748b; font-size: 12px; font-weight: 700; border-bottom: 1px solid rgba(255,255,255,0.04); text-transform: uppercase; letter-spacing: 0.5px;">NOMBRE COMPLETO</td>
-              <td style="padding: 10px 0; color: #f8fafc; font-size: 13px; font-weight: 700; text-align: right; border-bottom: 1px solid rgba(255,255,255,0.04);">${username || 'Sin nombre'}</td>
-            </tr>
-            <tr>
-              <td style="padding: 10px 0; color: #64748b; font-size: 12px; font-weight: 700; border-bottom: 1px solid rgba(255,255,255,0.04); text-transform: uppercase; letter-spacing: 0.5px;">APODO / LIGA</td>
-              <td style="padding: 10px 0; color: #e2b13c; font-size: 13px; font-weight: 800; text-align: right; border-bottom: 1px solid rgba(255,255,255,0.04);">${apodo || 'Sin apodo'}</td>
-            </tr>
-            <tr>
-              <td style="padding: 10px 0; color: #64748b; font-size: 12px; font-weight: 700; border-bottom: 1px solid rgba(255,255,255,0.04); text-transform: uppercase; letter-spacing: 0.5px;">CORREO ELECTRÓNICO</td>
-              <td style="padding: 10px 0; color: #3b82f6; font-size: 13px; font-weight: 700; text-align: right; border-bottom: 1px solid rgba(255,255,255,0.04);">${email}</td>
-            </tr>
-            <tr>
-              <td style="padding: 10px 0; color: #64748b; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">FECHA Y HORA</td>
-              <td style="padding: 10px 0; color: #94a3b8; font-size: 13px; text-align: right;">${formattedDate} (CET)</td>
-            </tr>
-          </table>
+
+        <div style="padding: 32px 24px;">
+          <p style="color: #94a3b8; font-size: 14px; margin-top: 0; line-height: 1.6; font-weight: 500;">
+            Se ha unido un nuevo entrenador a la plataforma. Aquí tienes los detalles del registro:
+          </p>
+          
+          <!-- Details Card -->
+          <div style="background-color: #1a2234; border: 3px solid #000000; padding: 16px; margin: 24px 0; box-shadow: 4px 4px 0px #000000;">
+            <table style="width: 100%; border-collapse: collapse;">
+              <tr>
+                <td style="padding: 10px 0; color: #94a3b8; font-size: 11px; font-weight: 800; border-bottom: 2px solid #000000; text-transform: uppercase; letter-spacing: 0.5px;">Nombre Completo</td>
+                <td style="padding: 10px 0; color: #ffffff; font-size: 13px; font-weight: 800; text-align: right; border-bottom: 2px solid #000000;">${username || 'Sin nombre'}</td>
+              </tr>
+              <tr>
+                <td style="padding: 10px 0; color: #94a3b8; font-size: 11px; font-weight: 800; border-bottom: 2px solid #000000; text-transform: uppercase; letter-spacing: 0.5px;">Apodo / Liga</td>
+                <td style="padding: 10px 0; color: #e2b13c; font-size: 13px; font-weight: 900; text-align: right; border-bottom: 2px solid #000000;">${apodo || 'Sin apodo'}</td>
+              </tr>
+              <tr>
+                <td style="padding: 10px 0; color: #94a3b8; font-size: 11px; font-weight: 800; border-bottom: 2px solid #000000; text-transform: uppercase; letter-spacing: 0.5px;">Correo Electrónico</td>
+                <td style="padding: 10px 0; color: #10b981; font-size: 13px; font-weight: 800; text-align: right; border-bottom: 2px solid #000000;">${email}</td>
+              </tr>
+              <tr>
+                <td style="padding: 10px 0; color: #94a3b8; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Fecha y Hora</td>
+                <td style="padding: 10px 0; color: #ffffff; font-size: 12px; text-align: right;">${formattedDate} (CET)</td>
+              </tr>
+            </table>
+          </div>
+
+          <!-- Button -->
+          <div style="text-align: center; margin-top: 32px; margin-bottom: 8px;">
+            <a href="https://www.castigosfantasy.com/" style="display: inline-block; background-color: #10b981; color: #000000; text-decoration: none; padding: 14px 28px; font-size: 14px; font-weight: 900; border: 3px solid #000000; box-shadow: 4px 4px 0px #000000; text-transform: uppercase; letter-spacing: 0.5px;">
+              Acceder a la Plataforma
+            </a>
+          </div>
         </div>
-        <div style="text-align: center; margin-top: 32px;">
-          <a href="https://www.castigosfantasy.com/" style="display: inline-block; background-color: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2); color: #10b981; text-decoration: none; padding: 12px 24px; font-size: 13px; font-weight: 700; border-radius: 8px;">Acceder a la Plataforma</a>
-        </div>
+
       </div>
     </div>
   `;
