@@ -56,7 +56,6 @@ export function renderSelectLeague(container, callbacks) {
           id: m.leagues.id,
           name: m.leagues.name,
           inviteCode: m.leagues.invite_code,
-          features: m.leagues.features || 'both',
           isAdmin: m.is_admin
         }));
 
@@ -97,9 +96,6 @@ export function renderSelectLeague(container, callbacks) {
               <div style="display: flex; flex-direction: column; gap: 0.75rem;">
                 ${leagues.map(l => {
                   const isActive = l.id === activeLeagueId;
-                  let featuresDesc = 'Ruleta + Deudas';
-                  if (l.features === 'wheel') featuresDesc = 'Solo Ruleta';
-                  if (l.features === 'money') featuresDesc = 'Solo Deudas';
 
                   return `
                     <div class="leaderboard-item ${isActive ? 'active-league-row' : ''}" style="
@@ -125,12 +121,10 @@ export function renderSelectLeague(container, callbacks) {
                           <span>Código: <strong style="color: var(--text-light);">${l.inviteCode}</strong></span>
                           <span>•</span>
                           <span>Rol: <strong>${l.isAdmin ? 'Administrador' : 'Miembro'}</strong></span>
-                          <span>•</span>
-                          <span class="gradient-text-gold" style="font-weight: 700;">${featuresDesc}</span>
                         </div>
                       </div>
                       
-                      <button class="btn-select-league btn-primary" data-id="${l.id}" data-name="${l.name}" data-features="${l.features}" style="
+                      <button class="btn-select-league btn-primary" data-id="${l.id}" data-name="${l.name}" style="
                         width: auto; 
                         padding: 0.55rem 1.25rem; 
                         font-size: 0.85rem; 
@@ -199,14 +193,7 @@ export function renderSelectLeague(container, callbacks) {
                     <label for="new-league-name">Nombre de la Liga (Ej: Liga Los Troncos)</label>
                     <input type="text" id="new-league-name" class="input-field" placeholder="Nombre de tu liga fantasy" required />
                   </div>
-                  <div class="form-group" style="margin-bottom: 0.25rem;">
-                    <label for="new-league-features">Funcionalidades Activas</label>
-                    <select id="new-league-features" class="input-field">
-                      <option value="both">Ruleta + Registro de Deudas (Ambos)</option>
-                      <option value="wheel">Solo Ruleta de Castigos (Sin deudas)</option>
-                      <option value="money">Solo Registro de Deudas/Bote (Sin ruleta)</option>
-                    </select>
-                  </div>
+
                   <button type="submit" class="btn-primary" id="btn-create" style="font-weight: 700;">Crear Liga</button>
                 </form>
               </div>
@@ -221,11 +208,9 @@ export function renderSelectLeague(container, callbacks) {
       btn.addEventListener('click', () => {
         const id = btn.dataset.id;
         const name = btn.dataset.name;
-        const features = btn.dataset.features;
 
         localStorage.setItem('CF_ACTIVE_LEAGUE_ID', id);
         localStorage.setItem('CF_ACTIVE_LEAGUE_NAME', name);
-        localStorage.setItem('CF_CURRENT_LEAGUE_FEATURES', features);
 
         callbacks.showToast(`Has seleccionado la liga "${name}"`, 'success');
         callbacks.onNavigate('menu-liga');
@@ -324,7 +309,6 @@ export function renderSelectLeague(container, callbacks) {
         // Set joined league as active
         localStorage.setItem('CF_ACTIVE_LEAGUE_ID', targetLeague.id);
         localStorage.setItem('CF_ACTIVE_LEAGUE_NAME', targetLeague.name);
-        localStorage.setItem('CF_CURRENT_LEAGUE_FEATURES', targetLeague.features || 'both');
 
         callbacks.onNavigate('menu-liga');
       } catch (err) {
@@ -341,7 +325,6 @@ export function renderSelectLeague(container, callbacks) {
       e.preventDefault();
       const btn = createForm.querySelector('#btn-create');
       const name = createForm.querySelector('#new-league-name').value.trim();
-      const features = createForm.querySelector('#new-league-features').value;
       const inviteCode = generateInviteCode();
 
       btn.disabled = true;
@@ -356,8 +339,7 @@ export function renderSelectLeague(container, callbacks) {
           .insert({
             name,
             invite_code: inviteCode,
-            created_by: currentUser.id,
-            features: features
+            created_by: currentUser.id
           })
           .select()
           .single();
@@ -380,7 +362,6 @@ export function renderSelectLeague(container, callbacks) {
         // Set created league as active
         localStorage.setItem('CF_ACTIVE_LEAGUE_ID', newLeague.id);
         localStorage.setItem('CF_ACTIVE_LEAGUE_NAME', newLeague.name);
-        localStorage.setItem('CF_CURRENT_LEAGUE_FEATURES', newLeague.features || 'both');
 
         callbacks.onNavigate('menu-liga');
       } catch (err) {

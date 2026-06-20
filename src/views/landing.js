@@ -5,9 +5,7 @@
  * @param {Function} callbacks.onNavigate 
  */
 export function renderLanding(container, callbacks) {
-  // Check active features from localStorage (same as main.js)
-  const activeFeatures = localStorage.getItem('CF_CURRENT_LEAGUE_FEATURES') || 'both';
-  const showRuleta = activeFeatures !== 'money';
+  const showRuleta = true;
 
   // Render HTML structure matching the Stitch design
   container.innerHTML = `
@@ -54,36 +52,22 @@ export function renderLanding(container, callbacks) {
             </ul>
           </article>
 
-          ${showRuleta ? `
-            <!-- Ruleta de Castigos Card -->
-            <article class="brutalist-card cursor-pointer" data-view-id="ruleta" style="background: var(--primary-green); color: #000000; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
-              <h2 style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 900; text-transform: uppercase; margin-bottom: 1.5rem; line-height: 1;">Ruleta de Sentencias</h2>
-              
-              <!-- Mock Wheel Graphic -->
-              <div style="width: 120px; height: 120px; border-radius: 50%; border: 6px solid #000000; margin-bottom: 1.5rem; position: relative; overflow: hidden; background: #ffffff; box-shadow: inset 0px 0px 10px rgba(0,0,0,0.5);">
-                <div style="position: absolute; inset: 0; background: var(--danger); clip-path: polygon(50% 50%, 100% 0, 100% 100%);"></div>
-                <div style="position: absolute; inset: 0; background: #ffe16d; clip-path: polygon(50% 50%, 0 100%, 0 0);"></div>
-                <div style="position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 4px; height: 20px; background: #000000; z-index: 20;"></div>
-                <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 10;">
-                  <span style="font-family: var(--font-display); font-size: 2.5rem; font-weight: 900; color: #000000; opacity: 0.25;">?</span>
-                </div>
+          <!-- Ruleta de Castigos Card -->
+          <article class="brutalist-card cursor-pointer" data-view-id="ruleta" style="background: var(--primary-green); color: #000000; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
+            <h2 style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 900; text-transform: uppercase; margin-bottom: 1.5rem; line-height: 1;">Ruleta de Sentencias</h2>
+            
+            <!-- Mock Wheel Graphic -->
+            <div style="width: 120px; height: 120px; border-radius: 50%; border: 6px solid #000000; margin-bottom: 1.5rem; position: relative; overflow: hidden; background: #ffffff; box-shadow: inset 0px 0px 10px rgba(0,0,0,0.5);">
+              <div style="position: absolute; inset: 0; background: var(--danger); clip-path: polygon(50% 50%, 100% 0, 100% 100%);"></div>
+              <div style="position: absolute; inset: 0; background: #ffe16d; clip-path: polygon(50% 50%, 0 100%, 0 0);"></div>
+              <div style="position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 4px; height: 20px; background: #000000; z-index: 20;"></div>
+              <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 10;">
+                <span style="font-family: var(--font-display); font-size: 2.5rem; font-weight: 900; color: #000000; opacity: 0.25;">?</span>
               </div>
+            </div>
 
-              <button class="brutalist-btn brutalist-btn-black" id="landing-ruleta-btn">GIRAR</button>
-            </article>
-          ` : `
-            <!-- El Bufón de la Corte Card (Takes Ruleta's spot if disabled) -->
-            <article class="brutalist-card cursor-pointer" data-view-id="bufon" style="display: flex; flex-direction: column; gap: 1rem;">
-              <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid #000000; padding-bottom: 0.75rem; margin-bottom: 0.5rem;">
-                <h2 style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 800; text-transform: uppercase;">El Bufón de la Corte</h2>
-                <span class="material-symbols-outlined" style="color: var(--accent); font-size: 2rem;">theater_comedy</span>
-              </div>
-              <p style="font-size: 0.95rem; color: var(--text-light); margin-bottom: 1.5rem; line-height: 1.4;">
-                La comunidad manda. Propón castigos graciosos para tus amigos, vota las ideas y condena al peor jugador.
-              </p>
-              <button class="brutalist-btn" id="landing-bufon-btn" style="margin-top: auto;">Proponer Castigo</button>
-            </article>
-          `}
+            <button class="brutalist-btn brutalist-btn-black" id="landing-ruleta-btn">GIRAR</button>
+          </article>
         </div>
 
         <!-- Grid Content: Row 2 (Full Width) -->
@@ -162,7 +146,6 @@ export function renderLanding(container, callbacks) {
           </article>
         </div>
 
-        ${showRuleta ? `
           <!-- Row 4 (Full Width): El Bufón (Only rendered if Ruleta is active, so we show all 5 modules) -->
           <article class="brutalist-card cursor-pointer" data-view-id="bufon" style="display: flex; flex-direction: column; gap: 1rem;">
             <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid #000000; padding-bottom: 0.75rem; margin-bottom: 0.5rem;">
@@ -174,7 +157,6 @@ export function renderLanding(container, callbacks) {
             </p>
             <button class="brutalist-btn brutalist-btn-secondary" id="landing-bufon-btn" style="width: auto; padding: 0.65rem 1.75rem; margin-top: 0.5rem; align-self: flex-start;">Proponer Castigo</button>
           </article>
-        ` : ''}
       </main>
 
       <!-- Columna derecha: PUBLICIDAD / ADVERTENCIAS -->

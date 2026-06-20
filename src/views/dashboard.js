@@ -90,9 +90,6 @@ export function renderDashboard(container, callbacks) {
       if (leagueErr) throw leagueErr;
       currentLeague = leagueData;
 
-      const features = currentLeague.features || 'both';
-      localStorage.setItem('CF_CURRENT_LEAGUE_FEATURES', features);
-
       // 5. Get members
       const { data: membersList, error: listErr } = await supabase
         .from('league_members')
@@ -131,7 +128,7 @@ export function renderDashboard(container, callbacks) {
   }
 
   function renderMainDashboard() {
-    const features = currentLeague.features || 'both';
+    const features = 'both';
 
     // 1. Calculate Leaderboard data (works for both Guest/Demo and Supabase)
     const leaderboard = members.map(m => {
@@ -147,11 +144,7 @@ export function renderDashboard(container, callbacks) {
       };
     });
 
-    if (features === 'wheel') {
-      leaderboard.sort((a, b) => b.countLast - a.countLast);
-    } else {
-      leaderboard.sort((a, b) => b.totalOwed - a.totalOwed || b.countLast - a.countLast);
-    }
+    leaderboard.sort((a, b) => b.totalOwed - a.totalOwed || b.countLast - a.countLast);
 
     // Get default next matchday number
     const maxMatchday = records.reduce((max, r) => r.matchday_number > max ? r.matchday_number : max, 0);
@@ -190,12 +183,12 @@ export function renderDashboard(container, callbacks) {
           </div>
         </div>
 
-        <div class="dashboard-grid" style="grid-template-columns: ${features === 'wheel' ? '1fr 1fr' : ''};">
+        <div class="dashboard-grid">
           <!-- Lista de Morosos -->
           <div class="card glass pitch-card" style="margin-bottom: 0;">
             <h2 class="card-title gradient-text-gold">💀 Lista de Morosos</h2>
             <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem;">
-              ${features === 'wheel' ? 'Ranking acumulado del que más veces ha quedado último.' : 'Ranking del que más debe al bote común y más veces ha sido último.'}
+              Ranking del que más debe al bote común y más veces ha sido último.
             </p>
             
             <div class="leaderboard-list">
@@ -210,11 +203,9 @@ export function renderDashboard(container, callbacks) {
                     <div class="leaderboard-name">${item.name}</div>
                     <div class="leaderboard-stats">Último puesto: <strong>${item.countLast}</strong> veces</div>
                   </div>
-                  ${features !== 'wheel' ? `
-                    <div class="leaderboard-debt">
-                      <div class="debt-amount">${item.totalOwed.toFixed(2)}€</div>
-                    </div>
-                  ` : ''}
+                  <div class="leaderboard-debt">
+                    <div class="debt-amount">${item.totalOwed.toFixed(2)}€</div>
+                  </div>
                 </div>
               `).join('')}
             </div>
@@ -224,23 +215,19 @@ export function renderDashboard(container, callbacks) {
           <div class="card glass" style="margin-bottom: 0;">
             <h2 class="card-title">💀 Registrar Último</h2>
             <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
-              ${features === 'wheel' ? 'Registra quién ha quedado último en esta jornada fantasy.' : 'Selecciona quién ha quedado último en esta jornada y cuánto debe al bote.'}
+              Selecciona quién ha quedado último en esta jornada y cuánto debe al bote.
             </p>
             
             <form id="record-loser-form">
-              <div style="display: grid; grid-template-columns: ${features === 'wheel' ? '1fr' : '1fr 1fr'}; gap: 0.75rem;">
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
                 <div class="form-group">
                   <label for="matchday-num">Jornada</label>
                   <input type="number" id="matchday-num" class="input-field" min="1" max="50" value="${nextMatchday}" required />
                 </div>
-                ${features !== 'wheel' ? `
-                  <div class="form-group">
-                    <label for="amount-owed">Deuda al Bote (€)</label>
-                    <input type="number" id="amount-owed" class="input-field" min="0" step="0.5" value="2.00" required />
-                  </div>
-                ` : `
-                  <input type="hidden" id="amount-owed" value="0" />
-                `}
+                <div class="form-group">
+                  <label for="amount-owed">Deuda al Bote (€)</label>
+                  <input type="number" id="amount-owed" class="input-field" min="0" step="0.5" value="2.00" required />
+                </div>
               </div>
 
               <div class="form-group">
@@ -288,10 +275,8 @@ export function renderDashboard(container, callbacks) {
             </div>
 
             <div style="margin-top: 2rem; display: flex; flex-direction: column; gap: 0.75rem;">
-              ${features !== 'money' ? `
-                <button class="btn-primary" id="go-to-wheel-btn">Girar Ruleta de Castigos</button>
-              ` : ''}
-              <button class="btn-secondary" id="stay-dashboard-btn">${features === 'money' ? 'Entendido' : 'Cerrar'}</button>
+              <button class="btn-primary" id="go-to-wheel-btn">Girar Ruleta de Castigos</button>
+              <button class="btn-secondary" id="stay-dashboard-btn">Cerrar</button>
             </div>
           </div>
         </div>
@@ -309,14 +294,6 @@ export function renderDashboard(container, callbacks) {
               <div class="form-group">
                 <label for="edit-league-name">Nombre de la Liga</label>
                 <input type="text" id="edit-league-name" class="input-field" value="${currentLeague.name}" required />
-              </div>
-              <div class="form-group">
-                <label for="edit-league-features">Funcionalidades Activas</label>
-                <select id="edit-league-features" class="input-field">
-                  <option value="both" ${features === 'both' ? 'selected' : ''}>Ruleta + Registro de Deudas (Ambos)</option>
-                  <option value="wheel" ${features === 'wheel' ? 'selected' : ''}>Solo Ruleta de Castigos (Sin deudas)</option>
-                  <option value="money" ${features === 'money' ? 'selected' : ''}>Solo Registro de Deudas/Bote (Sin ruleta)</option>
-                </select>
               </div>
               <button type="submit" class="btn-primary" id="btn-save-settings" style="margin-top: 1.5rem;">
                 Guardar Cambios
@@ -367,7 +344,6 @@ export function renderDashboard(container, callbacks) {
           e.preventDefault();
           const saveBtn = settingsForm.querySelector('#btn-save-settings');
           const newName = settingsForm.querySelector('#edit-league-name').value.trim();
-          const newFeatures = settingsForm.querySelector('#edit-league-features').value;
 
           saveBtn.disabled = true;
           saveBtn.innerHTML = '<span class="spinner"></span>';
@@ -376,48 +352,22 @@ export function renderDashboard(container, callbacks) {
             const { error } = await supabase
               .from('leagues')
               .update({
-                name: newName,
-                features: newFeatures
+                name: newName
               })
               .eq('id', currentLeague.id);
 
             if (error) throw error;
 
-            localStorage.setItem('CF_CURRENT_LEAGUE_FEATURES', newFeatures);
             callbacks.showToast('Configuración de liga actualizada', 'success');
             settingsModal.classList.remove('active');
             setTimeout(() => {
               window.location.reload();
             }, 500);
           } catch (err) {
-            // Fail-safe fallback if column 'features' doesn't exist
-            if (err.message && (err.message.includes('column') || err.message.includes('features') || err.code === '42703')) {
-              try {
-                const { error: nameErr } = await supabase
-                  .from('leagues')
-                  .update({
-                    name: newName
-                  })
-                  .eq('id', currentLeague.id);
-
-                if (nameErr) throw nameErr;
-                callbacks.showToast('Nombre guardado. El cambio de características requiere añadir la columna "features" de tipo text a la tabla leagues en Supabase.', 'success');
-                settingsModal.classList.remove('active');
-                setTimeout(() => {
-                  window.location.reload();
-                }, 2500);
-              } catch (retryErr) {
-                console.error(retryErr);
-                callbacks.showToast('Error al guardar cambios', 'error');
-                saveBtn.disabled = false;
-                saveBtn.innerHTML = 'Guardar Cambios';
-              }
-            } else {
-              console.error(err);
-              callbacks.showToast('Error al actualizar liga', 'error');
-              saveBtn.disabled = false;
-              saveBtn.innerHTML = 'Guardar Cambios';
-            }
+            console.error(err);
+            callbacks.showToast('Error al actualizar liga', 'error');
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = 'Guardar Cambios';
           }
         });
       }
@@ -577,7 +527,7 @@ export function renderDashboard(container, callbacks) {
       e.preventDefault();
       const btn = recordForm.querySelector('#btn-save-loser');
       const matchday = Number(recordForm.querySelector('#matchday-num').value);
-      const amount = features === 'wheel' ? 0 : Number(recordForm.querySelector('#amount-owed').value);
+      const amount = Number(recordForm.querySelector('#amount-owed').value);
       const loserId = recordForm.querySelector('#loser-select').value;
       
       if (!loserId) {
@@ -614,11 +564,7 @@ export function renderDashboard(container, callbacks) {
         lastRecordId = recordData.id;
         localStorage.setItem('CF_PENDING_RECORD_ID', lastRecordId);
 
-        if (features === 'wheel') {
-          modal.querySelector('#modal-desc').innerHTML = `¡Se ha registrado a <strong>${loserName}</strong> en la Lista de Morosos como el último de la <strong>Jornada ${matchday}</strong>!`;
-        } else {
-          modal.querySelector('#modal-desc').innerHTML = `¡Se ha guardado el registro de la <strong>Jornada ${matchday}</strong>!<br><strong>${loserName}</strong> suma <strong>${amount.toFixed(2)}€</strong> de deuda.`;
-        }
+        modal.querySelector('#modal-desc').innerHTML = `¡Se ha guardado el registro de la <strong>Jornada ${matchday}</strong>!<br><strong>${loserName}</strong> suma <strong>${amount.toFixed(2)}€</strong> de deuda.`;
         modal.querySelector('#modal-phrase').innerText = trashPhrase;
         modal.classList.add('active');
 
@@ -641,12 +587,10 @@ export function renderDashboard(container, callbacks) {
     container.querySelector('#close-modal-btn').addEventListener('click', closeModal);
     container.querySelector('#stay-dashboard-btn').addEventListener('click', closeModal);
     
-    if (features !== 'money') {
-      container.querySelector('#go-to-wheel-btn').addEventListener('click', () => {
-        modal.classList.remove('active');
-        callbacks.onNavigate('ruleta');
-      });
-    }
+    container.querySelector('#go-to-wheel-btn').addEventListener('click', () => {
+      modal.classList.remove('active');
+      callbacks.onNavigate('ruleta');
+    });
   }
 
   loadData();

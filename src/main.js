@@ -63,7 +63,6 @@ async function checkAuthAndRender() {
 }
 
 function renderMainLayout(isGuest) {
-  const activeFeatures = localStorage.getItem('CF_CURRENT_LEAGUE_FEATURES') || 'both';
   const notificationsCount = parseInt(localStorage.getItem('CF_COMMUNITY_NOTIFICATIONS_COUNT') || '0', 10);
 
   app.innerHTML = `

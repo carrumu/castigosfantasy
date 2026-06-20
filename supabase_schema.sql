@@ -33,7 +33,6 @@ CREATE TABLE IF NOT EXISTS public.leagues (
   name text NOT NULL,
   invite_code text NOT NULL UNIQUE,
   created_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,
-  features text NOT NULL DEFAULT 'both',
   created_at timestamp with time zone NOT NULL DEFAULT timezone('utc'::text, now())
 );
 

@@ -18,7 +18,6 @@ export function renderLeagueHub(container, callbacks) {
 
   const leagueId = localStorage.getItem('CF_ACTIVE_LEAGUE_ID');
   const leagueName = localStorage.getItem('CF_ACTIVE_LEAGUE_NAME') || 'Mi Liga';
-  const leagueFeatures = localStorage.getItem('CF_CURRENT_LEAGUE_FEATURES') || 'both';
 
   if (!leagueId) {
     callbacks.showToast('Selecciona una liga primero', 'info');
@@ -61,14 +60,13 @@ export function renderLeagueHub(container, callbacks) {
         </div>
 
         <!-- Card Ruleta de Castigos -->
-        <div id="card-go-roulette" class="card glass ${leagueFeatures === 'money' ? 'disabled-card' : ''}" style="
-          cursor: ${leagueFeatures === 'money' ? 'not-allowed' : 'pointer'};
-          opacity: ${leagueFeatures === 'money' ? '0.5' : '1'};
+        <div id="card-go-roulette" class="card glass" style="
+          cursor: pointer;
           display: flex;
           flex-direction: column;
           justify-content: space-between;
           border-radius: 16px;
-          border: 1.5px solid ${leagueFeatures === 'money' ? 'var(--border-color)' : 'var(--border-color-glow)'};
+          border: 1.5px solid var(--border-color-glow);
           padding: 2rem 1.5rem;
           transition: all var(--transition-fast);
         ">
@@ -76,19 +74,17 @@ export function renderLeagueHub(container, callbacks) {
             <div style="font-size: 3rem; margin-bottom: 1rem; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.25));">🎯</div>
             <h2 class="card-title" style="font-size: 1.5rem; font-weight: 900; margin-bottom: 0.75rem; color: var(--primary);">Ruleta de Castigos</h2>
             <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 1.5rem;">
-              ${leagueFeatures === 'money' 
-                ? 'Desactivado. La ruleta de castigos no está activa en la configuración actual de esta liga.' 
-                : 'Girar la ruleta para asignar castigos aleatorios a los perdedores y gestionar la lista oficial de retos de tu comunidad.'}
+              Girar la ruleta para asignar castigos aleatorios a los perdedores y gestionar la lista oficial de retos de tu comunidad.
             </p>
           </div>
           <button class="btn-secondary" style="
             pointer-events: none;
             font-weight: 700;
             width: 100%;
-            border-color: ${leagueFeatures === 'money' ? 'var(--border-color)' : 'var(--primary)'};
-            color: ${leagueFeatures === 'money' ? 'var(--text-muted)' : 'var(--text-light)'};
+            border-color: var(--primary);
+            color: var(--text-light);
           ">
-            ${leagueFeatures === 'money' ? 'No disponible' : 'Ir a la Ruleta'}
+            Ir a la Ruleta
           </button>
         </div>
 
@@ -128,7 +124,7 @@ export function renderLeagueHub(container, callbacks) {
     });
   }
 
-  if (cardRoulette && leagueFeatures !== 'money') {
+  if (cardRoulette) {
     cardRoulette.addEventListener('mouseenter', () => {
       cardRoulette.style.transform = 'translateY(-4px)';
       cardRoulette.style.borderColor = 'var(--primary)';
