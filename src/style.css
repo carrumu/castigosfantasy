@@ -170,6 +170,7 @@ body.light-theme {
 .gradient-text-gold {
   background: linear-gradient(135deg, #fecdd3 0%, var(--accent-gold) 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
@@ -189,6 +190,7 @@ body.light-theme {
   background: linear-gradient(270deg, #c7d2fe, var(--primary-green), #818cf8, #a5b4fc, #c7d2fe);
   background-size: 400% 400%;
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   animation: magmaGradient 8s ease infinite;
 }
