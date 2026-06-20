@@ -2300,3 +2300,389 @@ body {
 .streak-fire:hover {
   transform: scale(1.35);
 }
+
+/* League Options Actions */
+.btn-league-danger-outline {
+  background: rgba(211, 0, 23, 0.05);
+  border: 1.5px solid var(--danger);
+  color: #f87171;
+  font-weight: 800;
+  width: 100%;
+  padding: 0.8rem 1.25rem;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-sans);
+  transition: all var(--transition-fast);
+}
+
+.btn-league-danger-outline:hover {
+  background: rgba(211, 0, 23, 0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(211, 0, 23, 0.1);
+}
+
+.btn-league-danger-solid {
+  background: var(--danger);
+  border: 1.5px solid var(--danger);
+  color: #ffffff;
+  font-weight: 800;
+  width: 100%;
+  padding: 0.8rem 1.25rem;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-sans);
+  transition: all var(--transition-fast);
+  box-shadow: 0 4px 12px rgba(211, 0, 23, 0.2);
+}
+
+.btn-league-danger-solid:hover {
+  filter: brightness(1.15);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(211, 0, 23, 0.35);
+}
+
+/* Empty State Styling */
+.empty-state-container {
+  text-align: center;
+  padding: 3.5rem 2rem;
+  border: 1.5px dashed var(--border-color-glow);
+  border-radius: 16px;
+  background: rgba(222, 237, 0, 0.01);
+  box-shadow: inset 0 0 24px rgba(222, 237, 0, 0.01);
+  transition: all var(--transition-normal);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.empty-state-container:hover {
+  border-color: var(--accent);
+  background: rgba(222, 237, 0, 0.02);
+  box-shadow: inset 0 0 30px rgba(222, 237, 0, 0.02), 0 0 15px rgba(222, 237, 0, 0.05);
+}
+
+.empty-state-svg {
+  filter: drop-shadow(0 0 8px var(--accent-glow));
+  animation: neonPulse 2.5s infinite ease-in-out;
+  margin-bottom: 1.25rem;
+}
+
+@keyframes neonPulse {
+  0% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 6px var(--accent-glow));
+  }
+  50% {
+    transform: scale(1.05);
+    filter: drop-shadow(0 0 14px rgba(222, 237, 0, 0.4));
+  }
+  100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 6px var(--accent-glow));
+  }
+}
+
+/* Brutalist League Action Buttons Grid */
+.league-actions-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  padding-bottom: 1rem;
+}
+
+.btn-league-action {
+  padding: 1.5rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  outline: none;
+  text-align: center;
+}
+
+.btn-league-action span {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+}
+
+@media (max-width: 480px) {
+  .btn-league-action {
+    padding: 1.1rem 0.75rem;
+  }
+  .btn-league-action span {
+    font-size: 0.85rem;
+  }
+}
+
+/* --- Brutalist League Item Row Styling --- */
+.league-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  background-color: var(--bg-card);
+  border: 3px solid #000000;
+  box-shadow: 4px 4px 0px #000000;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  margin-bottom: 0.75rem;
+}
+
+.league-item:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px #000000;
+}
+
+/* Active League Highlight */
+.league-item.is-active {
+  background-color: #242423;
+  border-color: #000000;
+  box-shadow: 4px 4px 0px var(--accent);
+}
+
+.league-item.is-active:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px var(--accent);
+}
+
+/* League Item Info */
+.league-item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.league-item-name {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 900;
+  color: var(--text-light);
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: -0.5px;
+}
+
+/* Metadata Row */
+.league-item-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.league-code-text {
+  color: var(--accent);
+  font-family: monospace;
+  font-size: 0.85rem;
+  background: #000000;
+  padding: 2px 6px;
+  border: 1.5px solid #000000;
+  border-radius: 4px;
+}
+
+.league-role-text {
+  color: var(--text-light);
+}
+
+.league-meta-separator {
+  color: rgba(255, 255, 255, 0.15);
+}
+
+/* Active Badge */
+.league-active-badge {
+  background-color: var(--accent);
+  color: #000000;
+  border: 2px solid #000000;
+  padding: 2px 8px;
+  font-size: 0.7rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-radius: 4px;
+  display: inline-block;
+  box-shadow: 2px 2px 0px #000000;
+}
+
+/* Selection Buttons */
+.btn-select-league {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: -0.5px;
+  padding: 0.6rem 1.5rem;
+  border: 3px solid #000000;
+  background-color: var(--bg-card);
+  color: var(--text-light);
+  cursor: pointer;
+  box-shadow: 4px 4px 0px #000000;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), background-color var(--transition-fast);
+  outline: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-select-league:hover {
+  background-color: #2a2a2a;
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px #000000;
+}
+
+.btn-select-league:active {
+  transform: translate(2px, 2px);
+  box-shadow: 0px 0px 0px #000000;
+}
+
+/* Active button state (Entrar) */
+.btn-select-league.is-active {
+  background-color: #10b981;
+  color: #000000;
+  box-shadow: 4px 4px 0px #000000;
+}
+
+.btn-select-league.is-active:hover {
+  background-color: #059669;
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px #000000;
+}
+
+.btn-select-league.is-active:active {
+  transform: translate(2px, 2px);
+  box-shadow: 0px 0px 0px #000000;
+}
+
+/* Responsive adjustment for league items */
+@media (max-width: 580px) {
+  .league-item {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+    gap: 1.25rem;
+    padding: 1.25rem;
+  }
+
+  .league-item-info {
+    align-items: center;
+  }
+
+  .league-item-info > div {
+    justify-content: center;
+  }
+
+  .league-item-meta {
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.5rem 0.75rem;
+  }
+
+  .btn-select-league {
+    width: 100%;
+    padding: 0.75rem 1.25rem;
+  }
+}
+
+/* --- 3-Dots Options Button --- */
+.btn-dots {
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid #000000;
+  background-color: var(--bg-card);
+  color: var(--text-light);
+  cursor: pointer;
+  box-shadow: 2px 2px 0px #000000;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), background-color var(--transition-fast);
+  outline: none;
+  border-radius: 4px;
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.btn-dots:hover {
+  background-color: #2a2a2a;
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0px #000000;
+}
+
+.btn-dots:active {
+  transform: translate(1px, 1px);
+  box-shadow: 0px 0px 0px #000000;
+}
+
+/* --- League Hub Card Styling --- */
+.hub-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background-color: var(--bg-card);
+  border: 3px solid #000000;
+  box-shadow: 6px 6px 0px #000000;
+  padding: 2rem 1.5rem;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
+  cursor: pointer;
+}
+
+.hub-card:hover {
+  transform: translate(-3px, -3px);
+  box-shadow: 9px 9px 0px var(--accent);
+  border-color: #000000;
+}
+
+/* Specific red shadow hover for debt list */
+.hub-card.debt-card:hover {
+  box-shadow: 9px 9px 0px var(--danger);
+}
+
+.hub-card-badge {
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  display: inline-block;
+  margin-bottom: 1.25rem;
+  box-shadow: 1.5px 1.5px 0px #000000;
+  border: 1.5px solid #000000;
+}
+
+.hub-card-badge.classification {
+  background-color: var(--danger);
+  color: #ffffff;
+}
+
+.hub-card-badge.roulette {
+  background-color: var(--accent);
+  color: #000000;
+}
+
+.hub-card-badge.bufon {
+  background-color: var(--accent);
+  color: #000000;
+}
+
+@media (max-width: 580px) {
+  .hub-card {
+    padding: 1.5rem 1.25rem;
+  }
+}

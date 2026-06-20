@@ -1,5 +1,6 @@
 import { supabase } from '../supabase';
 import { getRandomPhrase } from '../utils/phrases';
+import { openLeagueSettings } from '../utils/league-options';
 
 /**
  * Renders the Main Dashboard (Leaderboard, Registering matchday loser).
@@ -16,6 +17,7 @@ export function renderDashboard(container, callbacks) {
   let members = [];
   let records = [];
   let isAdmin = false;
+  let currentUserId = null;
 
   // Default Mock Data for Guest / Demo Mode
   const DEFAULT_DEMO_MEMBERS = [
@@ -44,6 +46,7 @@ export function renderDashboard(container, callbacks) {
 
     try {
       const currentUser = supabase.auth.user ? supabase.auth.user() : (await supabase.auth.getUser()).data.user;
+      currentUserId = currentUser ? currentUser.id : null;
 
       // 1. Fetch user's leagues memberships
       const { data: userLeagues, error: leaguesErr } = await supabase
@@ -159,10 +162,12 @@ export function renderDashboard(container, callbacks) {
             <p style="font-size: 0.85rem; color: var(--text-muted);">
               Código de Invitación: <strong style="color: var(--accent-gold); cursor: pointer;" id="copy-invite-code" title="Copiar código">${currentLeague.invite_code} (Copiar)</strong>
             </p>
-          </div>
-         <div style="display: flex; gap: 0.5rem; align-items: center;">
+                    <div style="display: flex; gap: 0.75rem; align-items: center;">
             ${!isGuest ? `
-              <button class="header-action-btn btn-secondary" id="btn-back-to-hub" title="Volver al Menú" style="padding: 0.65rem 1rem; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 0.4rem; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color);">
+              <button class="btn-select-league is-active" id="btn-league-settings" title="Opciones de Liga" style="width: auto; padding: 0.65rem 1rem; font-size: 0.85rem; font-weight: 900; display: flex; align-items: center; gap: 0.4rem;">
+                Opciones Liga
+              </button>
+              <button class="btn-select-league" id="btn-back-to-hub" title="Volver al Menú" style="width: auto; padding: 0.65rem 1rem; font-size: 0.85rem; font-weight: 900; display: flex; align-items: center; gap: 0.4rem;">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                   <line x1="19" y1="12" x2="5" y2="12"></line>
                   <polyline points="12 19 5 12 12 5"></polyline>
@@ -175,12 +180,7 @@ export function renderDashboard(container, callbacks) {
                 Cambiar Liga
               </button>
             ` : ''}
-            ${(isGuest || isAdmin) ? `
-              <button class="header-action-btn" id="btn-league-settings" title="Configurar Liga" style="padding: 0.65rem 1rem; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 0.4rem; border-color: var(--border-color-glow);">
-                Ajustar Liga
-              </button>
-            ` : ''}
-          </div>
+          </div>    </div>
         </div>
 
         <div class="dashboard-grid">
@@ -282,26 +282,7 @@ export function renderDashboard(container, callbacks) {
         </div>
       </div>
 
-      <!-- Modal de Ajustes de la Liga (Admin) -->
-      <div class="modal-overlay" id="league-settings-modal">
-        <div class="modal-content glass">
-          <div class="modal-header">
-            <h3 class="gradient-text-gold" style="font-weight: 800; font-size: 1.25rem;">Ajustes de la Liga</h3>
-            <button class="modal-close" id="close-settings-modal-btn">✕</button>
-          </div>
-          <div class="modal-body">
-            <form id="league-settings-form">
-              <div class="form-group">
-                <label for="edit-league-name">Nombre de la Liga</label>
-                <input type="text" id="edit-league-name" class="input-field" value="${currentLeague.name}" required />
-              </div>
-              <button type="submit" class="btn-primary" id="btn-save-settings" style="margin-top: 1.5rem;">
-                Guardar Cambios
-              </button>
-            </form>
-          </div>
-        </div>
-      </div>
+
     `;
 
     // Hook Copy Invite Code
@@ -324,53 +305,10 @@ export function renderDashboard(container, callbacks) {
 
     // Hook settings modal triggers
     const settingsBtn = container.querySelector('#btn-league-settings');
-    const settingsModal = container.querySelector('#league-settings-modal');
-
-    if (settingsBtn && settingsModal) {
+    if (settingsBtn) {
       settingsBtn.addEventListener('click', () => {
-        settingsModal.classList.add('active');
+        openLeagueSettings(currentLeague.id, callbacks);
       });
-
-      const closeSettingsBtn = container.querySelector('#close-settings-modal-btn');
-      if (closeSettingsBtn) {
-        closeSettingsBtn.addEventListener('click', () => {
-          settingsModal.classList.remove('active');
-        });
-      }
-
-      const settingsForm = container.querySelector('#league-settings-form');
-      if (settingsForm) {
-        settingsForm.addEventListener('submit', async (e) => {
-          e.preventDefault();
-          const saveBtn = settingsForm.querySelector('#btn-save-settings');
-          const newName = settingsForm.querySelector('#edit-league-name').value.trim();
-
-          saveBtn.disabled = true;
-          saveBtn.innerHTML = '<span class="spinner"></span>';
-
-          try {
-            const { error } = await supabase
-              .from('leagues')
-              .update({
-                name: newName
-              })
-              .eq('id', currentLeague.id);
-
-            if (error) throw error;
-
-            callbacks.showToast('Configuración de liga actualizada', 'success');
-            settingsModal.classList.remove('active');
-            setTimeout(() => {
-              window.location.reload();
-            }, 500);
-          } catch (err) {
-            console.error(err);
-            callbacks.showToast('Error al actualizar liga', 'error');
-            saveBtn.disabled = false;
-            saveBtn.innerHTML = 'Guardar Cambios';
-          }
-        });
-      }
     }
 
     // Hook Record Loser Form
