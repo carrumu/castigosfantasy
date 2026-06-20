@@ -97,7 +97,7 @@ export function renderLanding(container, callbacks) {
               Sobrevive a la "Semana Infernal" sin usar a tu mariscal de campo titular. Si pierdes, te enfrentas al castigo supremo.
             </p>
             <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-              <button class="brutalist-btn" style="width: auto; padding: 0.65rem 1.75rem;" id="landing-retos-btn-accept">Aceptar Reto</button>
+              <button class="brutalist-btn" style="width: auto; padding: 0.65rem 1.75rem;" id="landing-retos-btn-accept">Votar</button>
               <button class="brutalist-btn brutalist-btn-secondary" style="width: auto; padding: 0.65rem 1.75rem;" id="landing-retos-btn-details">Ver Detalles</button>
             </div>
           </div>
