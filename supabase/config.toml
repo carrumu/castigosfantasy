@@ -248,7 +248,7 @@ otp_expiry = 3600
 # subject = "You have been invited"
 # content_path = "./supabase/templates/invite.html"
 
-[auth.email.template.signup]
+[auth.email.template.confirmation]
 subject = "Confirma tu cuenta en CastigoFantasy"
 content_path = "./supabase/templates/confirm_signup.html"
 
