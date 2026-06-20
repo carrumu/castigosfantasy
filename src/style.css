@@ -1083,29 +1083,39 @@ body {
 /* Color states */
 .wordle-cell.correct {
   background-color: #22c55e !important; /* Pure Green */
-  border-color: #22c55e !important;
+  border: 3px solid #000000 !important;
+  box-shadow: 3px 3px 0px #000000 !important;
   color: #fff !important;
 }
 
 .wordle-cell.present {
   background-color: #deed00 !important; /* Neon Yellow/Gold */
-  border-color: #deed00 !important;
+  border: 3px solid #000000 !important;
+  box-shadow: 3px 3px 0px #000000 !important;
   color: #000000 !important; /* Dark text for contrast */
 }
 
 .wordle-cell.absent {
-  background-color: #222222 !important; /* Neutral Dark Grey */
-  border-color: #222222 !important;
-  color: #555555 !important;
+  background-color: #333333 !important; /* Neutral Grey */
+  border: 3px solid #000000 !important;
+  box-shadow: 3px 3px 0px #000000 !important;
+  color: #aaaaaa !important; /* Clearer contrast to avoid feeling sunken */
 }
 
 /* Virtual Keyboard hover/active styles */
+.keyboard-key {
+  border: 2px solid #000000 !important;
+  box-shadow: 2px 2px 0px #000000 !important;
+  transition: transform 0.05s ease, box-shadow 0.05s ease, background-color var(--transition-fast) !important;
+}
+
 .keyboard-key:hover {
   filter: brightness(1.15);
 }
 
 .keyboard-key:active {
-  transform: scale(0.95);
+  transform: translate(1.5px, 1.5px) !important;
+  box-shadow: 0.5px 0.5px 0px #000000 !important;
 }
 
 /* Ensure letters in keyboard match color status correctly */
@@ -2042,7 +2052,6 @@ body {
   }
 }
 
-/* Brutalist Cards and Sections */
 .brutalist-card {
   background: var(--bg-card);
   border: 4px solid #000000;
@@ -2050,12 +2059,11 @@ body {
   padding: 2rem;
   position: relative;
   overflow: hidden;
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast), background-color var(--transition-fast);
 }
 
 .brutalist-card:hover {
-  box-shadow: 0px 0px 0px 0px #000000;
-  transform: translate(8px, 8px);
+  border-color: var(--accent);
 }
 
 .brutalist-hero {
@@ -2219,8 +2227,9 @@ body {
 
 .wordle-cell-mock {
   aspect-ratio: 1;
-  background: var(--bg-obsidian);
+  background: var(--bg-card);
   border: 3px solid #000000;
+  box-shadow: 2px 2px 0px #000000;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2231,13 +2240,13 @@ body {
 }
 
 .wordle-cell-mock.correct {
-  background: var(--primary-green);
-  color: #000000;
+  background: var(--primary-green) !important;
+  color: #000000 !important;
 }
 
 .wordle-cell-mock.present {
-  background: var(--danger);
-  color: #ffffff;
+  background: var(--danger) !important;
+  color: #ffffff !important;
 }
 
 .keyboard-row-mock {
@@ -2283,7 +2292,7 @@ body {
     box-shadow: 4px 4px 0px 0px #000000;
     align-items: center;
     justify-content: space-around;
-    padding: 0 8px;
+    padding: 0 4px;
     z-index: 9999;
   }
   
@@ -2296,25 +2305,31 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 6px 12px;
+    padding: 4px 2px;
     cursor: pointer;
     transition: all var(--transition-fast);
     flex: 1;
-    max-width: 80px;
-    height: 52px;
+    min-width: 0;
+    max-width: none;
+    height: 54px;
   }
   
   .mobile-nav-item .material-symbols-outlined {
-    font-size: 22px;
-    margin-bottom: 2px;
+    font-size: 20px;
+    margin-bottom: 1px;
   }
   
   .mobile-nav-item .mobile-nav-label {
     font-family: var(--font-sans);
     font-weight: 800;
-    font-size: 9px;
-    letter-spacing: 0.5px;
+    font-size: 8px;
+    letter-spacing: 0.2px;
     text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+    text-align: center;
   }
   
   .mobile-nav-item.active {

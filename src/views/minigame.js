@@ -656,10 +656,10 @@ export function renderMinigame(container, callbacks) {
                     cellClass = char ? "pop" : "empty";
                   }
 
-                  return `
+                   return `
                     <div class="wordle-cell ${cellClass}" style="
                       aspect-ratio: 1; 
-                      border: 2px solid ${char ? 'var(--border-color-glow)' : 'var(--border-color)'};
+                      border: 3px solid ${char ? 'var(--accent)' : '#000000'};
                       border-radius: 8px;
                       display: flex;
                       align-items: center;
@@ -667,9 +667,11 @@ export function renderMinigame(container, callbacks) {
                       font-size: calc(1rem + 0.5vw);
                       font-weight: 800;
                       text-transform: uppercase;
-                      background: rgba(255, 255, 255, 0.03);
+                      background: var(--bg-card);
                       user-select: none;
-                      transition: border-color 0.1s ease;
+                      transition: border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+                      transform: ${char && !isFinished ? 'translate(-2px, -2px)' : 'none'};
+                      box-shadow: ${char && !isFinished ? '5px 5px 0px #000000' : '3px 3px 0px #000000'};
                     ">${char}</div>
                   `;
                 }).join('')}
@@ -705,9 +707,8 @@ export function renderMinigame(container, callbacks) {
                   <button class="keyboard-key ${state}" data-key="${key}" style="
                     flex-grow: ${isSpecial ? 1.5 : 1};
                     flex-shrink: 0;
-                    height: 48px;
+                    height: 55px;
                     border-radius: 6px;
-                    border: none;
                     background: ${
                       state === 'correct' ? '#22c55e' :
                       state === 'present' ? '#deed00' :
@@ -719,14 +720,13 @@ export function renderMinigame(container, callbacks) {
                       'var(--text-light)'
                     };
                     font-family: var(--font-sans);
-                    font-size: ${isSpecial ? '0.75rem' : '0.95rem'};
+                    font-size: ${isSpecial ? '0.8rem' : '1.05rem'};
                     font-weight: 800;
                     cursor: pointer;
                     display: flex;
                     align-items: center;
                     justify-content: center;
                     user-select: none;
-                    transition: background-color var(--transition-fast), transform 0.05s ease;
                   ">
                     ${key === 'BACK' ? '⌫' : key}
                   </button>
@@ -745,15 +745,6 @@ export function renderMinigame(container, callbacks) {
           btn.blur();
           const key = btn.dataset.key;
           handleKeyPress(key === 'BACK' ? 'BACKSPACE' : key);
-        });
-        btn.addEventListener('mousedown', () => {
-          btn.style.transform = 'scale(0.95)';
-        });
-        btn.addEventListener('mouseup', () => {
-          btn.style.transform = 'scale(1)';
-        });
-        btn.addEventListener('mouseleave', () => {
-          btn.style.transform = 'scale(1)';
         });
       });
     }

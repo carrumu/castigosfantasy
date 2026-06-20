@@ -1,3 +1,5 @@
+import { supabase, isConfigured } from '../supabase';
+
 /**
  * Renders the Weekly Challenges view (Reto Semanal).
  * Includes interactive voting, real-time countdown, completed dares history, and a trash-talk board.
@@ -17,11 +19,7 @@ export function renderChallenges(container, callbacks) {
     { id: 3, title: "El Cantante de WhatsApp", desc: "Grabar un audio de WhatsApp de al menos 1 minuto cantando a capela el himno del equipo del último clasificado con la mano en el pecho.", votes: 12 }
   ];
 
-  const DEFAULT_HISTORY = [
-    { matchday: 4, dare: "Llevar puesta una peluca de payaso durante toda la jornada de liga de fútbol en el bar." },
-    { matchday: 3, dare: "Cambiar la foto de perfil de WhatsApp por una foto graciosa de Torrente durante una semana completa." },
-    { matchday: 2, dare: "Hacer 50 flexiones seguidas grabadas en vídeo o pagar una ronda de cervezas a la liga." }
-  ];
+  const DEFAULT_HISTORY = [];
 
   // Load challenges from local storage or set defaults
   let challenges = JSON.parse(localStorage.getItem('CF_CHALLENGES_DATA') || 'null');
@@ -33,15 +31,38 @@ export function renderChallenges(container, callbacks) {
   // Check if the current user has already voted
   let userVotedId = localStorage.getItem('CF_USER_VOTED_CHALLENGE_ID') || null;
 
+  let currentMatchday = 5;
+  const activeLeagueId = localStorage.getItem('CF_ACTIVE_LEAGUE_ID');
+
+  async function loadMatchday() {
+    if (activeLeagueId && isConfigured) {
+      try {
+        const { data: league } = await supabase
+          .from('leagues')
+          .select('jester_current_matchday')
+          .eq('id', activeLeagueId)
+          .maybeSingle();
+        if (league && league.jester_current_matchday) {
+          currentMatchday = league.jester_current_matchday;
+        }
+      } catch (_) {}
+    }
+  }
+
   function renderView() {
     const totalVotes = challenges.reduce((sum, c) => sum + c.votes, 0);
 
     container.innerHTML = `
       <div class="container">
         <!-- Header -->
-        <div style="margin-bottom: 1.5rem;">
-          <h1 class="gradient-text-green" style="font-size: 1.65rem; font-weight: 900;">Reto Semanal</h1>
-          <p style="font-size: 0.85rem; color: var(--text-muted);">Decide democráticamente qué penitencia tendrá que realizar el último de esta jornada.</p>
+        <div style="margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <h1 style="font-size: 1.65rem; font-weight: 900; display: inline-flex; align-items: center; gap: 0.75rem; margin: 0;">
+              <span class="gradient-text-green">Reto Semanal</span>
+              <span class="brutalist-badge" style="transform: rotate(-2deg); font-size: 0.75rem; background: var(--accent); color: #000000; border-color: #000000;">JORNADA ${currentMatchday}</span>
+            </h1>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">Decide democráticamente qué penitencia tendrá que realizar el último de esta jornada.</p>
+          </div>
         </div>
 
         <div class="dashboard-grid">
@@ -134,14 +155,17 @@ export function renderChallenges(container, callbacks) {
             <div class="card glass">
               <h3 class="card-title" style="font-size: 1.05rem; margin-bottom: 1rem;">Historial de Penitencias</h3>
               <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-                ${DEFAULT_HISTORY.map(h => `
-                  <div style="border-left: 2.5px solid var(--accent); padding: 0.5rem 0.75rem; background: rgba(0,0,0,0.1); border-radius: 0 8px 8px 0; font-size: 0.8rem;">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.15rem;">
-                      <strong>Jornada ${h.matchday}</strong>
+                ${DEFAULT_HISTORY.length === 0 
+                  ? `<p style="color: var(--text-muted); font-size: 0.85rem; font-style: italic; padding: 0.5rem 0;">No hay retos pasados todavía.</p>`
+                  : DEFAULT_HISTORY.map(h => `
+                    <div style="border-left: 2.5px solid var(--accent); padding: 0.5rem 0.75rem; background: rgba(0,0,0,0.1); border-radius: 0 8px 8px 0; font-size: 0.8rem;">
+                      <div style="display: flex; justify-content: space-between; margin-bottom: 0.15rem;">
+                        <strong>Jornada ${h.matchday}</strong>
+                      </div>
+                      <p style="color: var(--text-muted); line-height: 1.3;">Reto: ${h.dare}</p>
                     </div>
-                    <p style="color: var(--text-muted); line-height: 1.3;">Reto: ${h.dare}</p>
-                  </div>
-                `).join('')}
+                  `).join('')
+                }
               </div>
             </div>
           </div>
@@ -233,5 +257,7 @@ export function renderChallenges(container, callbacks) {
     }, 1000);
   }
 
-  renderView();
+  loadMatchday().then(() => {
+    renderView();
+  });
 }

@@ -95,6 +95,7 @@ export function renderRoulette(container, callbacks) {
             amount_owed,
             loser_profile_id,
             profiles:loser_profile_id (
+              apodo,
               display_name
             )
           `)
@@ -106,7 +107,7 @@ export function renderRoulette(container, callbacks) {
             id: recData.id,
             matchday_number: recData.matchday_number,
             amount_owed: recData.amount_owed,
-            display_name: recData.profiles?.display_name || 'Entrenador'
+            display_name: recData.profiles?.apodo || recData.profiles?.display_name || 'Entrenador'
           };
         }
       }
@@ -147,6 +148,7 @@ export function renderRoulette(container, callbacks) {
           trash_talk_phrase,
           created_at,
           profiles:loser_profile_id (
+            apodo,
             display_name
           ),
           punishments:punishment_id (
@@ -279,7 +281,7 @@ export function renderRoulette(container, callbacks) {
                   ` : history.map(item => `
                     <div class="history-item">
                       <div class="history-header">
-                        <span class="history-loser">${escapeHTML(item.profiles?.display_name || 'Entrenador')}</span>
+                        <span class="history-loser">${escapeHTML(item.profiles?.apodo || item.profiles?.display_name || 'Entrenador')}</span>
                         <span class="history-date">Jornada ${item.matchday_number} ${item.amount_owed ? `(${item.amount_owed}€)` : ''}</span>
                       </div>
                       <div style="font-weight: 700; color: var(--accent); margin-top: 0.25rem; font-size: 0.95rem;">

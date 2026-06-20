@@ -100,6 +100,7 @@ export function renderDashboard(container, callbacks) {
           profile_id,
           is_admin,
           profiles (
+            apodo,
             display_name,
             avatar_url
           )
@@ -110,7 +111,7 @@ export function renderDashboard(container, callbacks) {
       
       members = membersList.map(m => ({
         profile_id: m.profile_id,
-        display_name: m.profiles?.display_name || 'Desconocido',
+        display_name: m.profiles?.apodo || m.profiles?.display_name || 'Desconocido',
         avatar_url: m.profiles?.avatar_url || ''
       }));
 
@@ -183,7 +184,7 @@ export function renderDashboard(container, callbacks) {
         <div class="dashboard-grid">
           <!-- Lista de Morosos -->
           <div class="card glass pitch-card" style="margin-bottom: 0;">
-            <h2 class="card-title gradient-text-gold">💀 Lista de Morosos</h2>
+            <h2 class="card-title gradient-text-gold">Lista de Morosos</h2>
             <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem;">
               Ranking del que más debe al bote común y más veces ha sido último.
             </p>
@@ -210,7 +211,7 @@ export function renderDashboard(container, callbacks) {
 
           <!-- Registrar Último de la Jornada Form -->
           <div class="card glass" style="margin-bottom: 0;">
-            <h2 class="card-title">💀 Registrar Último</h2>
+            <h2 class="card-title">Registrar Último</h2>
             <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
               Selecciona quién ha quedado último en esta jornada y cuánto debe al bote.
             </p>

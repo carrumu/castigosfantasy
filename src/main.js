@@ -236,7 +236,7 @@ function renderMainLayout(isGuest, currentUser = null) {
         </button>
         <button class="mobile-nav-item ${currentView === 'comunidad' || currentView === 'bufon' ? 'active' : ''}" data-nav="comunidad" title="Comunidad">
           <span class="material-symbols-outlined">groups</span>
-          <span class="mobile-nav-label">COMUNIDAD</span>
+          <span class="mobile-nav-label">COM.</span>
         </button>
         <button class="mobile-nav-item ${currentView === 'minijuego' ? 'active' : ''}" data-nav="minijuego" title="Juego interactivo">
           <span class="material-symbols-outlined">sports_esports</span>

@@ -26,7 +26,6 @@ export function renderComunidad(container, callbacks) {
           <div>
             <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid #000000; padding-bottom: 0.75rem; margin-bottom: 1rem;">
               <h2 style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 800; text-transform: uppercase;">El Bufón de la Corte</h2>
-              <span class="material-symbols-outlined" style="color: var(--accent); font-size: 2rem;">theater_comedy</span>
             </div>
             <p style="font-size: 0.95rem; color: var(--text-light); line-height: 1.5; margin-bottom: 1.5rem;">
               Vota democráticamente por el peor jugador de la jornada en tu liga y propone ideas divertidas de castigos para tus amigos.
