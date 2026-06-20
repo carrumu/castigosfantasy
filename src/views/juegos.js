@@ -5,6 +5,14 @@
  * @param {Function} callbacks.onNavigate
  */
 export function renderJuegos(container, callbacks) {
+  let currentStreak = 0;
+  try {
+    const stats = JSON.parse(localStorage.getItem('CF_WORDLE_STATS') || 'null');
+    if (stats && typeof stats.currentStreak === 'number') {
+      currentStreak = stats.currentStreak;
+    }
+  } catch (_) {}
+
   container.innerHTML = `
     <div class="container fade-in-up" style="max-width: 800px;">
 
@@ -23,7 +31,10 @@ export function renderJuegos(container, callbacks) {
       <div class="tools-grid">
 
         <!-- Adivina el Jugador Card (Active) -->
-        <button id="game-adivina-btn" class="tool-card-btn">
+        <button id="game-adivina-btn" class="tool-card-btn" style="position: relative;">
+          <div style="position: absolute; top: 1rem; right: 1rem; background: rgba(222, 237, 0, 0.12); border: 1.5px solid var(--accent); color: var(--accent); font-size: 1.05rem; font-weight: 800; padding: 0.3rem 0.8rem; border-radius: 20px; display: flex; align-items: center; gap: 0.45rem; box-shadow: 0 0 12px rgba(222,237,0,0.25); line-height: 1; font-family: var(--font-sans);">
+            <span>🔥</span><span>${currentStreak}</span>
+          </div>
           <div class="tool-card-inner">
             <div class="tool-card-icon-wrap" style="background: var(--accent); color: #000;">
               <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">

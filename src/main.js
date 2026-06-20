@@ -6,6 +6,7 @@ import { renderDashboard } from './views/dashboard';
 import { renderRoulette } from './views/roulette';
 import { renderChallenges } from './views/challenges';
 import { renderMinigame } from './views/minigame';
+import { renderJuegos } from './views/juegos';
 import { renderBufon } from './views/bufon';
 import { renderLanding } from './views/landing';
 import { renderSelectLeague } from './views/select-league';
@@ -115,9 +116,9 @@ function renderMainLayout(isGuest, currentUser = null) {
             </svg>
             <span>El Bufón</span>
           </button>
-          <button class="nav-item ${currentView === 'minijuego' ? 'active' : ''}" id="nav-minigame-btn">
+          <button class="nav-item ${currentView === 'juegos' || currentView === 'adivina-jugador' ? 'active' : ''}" id="nav-minigame-btn">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;"><line x1="6" y1="12" x2="10" y2="12"></line><line x1="8" y1="10" x2="8" y2="14"></line><line x1="15" y1="13" x2="15.01" y2="13"></line><line x1="18" y1="11" x2="18.01" y2="11"></line><rect x="2" y="6" width="20" height="12" rx="3"></rect></svg>
-            <span>Adivinar Jugador</span>
+            <span>Juegos</span>
           </button>
           <button class="nav-item ${currentView === 'generador' ? 'active' : ''}" id="nav-generator-btn">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;">
@@ -187,7 +188,7 @@ function renderMainLayout(isGuest, currentUser = null) {
             <button class="header-nav-link ${currentView === 'herramientas' || currentView === 'ruleta' || currentView === 'generador' ? 'active' : ''}" data-nav="herramientas">HERRAMIENTAS</button>
             <button class="header-nav-link ${currentView === 'retos' ? 'active' : ''}" data-nav="retos">RETOS</button>
             <button class="header-nav-link ${currentView === 'comunidad' || currentView === 'bufon' ? 'active' : ''}" data-nav="comunidad">COMUNIDAD</button>
-            <button class="header-nav-link ${currentView === 'minijuego' ? 'active' : ''}" data-nav="minijuego">JUEGO</button>
+            <button class="header-nav-link ${currentView === 'juegos' || currentView === 'adivina-jugador' ? 'active' : ''}" data-nav="juegos">JUEGOS</button>
             <button class="header-nav-link ${currentView === 'mis-ligas' ? 'active' : ''}" data-nav="mis-ligas">MIS LIGAS</button>
           </nav>
           
@@ -238,9 +239,9 @@ function renderMainLayout(isGuest, currentUser = null) {
           <span class="material-symbols-outlined">groups</span>
           <span class="mobile-nav-label">COM.</span>
         </button>
-        <button class="mobile-nav-item ${currentView === 'minijuego' ? 'active' : ''}" data-nav="minijuego" title="Juego interactivo">
+        <button class="mobile-nav-item ${currentView === 'juegos' || currentView === 'adivina-jugador' ? 'active' : ''}" data-nav="juegos" title="Juegos interactivos">
           <span class="material-symbols-outlined">sports_esports</span>
-          <span class="mobile-nav-label">JUEGO</span>
+          <span class="mobile-nav-label">JUEGOS</span>
         </button>
         <button class="mobile-nav-item ${currentView === 'mis-ligas' || currentView === 'menu-liga' ? 'active' : ''}" data-nav="mis-ligas" title="Mis ligas">
           <span class="material-symbols-outlined">shield</span>
@@ -323,7 +324,11 @@ function renderMainLayout(isGuest, currentUser = null) {
       onNavigate: navigate,
       showToast
     });
-  } else if (currentView === 'minijuego') {
+  } else if (currentView === 'juegos') {
+    renderJuegos(viewContainer, {
+      onNavigate: navigate
+    });
+  } else if (currentView === 'adivina-jugador') {
     renderMinigame(viewContainer, {
       showToast
     });
@@ -399,7 +404,7 @@ function renderMainLayout(isGuest, currentUser = null) {
   const minigameBtn = app.querySelector('#nav-minigame-btn');
   if (minigameBtn) {
     minigameBtn.addEventListener('click', () => {
-      navigate('minijuego');
+      navigate('juegos');
     });
   }
 

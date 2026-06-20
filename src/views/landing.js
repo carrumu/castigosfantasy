@@ -162,58 +162,68 @@ export function renderLanding(container, callbacks) {
           <!-- Grid Content: Row 1 -->
           <div class="brutalist-grid-2">
             <!-- Lista de Morosos Card -->
-            <article class="brutalist-card concrete-bg cursor-pointer" data-view-id="muro" id="morosos-card">
-              <div style="margin-bottom: 1.5rem;">
-                <h2 style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 800; text-transform: uppercase;">Lista de Morosos</h2>
-              </div>
-              ${hasLeagues ? `
-                <p style="font-size: 0.85rem; color: var(--text-light); margin-bottom: 1rem; font-weight: bold;">
-                  Liga Activa: ${escapeHTML(activeLeagueName)}
-                </p>
-                <ul style="list-style: none; display: flex; flex-direction: column; gap: 0.5rem; padding: 0; margin-bottom: 1rem;">
-                  ${leaderboard.length === 0 ? `
-                    <li style="text-align: center; color: var(--text-muted); font-size: 0.8rem; padding: 0.5rem 0;">No hay deudas registradas.</li>
-                  ` : leaderboard.map((item, idx) => `
-                    <li style="background: var(--bg-obsidian); display: flex; justify-content: space-between; padding: 0.65rem 0.85rem; border: 3px solid #000000; border-left: 6px solid ${idx === 0 ? 'var(--danger)' : 'var(--accent)'};">
-                      <span style="font-family: var(--font-sans); font-weight: 700; font-size: 0.8rem; color: var(--text-light);">${idx + 1}. ${escapeHTML(item.name)}</span>
-                      <span style="font-family: var(--font-sans); font-weight: 800; color: ${idx === 0 ? 'var(--danger)' : 'var(--text-light)'}; font-size: 0.8rem;">${item.totalOwed.toFixed(2)}€</span>
-                    </li>
-                  `).join('')}
-                </ul>
-                
-                ${leagues.length > 1 ? `
-                  <div style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 0.75rem; margin-top: 0.75rem;">
-                    <span style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 0.5rem; font-weight: 700; text-transform: uppercase;">Cambiar de Liga:</span>
-                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                      ${leagues.map(l => {
-                        if (l.id === activeLeagueId) return '';
-                        return `
-                          <button class="btn-switch-league-landing" data-id="${l.id}" data-name="${l.name}" style="
-                            background: rgba(255,255,255,0.03);
-                            color: var(--text-light);
-                            border: 1px solid var(--border-color);
-                            font-size: 0.7rem;
-                            padding: 0.3rem 0.6rem;
-                            border-radius: 4px;
-                            cursor: pointer;
-                            font-weight: 600;
-                            transition: var(--transition-fast);
-                          ">${escapeHTML(l.name)}</button>
-                        `;
-                      }).join('')}
-                    </div>
-                  </div>
-                ` : ''}
-              ` : `
-                <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 1.25rem;">
-                  Sigue el saldo del bote común, las deudas de cada jornada y el historial de castigos de tu liga.
-                </p>
-                <div style="margin-top: 1.5rem; text-align: center; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 1.5rem;">
-                  <button class="brutalist-btn" id="landing-join-league-btn" style="font-size: 0.8rem; width: 100%;">
-                    Crear o Unirse a Liga
-                  </button>
+            <article class="brutalist-card concrete-bg" id="morosos-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+              <div>
+                <div style="margin-bottom: 1.5rem;">
+                  <h2 style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 800; text-transform: uppercase;">Lista de Morosos</h2>
                 </div>
-              `}
+                ${hasLeagues ? `
+                  <p style="font-size: 0.85rem; color: var(--text-light); margin-bottom: 1rem; font-weight: bold;">
+                    Liga Activa: ${escapeHTML(activeLeagueName)}
+                  </p>
+                  <ul style="list-style: none; display: flex; flex-direction: column; gap: 0.5rem; padding: 0; margin-bottom: 1rem;">
+                    ${leaderboard.length === 0 ? `
+                      <li style="text-align: center; color: var(--text-muted); font-size: 0.8rem; padding: 0.5rem 0;">No hay deudas registradas.</li>
+                    ` : leaderboard.map((item, idx) => `
+                      <li style="background: var(--bg-obsidian); display: flex; justify-content: space-between; padding: 0.65rem 0.85rem; border: 3px solid #000000; border-left: 6px solid ${idx === 0 ? 'var(--danger)' : 'var(--accent)'};">
+                        <span style="font-family: var(--font-sans); font-weight: 700; font-size: 0.8rem; color: var(--text-light);">${idx + 1}. ${escapeHTML(item.name)}</span>
+                        <span style="font-family: var(--font-sans); font-weight: 800; color: ${idx === 0 ? 'var(--danger)' : 'var(--text-light)'}; font-size: 0.8rem;">${item.totalOwed.toFixed(2)}€</span>
+                      </li>
+                    `).join('')}
+                  </ul>
+                ` : `
+                  <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 1.25rem;">
+                    Sigue el saldo del bote común, las deudas de cada jornada y el historial de castigos de tu liga.
+                  </p>
+                `}
+              </div>
+              
+              <div>
+                ${hasLeagues ? `
+                  <button class="brutalist-btn" id="btn-go-morosos" style="width: 100%; margin-top: auto; margin-bottom: 0.75rem;">
+                    Ver Lista Completa
+                  </button>
+                  ${leagues.length > 1 ? `
+                    <div style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 0.75rem; margin-top: 0.75rem;">
+                      <span style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 0.5rem; font-weight: 700; text-transform: uppercase;">Cambiar de Liga:</span>
+                      <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                        ${leagues.map(l => {
+                          if (l.id === activeLeagueId) return '';
+                          return `
+                            <button class="btn-switch-league-landing" data-id="${l.id}" data-name="${l.name}" style="
+                              background: rgba(255,255,255,0.03);
+                              color: var(--text-light);
+                              border: 1px solid var(--border-color);
+                              font-size: 0.7rem;
+                              padding: 0.3rem 0.6rem;
+                              border-radius: 4px;
+                              cursor: pointer;
+                              font-weight: 600;
+                              transition: var(--transition-fast);
+                            ">${escapeHTML(l.name)}</button>
+                          `;
+                        }).join('')}
+                      </div>
+                    </div>
+                  ` : ''}
+                ` : `
+                  <div style="margin-top: 1.5rem; text-align: center; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 1.5rem;">
+                    <button class="brutalist-btn" id="landing-join-league-btn" style="font-size: 0.8rem; width: 100%;">
+                      Crear o Unirse a Liga
+                    </button>
+                  </div>
+                `}
+              </div>
             </article>
 
             <!-- Ruleta de Castigos Card -->
@@ -253,43 +263,34 @@ export function renderLanding(container, callbacks) {
 
           <!-- Grid Content: Row 3 -->
           <div class="brutalist-grid-2">
-            <!-- Adivina el Jugador Card -->
-            <article class="brutalist-card cursor-pointer" data-view-id="minijuego" style="display: flex; flex-direction: column; gap: 1rem; justify-content: space-between;">
+            <!-- Juegos Card -->
+            <article class="brutalist-card" id="juegos-card" style="display: flex; flex-direction: column; gap: 1rem; justify-content: space-between;">
               <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid #000000; padding-bottom: 0.75rem; margin-bottom: 0.5rem;">
-                <h2 style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 800; text-transform: uppercase;">Adivina el Jugador</h2>
+                <h2 style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 800; text-transform: uppercase;">Juegos</h2>
               </div>
               
-              <!-- Mock Wordle Grid -->
-              <div>
-                <div class="wordle-row-mock">
-                  <div class="wordle-cell-mock">P</div>
-                  <div class="wordle-cell-mock correct">A</div>
-                  <div class="wordle-cell-mock">T</div>
-                  <div class="wordle-cell-mock">O</div>
-                  <div class="wordle-cell-mock">S</div>
+              <!-- Miniature Grid of Available Games -->
+              <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin: 0.5rem 0;">
+                <!-- Game 1: Adivina el Jugador -->
+                <div style="background: var(--bg-obsidian); border: 2px solid #000000; box-shadow: 2px 2px 0px #000000; padding: 0.5rem; text-align: center; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 80px;">
+                  <span class="material-symbols-outlined" style="font-size: 1.5rem; color: var(--accent); margin-bottom: 0.25rem;">sports_esports</span>
+                  <span style="font-family: var(--font-sans); font-size: 0.6rem; font-weight: 800; color: var(--text-light); text-transform: uppercase; line-height: 1.1; letter-spacing: 0.5px;">Adivina el Jugador</span>
                 </div>
-                <div class="wordle-row-mock">
-                  <div class="wordle-cell-mock"></div>
-                  <div class="wordle-cell-mock"></div>
-                  <div class="wordle-cell-mock"></div>
-                  <div class="wordle-cell-mock"></div>
-                  <div class="wordle-cell-mock"></div>
+                <!-- Game 2: Trivia de Castigos -->
+                <div style="background: var(--bg-obsidian); border: 2px solid #000000; box-shadow: 2px 2px 0px #000000; padding: 0.5rem; text-align: center; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 80px; opacity: 0.75;">
+                  <span class="material-symbols-outlined" style="font-size: 1.5rem; color: var(--primary-green); margin-bottom: 0.25rem;">help</span>
+                  <span style="font-family: var(--font-sans); font-size: 0.6rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; line-height: 1.1; letter-spacing: 0.5px;">Trivia de Castigos</span>
+                </div>
+                <!-- Game 3: Penaltis Fantasy -->
+                <div style="background: var(--bg-obsidian); border: 2px solid #000000; box-shadow: 2px 2px 0px #000000; padding: 0.5rem; text-align: center; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 80px; opacity: 0.75;">
+                  <span class="material-symbols-outlined" style="font-size: 1.5rem; color: var(--danger); margin-bottom: 0.25rem;">sports_soccer</span>
+                  <span style="font-family: var(--font-sans); font-size: 0.6rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; line-height: 1.1; letter-spacing: 0.5px;">Penaltis Fantasy</span>
                 </div>
               </div>
 
-              <!-- Mock Keyboard -->
-              <div>
-                <div class="keyboard-row-mock">
-                  <span class="keyboard-key-mock">Q</span>
-                  <span class="keyboard-key-mock">W</span>
-                  <span class="keyboard-key-mock active">E</span>
-                  <span class="keyboard-key-mock">R</span>
-                  <span class="keyboard-key-mock">T</span>
-                  <span class="keyboard-key-mock">Y</span>
-                  <span class="keyboard-key-mock">U</span>
-                  <span class="keyboard-key-mock">I</span>
-                </div>
-              </div>
+              <button class="brutalist-btn" id="landing-juegos-btn" style="width: 100%; margin-top: auto;">
+                Ver Juegos Disponibles
+              </button>
             </article>
 
             <!-- Generador de Castigos Card -->
@@ -335,10 +336,11 @@ export function renderLanding(container, callbacks) {
       </div>
     `;
 
-    // Attach Event Listeners to card/navigation elements
-    const morososCard = container.querySelector('#morosos-card');
-    if (morososCard) {
-      morososCard.addEventListener('click', () => {
+    // Attach Event Listeners to buttons and navigation elements
+    const btnGoMorosos = container.querySelector('#btn-go-morosos');
+    if (btnGoMorosos) {
+      btnGoMorosos.addEventListener('click', (e) => {
+        e.stopPropagation();
         if (currentUser) {
           if (leagues.length > 0) {
             callbacks.onNavigate('muro');
@@ -372,17 +374,14 @@ export function renderLanding(container, callbacks) {
       });
     });
 
-    const cardElements = container.querySelectorAll('.brutalist-card[data-view-id]');
-    cardElements.forEach(card => {
-      card.addEventListener('click', () => {
-        const viewId = card.dataset.viewId;
-        if (viewId && callbacks.onNavigate) {
-          callbacks.onNavigate(viewId);
-        }
+    const juegosBtn = container.querySelector('#landing-juegos-btn');
+    if (juegosBtn) {
+      juegosBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (callbacks.onNavigate) callbacks.onNavigate('juegos');
       });
-    });
+    }
 
-    // Attach Event Listeners to inner buttons with stopPropagation
     const ruletaBtn = container.querySelector('#landing-ruleta-btn');
     if (ruletaBtn) {
       ruletaBtn.addEventListener('click', (e) => {
