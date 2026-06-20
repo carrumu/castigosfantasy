@@ -657,7 +657,7 @@ export function renderBufon(container, callbacks) {
           font-size: 0.85rem;
           font-family: var(--font-sans);
         ">
-          🏆 Mi Liga (${escapeHTML(currentLeagueName)})
+          Mi Liga (${escapeHTML(currentLeagueName)})
         </button>
         <button id="tab-global-btn" class="tab-btn" style="
           background: transparent;
@@ -669,7 +669,7 @@ export function renderBufon(container, callbacks) {
           font-size: 0.85rem;
           font-family: var(--font-sans);
         ">
-          🌐 Vista Global (Todas las Ligas)
+          Vista Global (Todas las Ligas)
         </button>
       </div>
     `;
@@ -913,7 +913,7 @@ export function renderBufon(container, callbacks) {
             font-size: 0.85rem;
             font-family: var(--font-sans);
           ">
-            🏆 Mi Liga (${escapeHTML(currentLeagueName)})
+            Mi Liga (${escapeHTML(currentLeagueName)})
           </button>
           <button id="tab-global-btn" class="tab-btn" style="
             background: rgba(var(--accent-rgb), 0.08);
@@ -926,7 +926,7 @@ export function renderBufon(container, callbacks) {
             font-size: 0.85rem;
             font-family: var(--font-sans);
           ">
-            🌐 Vista Global (Todas las Ligas)
+            Vista Global (Todas las Ligas)
           </button>
         </div>
       `;
@@ -937,7 +937,6 @@ export function renderBufon(container, callbacks) {
     if (isGuest) {
       actionCardHtml = `
         <div class="card glass" style="text-align: center; padding: 1.5rem; border: 1.2px dashed var(--border-color-glow);">
-          <span style="font-size: 1.8rem; display: block; margin-bottom: 0.5rem;">🎭</span>
           <h3 class="gradient-text-gold" style="font-size: 1.05rem; font-weight: 800; margin-bottom: 0.35rem;">¿Quieres votar o nominar?</h3>
           <p style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 1rem;">
             La nominación y votación se realiza de manera privada dentro de cada liga fantasy. ¡Únete o crea la tuya!
@@ -950,7 +949,6 @@ export function renderBufon(container, callbacks) {
     } else if (!activeLeagueId) {
       actionCardHtml = `
         <div class="card glass" style="text-align: center; padding: 1.5rem; border: 1.2px dashed var(--border-color-glow);">
-          <span style="font-size: 1.8rem; display: block; margin-bottom: 0.5rem;">🏆</span>
           <h3 class="gradient-text-gold" style="font-size: 1.05rem; font-weight: 800; margin-bottom: 0.35rem;">Selecciona una Liga</h3>
           <p style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 1rem;">
             Para nominar y votar necesitas seleccionar tu liga activa o unirte a una nueva comunidad.
@@ -963,7 +961,6 @@ export function renderBufon(container, callbacks) {
     } else {
       actionCardHtml = `
         <div class="card glass" style="text-align: center; padding: 1.5rem; border: 1.2px solid rgba(var(--primary-rgb), 0.2);">
-          <span style="font-size: 1.8rem; display: block; margin-bottom: 0.5rem;">⚡</span>
           <h3 class="gradient-text-green" style="font-size: 1.05rem; font-weight: 800; margin-bottom: 0.35rem;">Estás en Modo Vista Global</h3>
           <p style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 1rem;">
             Para nominar futbolistas o emitir tu voto de esta jornada, cambia a la pestaña de tu liga.
@@ -994,7 +991,7 @@ export function renderBufon(container, callbacks) {
               <div style="background: rgba(255,255,255,0.01); border: 1px solid var(--border-color); border-radius: 14px; padding: 1.25rem; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 0.5rem; flex-wrap: wrap; gap: 0.5rem;">
                   <h3 class="gradient-text-green" style="font-size: 1.05rem; font-weight: 800;">
-                    🏆 Liga: ${escapeHTML(leagueObj.name)}
+                    Liga: ${escapeHTML(leagueObj.name)}
                   </h3>
                   <span style="font-size: 0.75rem; background: rgba(var(--accent-rgb), 0.08); border: 1px solid rgba(var(--accent-rgb), 0.2); padding: 0.15rem 0.5rem; border-radius: 4px; color: var(--accent); font-weight: 700;">
                     Jornada ${leagueObj.matchday}
@@ -1122,7 +1119,7 @@ export function renderBufon(container, callbacks) {
         <!-- Header -->
         <div style="margin-bottom: 1.5rem;">
           <h1 class="gradient-text-gold" style="font-size: 1.65rem; font-weight: 900; display: flex; align-items: center; gap: 0.5rem;">
-            El Bufón de la Corte 🌐
+            El Bufón de la Corte
           </h1>
           <p style="font-size: 0.85rem; color: var(--text-muted);">
             Vista Global: Mira las nominaciones activas y los bufones coronados en todas las ligas. Para votar, entra en tu liga correspondiente.
