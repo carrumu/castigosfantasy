@@ -277,13 +277,6 @@ function renderMainLayout(isGuest) {
         </button>
       </nav>
 
-      <!-- Burbuja Flotante de Soporte -->
-      <div id="draggable-support-bubble" class="support-bubble" title="Soporte y Ayuda">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0 0 2px rgba(0,0,0,0.5));">
-          <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-          <line x1="12" y1="17" x2="12.01" y2="17"></line>
-        </svg>
-      </div>
     </div>
   `;
 
@@ -504,121 +497,6 @@ function renderMainLayout(isGuest) {
         localStorage.setItem('CF_THEME', 'dark');
       }
     });
-  }
-
-  // Draggable Support Bubble Logic
-  const bubble = app.querySelector('#draggable-support-bubble');
-  if (bubble) {
-    let isDragging = false;
-    let startX = 0;
-    let startY = 0;
-    let initialLeft = 0;
-    let initialTop = 0;
-    let hasMoved = false;
-
-    // Apply or compute position
-    if (supportBubblePos) {
-      bubble.style.position = 'fixed';
-      bubble.style.left = `${supportBubblePos.left}px`;
-      bubble.style.top = `${supportBubblePos.top}px`;
-      bubble.style.right = 'auto';
-      bubble.style.bottom = 'auto';
-    } else {
-      // Default position: bottom-right
-      const initLeft = window.innerWidth - 80;
-      const initTop = window.innerHeight - 80;
-      bubble.style.position = 'fixed';
-      bubble.style.left = `${initLeft}px`;
-      bubble.style.top = `${initTop}px`;
-      bubble.style.right = 'auto';
-      bubble.style.bottom = 'auto';
-      supportBubblePos = { left: initLeft, top: initTop };
-    }
-
-    const onStart = (clientX, clientY) => {
-      isDragging = true;
-      bubble.classList.add('dragging');
-      startX = clientX;
-      startY = clientY;
-      initialLeft = parseFloat(bubble.style.left) || 0;
-      initialTop = parseFloat(bubble.style.top) || 0;
-      hasMoved = false;
-    };
-
-    const onMove = (clientX, clientY) => {
-      if (!isDragging) return;
-      const dx = clientX - startX;
-      const dy = clientY - startY;
-      if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
-        hasMoved = true;
-      }
-      
-      let newLeft = initialLeft + dx;
-      let newTop = initialTop + dy;
-
-      // Keep within bounds
-      const minX = 10;
-      const maxX = window.innerWidth - bubble.offsetWidth - 10;
-      const minY = 10;
-      const maxY = window.innerHeight - bubble.offsetHeight - 10;
-
-      newLeft = Math.max(minX, Math.min(newLeft, maxX));
-      newTop = Math.max(minY, Math.min(newTop, maxY));
-
-      bubble.style.left = `${newLeft}px`;
-      bubble.style.top = `${newTop}px`;
-      
-      // Persist globally
-      supportBubblePos = { left: newLeft, top: newTop };
-    };
-
-    const onEnd = () => {
-      if (!isDragging) return;
-      isDragging = false;
-      bubble.classList.remove('dragging');
-      if (!hasMoved) {
-        // Open support modal
-        showSupportModal();
-      }
-    };
-
-    const onMouseMove = (e) => {
-      onMove(e.clientX, e.clientY);
-    };
-
-    const onMouseUp = () => {
-      onEnd();
-      document.removeEventListener('mousemove', onMouseMove);
-      document.removeEventListener('mouseup', onMouseUp);
-    };
-
-    const onTouchMove = (e) => {
-      if (e.touches.length > 0) {
-        onMove(e.touches[0].clientX, e.touches[0].clientY);
-      }
-    };
-
-    const onTouchEnd = () => {
-      onEnd();
-      document.removeEventListener('touchmove', onTouchMove);
-      document.removeEventListener('touchend', onTouchEnd);
-    };
-
-    // Attach drag triggers
-    bubble.addEventListener('mousedown', (e) => {
-      e.preventDefault();
-      onStart(e.clientX, e.clientY);
-      document.addEventListener('mousemove', onMouseMove);
-      document.addEventListener('mouseup', onMouseUp);
-    });
-
-    bubble.addEventListener('touchstart', (e) => {
-      if (e.touches.length > 0) {
-        onStart(e.touches[0].clientX, e.touches[0].clientY);
-        document.addEventListener('touchmove', onTouchMove, { passive: false });
-        document.addEventListener('touchend', onTouchEnd);
-      }
-    }, { passive: true });
   }
 }
 
