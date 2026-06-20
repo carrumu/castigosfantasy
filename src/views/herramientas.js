@@ -11,7 +11,7 @@ export function renderHerramientas(container, callbacks) {
       <!-- Header -->
       <div style="margin-bottom: 2.5rem;">
         <span style="font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); font-family: var(--font-display);">Caja de utilidades</span>
-        <h1 class="gradient-text-green" style="font-family: var(--font-display); font-size: 2.4rem; font-weight: 900; text-transform: uppercase; letter-spacing: -1px; line-height: 1; margin: 0.15rem 0 0.6rem;">
+        <h1 class="gradient-text-green" style="font-family: var(--font-display); font-size: clamp(1.8rem, 8vw, 2.4rem); font-weight: 900; text-transform: uppercase; letter-spacing: -1px; line-height: 1; margin: 0.15rem 0 0.6rem;">
           Herramientas
         </h1>
         <p style="color: var(--text-muted); font-size: 0.85rem; font-weight: 500; max-width: 500px; line-height: 1.4;">
@@ -20,7 +20,7 @@ export function renderHerramientas(container, callbacks) {
       </div>
 
       <!-- Tool Cards Grid -->
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem;">
+      <div class="tools-grid">
 
         <!-- Ruleta Card -->
         <button id="tool-ruleta-btn" class="tool-card-btn">
