@@ -27,9 +27,9 @@ export function renderLanding(container, callbacks) {
       <main class="brutalist-main">
         <!-- Hero Intro -->
         <section class="brutalist-hero">
-          <h1 class="brutalist-hero-title">NO HAY PIEDAD</h1>
+          <h1 class="brutalist-hero-title">Hablar es gratis. Quedar último no.</h1>
           <p class="brutalist-hero-subtitle">
-            EL LUGAR DONDE LAS PROMESAS ROTAS Y LAS MALAS DECISIONES FANTASY SE PAGAN CON HUMILLACIÓN PÚBLICA. PREPÁRATE PARA EL CASTIGO.
+            Sigue la jornada, vota al bufón y descubre quién debe pasar por caja esta semana.
           </p>
         </section>
 
