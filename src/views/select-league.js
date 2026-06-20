@@ -106,31 +106,32 @@ export function renderSelectLeague(container, callbacks) {
                 <p style="font-size: 0.85rem; color: var(--text-muted); max-width: 440px; margin: 0 auto; line-height: 1.45;">No perteneces a ninguna liga todavía. Únete a una existente con un código o crea una nueva para empezar el pique.</p>
               </div>
             ` : `
-              <div style="display: flex; flex-direction: column; gap: 1rem;">
+              <div style="display: flex; flex-direction: column; gap: 0.75rem;">
                 ${leagues.map(l => {
                   const isActive = l.id === activeLeagueId;
 
                   return `
                     <div class="league-item ${isActive ? 'is-active' : ''}">
-                      <div class="league-item-info">
-                        <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
-                          <h4 class="league-item-name">${l.name}</h4>
-                          ${isActive ? `
-                            <span class="league-active-badge">Activa</span>
-                          ` : ''}
-                        </div>
+                      <div class="league-item-top-row">
+                        <h4 class="league-item-name">${l.name}</h4>
+                        ${isActive ? `
+                          <span class="league-active-badge">Activa</span>
+                        ` : ''}
+                      </div>
+                      
+                      <div class="league-item-bottom-row">
                         <div class="league-item-meta">
                           <span>Código: <strong class="league-code-text">${l.inviteCode}</strong></span>
                           <span class="league-meta-separator">•</span>
-                          <span>Rol: <strong class="league-role-text">${l.isAdmin ? 'Administrador' : 'Miembro'}</strong></span>
+                          <span>Rol: <strong class="league-role-text">${l.isAdmin ? 'Admin' : 'Miembro'}</strong></span>
                         </div>
-                      </div>
-                      
-                      <div style="display: flex; gap: 0.5rem; align-items: center;">
-                        <button class="btn-dots btn-league-opts" data-id="${l.id}" title="Opciones de la Liga">⋮</button>
-                        <button class="btn-select-league ${isActive ? 'is-active' : ''}" data-id="${l.id}" data-name="${l.name}">
-                          ${isActive ? 'Entrar ✓' : 'Seleccionar'}
-                        </button>
+                        
+                        <div class="league-item-actions">
+                          <button class="btn-dots btn-league-opts" data-id="${l.id}" title="Opciones de la Liga">⋮</button>
+                          <button class="btn-select-league ${isActive ? 'is-active' : ''}" data-id="${l.id}" data-name="${l.name}">
+                            ${isActive ? 'Entrar ✓' : 'Seleccionar'}
+                          </button>
+                        </div>
                       </div>
                     </div>
                   `;
