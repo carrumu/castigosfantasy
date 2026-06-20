@@ -164,9 +164,6 @@ export function renderDashboard(container, callbacks) {
             </p>
                     <div style="display: flex; gap: 0.75rem; align-items: center;">
             ${!isGuest ? `
-              <button class="btn-select-league is-active" id="btn-league-settings" title="Opciones de Liga" style="width: auto; padding: 0.65rem 1rem; font-size: 0.85rem; font-weight: 900; display: flex; align-items: center; gap: 0.4rem;">
-                Opciones Liga
-              </button>
               <button class="btn-select-league" id="btn-back-to-hub" title="Volver al Menú" style="width: auto; padding: 0.65rem 1rem; font-size: 0.85rem; font-weight: 900; display: flex; align-items: center; gap: 0.4rem;">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                   <line x1="19" y1="12" x2="5" y2="12"></line>
@@ -300,14 +297,6 @@ export function renderDashboard(container, callbacks) {
     if (backToHubBtn) {
       backToHubBtn.addEventListener('click', () => {
         callbacks.onNavigate('menu-liga');
-      });
-    }
-
-    // Hook settings modal triggers
-    const settingsBtn = container.querySelector('#btn-league-settings');
-    if (settingsBtn) {
-      settingsBtn.addEventListener('click', () => {
-        openLeagueSettings(currentLeague.id, callbacks);
       });
     }
 
