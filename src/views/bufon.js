@@ -1,4 +1,5 @@
 import { supabase, isConfigured } from '../supabase';
+import { setupAutocomplete } from '../utils/autocomplete';
 
 /**
  * Renders the "El Bufón" (Matchday's Worst Player) screen.
@@ -12,6 +13,7 @@ import { supabase, isConfigured } from '../supabase';
 export function renderBufon(container, callbacks) {
   const isGuest = callbacks.isGuest;
   
+  let nominateAutocompleteCleanup = null;
   let forceDemoMode = false;
   let nominees = [];
   let history = [];
@@ -1181,10 +1183,26 @@ export function renderBufon(container, callbacks) {
     // Hook Nominar Form
     const nominateForm = container.querySelector('#nominate-form');
     if (nominateForm) {
+      const nameInput = nominateForm.querySelector('#nom-name');
+      const teamInput = nominateForm.querySelector('#nom-team');
+
+      if (nominateAutocompleteCleanup) {
+        nominateAutocompleteCleanup();
+        nominateAutocompleteCleanup = null;
+      }
+
+      if (nameInput) {
+        nominateAutocompleteCleanup = setupAutocomplete(nameInput, (player) => {
+          if (teamInput) {
+            teamInput.value = player.team;
+          }
+        });
+      }
+
       nominateForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        const name = nominateForm.querySelector('#nom-name').value.trim();
-        const team = nominateForm.querySelector('#nom-team').value.trim();
+        const name = nameInput.value.trim();
+        const team = teamInput.value.trim();
         const reason = nominateForm.querySelector('#nom-reason').value.trim();
         if (!name || !team || !reason) return;
         
@@ -1259,4 +1277,16 @@ export function renderBufon(container, callbacks) {
 
   // Load and display everything
   loadData();
+
+  // Custom cleanup when view gets destroyed/unmounted (prevent autocomplete memory leaks)
+  const observer = new MutationObserver((mutations) => {
+    if (!document.body.contains(container)) {
+      if (nominateAutocompleteCleanup) {
+        nominateAutocompleteCleanup();
+        nominateAutocompleteCleanup = null;
+      }
+      observer.disconnect();
+    }
+  });
+  observer.observe(document.body, { childList: true, subtree: true });
 }

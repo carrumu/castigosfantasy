@@ -264,24 +264,29 @@ export function renderLanding(container, callbacks) {
           <!-- Grid Content: Row 3 -->
           <div class="brutalist-grid-2">
             <!-- Juegos Card -->
-            <article class="brutalist-card" id="juegos-card" style="display: flex; flex-direction: column; gap: 1rem; justify-content: space-between;">
+            <article class="brutalist-card" id="juegos-card" style="display: flex; flex-direction: column; gap: 1rem; justify-content: space-between; cursor: pointer;">
               <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid #000000; padding-bottom: 0.75rem; margin-bottom: 0.5rem;">
                 <h2 style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 800; text-transform: uppercase;">Juegos</h2>
               </div>
               
               <!-- Miniature Grid of Available Games -->
-              <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin: 0.5rem 0;">
+              <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; margin: 0.5rem 0;">
                 <!-- Game 1: Adivina el Jugador -->
                 <div style="background: var(--bg-obsidian); border: 2px solid #000000; box-shadow: 2px 2px 0px #000000; padding: 0.5rem; text-align: center; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 80px;">
                   <span class="material-symbols-outlined" style="font-size: 1.5rem; color: var(--accent); margin-bottom: 0.25rem;">sports_esports</span>
                   <span style="font-family: var(--font-sans); font-size: 0.6rem; font-weight: 800; color: var(--text-light); text-transform: uppercase; line-height: 1.1; letter-spacing: 0.5px;">Adivina el Jugador</span>
                 </div>
-                <!-- Game 2: Trivia de Castigos -->
+                <!-- Game 2: LaLiga Top 10 -->
+                <div style="background: var(--bg-obsidian); border: 2px solid #000000; box-shadow: 2px 2px 0px #000000; padding: 0.5rem; text-align: center; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 80px;">
+                  <span class="material-symbols-outlined" style="font-size: 1.5rem; color: #ffe16d; margin-bottom: 0.25rem;">emoji_events</span>
+                  <span style="font-family: var(--font-sans); font-size: 0.6rem; font-weight: 800; color: var(--text-light); text-transform: uppercase; line-height: 1.1; letter-spacing: 0.5px;">LaLiga Top 10</span>
+                </div>
+                <!-- Game 3: Trivia de Castigos -->
                 <div style="background: var(--bg-obsidian); border: 2px solid #000000; box-shadow: 2px 2px 0px #000000; padding: 0.5rem; text-align: center; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 80px; opacity: 0.75;">
                   <span class="material-symbols-outlined" style="font-size: 1.5rem; color: var(--primary-green); margin-bottom: 0.25rem;">help</span>
                   <span style="font-family: var(--font-sans); font-size: 0.6rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; line-height: 1.1; letter-spacing: 0.5px;">Trivia de Castigos</span>
                 </div>
-                <!-- Game 3: Penaltis Fantasy -->
+                <!-- Game 4: Penaltis Fantasy -->
                 <div style="background: var(--bg-obsidian); border: 2px solid #000000; box-shadow: 2px 2px 0px #000000; padding: 0.5rem; text-align: center; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 80px; opacity: 0.75;">
                   <span class="material-symbols-outlined" style="font-size: 1.5rem; color: var(--danger); margin-bottom: 0.25rem;">sports_soccer</span>
                   <span style="font-family: var(--font-sans); font-size: 0.6rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; line-height: 1.1; letter-spacing: 0.5px;">Penaltis Fantasy</span>
@@ -373,6 +378,13 @@ export function renderLanding(container, callbacks) {
         loadData();
       });
     });
+
+    const juegosCard = container.querySelector('#juegos-card');
+    if (juegosCard) {
+      juegosCard.addEventListener('click', () => {
+        if (callbacks.onNavigate) callbacks.onNavigate('juegos');
+      });
+    }
 
     const juegosBtn = container.querySelector('#landing-juegos-btn');
     if (juegosBtn) {
