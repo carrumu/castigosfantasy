@@ -13,6 +13,7 @@ import { renderSelectLeague } from './views/select-league';
 import { renderLeagueHub } from './views/league-hub';
 import { renderGenerator } from './views/generator';
 import { renderComunidad } from './views/comunidad';
+import { renderForo } from './views/foro';
 import { renderHerramientas } from './views/herramientas';
 import { renderTop10 } from './views/top10';
 
@@ -188,7 +189,7 @@ function renderMainLayout(isGuest, currentUser = null) {
             <button class="header-nav-link ${currentView === 'inicio' ? 'active' : ''}" data-nav="inicio">INICIO</button>
             <button class="header-nav-link ${currentView === 'herramientas' || currentView === 'ruleta' || currentView === 'generador' ? 'active' : ''}" data-nav="herramientas">HERRAMIENTAS</button>
             <button class="header-nav-link ${currentView === 'retos' ? 'active' : ''}" data-nav="retos">RETOS</button>
-            <button class="header-nav-link ${currentView === 'comunidad' || currentView === 'bufon' ? 'active' : ''}" data-nav="comunidad">COMUNIDAD</button>
+            <button class="header-nav-link ${currentView === 'comunidad' || currentView === 'bufon' || currentView === 'foro' ? 'active' : ''}" data-nav="comunidad">COMUNIDAD</button>
             <button class="header-nav-link ${currentView === 'juegos' || currentView === 'adivina-jugador' ? 'active' : ''}" data-nav="juegos">JUEGOS</button>
             <button class="header-nav-link ${currentView === 'mis-ligas' ? 'active' : ''}" data-nav="mis-ligas">MIS LIGAS</button>
           </nav>
@@ -236,7 +237,7 @@ function renderMainLayout(isGuest, currentUser = null) {
           <span class="material-symbols-outlined">emoji_events</span>
           <span class="mobile-nav-label">RETOS</span>
         </button>
-        <button class="mobile-nav-item ${currentView === 'comunidad' || currentView === 'bufon' ? 'active' : ''}" data-nav="comunidad" title="Comunidad">
+        <button class="mobile-nav-item ${currentView === 'comunidad' || currentView === 'bufon' || currentView === 'foro' ? 'active' : ''}" data-nav="comunidad" title="Comunidad">
           <span class="material-symbols-outlined">groups</span>
           <span class="mobile-nav-label">COM.</span>
         </button>
@@ -351,6 +352,13 @@ function renderMainLayout(isGuest, currentUser = null) {
     });
   } else if (currentView === 'comunidad') {
     renderComunidad(viewContainer, {
+      onNavigate: navigate,
+      showToast
+    });
+  } else if (currentView === 'foro') {
+    renderForo(viewContainer, {
+      isGuest,
+      currentUser: currentUser,
       onNavigate: navigate,
       showToast
     });

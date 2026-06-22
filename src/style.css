@@ -3279,9 +3279,49 @@ body {
 .autocomplete-item:hover .autocomplete-team,
 .autocomplete-item.active .autocomplete-team {
   color: rgba(0, 0, 0, 0.7) !important;
+}.brutalist-btn-small {
+  background-color: var(--bg-card);
+  color: var(--text-light);
+  border: 2.5px solid #000000;
+  box-shadow: 2px 2px 0px #000000;
+  border-radius: 0px;
+  font-family: var(--font-sans);
+  font-weight: 800;
+  font-size: 0.78rem;
+  padding: 0.3rem 0.65rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), background-color var(--transition-fast);
 }
 
+.brutalist-btn-small:hover {
+  background-color: var(--bg-card-hover);
+  transform: translate(-1px, -1px);
+  box-shadow: 3.5px 3.5px 0px #000000;
+}
 
+.brutalist-btn-small:active {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0px #000000;
+}
 
+.brutalist-btn-small.is-active {
+  background-color: var(--accent) !important;
+  color: #000000 !important;
+}
 
+.brutalist-btn-small.is-active:hover {
+  background-color: var(--primary-green-dark) !important;
+}
 
+.brutalist-btn-small.btn-danger {
+  background-color: var(--danger);
+  color: #ffffff;
+}
+
+.brutalist-btn-small.btn-danger:hover {
+  background-color: #b91c1c;
+}
