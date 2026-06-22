@@ -99,6 +99,7 @@ export function renderMinigame(container, callbacks) {
   let currentGuess = "";
   let gameStatus = "IN_PROGRESS"; // "IN_PROGRESS", "WON", "LOST"
   let dailyNumber = 0;
+  let activeModal = null;
 
   // Initialize Daily Game State
   function initGame() {
@@ -410,9 +411,14 @@ export function renderMinigame(container, callbacks) {
     // Find max guess count for simple graph scaling
     const maxGuessCount = Math.max(...Object.values(stats.guesses), 1);
 
+    // Remove any existing modal first to avoid duplicates
+    const existing = document.querySelector('#wordle-stats-modal');
+    if (existing) existing.remove();
+
     // Create Modal Element
     const modal = document.createElement('div');
-    modal.className = 'modal-backdrop active';
+    modal.id = 'wordle-stats-modal';
+    modal.className = 'modal-overlay active';
     modal.innerHTML = `
       <div class="modal-content glass" style="max-width: 450px; text-align: center; border: 1px solid var(--border-color-glow);">
         <h2 class="gradient-text-green" style="font-size: 1.6rem; margin-bottom: 0.5rem; font-weight: 800;">
@@ -514,11 +520,21 @@ export function renderMinigame(container, callbacks) {
       </div>
     `;
 
+    activeModal = modal;
     document.body.appendChild(modal);
 
     modal.querySelector('#modal-share-btn').addEventListener('click', handleShareClick);
     modal.querySelector('#modal-close-btn').addEventListener('click', () => {
       modal.remove();
+      activeModal = null;
+    });
+
+    // Close when clicking outside modal content
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.remove();
+        activeModal = null;
+      }
     });
   }
 
@@ -790,6 +806,10 @@ export function renderMinigame(container, callbacks) {
   const observer = new MutationObserver((mutations) => {
     if (!document.body.contains(container)) {
       window.removeEventListener('keydown', handleKeyDown);
+      if (activeModal) {
+        activeModal.remove();
+        activeModal = null;
+      }
       observer.disconnect();
     }
   });

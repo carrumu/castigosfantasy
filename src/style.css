@@ -3242,6 +3242,46 @@ body {
   }
 }
 
+/* Autocomplete Dropdown */
+.autocomplete-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--bg-obsidian);
+  border: 3px solid #000000;
+  box-shadow: 5px 5px 0px #000000;
+  border-radius: 8px;
+  z-index: 10000;
+  max-height: 130px;
+  overflow-y: auto;
+  margin-top: 0.25rem;
+}
+
+.autocomplete-item {
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+
+.autocomplete-item:last-child {
+  border-bottom: none !important;
+}
+
+.autocomplete-item:hover,
+.autocomplete-item.active {
+  background-color: var(--primary-green) !important;
+}
+
+.autocomplete-item:hover .autocomplete-name,
+.autocomplete-item.active .autocomplete-name {
+  color: #000000 !important;
+}
+
+.autocomplete-item:hover .autocomplete-team,
+.autocomplete-item.active .autocomplete-team {
+  color: rgba(0, 0, 0, 0.7) !important;
+}
+
+
 
 
 

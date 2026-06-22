@@ -14,6 +14,7 @@ import { renderLeagueHub } from './views/league-hub';
 import { renderGenerator } from './views/generator';
 import { renderComunidad } from './views/comunidad';
 import { renderHerramientas } from './views/herramientas';
+import { renderTop10 } from './views/top10';
 
 // Initialize Theme (Force Dark Mode)
 document.body.classList.remove('light-theme');
@@ -330,6 +331,11 @@ function renderMainLayout(isGuest, currentUser = null) {
     });
   } else if (currentView === 'adivina-jugador') {
     renderMinigame(viewContainer, {
+      showToast
+    });
+  } else if (currentView === 'top-10') {
+    renderTop10(viewContainer, {
+      onNavigate: navigate,
       showToast
     });
   } else if (currentView === 'bufon') {
