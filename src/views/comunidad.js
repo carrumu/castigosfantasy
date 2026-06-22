@@ -36,22 +36,19 @@ export function renderComunidad(container, callbacks) {
           </button>
         </article>
 
-        <!-- Foro Card (Próximamente) -->
-        <article class="brutalist-card" style="position: relative; opacity: 0.8; display: flex; flex-direction: column; justify-content: space-between; min-height: 260px; background: rgba(0,0,0,0.25);">
-          <div style="position: absolute; top: 1.25rem; right: 1.25rem; z-index: 10;">
-            <span class="brutalist-badge" style="transform: rotate(3deg); background: var(--bg-card); color: var(--accent); border-color: var(--accent);">PRÓXIMAMENTE</span>
-          </div>
+        <!-- Foro Card -->
+        <article class="brutalist-card concrete-bg" id="comunidad-foro-card" style="cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; min-height: 260px; position: relative;">
           <div>
             <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid #000000; padding-bottom: 0.75rem; margin-bottom: 1rem;">
-              <h2 style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 800; text-transform: uppercase; color: var(--text-muted);">Foro de Mánagers</h2>
-              <span class="material-symbols-outlined" style="color: var(--text-muted); font-size: 2rem;">forum</span>
+              <h2 style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 800; text-transform: uppercase;">Foro de Mánagers</h2>
+              <span class="material-symbols-outlined" style="font-size: 2rem;">forum</span>
             </div>
-            <p style="font-size: 0.95rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 1.5rem;">
+            <p style="font-size: 0.95rem; color: var(--text-light); line-height: 1.5; margin-bottom: 1.5rem;">
               Debates, estrategias de fichajes, quejas sobre arbitraje y compra-venta de jugadores con el resto de la comunidad.
             </p>
           </div>
-          <button class="brutalist-btn brutalist-btn-secondary" disabled style="margin-top: auto; opacity: 0.5; cursor: not-allowed; width: 100%;">
-            En Construcción <span class="material-symbols-outlined" style="font-size: 1.2rem;">lock</span>
+          <button class="brutalist-btn" style="margin-top: auto; pointer-events: none; width: 100%;">
+            Entrar al Foro <span class="material-symbols-outlined" style="font-size: 1.2rem;">chevron_right</span>
           </button>
         </article>
 
@@ -59,12 +56,21 @@ export function renderComunidad(container, callbacks) {
     </div>
   `;
 
-  // Attach event listener
+  // Attach event listeners
   const bufonCard = container.querySelector('#comunidad-bufon-card');
   if (bufonCard) {
     bufonCard.addEventListener('click', () => {
       if (callbacks.onNavigate) {
         callbacks.onNavigate('bufon');
+      }
+    });
+  }
+
+  const foroCard = container.querySelector('#comunidad-foro-card');
+  if (foroCard) {
+    foroCard.addEventListener('click', () => {
+      if (callbacks.onNavigate) {
+        callbacks.onNavigate('foro');
       }
     });
   }
