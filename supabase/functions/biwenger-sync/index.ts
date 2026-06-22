@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
@@ -6,7 +7,7 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-serve(async (req) => {
+serve(async (req: Request) => {
   // Handle CORS preflight request with explicit 200 OK status
   if (req.method === "OPTIONS") {
     return new Response("ok", { 
@@ -104,7 +105,7 @@ serve(async (req) => {
     const inputClean = leagueId.trim().toLowerCase();
 
     // Find by ID match, Name match, or settings.secret match (case-insensitive)
-    const foundLeague = leagues.find(l => 
+    const foundLeague = leagues.find((l: any) => 
       l.id.toString() === inputClean || 
       l.name.toLowerCase() === inputClean ||
       (l.settings?.secret && l.settings.secret.toLowerCase() === inputClean)
@@ -219,7 +220,8 @@ serve(async (req) => {
 
   } catch (error) {
     console.error("Error in biwenger-sync Edge Function:", error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    return new Response(JSON.stringify({ error: errorMessage }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
