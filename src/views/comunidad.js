@@ -14,7 +14,7 @@ export function renderComunidad(container, callbacks) {
           Comunidad
         </h1>
         <p style="font-size: 0.95rem; color: var(--text-muted); max-width: 500px; margin: 0 auto; line-height: 1.4;">
-          El punto de encuentro de los mánagers de CastigoFantasy. Selecciona la sección a la que deseas acceder.
+          El punto de encuentro de los mánagers de CastigosFantasy. Selecciona la sección a la que deseas acceder.
         </p>
       </div>
 
@@ -28,7 +28,7 @@ export function renderComunidad(container, callbacks) {
               <h2 style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 800; text-transform: uppercase;">El Bufón de la Corte</h2>
             </div>
             <p style="font-size: 0.95rem; color: var(--text-light); line-height: 1.5; margin-bottom: 1.5rem;">
-              Vota por el peor mánager o jugador fantasy de la jornada de tu liga: el que menos puntos ha dado, del que más se esperaba y menos ha hecho.
+              Vota por el peor futbolista de LaLiga en la jornada: el que menos puntos ha dado en el fantasy, del que más se esperaba y menos ha hecho.
             </p>
           </div>
           <button class="brutalist-btn" style="margin-top: auto; pointer-events: none; width: 100%;">

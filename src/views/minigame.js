@@ -247,7 +247,7 @@ export function renderMinigame(container, callbacks) {
 
   // Generate shareable grid text
   function getShareText() {
-    let text = `CastigoFantasy Wordle #Día${dailyNumber} (${gameStatus === 'WON' ? guesses.length : 'X'}/6)\n\n`;
+    let text = `CastigosFantasy Wordle #Día${dailyNumber} (${gameStatus === 'WON' ? guesses.length : 'X'}/6)\n\n`;
     guesses.forEach(g => {
       const evaluation = checkGuess(g, secretPlayer);
       const rowEmojis = evaluation.map(state => {
