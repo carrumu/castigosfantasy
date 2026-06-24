@@ -67,6 +67,11 @@ body {
   transition: background-color var(--transition-normal), color var(--transition-normal);
 }
 
+/* Ensure form controls inherit the application's premium typography */
+input, select, textarea, button {
+  font-family: inherit;
+}
+
 
 
 /* Brutalist utility classes */
