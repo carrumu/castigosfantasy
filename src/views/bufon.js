@@ -685,7 +685,7 @@ export function renderBufon(container, callbacks) {
               El Bufón de la Jornada
             </h1>
             <p style="font-size: 0.85rem; color: var(--text-muted);">
-              Votación democrática al futbolista de LaLiga con la actuación más cómica o desastrosa en la <strong>Jornada ${currentMatchday}</strong> (${escapeHTML(currentLeagueName)}).
+              Votación al futbolista de LaLiga con la actuación más cómica o desastrosa en la <strong>Jornada ${currentMatchday}</strong> (${escapeHTML(currentLeagueName)}).
             </p>
           </div>
           ${!isGuest ? `
@@ -827,17 +827,17 @@ export function renderBufon(container, callbacks) {
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                   <div class="form-group">
                     <label for="nom-name" style="font-size: 0.75rem; margin-bottom: 0.35rem; display: block; color: var(--text-muted);">Nombre del Futbolista</label>
-                    <input type="text" id="nom-name" class="input-field" placeholder="Ej: Amallah" required />
+                    <input type="text" id="nom-name" class="input-field" required />
                   </div>
                   <div class="form-group">
                     <label for="nom-team" style="font-size: 0.75rem; margin-bottom: 0.35rem; display: block; color: var(--text-muted);">Equipo de LaLiga</label>
-                    <input type="text" id="nom-team" class="input-field" placeholder="Ej: Real Valladolid" required />
+                    <input type="text" id="nom-team" class="input-field" required />
                   </div>
                 </div>
 
                 <div class="form-group">
                   <label for="nom-reason" style="font-size: 0.75rem; margin-bottom: 0.35rem; display: block; color: var(--text-muted);">Razón de la nominación</label>
-                  <textarea id="nom-reason" class="input-field" rows="2" placeholder="Ej: Marcó gol en propia y vio la tarjeta roja directa en 20 minutos..." style="resize: none; font-family: var(--font-sans);" required></textarea>
+                  <textarea id="nom-reason" class="input-field" rows="2" style="resize: none; font-family: var(--font-sans);" required></textarea>
                 </div>
 
                 <button type="submit" class="btn-primary" style="font-weight: 700; width: 100%; padding: 0.75rem;">

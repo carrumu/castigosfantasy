@@ -28,7 +28,7 @@ export function renderComunidad(container, callbacks) {
               <h2 style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 800; text-transform: uppercase;">El Bufón de la Corte</h2>
             </div>
             <p style="font-size: 0.95rem; color: var(--text-light); line-height: 1.5; margin-bottom: 1.5rem;">
-              Vota democráticamente por el peor jugador de la jornada en tu liga y propone ideas divertidas de castigos para tus amigos.
+              Vota por el peor mánager o jugador fantasy de la jornada de tu liga: el que menos puntos ha dado, del que más se esperaba y menos ha hecho.
             </p>
           </div>
           <button class="brutalist-btn" style="margin-top: auto; pointer-events: none; width: 100%;">
