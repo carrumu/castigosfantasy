@@ -14,17 +14,14 @@ export function renderJuegos(container, callbacks) {
   } catch (_) {}
 
   container.innerHTML = `
-    <div class="container fade-in-up" style="max-width: 800px;">
+    <div class="container fade-in-up">
 
       <!-- Header -->
-      <div style="margin-bottom: 2.5rem;">
+      <div style="margin-bottom: 1.5rem;">
         <span style="font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); font-family: var(--font-display);">Entretenimiento</span>
-        <h1 class="gradient-text-green" style="font-family: var(--font-display); font-size: clamp(1.8rem, 8vw, 2.4rem); font-weight: 900; text-transform: uppercase; letter-spacing: -1px; line-height: 1; margin: 0.15rem 0 0.6rem;">
-          Juegos Interactivos
+        <h1 class="gradient-text-green" style="font-family: var(--font-display); font-size: clamp(1.8rem, 8vw, 2.4rem); font-weight: 900; text-transform: uppercase; letter-spacing: -1px; line-height: 1; margin: 0.15rem 0 0;">
+          Juegos
         </h1>
-        <p style="color: var(--text-muted); font-size: 0.85rem; font-weight: 500; max-width: 500px; line-height: 1.4;">
-          Elige un juego para divertirte, competir con tu liga o pasar el rato mientras esperas la próxima jornada de fútbol.
-        </p>
       </div>
 
       <!-- Games Cards Grid -->

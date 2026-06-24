@@ -7,7 +7,7 @@
  */
 export function renderHerramientas(container, callbacks) {
   container.innerHTML = `
-    <div class="container fade-in-up" style="max-width: 800px;">
+    <div class="container fade-in-up">
 
       <!-- Header -->
       <div style="margin-bottom: 2.5rem;">
