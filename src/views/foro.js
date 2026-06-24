@@ -89,11 +89,11 @@ export async function renderForo(container, callbacks) {
     <div class="foro-container fade-in-up" style="max-width: 750px; margin: 0 auto; padding: 1.5rem 1.25rem;">
       
       <!-- Back navigation and Header -->
-      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem;">
-        <button class="brutalist-btn" id="foro-back-btn" style="padding: 0.4rem 0.8rem; display: flex; align-items: center; gap: 0.25rem; font-size: 0.85rem;">
-          <span class="material-symbols-outlined" style="font-size: 1.1rem;">arrow_back</span> Atrás
+      <div style="display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 1.5rem; min-height: 38px;">
+        <button class="brutalist-btn-secondary" id="foro-back-btn" style="position: absolute; left: 0; width: 30px; height: 30px; padding: 0 !important; display: inline-flex; align-items: center; justify-content: center; border-radius: 50% !important; margin: 0;" title="Atrás">
+          <span class="material-symbols-outlined" style="font-size: 1.05rem;">arrow_back</span>
         </button>
-        <h1 class="gradient-text-gold" style="font-size: 1.8rem; font-weight: 900; font-family: var(--font-display); text-transform: uppercase; margin: 0; text-shadow: 2px 2px 0px #000;">
+        <h1 class="gradient-text-gold" style="font-size: 1.5rem; font-weight: 900; font-family: var(--font-display); text-transform: uppercase; margin: 0; text-align: center; padding: 0 40px;">
           Foro de Mánagers
         </h1>
       </div>
