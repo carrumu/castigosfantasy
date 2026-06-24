@@ -76,7 +76,7 @@ function renderMainLayout(isGuest, currentUser = null) {
         <div class="sidebar-header">
           <div class="logo gradient-text-green" style="cursor: pointer; display: flex; align-items: center; gap: 0.35rem;" id="logo-home">
             <span class="logo-icon" style="width: 50px; height: 36px; flex-shrink: 0;"></span>
-            CastigoFantasy
+            CastigosFantasy
           </div>
           <button class="sidebar-close-btn" id="sidebar-close-btn" aria-label="Cerrar menú">✕</button>
         </div>
@@ -180,7 +180,7 @@ function renderMainLayout(isGuest, currentUser = null) {
               </svg>
             </button>
             <div class="logo text-primary" style="cursor: pointer; user-select: none; font-family: var(--font-display); font-weight: 900; font-size: 1.3rem;" id="header-logo-home">
-              CASTIGO FANTASY
+              CASTIGOS FANTASY
             </div>
           </div>
           
@@ -700,7 +700,7 @@ function showSupportModal() {
       </div>
       <div class="modal-body">
         <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem; line-height: 1.4;">
-          ¿Tienes alguna sugerencia, duda o problema con CastigoFantasy? Rellena el formulario o utiliza nuestro correo oficial. Responderemos a tu consulta en un plazo de 24 a 48 horas.
+          ¿Tienes alguna sugerencia, duda o problema con CastigosFantasy? Rellena el formulario o utiliza nuestro correo oficial. Responderemos a tu consulta en un plazo de 24 a 48 horas.
         </p>
 
         <form id="support-form" style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.25rem;">

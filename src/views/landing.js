@@ -321,7 +321,7 @@ export function renderLanding(container, callbacks) {
               <h2 style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 800; text-transform: uppercase;">El Bufón de la Corte</h2>
             </div>
             <p style="font-size: 0.95rem; color: var(--text-light); line-height: 1.4;">
-              La comunidad manda. Señala y vota al peor mánager o jugador fantasy de la jornada: el que menos puntos ha dado, del que más se esperaba y menos ha hecho, o el que la ha liado parda.
+              La comunidad manda. Señala y vota al peor futbolista de LaLiga en la jornada: el que menos puntos ha dado en el fantasy, del que más se esperaba y menos ha hecho.
             </p>
             <button class="brutalist-btn brutalist-btn-secondary" id="landing-bufon-btn" style="width: auto; padding: 0.65rem 1.75rem; margin-top: 0.5rem; align-self: flex-start;">Entrar a la Corte</button>
           </article>

@@ -170,16 +170,11 @@ export function renderAuth(container, callbacks) {
     container.innerHTML = `
       <div class="container" style="display: flex; align-items: center; justify-content: center; min-height: 80vh;">
         <div class="card glass pitch-card" style="width: 100%; max-width: 350px; padding: 2rem 1.5rem;">
-            <div style="display: flex; align-items: center; justify-content: center; border: 2px solid var(--border-color); padding: 0.6rem 0.75rem; background: rgba(0,0,0,0.35); border-radius: 8px; margin-bottom: 1.5rem; width: 100%;">
-              <div style="display: flex; flex-direction: column; align-items: flex-start; line-height: 0.9;">
-                <h1 class="gradient-text-green" style="font-family: var(--font-display); font-size: 1.65rem; font-weight: 900; text-transform: uppercase; letter-spacing: -0.5px; margin: 0;">
-                  Castigo
-                </h1>
-                <h1 class="gradient-text-green" style="font-family: var(--font-display); font-size: 1.65rem; font-weight: 900; text-transform: uppercase; letter-spacing: -0.5px; margin: 0;">
-                  Fantasy
-                </h1>
-              </div>
-              <span class="logo-icon" style="width: 36px; height: 26px; flex-shrink: 0; margin-left: 0.75rem;"></span>
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; border: 1px solid rgba(255, 255, 255, 0.08); padding: 0.75rem 1rem; background: rgba(0,0,0,0.35); border-radius: 12px; margin-bottom: 1.25rem; width: 100%;">
+              <span class="logo-icon" style="width: 44px; height: 32px; flex-shrink: 0; margin-bottom: 0.4rem;"></span>
+              <h1 class="gradient-text-green" style="font-family: var(--font-display); font-size: 1.3rem; font-weight: 900; text-transform: uppercase; letter-spacing: -0.5px; margin: 0; text-align: center;">
+                Castigos Fantasy
+              </h1>
             </div>
             
             <h2 style="font-family: var(--font-display); font-size: 1.25rem; font-weight: 800; text-transform: uppercase; margin-bottom: 1.25rem; text-align: center; color: var(--text-light);">

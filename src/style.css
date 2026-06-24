@@ -1,4 +1,4 @@
-/* --- CastigoFantasy: Design System --- */
+/* --- CastigosFantasy: Design System --- */
 
 :root {
   --font-sans: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -3851,7 +3851,7 @@ input, select, textarea, button {
 #view-container .league-item,
 #view-container .tool-card-btn,
 #view-container .card {
-  border: 1px solid var(--border-color) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25) !important;
   border-radius: 12px !important;
   background-color: var(--bg-card) !important;
@@ -3925,12 +3925,12 @@ input, select, textarea, button {
 
 /* 4. Dashboard layout and header overrides */
 .top-header {
-  border-bottom: 1px solid var(--border-color) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3) !important;
 }
 
 .brutalist-hero {
-  border-bottom: 1px solid var(--border-color) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
   border-radius: 12px !important;
   background: rgba(255, 255, 255, 0.01) !important;

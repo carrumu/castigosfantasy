@@ -195,7 +195,7 @@ export async function openBiwengerTestModal() {
       status: 200,
       data: {
         id: "cwRzHsqCc6nx",
-        name: "Liga CastigoFantasy de Prueba (Simulada)",
+        name: "Liga CastigosFantasy de Prueba (Simulada)",
         users: [
           { id: 101, name: "YtnoxGames (Tú)", email: "ytnoxgames@gmail.com" },
           { id: 102, name: "Carlos M.", email: "carlos.m@example.com" },

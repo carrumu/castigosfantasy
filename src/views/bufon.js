@@ -201,7 +201,7 @@ export function renderBufon(container, callbacks) {
       const leaguesGrouped = {};
       nomineesData.forEach(n => {
         const lId = n.league_id;
-        const lName = n.leagues?.name || "Liga de CastigoFantasy";
+        const lName = n.leagues?.name || "Liga de CastigosFantasy";
         if (!leaguesGrouped[lId]) {
           leaguesGrouped[lId] = {
             id: lId,
@@ -246,7 +246,7 @@ export function renderBufon(container, callbacks) {
         reason: h.reason,
         raffleWinner: h.raffle_winner,
         rafflePlayer: h.raffle_player,
-        leagueName: h.leagues?.name || "Liga de CastigoFantasy"
+        leagueName: h.leagues?.name || "Liga de CastigosFantasy"
       }));
 
       // Get user nickname for UI references
