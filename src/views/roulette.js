@@ -19,6 +19,17 @@ export function renderRoulette(container, callbacks) {
   let pendingRecord = null;
   let isSpinning = false;
   let currentUser = null;
+  let showLegend = false; // State to control legend visibility
+
+  // Shared colors array for the wheel slices and the legend
+  const WHEEL_COLORS = [
+    '#6366f1', // indigo
+    '#4f46e5', // indigo dark
+    '#f43f5e', // rose
+    '#db2777', // pink/rose dark
+    '#1e293b', // charcoal
+    '#0f172a'  // dark slate
+  ];
 
   // Initial default punishments
   const DEFAULT_PUNISHMENTS = [
@@ -232,18 +243,66 @@ export function renderRoulette(container, callbacks) {
             <div class="wheel-wrapper">
               <div class="wheel-arrow"></div>
               <div class="wheel-center"></div>
-              <canvas id="wheel-canvas" class="wheel-canvas" width="500" height="500"></canvas>
+              <!-- High-definition canvas drawing: 800x800 resolution scaled down using CSS for ultimate sharpness -->
+              <canvas id="wheel-canvas" class="wheel-canvas" width="800" height="800" style="width: 100%; max-width: 420px; height: auto; display: block; margin: 0 auto;"></canvas>
             </div>
 
             <!-- Gating: Only allow the pending loser to spin the wheel -->
             ${!isLocalMode && pendingRecord && !isLoser ? `
-              <div style="background: rgba(239, 68, 68, 0.1); border: 2px solid #ef4444; border-radius: 6px; padding: 0.75rem; font-size: 0.85rem; color: #f87171; text-align: center; margin-bottom: 1rem; width: 100%; max-width: 320px; margin: 0 auto 1.25rem auto; line-height: 1.35;">
+              <div style="background: rgba(239, 68, 68, 0.1); border: 2px solid #ef4444; border-radius: 6px; padding: 0.75rem; font-size: 0.85rem; color: #f87171; text-align: center; margin-bottom: 1rem; width: 100%; max-width: 320px; margin: 0.5rem auto 1.25rem auto; line-height: 1.35;">
                 Solo el jugador castigado, <strong>${escapeHTML(pendingRecord.display_name)}</strong>, puede girar la ruleta. ¡Haz que inicie sesión para tirar!
               </div>
-              <button id="spin-btn" class="btn-primary" style="max-width: 200px; opacity: 0.5; cursor: not-allowed;" disabled>¡GIRAR!</button>
+              <button id="spin-btn" class="btn-primary" style="max-width: 200px; opacity: 0.5; cursor: not-allowed; margin-bottom: 0.5rem;" disabled>¡GIRAR!</button>
             ` : `
-              <button id="spin-btn" class="btn-primary" style="max-width: 200px;">¡GIRAR!</button>
+              <button id="spin-btn" class="btn-primary" style="max-width: 200px; margin-bottom: 0.5rem;">¡GIRAR!</button>
             `}
+
+            <!-- Color-coded Legend for Roulette Options (Collapsible/Optional) -->
+            <div style="margin-top: 1.5rem; width: 100%; text-align: left; padding: 0.5rem; border-top: 1.5px solid var(--border-color); padding-top: 1.25rem;">
+              <button id="btn-toggle-legend" style="
+                background: transparent;
+                border: none;
+                color: var(--text-muted);
+                font-family: var(--font-sans);
+                font-size: 0.8rem;
+                font-weight: 800;
+                text-transform: uppercase;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                gap: 0.35rem;
+                padding: 0;
+                width: 100%;
+                justify-content: space-between;
+              ">
+                <span>Opciones en la Ruleta</span>
+                <span style="font-size: 0.7rem; color: var(--accent);" id="legend-toggle-indicator">
+                  ${showLegend ? 'Ocultar ▲' : 'Mostrar ▼'}
+                </span>
+              </button>
+              
+              <div id="roulette-legend-content" style="
+                display: ${showLegend ? 'grid' : 'none'};
+                grid-template-columns: 1fr 1fr;
+                gap: 0.5rem 1rem;
+                max-height: 140px;
+                overflow-y: auto;
+                padding-right: 0.25rem;
+                margin-top: 0.75rem;
+              ">
+                ${punishments.map((p, idx) => {
+                  const color = WHEEL_COLORS[idx % WHEEL_COLORS.length];
+                  return `
+                    <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; min-width: 0;">
+                      <span style="width: 10px; height: 10px; border-radius: 50%; background: ${color}; border: 1.5px solid #000; flex-shrink: 0;"></span>
+                      <span style="font-weight: 700; color: var(--text-light); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${escapeHTML(p.name)}: ${escapeHTML(p.description || '')}">
+                        ${escapeHTML(p.name)}
+                      </span>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            </div>
           </div>
 
           <!-- Columna Derecha: Personalizar e Historial -->
@@ -357,6 +416,27 @@ export function renderRoulette(container, callbacks) {
         }
         
         spinWheel(canvas);
+      });
+    }
+
+    // Collapsible legend toggle listener
+    const toggleLegendBtn = container.querySelector('#btn-toggle-legend');
+    if (toggleLegendBtn) {
+      toggleLegendBtn.addEventListener('click', () => {
+        showLegend = !showLegend;
+        
+        const contentEl = container.querySelector('#roulette-legend-content');
+        const indicatorEl = container.querySelector('#legend-toggle-indicator');
+        
+        if (contentEl && indicatorEl) {
+          if (showLegend) {
+            contentEl.style.display = 'grid';
+            indicatorEl.textContent = 'Ocultar ▲';
+          } else {
+            contentEl.style.display = 'none';
+            indicatorEl.textContent = 'Mostrar ▼';
+          }
+        }
       });
     }
 
@@ -490,21 +570,12 @@ export function renderRoulette(container, callbacks) {
 
     const arcLength = (2 * Math.PI) / punishments.length;
 
-    const colors = [
-      '#6366f1', // indigo
-      '#4f46e5', // indigo dark
-      '#f43f5e', // rose
-      '#db2777', // pink/rose dark
-      '#1e293b', // charcoal
-      '#0f172a'  // dark slate
-    ];
-
     for (let i = 0; i < punishments.length; i++) {
       const angle = i * arcLength;
       ctx.beginPath();
-      ctx.fillStyle = colors[i % colors.length];
+      ctx.fillStyle = WHEEL_COLORS[i % WHEEL_COLORS.length];
       ctx.moveTo(center, center);
-      ctx.arc(center, center, center - 10, angle, angle + arcLength);
+      ctx.arc(center, center, center - 15, angle, angle + arcLength);
       ctx.closePath();
       ctx.fill();
 
@@ -514,22 +585,26 @@ export function renderRoulette(container, callbacks) {
       ctx.textAlign = "right";
       ctx.fillStyle = "#ffffff";
       ctx.shadowColor = "rgba(0,0,0,0.95)";
-      ctx.shadowBlur = 5;
+      ctx.shadowBlur = 6;
       
       const nameText = punishments[i].name;
-      let fontSize = 20;
-      if (nameText.length > 20) fontSize = 16;
-      if (nameText.length > 28) fontSize = 13;
-      if (nameText.length > 36) fontSize = 11;
       
-      ctx.font = `bold ${fontSize}px Outfit`;
+      // Significantly enlarged font size parameters for 800x800 canvas
+      let fontSize = 28;
+      if (nameText.length > 15) fontSize = 24;
+      if (nameText.length > 22) fontSize = 20;
+      if (nameText.length > 30) fontSize = 16;
+      if (nameText.length > 38) fontSize = 13;
+      
+      ctx.font = `bold ${fontSize}px Space Grotesk, sans-serif`;
       
       let displayName = nameText;
       if (nameText.length > 45) {
         displayName = nameText.substring(0, 42) + "...";
       }
 
-      ctx.fillText(displayName, center - 20, 6);
+      const verticalOffset = fontSize / 3;
+      ctx.fillText(displayName, center - 35, verticalOffset);
       ctx.restore();
     }
   }
