@@ -290,20 +290,16 @@ export function renderMinigame(container, callbacks) {
         saveDailyState();
         setTimeout(() => {
           showStatsModal(true);
-        }, 1800);
+        }, secretPlayer.length * 350 + 800);
       } else if (guesses.length >= 6) {
         gameStatus = "LOST";
         updateStats(false, 6);
         saveDailyState();
         setTimeout(() => {
           showStatsModal(false);
-        }, 1800);
+        }, secretPlayer.length * 350 + 800);
       } else {
         saveDailyState();
-        // Render updates
-        setTimeout(() => {
-          renderView();
-        }, 1500);
       }
     } else if (key === 'BACKSPACE' || key === 'BACK') {
       currentGuess = currentGuess.slice(0, -1);
