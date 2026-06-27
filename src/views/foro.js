@@ -34,26 +34,33 @@ function showForoAlert(message, type = 'info') {
 
   const alert = document.createElement('div');
   alert.className = 'brutalist-card';
-  const bgColor = type === 'success' ? '#86efac' : type === 'error' ? '#fca5a5' : '#fef08a';
+  const accentColor = type === 'success' ? '#deed00' : type === 'error' ? 'var(--danger)' : '#ffe16d';
   alert.style.cssText = `
-    background: ${bgColor};
-    color: #000;
+    background: var(--bg-card);
+    color: var(--text-light);
     border: 3px solid #000;
+    border-left: 6px solid ${accentColor};
     box-shadow: 4px 4px 0px #000;
-    padding: 0.75rem 1rem;
+    padding: 0.85rem 1.25rem;
     font-weight: 800;
-    font-size: 0.9rem;
-    font-family: var(--font-display);
+    font-size: 0.85rem;
+    font-family: var(--font-sans);
     text-transform: uppercase;
     display: flex;
     justify-content: space-between;
     align-items: center;
     pointer-events: auto;
     animation: slideDown 0.3s ease-out;
+    letter-spacing: 0.5px;
   `;
   alert.innerHTML = `
-    <span>${message}</span>
-    <button style="background: none; border: none; font-size: 1.1rem; font-weight: 900; cursor: pointer; margin-left: 0.5rem; color: #000;">✕</button>
+    <div style="display: flex; align-items: center; gap: 0.65rem;">
+      <span class="material-symbols-outlined" style="color: ${accentColor}; font-size: 1.2rem; vertical-align: middle;">
+        ${type === 'success' ? 'check_circle' : type === 'error' ? 'error' : 'info'}
+      </span>
+      <span>${message}</span>
+    </div>
+    <button style="background: none; border: none; font-size: 1.1rem; font-weight: 900; cursor: pointer; margin-left: 0.85rem; color: var(--text-muted); transition: color var(--transition-fast);">✕</button>
   `;
 
   alertContainer.appendChild(alert);
@@ -488,7 +495,7 @@ function renderFeed(container, newPosts) {
             ${post.profiles?.apodo ? post.profiles.apodo.charAt(0).toUpperCase() : '?'}
           </div>
           <div>
-            <span style="font-weight: 800; font-size: 0.95rem; display: block; line-height: 1.1;">${post.profiles?.apodo || 'Mánager'}</span>
+            <span style="font-weight: 800; font-size: 0.95rem; display: block; line-height: 1.1;">@${post.profiles?.apodo || 'Mánager'}</span>
             <span style="font-size: 0.72rem; color: var(--text-muted); font-weight: 700;">${new Date(post.created_at).toLocaleString()}</span>
           </div>
         </div>
@@ -841,7 +848,7 @@ async function fetchCommentsAndRender(postId, listContainer) {
       el.innerHTML = `
         <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.75rem; font-weight: 800; border-bottom: 1.5px dashed #000; padding-bottom: 0.25rem; margin-bottom: 0.25rem;">
           <div style="display: flex; align-items: center; gap: 0.35rem;">
-            <span style="color: var(--accent);">${comment.profiles?.apodo || 'Mánager'}</span>
+            <span style="color: var(--accent);">@${comment.profiles?.apodo || 'Mánager'}</span>
             <span style="color: var(--text-muted); font-size: 0.7rem;">(${new Date(comment.created_at).toLocaleTimeString()})</span>
           </div>
         </div>
@@ -944,6 +951,10 @@ async function fetchCommentsAndRender(postId, listContainer) {
       if (replyForm) {
         replyForm.addEventListener('submit', async (e) => {
           e.preventDefault();
+          if (isGuestState) {
+            showForoAlert('Inicia sesión para responder.', 'info');
+            return;
+          }
           const input = replyForm.querySelector('.reply-input');
           const text = input.value.trim();
           if (!text) return;

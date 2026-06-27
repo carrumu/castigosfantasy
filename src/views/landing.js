@@ -315,16 +315,45 @@ export function renderLanding(container, callbacks) {
             </article>
           </div>
 
-          <!-- Row 4 (Full Width): El Bufón (Only rendered if Ruleta is active, so we show all 5 modules) -->
-          <article class="brutalist-card" style="display: flex; flex-direction: column; gap: 1rem;">
-            <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid #000000; padding-bottom: 0.75rem; margin-bottom: 0.5rem;">
-              <h2 style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 800; text-transform: uppercase;">El Bufón de la Corte</h2>
+          <!-- Row 4: Comunidad (El Bufón + Foro de Mánagers) -->
+          <section style="margin-top: 1rem; border-top: 3px solid #000000; padding-top: 1.5rem; width: 100%;">
+            <h2 style="font-family: var(--font-display); font-size: 1.8rem; font-weight: 900; text-transform: uppercase; margin-bottom: 1.25rem; color: var(--text-light); letter-spacing: -0.5px;">
+              Comunidad
+            </h2>
+            <div class="brutalist-grid-2" style="gap: 1.5rem;">
+              <!-- El Bufón de la Corte Card -->
+              <article class="brutalist-card concrete-bg" style="display: flex; flex-direction: column; justify-content: space-between; min-height: 200px;">
+                <div>
+                  <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid #000000; padding-bottom: 0.75rem; margin-bottom: 1rem;">
+                    <h3 style="font-family: var(--font-display); font-size: 1.3rem; font-weight: 800; text-transform: uppercase; margin: 0;">El Bufón de la Corte</h3>
+                    <span class="material-symbols-outlined" style="font-size: 1.8rem; color: var(--accent);">sports_kabaddi</span>
+                  </div>
+                  <p style="font-size: 0.85rem; color: var(--text-light); opacity: 0.8; line-height: 1.4; margin-bottom: 1rem;">
+                    Vota y señala al peor futbolista de la jornada. Quien dé menos puntos en el fantasy paga las consecuencias.
+                  </p>
+                </div>
+                <button class="brutalist-btn" id="landing-bufon-btn" style="width: 100%;">
+                  Entrar a la Corte
+                </button>
+              </article>
+
+              <!-- Foro de Mánagers Card -->
+              <article class="brutalist-card concrete-bg" style="display: flex; flex-direction: column; justify-content: space-between; min-height: 200px;">
+                <div>
+                  <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid #000000; padding-bottom: 0.75rem; margin-bottom: 1rem;">
+                    <h3 style="font-family: var(--font-display); font-size: 1.3rem; font-weight: 800; text-transform: uppercase; margin: 0;">Foro de Mánagers</h3>
+                    <span class="material-symbols-outlined" style="font-size: 1.8rem; color: var(--primary-green);">forum</span>
+                  </div>
+                  <p style="font-size: 0.85rem; color: var(--text-light); opacity: 0.8; line-height: 1.4; margin-bottom: 1rem;">
+                    Discute fichajes, llora por las lesiones, pacta traspasos y debate estrategias con los otros mánagers.
+                  </p>
+                </div>
+                <button class="brutalist-btn" id="landing-foro-btn" style="width: 100%;">
+                  Ir al Foro
+                </button>
+              </article>
             </div>
-            <p style="font-size: 0.95rem; color: var(--text-light); line-height: 1.4;">
-              La comunidad manda. Señala y vota al peor futbolista de LaLiga en la jornada: el que menos puntos ha dado en el fantasy, del que más se esperaba y menos ha hecho.
-            </p>
-            <button class="brutalist-btn brutalist-btn-secondary" id="landing-bufon-btn" style="width: auto; padding: 0.65rem 1.75rem; margin-top: 0.5rem; align-self: flex-start;">Entrar a la Corte</button>
-          </article>
+          </section>
         </main>
 
         <!-- Columna derecha: PUBLICIDAD / ADVERTENCIAS -->
@@ -407,6 +436,14 @@ export function renderLanding(container, callbacks) {
       bufonBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         if (callbacks.onNavigate) callbacks.onNavigate('bufon');
+      });
+    }
+
+    const foroBtn = container.querySelector('#landing-foro-btn');
+    if (foroBtn) {
+      foroBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (callbacks.onNavigate) callbacks.onNavigate('foro');
       });
     }
 

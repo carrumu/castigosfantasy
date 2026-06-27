@@ -641,10 +641,8 @@ async function openProfileModal(user) {
 // Listen for Auth Session changes
 if (isConfigured) {
   supabase.auth.onAuthStateChange((event, session) => {
-    if (event === 'SIGNED_IN') {
+    if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
       checkAuthAndRender();
-    } else if (event === 'SIGNED_OUT') {
-      navigate('inicio');
     }
   });
 }
