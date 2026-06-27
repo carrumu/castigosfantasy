@@ -109,11 +109,11 @@ export function renderMinigame(container, callbacks) {
     secretPlayer = dailyInfo.name;
     dailyNumber = dailyInfo.number;
 
-    // Calculate and verify streak cooldown (grace period of 2 days: difference <= 3)
+    // Calculate and verify streak cooldown (must be strictly consecutive, max 1 day difference)
     const lastWonStr = localStorage.getItem('CF_WORDLE_LAST_WON_DATE');
     const daysSinceLastWin = getDaysDiff(todayStr, lastWonStr);
     const stats = getStats();
-    if (daysSinceLastWin > 3 && stats.currentStreak > 0) {
+    if (daysSinceLastWin > 1 && stats.currentStreak > 0) {
       stats.currentStreak = 0;
       localStorage.setItem('CF_WORDLE_STATS', JSON.stringify(stats));
     }
@@ -168,8 +168,8 @@ export function renderMinigame(container, callbacks) {
 
       if (lastWonStr === todayStr) {
         // Already won today, do nothing to streak
-      } else if (daysSinceLastWin <= 3) {
-        // Streak continues (yesterday, 2 days ago, or 3 days ago)
+      } else if (daysSinceLastWin === 1) {
+        // Streak continues (must be strictly consecutive yesterday)
         stats.currentStreak += 1;
       } else {
         // Streak resets to 1 (new start or broken cooldown)
@@ -344,13 +344,13 @@ export function renderMinigame(container, callbacks) {
           cell.classList.remove('empty');
           cell.classList.add(evaluation[i]);
         }, 250);
-      }, i * 200);
+      }, i * 350);
     });
 
     // Re-render whole keyboard states after the last flip finishes
     setTimeout(() => {
       renderView();
-    }, cells.length * 200 + 400);
+    }, cells.length * 350 + 400);
   }
 
   // Update active row characters in real-time
