@@ -18,6 +18,7 @@ export function renderRoulette(container, callbacks) {
   let currentLeague = null;
   let pendingRecord = null;
   let isSpinning = false;
+  let currentUser = null;
 
   // Initial default punishments
   const DEFAULT_PUNISHMENTS = [
@@ -48,7 +49,7 @@ export function renderRoulette(container, callbacks) {
     }
 
     try {
-      const currentUser = supabase.auth.user ? supabase.auth.user() : (await supabase.auth.getUser()).data.user;
+      currentUser = supabase.auth.user ? supabase.auth.user() : (await supabase.auth.getUser()).data.user;
 
       // 1. Fetch user's leagues memberships
       const { data: userLeagues, error: leaguesErr } = await supabase
@@ -107,6 +108,7 @@ export function renderRoulette(container, callbacks) {
             id: recData.id,
             matchday_number: recData.matchday_number,
             amount_owed: recData.amount_owed,
+            loser_profile_id: recData.loser_profile_id,
             display_name: recData.profiles?.apodo || recData.profiles?.display_name || 'Entrenador'
           };
         }
@@ -173,6 +175,7 @@ export function renderRoulette(container, callbacks) {
 
   function renderView() {
     const isLocalMode = isGuest || !activeLeagueId;
+    const isLoser = !isLocalMode && pendingRecord && currentUser && currentUser.id === pendingRecord.loser_profile_id;
 
     container.innerHTML = `
       <div class="container">
@@ -213,7 +216,7 @@ export function renderRoulette(container, callbacks) {
         ${pendingRecord ? `
           <div class="supabase-banner" style="background: rgba(var(--accent-rgb), 0.1); border-color: rgba(var(--accent-rgb), 0.3); margin-bottom: 1.25rem;">
             <div class="supabase-banner-text" style="color: var(--text-light);">
-              Tirada pendiente para <strong>${escapeHTML(pendingRecord.display_name)}</strong> (Jornada ${pendingRecord.matchday_number}). ¡Gira la ruleta para asignarle su castigo!
+              Tirada pendiente para <strong>${escapeHTML(pendingRecord.display_name)}</strong> (Jornada ${pendingRecord.matchday_number}). ¡Debe girar la ruleta para asignarle su castigo!
             </div>
           </div>
         ` : ''}
@@ -232,7 +235,15 @@ export function renderRoulette(container, callbacks) {
               <canvas id="wheel-canvas" class="wheel-canvas" width="500" height="500"></canvas>
             </div>
 
-            <button id="spin-btn" class="btn-primary" style="max-width: 200px;">¡GIRAR!</button>
+            <!-- Gating: Only allow the pending loser to spin the wheel -->
+            ${!isLocalMode && pendingRecord && !isLoser ? `
+              <div style="background: rgba(239, 68, 68, 0.1); border: 2px solid #ef4444; border-radius: 6px; padding: 0.75rem; font-size: 0.85rem; color: #f87171; text-align: center; margin-bottom: 1rem; width: 100%; max-width: 320px; margin: 0 auto 1.25rem auto; line-height: 1.35;">
+                Solo el jugador castigado, <strong>${escapeHTML(pendingRecord.display_name)}</strong>, puede girar la ruleta. ¡Haz que inicie sesión para tirar!
+              </div>
+              <button id="spin-btn" class="btn-primary" style="max-width: 200px; opacity: 0.5; cursor: not-allowed;" disabled>¡GIRAR!</button>
+            ` : `
+              <button id="spin-btn" class="btn-primary" style="max-width: 200px;">¡GIRAR!</button>
+            `}
           </div>
 
           <!-- Columna Derecha: Personalizar e Historial -->
@@ -333,10 +344,21 @@ export function renderRoulette(container, callbacks) {
 
     // Event listeners
     const spinBtn = container.querySelector('#spin-btn');
-    spinBtn.addEventListener('click', () => {
-      if (isSpinning) return;
-      spinWheel(canvas);
-    });
+    if (spinBtn) {
+      spinBtn.addEventListener('click', () => {
+        if (isSpinning) return;
+        
+        // Enforce loser spin rule in database mode
+        if (!isLocalMode && pendingRecord) {
+          if (!isLoser) {
+            callbacks.showToast(`Solo el jugador castigado (${pendingRecord.display_name}) puede girar la ruleta`, 'error');
+            return;
+          }
+        }
+        
+        spinWheel(canvas);
+      });
+    }
 
     // Handle add punishment
     const addForm = container.querySelector('#add-punishment-form');
@@ -517,7 +539,7 @@ export function renderRoulette(container, callbacks) {
     if (punishments.length === 0) return;
     isSpinning = true;
     const spinBtn = container.querySelector('#spin-btn');
-    spinBtn.disabled = true;
+    if (spinBtn) spinBtn.disabled = true;
 
     const sectorsCount = punishments.length;
     const winningIdx = Math.floor(Math.random() * sectorsCount);
@@ -534,7 +556,7 @@ export function renderRoulette(container, callbacks) {
       canvas.removeEventListener('transitionend', handleEnd);
       
       isSpinning = false;
-      spinBtn.disabled = false;
+      if (spinBtn) spinBtn.disabled = false;
       
       const isLocalMode = isGuest || !activeLeagueId;
       const loserName = pendingRecord ? pendingRecord.display_name : 'Entrenador Aleatorio';
@@ -561,10 +583,12 @@ export function renderRoulette(container, callbacks) {
 
       // Show Result Modal
       const resModal = container.querySelector('#result-modal');
-      resModal.querySelector('#result-title').innerText = winningPunishment.name;
-      resModal.querySelector('#result-desc').innerText = winningPunishment.description || 'Cumple con el castigo en tu próxima cita.';
-      resModal.querySelector('#result-loser').innerText = loserName;
-      resModal.classList.add('active');
+      if (resModal) {
+        resModal.querySelector('#result-title').innerText = winningPunishment.name;
+        resModal.querySelector('#result-desc').innerText = winningPunishment.description || 'Cumple con el castigo en tu próxima cita.';
+        resModal.querySelector('#result-loser').innerText = loserName;
+        resModal.classList.add('active');
+      }
 
       setTimeout(() => {
         canvas.style.transition = 'none';
