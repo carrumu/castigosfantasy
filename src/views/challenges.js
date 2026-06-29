@@ -11,31 +11,15 @@ import { supabase, isConfigured } from '../supabase';
  */
 export function renderChallenges(container, callbacks) {
   const isGuest = callbacks.isGuest;
-
-  // Predefined Dares
-  const DEFAULT_CHALLENGES = [
-    { id: 1, title: "El Eterno Rival", desc: "Llevar la camiseta del máximo rival de tu equipo durante un día entero de trabajo/estudios (y subir foto de prueba).", votes: 8 },
-    { id: 2, title: "El Camarero de la Liga", desc: "Pagarle un café o refresco a cada uno de los miembros de la liga la próxima vez que os veáis.", votes: 5 },
-    { id: 3, title: "El Cantante de WhatsApp", desc: "Grabar un audio de WhatsApp de al menos 1 minuto cantando a capela el himno del equipo del último clasificado con la mano en el pecho.", votes: 12 }
-  ];
-
-  const DEFAULT_HISTORY = [];
-
-  // Load challenges from local storage or set defaults
-  let challenges = JSON.parse(localStorage.getItem('CF_CHALLENGES_DATA') || 'null');
-  if (!challenges || challenges.some(c => c.title.includes('👕') || c.title.includes('☕') || c.title.includes('🎤'))) {
-    challenges = DEFAULT_CHALLENGES;
-    localStorage.setItem('CF_CHALLENGES_DATA', JSON.stringify(challenges));
-  }
-
-  // Check if the current user has already voted
-  let userVotedId = localStorage.getItem('CF_USER_VOTED_CHALLENGE_ID') || null;
-
-  let currentMatchday = 5;
   const activeLeagueId = localStorage.getItem('CF_ACTIVE_LEAGUE_ID');
 
+  let challenges = [];
+  let userVotedId = null;
+  let currentMatchday = 5;
+  let isLoading = true;
+
   async function loadMatchday() {
-    if (activeLeagueId && isConfigured) {
+    if (activeLeagueId && isConfigured && !isGuest) {
       try {
         const { data: league } = await supabase
           .from('leagues')
@@ -49,7 +33,176 @@ export function renderChallenges(container, callbacks) {
     }
   }
 
+  async function loadData() {
+    isLoading = true;
+    renderView();
+
+    if (isGuest || !activeLeagueId || !isConfigured) {
+      // Local Guest fallback mode
+      const defaultDares = [
+        { id: 'guest-1', title: "El Eterno Rival", desc: "Llevar la camiseta del máximo rival de tu equipo durante un día entero de trabajo/estudios (y subir foto de prueba).", votes: 8 },
+        { id: 'guest-2', title: "El Camarero de la Liga", desc: "Pagarle un café o refresco a cada uno de los miembros de la liga la próxima vez que os veáis.", votes: 5 },
+        { id: 'guest-3', title: "El Cantante de WhatsApp", desc: "Grabar un audio de WhatsApp de al menos 1 minuto cantando a capela el himno del equipo del último clasificado con la mano en el pecho.", votes: 12 }
+      ];
+      challenges = defaultDares;
+      userVotedId = localStorage.getItem('CF_USER_VOTED_CHALLENGE_ID') || null;
+      isLoading = false;
+      renderView();
+      return;
+    }
+
+    try {
+      const currentUser = supabase.auth.user ? supabase.auth.user() : (await supabase.auth.getUser()).data.user;
+
+      // 1. Fetch challenges from Supabase for this matchday
+      let { data: remoteChallenges, error: chalErr } = await supabase
+        .from('weekly_challenges')
+        .select('*')
+        .eq('league_id', activeLeagueId)
+        .eq('matchday_number', currentMatchday);
+
+      if (chalErr) throw chalErr;
+
+      // Seed default challenges if empty in Supabase database
+      if (!remoteChallenges || remoteChallenges.length === 0) {
+        const seedDares = [
+          { title: "El Eterno Rival", description: "Llevar la camiseta del máximo rival de tu equipo durante un día entero de trabajo/estudios (y subir foto de prueba)." },
+          { title: "El Camarero de la Liga", description: "Pagarle un café o refresco a cada uno de los miembros de la liga la próxima vez que os veáis." },
+          { title: "El Cantante de WhatsApp", description: "Grabar un audio de WhatsApp de al menos 1 minuto cantando a capela el himno del equipo del último clasificado con la mano en el pecho." }
+        ];
+        
+        const insertList = seedDares.map(d => ({
+          league_id: activeLeagueId,
+          matchday_number: currentMatchday,
+          title: d.title,
+          description: d.description
+        }));
+
+        const { data: inserted, error: insertErr } = await supabase
+          .from('weekly_challenges')
+          .insert(insertList)
+          .select();
+
+        if (!insertErr && inserted) {
+          remoteChallenges = inserted;
+        }
+      }
+
+      challenges = remoteChallenges || [];
+
+      // 2. Fetch all votes for these challenges
+      if (challenges.length > 0) {
+        const challengeIds = challenges.map(c => c.id);
+        const { data: votesList, error: votesErr } = await supabase
+          .from('challenge_votes')
+          .select('challenge_id, profile_id')
+          .in('challenge_id', challengeIds);
+
+        if (!votesErr && votesList) {
+          // Count votes per challenge
+          challenges = challenges.map(c => {
+            const count = votesList.filter(v => v.challenge_id === c.id).length;
+            return {
+              id: c.id,
+              title: c.title,
+              desc: c.description,
+              votes: count
+            };
+          });
+
+          // Check if current user voted
+          if (currentUser) {
+            const myVote = votesList.find(v => v.profile_id === currentUser.id);
+            userVotedId = myVote ? myVote.challenge_id : null;
+          }
+        } else {
+          challenges = challenges.map(c => ({ id: c.id, title: c.title, desc: c.description, votes: 0 }));
+          userVotedId = null;
+        }
+      }
+    } catch (e) {
+      console.error('Error fetching challenges from Supabase:', e);
+    } finally {
+      isLoading = false;
+      renderView();
+    }
+  }
+
+  async function castVote(challengeId) {
+    if (isGuest || !isConfigured) {
+      // Local Guest mode voting toggle
+      if (userVotedId == challengeId) {
+        userVotedId = null;
+        localStorage.removeItem('CF_USER_VOTED_CHALLENGE_ID');
+      } else {
+        userVotedId = challengeId;
+        localStorage.setItem('CF_USER_VOTED_CHALLENGE_ID', challengeId);
+      }
+      callbacks.showToast('Voto local registrado', 'success');
+      loadData();
+      return;
+    }
+
+    try {
+      const currentUser = supabase.auth.user ? supabase.auth.user() : (await supabase.auth.getUser()).data.user;
+      if (!currentUser) return;
+
+      if (userVotedId == challengeId) {
+        // Undo vote
+        await supabase
+          .from('challenge_votes')
+          .delete()
+          .eq('challenge_id', challengeId)
+          .eq('profile_id', currentUser.id);
+        
+        userVotedId = null;
+      } else {
+        // Change vote (delete previous)
+        if (userVotedId) {
+          await supabase
+            .from('challenge_votes')
+            .delete()
+            .eq('challenge_id', userVotedId)
+            .eq('profile_id', currentUser.id);
+        }
+
+        // Insert new vote
+        await supabase
+          .from('challenge_votes')
+          .insert({
+            challenge_id: challengeId,
+            profile_id: currentUser.id
+          });
+        
+        userVotedId = challengeId;
+      }
+      callbacks.showToast('Voto registrado con éxito', 'success');
+    } catch (e) {
+      console.error('Error casting challenge vote:', e);
+      callbacks.showToast('Error al registrar tu voto', 'error');
+    } finally {
+      loadData();
+    }
+  }
+
   function renderView() {
+    if (isLoading) {
+      container.innerHTML = `
+        <div class="container fade-in-up" style="max-width: 500px; margin: 0 auto; text-align: center; padding: 4rem 1rem;">
+          <div style="background: var(--bg-card); border: 3px solid #000; box-shadow: 6px 6px 0 #000; border-radius: 8px; padding: 3rem 2rem;">
+            <div class="loading-spinner" style="border: 4px solid rgba(255,255,255,0.1); border-left-color: var(--accent); border-radius: 50%; width: 45px; height: 45px; animation: spin 1s linear infinite; margin: 0 auto 1.5rem;"></div>
+            <h2 style="font-family: var(--font-display); font-size: 1.35rem; font-weight: 900; text-transform: uppercase; color: var(--text-light); margin-bottom: 0.75rem;">
+              Cargando Votos
+            </h2>
+            <p style="color: var(--text-muted); font-size: 0.85rem; line-height: 1.4; margin: 0;">
+              Obteniendo los retos semanales y recuento de votos en tiempo real de Supabase...
+            </p>
+          </div>
+        </div>
+      `;
+      return;
+    }
+
     const totalVotes = challenges.reduce((sum, c) => sum + c.votes, 0);
 
     container.innerHTML = `
@@ -77,7 +230,7 @@ export function renderChallenges(container, callbacks) {
                 const isThisVoted = userVotedId == item.id;
                 return `
                   <div class="card" style="background: rgba(255, 255, 255, 0.02); border: 1px solid ${isThisVoted ? 'var(--primary)' : 'var(--border-color)'}; padding: 1.25rem; margin: 0; position: relative; overflow: hidden; border-radius: 12px;">
-                    <!-- Background fill for visual progress bar -->
+                    <!-- Background fill for progress bar -->
                     <div style="position: absolute; left: 0; top: 0; bottom: 0; width: ${percent}%; background: rgba(var(--primary-rgb), 0.04); transition: width 0.6s ease; pointer-events: none; z-index: 1;"></div>
                     
                     <div style="position: relative; z-index: 2; display: flex; justify-content: space-between; align-items: start; gap: 1rem;">
@@ -94,7 +247,7 @@ export function renderChallenges(container, callbacks) {
                     </div>
 
                     <div style="margin-top: 1rem; display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 2;">
-                      <!-- Visual progress bar slider -->
+                      <!-- Progress bar slider -->
                       <div style="flex-grow: 1; height: 6px; background: rgba(255, 255, 255, 0.05); border-radius: 3px; margin-right: 1.5rem; overflow: hidden;">
                         <div style="height: 100%; width: ${percent}%; background: ${isThisVoted ? 'var(--primary)' : 'var(--text-muted)'}; border-radius: 3px; transition: width 0.6s ease;"></div>
                       </div>
@@ -151,21 +304,11 @@ export function renderChallenges(container, callbacks) {
               </p>
             </div>
 
-            <!-- Historial de Retos -->
+            <!-- Historial de Retos (Predefined fallback) -->
             <div class="card glass">
               <h3 class="card-title" style="font-size: 1.05rem; margin-bottom: 1rem;">Historial de Penitencias</h3>
               <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-                ${DEFAULT_HISTORY.length === 0 
-                  ? `<p style="color: var(--text-muted); font-size: 0.85rem; font-style: italic; padding: 0.5rem 0;">No hay retos pasados todavía.</p>`
-                  : DEFAULT_HISTORY.map(h => `
-                    <div style="border-left: 2.5px solid var(--accent); padding: 0.5rem 0.75rem; background: rgba(0,0,0,0.1); border-radius: 0 8px 8px 0; font-size: 0.8rem;">
-                      <div style="display: flex; justify-content: space-between; margin-bottom: 0.15rem;">
-                        <strong>Jornada ${h.matchday}</strong>
-                      </div>
-                      <p style="color: var(--text-muted); line-height: 1.3;">Reto: ${h.dare}</p>
-                    </div>
-                  `).join('')
-                }
+                <p style="color: var(--text-muted); font-size: 0.85rem; font-style: italic; padding: 0.5rem 0;">No hay retos pasados todavía.</p>
               </div>
             </div>
           </div>
@@ -176,43 +319,14 @@ export function renderChallenges(container, callbacks) {
     // Hook Vote Buttons
     container.querySelectorAll('.btn-vote').forEach(button => {
       button.addEventListener('click', (e) => {
-        if (isGuest) {
-          callbacks.onNavigate('acceso');
-          return;
-        }
-        const id = Number(e.target.dataset.id);
-        
-        if (userVotedId == id) {
-          // Undo vote
-          challenges = challenges.map(c => c.id === id ? { ...c, votes: Math.max(0, c.votes - 1) } : c);
-          userVotedId = null;
-          localStorage.removeItem('CF_USER_VOTED_CHALLENGE_ID');
-        } else {
-          // Change or make vote
-          if (userVotedId) {
-            // Subtract previous
-            const prevId = Number(userVotedId);
-            challenges = challenges.map(c => c.id === prevId ? { ...c, votes: Math.max(0, c.votes - 1) } : c);
-          }
-          // Add new
-          challenges = challenges.map(c => c.id === id ? { ...c, votes: c.votes + 1 } : c);
-          userVotedId = id;
-          localStorage.setItem('CF_USER_VOTED_CHALLENGE_ID', id);
-        }
-
-        localStorage.setItem('CF_CHALLENGES_DATA', JSON.stringify(challenges));
-        callbacks.showToast('Voto registrado con éxito', 'success');
-        renderView();
+        const id = e.target.dataset.id;
+        castVote(id);
       });
     });
 
-    // Hook Pique Form removed
-
-    // Initialize Countdown Timer
     startCountdown();
   }
 
-  // Ticking countdown timer to next Sunday 20:00
   function startCountdown() {
     const dVal = container.querySelector('#days');
     const hVal = container.querySelector('#hours');
@@ -224,12 +338,10 @@ export function renderChallenges(container, callbacks) {
     const updateTimer = () => {
       const now = new Date();
       const nextSunday = new Date();
-      // Sunday is 0. Find days until next Sunday.
       const dayOffset = (7 - now.getDay()) % 7;
       nextSunday.setDate(now.getDate() + dayOffset);
       nextSunday.setHours(20, 0, 0, 0);
 
-      // If Sunday after 20:00, target next Sunday
       if (now.getDay() === 0 && now.getHours() >= 20) {
         nextSunday.setDate(nextSunday.getDate() + 7);
       }
@@ -258,6 +370,6 @@ export function renderChallenges(container, callbacks) {
   }
 
   loadMatchday().then(() => {
-    renderView();
+    loadData();
   });
 }
