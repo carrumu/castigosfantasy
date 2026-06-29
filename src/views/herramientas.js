@@ -1,3 +1,5 @@
+import { supabase } from '../supabase';
+
 /**
  * Renders the Herramientas (Sala VAR) hub page.
  * @param {HTMLElement} container
@@ -11,6 +13,11 @@ export function renderHerramientas(container, callbacks) {
   let contractState = 'view'; // 'view', 'edit', 'loading', 'preview'
   let draftRules = '';
   let generatedContract = '';
+  
+  // Supabase dynamic state
+  let isAdmin = false;
+  let isLoadingData = false;
+  let savedContract = '';
 
   // Client-side funny legal formalization generator (no emojis!)
   function formalizeRule(rule, index) {
@@ -61,6 +68,50 @@ ${clauses}
 DISPOSICION FINAL: Las clausulas detalladas anteriormente son sagradas. Ningun firmante podra alegar desconocimiento de las mismas, ni justificar su incumplimiento por motivos de mala racha, lesiones o decisiones arbitrales. El VAR actuara de oficio ante cualquier infraccion.
 
 Firmado y jurado por todos los miembros del grupo de WhatsApp.`;
+  }
+
+  async function loadContractAndRole() {
+    isLoadingData = true;
+    render();
+
+    try {
+      const user = supabase.auth.user ? supabase.auth.user() : (await supabase.auth.getUser()).data.user;
+      
+      if (user && activeLeagueId !== 'default') {
+        // 1. Fetch admin status of this member
+        const { data: memberData, error: memberErr } = await supabase
+          .from('league_members')
+          .select('is_admin')
+          .eq('league_id', activeLeagueId)
+          .eq('profile_id', user.id)
+          .maybeSingle();
+        
+        if (!memberErr && memberData) {
+          isAdmin = memberData.is_admin;
+        }
+
+        // 2. Fetch contract from leagues table
+        const { data: leagueData, error: leagueErr } = await supabase
+          .from('leagues')
+          .select('contract_text')
+          .eq('id', activeLeagueId)
+          .maybeSingle();
+
+        if (!leagueErr && leagueData) {
+          savedContract = leagueData.contract_text || '';
+        }
+      } else {
+        // Fallback for guest/demo mode
+        isAdmin = true;
+        savedContract = localStorage.getItem('CF_LEAGUE_CONTRACT_demo') || '';
+      }
+    } catch (e) {
+      console.error('Error loading contract data from Supabase:', e);
+    } finally {
+      isLoadingData = false;
+      contractState = savedContract ? 'view' : 'edit';
+      render();
+    }
   }
 
   function render() {
@@ -159,10 +210,7 @@ Firmado y jurado por todos los miembros del grupo de WhatsApp.`;
 
       container.querySelector('#tool-contrato-btn').addEventListener('click', () => {
         subview = 'contrato';
-        // Auto resolve contract state based on whether one already exists
-        const saved = localStorage.getItem('CF_LEAGUE_CONTRACT_' + activeLeagueId);
-        contractState = saved ? 'view' : 'edit';
-        render();
+        loadContractAndRole();
       });
 
       container.querySelector('#tool-calculadora-btn').addEventListener('click', () => {
@@ -171,7 +219,23 @@ Firmado y jurado por todos los miembros del grupo de WhatsApp.`;
       });
 
     } else if (subview === 'contrato') {
-      const savedContract = localStorage.getItem('CF_LEAGUE_CONTRACT_' + activeLeagueId);
+
+      if (isLoadingData) {
+        container.innerHTML = `
+          <div class="container fade-in-up" style="max-width: 500px; margin: 0 auto; text-align: center; padding: 4rem 1rem;">
+            <div style="background: var(--bg-card); border: 3px solid #000; box-shadow: 6px 6px 0 #000; border-radius: 8px; padding: 3rem 2rem;">
+              <div class="loading-spinner" style="border: 4px solid rgba(255,255,255,0.1); border-left-color: var(--accent); border-radius: 50%; width: 45px; height: 45px; animation: spin 1s linear infinite; margin: 0 auto 1.5rem;"></div>
+              <h2 style="font-family: var(--font-display); font-size: 1.35rem; font-weight: 900; text-transform: uppercase; color: var(--text-light); margin-bottom: 0.75rem;">
+                Cargando
+              </h2>
+              <p style="color: var(--text-muted); font-size: 0.85rem; line-height: 1.4; margin: 0;">
+                Conectando con Supabase para obtener el contrato de la liga...
+              </p>
+            </div>
+          </div>
+        `;
+        return;
+      }
 
       if (contractState === 'view' && savedContract) {
         container.innerHTML = `
@@ -200,10 +264,17 @@ Firmado y jurado por todos los miembros del grupo de WhatsApp.`;
                   <span class="material-symbols-outlined">content_copy</span>
                   <span id="copy-btn-text">Copiar Contrato</span>
                 </button>
-                <button id="btn-edit-contract-rules" class="btn-primary" style="flex: 1; min-width: 180px; display: flex; align-items: center; justify-content: center; gap: 0.5rem; font-weight: 800; padding: 0.85rem; background: transparent; color: var(--text-light); border: 2.5px solid var(--border-color); box-shadow: 3px 3px 0 #000;">
-                  <span class="material-symbols-outlined">edit</span>
-                  Redactar Nuevo Reglamento
-                </button>
+                
+                ${isAdmin ? `
+                  <button id="btn-edit-contract-rules" class="btn-primary" style="flex: 1; min-width: 180px; display: flex; align-items: center; justify-content: center; gap: 0.5rem; font-weight: 800; padding: 0.85rem; background: transparent; color: var(--text-light); border: 2.5px solid var(--border-color); box-shadow: 3px 3px 0 #000;">
+                    <span class="material-symbols-outlined">edit</span>
+                    Redactar Nuevo Reglamento
+                  </button>
+                ` : `
+                  <div style="width: 100%; text-align: center; margin-top: 1rem; color: var(--text-muted); font-size: 0.78rem; font-weight: 700; border-top: 1.5px dashed var(--border-color); padding-top: 1rem;">
+                    Solo los administradores de la liga pueden modificar el contrato.
+                  </div>
+                `}
               </div>
             </div>
           </div>
@@ -232,12 +303,21 @@ Firmado y jurado por todos los miembros del grupo de WhatsApp.`;
           });
         });
 
-        container.querySelector('#btn-edit-contract-rules').addEventListener('click', () => {
-          contractState = 'edit';
-          render();
-        });
+        if (isAdmin) {
+          container.querySelector('#btn-edit-contract-rules').addEventListener('click', () => {
+            contractState = 'edit';
+            render();
+          });
+        }
 
       } else if (contractState === 'edit') {
+        // Double check admin protection
+        if (!isAdmin && savedContract) {
+          contractState = 'view';
+          render();
+          return;
+        }
+
         container.innerHTML = `
           <div class="container fade-in-up" style="max-width: 600px; margin: 0 auto;">
             <!-- Header -->
@@ -288,7 +368,7 @@ Firmado y jurado por todos los miembros del grupo de WhatsApp.`;
         container.innerHTML = `
           <div class="container fade-in-up" style="max-width: 500px; margin: 0 auto; text-align: center; padding: 4rem 1rem;">
             <div style="background: var(--bg-card); border: 3px solid #000; box-shadow: 6px 6px 0 #000; border-radius: 8px; padding: 3rem 2rem;">
-              <div class="loading-spinner" style="border: 4px solid rgba(0,0,0,0.1); border-left-color: var(--accent); border-radius: 50%; width: 45px; height: 45px; animation: spin 1s linear infinite; margin: 0 auto 1.5rem;"></div>
+              <div class="loading-spinner" style="border: 4px solid rgba(255,255,255,0.1); border-left-color: var(--accent); border-radius: 50%; width: 45px; height: 45px; animation: spin 1s linear infinite; margin: 0 auto 1.5rem;"></div>
               <h2 style="font-family: var(--font-display); font-size: 1.35rem; font-weight: 900; text-transform: uppercase; color: var(--text-light); margin-bottom: 0.75rem;">
                 Procesando Reglamento
               </h2>
@@ -341,10 +421,31 @@ Firmado y jurado por todos los miembros del grupo de WhatsApp.`;
           render();
         });
 
-        container.querySelector('#btn-save-ai-contract').addEventListener('click', () => {
-          localStorage.setItem('CF_LEAGUE_CONTRACT_' + activeLeagueId, generatedContract);
-          contractState = 'view';
-          render();
+        container.querySelector('#btn-save-ai-contract').addEventListener('click', async () => {
+          const saveBtn = container.querySelector('#btn-save-ai-contract');
+          saveBtn.disabled = true;
+          saveBtn.innerHTML = '<span class="spinner"></span> Guardando...';
+
+          try {
+            if (activeLeagueId !== 'default') {
+              const { error } = await supabase
+                .from('leagues')
+                .update({ contract_text: generatedContract })
+                .eq('id', activeLeagueId);
+              
+              if (error) throw error;
+            } else {
+              localStorage.setItem('CF_LEAGUE_CONTRACT_demo', generatedContract);
+            }
+            
+            savedContract = generatedContract;
+            contractState = 'view';
+          } catch (e) {
+            console.error('Error saving contract to Supabase:', e);
+            alert('Error al guardar el contrato en la base de datos de Supabase.');
+          } finally {
+            render();
+          }
         });
       }
 
