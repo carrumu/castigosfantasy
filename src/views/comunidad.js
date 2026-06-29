@@ -21,21 +21,6 @@ export function renderComunidad(container, callbacks) {
       <!-- Options Grid -->
       <div class="brutalist-grid-2" style="max-width: 900px; margin: 0 auto; gap: 2rem;">
         
-        <!-- El Bufón Card (Active) -->
-        <article class="brutalist-card concrete-bg" id="comunidad-bufon-card" style="cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; min-height: 260px; position: relative;">
-          <div>
-            <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid #000000; padding-bottom: 0.75rem; margin-bottom: 1rem;">
-              <h2 style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 800; text-transform: uppercase;">El Bufón de la Corte</h2>
-            </div>
-            <p style="font-size: 0.95rem; color: var(--text-light); line-height: 1.5; margin-bottom: 1.5rem;">
-              Vota por el peor futbolista de LaLiga en la jornada: el que menos puntos ha dado en el fantasy, del que más se esperaba y menos ha hecho.
-            </p>
-          </div>
-          <button class="brutalist-btn" style="margin-top: auto; pointer-events: none; width: 100%;">
-            Entrar a la Corte <span class="material-symbols-outlined" style="font-size: 1.2rem;">chevron_right</span>
-          </button>
-        </article>
-
         <!-- Foro Card -->
         <article class="brutalist-card concrete-bg" id="comunidad-foro-card" style="cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; min-height: 260px; position: relative;">
           <div>
@@ -49,6 +34,21 @@ export function renderComunidad(container, callbacks) {
           </div>
           <button class="brutalist-btn" style="margin-top: auto; pointer-events: none; width: 100%;">
             Entrar al Foro <span class="material-symbols-outlined" style="font-size: 1.2rem;">chevron_right</span>
+          </button>
+        </article>
+
+        <!-- El Bufón Card (Active) -->
+        <article class="brutalist-card concrete-bg" id="comunidad-bufon-card" style="cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; min-height: 260px; position: relative;">
+          <div>
+            <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid #000000; padding-bottom: 0.75rem; margin-bottom: 1rem;">
+              <h2 style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 800; text-transform: uppercase;">El Bufón de la Corte</h2>
+            </div>
+            <p style="font-size: 0.95rem; color: var(--text-light); line-height: 1.5; margin-bottom: 1.5rem;">
+              Vota por el peor futbolista de LaLiga en la jornada: el que menos puntos ha dado en el fantasy, del que más se esperaba y menos ha hecho.
+            </p>
+          </div>
+          <button class="brutalist-btn" style="margin-top: auto; pointer-events: none; width: 100%;">
+            Entrar a la Corte <span class="material-symbols-outlined" style="font-size: 1.2rem;">chevron_right</span>
           </button>
         </article>
 
