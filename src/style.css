@@ -2335,11 +2335,12 @@ input, select, textarea, button {
     z-index: 9999;
   }
   
+  /* Secondary mobile nav items (default) */
   .mobile-nav-item {
     background: transparent;
     border: 2px solid transparent;
     border-radius: 12px;
-    color: var(--text-muted);
+    color: #777777; /* Neutral gray */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -2349,54 +2350,81 @@ input, select, textarea, button {
     transition: all var(--transition-fast);
     flex: 1;
     min-width: 0;
-    max-width: none;
     height: 54px;
   }
   
   .mobile-nav-item .material-symbols-outlined {
-    font-size: 20px;
-    margin-bottom: 1px;
+    font-size: 17px; /* Slightly smaller icon */
+    margin-bottom: 2px;
+    color: #777777;
+    transition: color var(--transition-fast);
   }
   
   .mobile-nav-item .mobile-nav-label {
     font-family: var(--font-sans);
     font-weight: 800;
-    font-size: 8px;
-    letter-spacing: 0.2px;
+    font-size: 7.2px; /* Slightly smaller text for secondary */
+    letter-spacing: 0.1px;
     text-transform: uppercase;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     width: 100%;
     text-align: center;
+    color: #777777;
+    transition: color var(--transition-fast);
   }
   
+  /* Active state for secondary buttons */
   .mobile-nav-item.active {
-    background-color: rgba(var(--accent-rgb), 0.15);
+    background-color: rgba(var(--accent-rgb), 0.12);
     border-color: var(--accent);
-    color: var(--accent);
+  }
+  .mobile-nav-item.active .material-symbols-outlined,
+  .mobile-nav-item.active .mobile-nav-label {
+    color: var(--accent) !important;
   }
 
-  /* Highlighted center action item for Ligas */
-  .mobile-nav-item.mobile-nav-item-highlight {
-    background-color: var(--bg-sidebar) !important;
+  /* Primary main items (Panel and Ligas) */
+  .mobile-nav-item.mobile-nav-main {
     color: var(--text-light) !important;
-    border: 2px solid var(--accent) !important;
-    transform: translateY(-8px) scale(1.08);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4) !important;
+    font-weight: 800;
+  }
+
+  /* Specific sizes for Panel (Main) */
+  .mobile-nav-item.mobile-nav-panel .material-symbols-outlined {
+    font-size: 20px !important;
+    color: var(--text-light);
+  }
+  .mobile-nav-item.mobile-nav-panel .mobile-nav-label {
+    font-size: 7.6px !important;
+    font-weight: 900;
+    color: var(--text-light);
+  }
+
+  /* Specific sizes for Ligas (Main & largest) */
+  .mobile-nav-item.mobile-nav-ligas .material-symbols-outlined {
+    font-size: 24px !important;
+    color: var(--text-light);
+  }
+  .mobile-nav-item.mobile-nav-ligas .mobile-nav-label {
+    font-size: 8.2px !important;
+    font-weight: 900;
+    color: var(--text-light);
+  }
+  
+  /* Highlighted active state for Panel and Ligas (Flat design, no displacement) */
+  .mobile-nav-item.mobile-nav-main.active {
+    background-color: var(--accent) !important;
+    border: 2.5px solid #000000 !important;
+    box-shadow: 3px 3px 0px #000000, 0 0 10px rgba(222, 237, 0, 0.4) !important;
     border-radius: 12px;
     z-index: 10;
   }
   
-  .mobile-nav-item.mobile-nav-item-highlight.active {
-    background-color: var(--accent) !important;
+  .mobile-nav-item.mobile-nav-main.active .material-symbols-outlined,
+  .mobile-nav-item.mobile-nav-main.active .mobile-nav-label {
     color: #000000 !important;
-    border: 2.5px solid #000000 !important;
-    box-shadow: 3px 3px 0px #000000, 0 0 10px rgba(222, 237, 0, 0.4) !important;
-  }
-  
-  .mobile-nav-item .mobile-nav-label {
-    font-size: 7.5px; /* Slightly smaller to fit COMUNIDAD and HERRAM. perfectly */
   }
 
   .menu-toggle-btn {
@@ -2875,7 +2903,7 @@ input, select, textarea, button {
   color: var(--text-light);
 }
 
-/* --- Herramientas Tool Cards --- */
+/* --- Sala VAR Tool Cards --- */
 .tool-card-btn {
   width: 100%;
   background: var(--bg-card);

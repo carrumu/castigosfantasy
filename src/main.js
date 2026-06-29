@@ -89,7 +89,7 @@ function renderMainLayout(isGuest, currentUser = null) {
 
           <button class="nav-item ${currentView === 'herramientas' || currentView === 'ruleta' || currentView === 'generador' ? 'active' : ''}" id="nav-wheel-btn">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;"><circle cx="12" cy="12" r="10"></circle><path d="M12 2v20"></path><path d="M2 12h20"></path></svg>
-            <span>Herramientas</span>
+            <span>Sala VAR</span>
           </button>
 
           <button class="nav-item ${currentView === 'retos' ? 'active' : ''}" id="nav-challenges-btn">
@@ -187,7 +187,7 @@ function renderMainLayout(isGuest, currentUser = null) {
           <!-- Enlaces de navegación en cabecera (Escritorio) -->
           <nav class="header-nav">
             <button class="header-nav-link ${currentView === 'inicio' ? 'active' : ''}" data-nav="inicio">INICIO</button>
-            <button class="header-nav-link ${currentView === 'herramientas' || currentView === 'ruleta' || currentView === 'generador' ? 'active' : ''}" data-nav="herramientas">HERRAMIENTAS</button>
+            <button class="header-nav-link ${currentView === 'herramientas' || currentView === 'ruleta' || currentView === 'generador' ? 'active' : ''}" data-nav="herramientas">SALA VAR</button>
             <button class="header-nav-link ${currentView === 'retos' ? 'active' : ''}" data-nav="retos">RETOS</button>
             <button class="header-nav-link ${currentView === 'comunidad' || currentView === 'bufon' || currentView === 'foro' ? 'active' : ''}" data-nav="comunidad">COMUNIDAD</button>
             <button class="header-nav-link ${currentView === 'juegos' || currentView === 'adivina-jugador' ? 'active' : ''}" data-nav="juegos">JUEGOS</button>
@@ -231,7 +231,7 @@ function renderMainLayout(isGuest, currentUser = null) {
       <!-- Navegación Inferior para Móvil -->
       <nav class="mobile-bottom-nav">
         <!-- 1. Panel -->
-        <button class="mobile-nav-item ${currentView === 'inicio' ? 'active' : ''}" data-nav="inicio" title="Panel principal">
+        <button class="mobile-nav-item mobile-nav-main mobile-nav-panel ${currentView === 'inicio' ? 'active' : ''}" data-nav="inicio" title="Panel principal">
           <span class="material-symbols-outlined">grid_view</span>
           <span class="mobile-nav-label">PANEL</span>
         </button>
@@ -241,24 +241,24 @@ function renderMainLayout(isGuest, currentUser = null) {
           <span class="mobile-nav-label">COMUNIDAD</span>
         </button>
         <!-- 3. Ligas (Destacado) -->
-        <button class="mobile-nav-item mobile-nav-item-highlight ${currentView === 'mis-ligas' || currentView === 'menu-liga' || currentView === 'muro' ? 'active' : ''}" data-nav="mis-ligas" title="Mis ligas">
+        <button class="mobile-nav-item mobile-nav-main mobile-nav-ligas ${currentView === 'mis-ligas' || currentView === 'menu-liga' || currentView === 'muro' ? 'active' : ''}" data-nav="mis-ligas" title="Mis ligas">
           <span class="material-symbols-outlined">shield</span>
           <span class="mobile-nav-label">LIGAS</span>
         </button>
-        <!-- 4. Juegos -->
+        <!-- 4. Sala VAR -->
+        <button class="mobile-nav-item ${currentView === 'herramientas' || currentView === 'ruleta' || currentView === 'generador' ? 'active' : ''}" data-nav="herramientas" title="Sala VAR">
+          <span class="material-symbols-outlined">casino</span>
+          <span class="mobile-nav-label">VAR</span>
+        </button>
+        <!-- 5. Juegos -->
         <button class="mobile-nav-item ${currentView === 'juegos' || currentView === 'adivina-jugador' || currentView === 'top-10' ? 'active' : ''}" data-nav="juegos" title="Juegos interactivos">
           <span class="material-symbols-outlined">sports_esports</span>
           <span class="mobile-nav-label">JUEGOS</span>
         </button>
-        <!-- 5. Retos -->
+        <!-- 6. Retos -->
         <button class="mobile-nav-item ${currentView === 'retos' ? 'active' : ''}" data-nav="retos" title="Reto semanal">
           <span class="material-symbols-outlined">emoji_events</span>
           <span class="mobile-nav-label">RETOS</span>
-        </button>
-        <!-- 6. Herramientas -->
-        <button class="mobile-nav-item ${currentView === 'herramientas' || currentView === 'ruleta' || currentView === 'generador' ? 'active' : ''}" data-nav="herramientas" title="Herramientas">
-          <span class="material-symbols-outlined">casino</span>
-          <span class="mobile-nav-label">HERRAM.</span>
         </button>
       </nav>
 
