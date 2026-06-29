@@ -508,7 +508,7 @@ export function renderDashboard(container, callbacks) {
               <div class="leaderboard-stats">Último puesto: <strong>${item.countLast}</strong> veces</div>
             </div>
             <div class="leaderboard-debt">
-              <div class="debt-amount">${item.totalOwed.toFixed(2)}€</div>
+              <div class="debt-amount" style="color: ${item.totalOwed === 0 ? '#30d158' : (idx === 0 || item.totalOwed >= 20 ? '#ff453a' : '#ffd60a')} !important; text-shadow: 0 0 10px ${item.totalOwed === 0 ? 'rgba(48,209,88,0.25)' : (idx === 0 || item.totalOwed >= 20 ? 'rgba(255,69,58,0.25)' : 'rgba(255,214,10,0.25)')};">${item.totalOwed.toFixed(2)}€</div>
             </div>
           </div>
         `;
