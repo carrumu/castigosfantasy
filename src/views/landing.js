@@ -148,13 +148,21 @@ export function renderLanding(container, callbacks) {
               onmousedown="this.style.transform='translate(3px,3px)'; this.style.boxShadow='0px 0px 0px #000000';"
               onmouseup="this.style.transform='translate(-2px,-2px)'; this.style.boxShadow='7px 7px 0px 0px #000000';"
               >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                  <circle cx="9" cy="7" r="4"></circle>
-                  <line x1="19" y1="8" x2="19" y2="14"></line>
-                  <line x1="22" y1="11" x2="16" y2="11"></line>
-                </svg>
-                Crea tu Liga
+                ${hasLeagues ? `
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                    <line x1="3" y1="12" x2="15" y2="12"></line>
+                  </svg>
+                  Llévame a mi Liga
+                ` : `
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <line x1="19" y1="8" x2="19" y2="14"></line>
+                    <line x1="22" y1="11" x2="16" y2="11"></line>
+                  </svg>
+                  Crea tu Liga
+                `}
               </button>
             </div>
           </section>
@@ -175,9 +183,9 @@ export function renderLanding(container, callbacks) {
                     ${leaderboard.length === 0 ? `
                       <li style="text-align: center; color: var(--text-muted); font-size: 0.8rem; padding: 0.5rem 0;">No hay deudas registradas.</li>
                     ` : leaderboard.map((item, idx) => `
-                      <li style="background: var(--bg-obsidian); display: flex; justify-content: space-between; padding: 0.65rem 0.85rem; border: 3px solid #000000; border-left: 6px solid ${idx === 0 ? 'var(--danger)' : 'var(--accent)'};">
+                      <li style="background: var(--bg-obsidian); display: flex; justify-content: space-between; padding: 0.65rem 0.85rem; border: 3px solid #000000;">
                         <span style="font-family: var(--font-sans); font-weight: 700; font-size: 0.8rem; color: var(--text-light);">${idx + 1}. ${escapeHTML(item.name)}</span>
-                        <span style="font-family: var(--font-sans); font-weight: 800; color: ${idx === 0 ? 'var(--danger)' : 'var(--text-light)'}; font-size: 0.8rem;">${item.totalOwed.toFixed(2)}€</span>
+                        <span style="font-family: var(--font-sans); font-weight: 800; color: ${item.totalOwed === 0 ? '#30d158' : (idx === 0 || item.totalOwed >= 20 ? '#ff453a' : '#ffd60a')}; font-size: 0.8rem; text-shadow: 0 0 10px ${item.totalOwed === 0 ? 'rgba(48,209,88,0.2)' : (idx === 0 || item.totalOwed >= 20 ? 'rgba(255,69,58,0.2)' : 'rgba(255,214,10,0.2)')};">${item.totalOwed.toFixed(2)}€</span>
                       </li>
                     `).join('')}
                   </ul>
@@ -474,7 +482,13 @@ export function renderLanding(container, callbacks) {
     const heroCreateBtn = container.querySelector('#hero-create-league-btn');
     if (heroCreateBtn) {
       heroCreateBtn.addEventListener('click', () => {
-        if (callbacks.onNavigate) callbacks.onNavigate('mis-ligas');
+        if (callbacks.onNavigate) {
+          if (hasLeagues) {
+            callbacks.onNavigate('menu-liga');
+          } else {
+            callbacks.onNavigate('mis-ligas');
+          }
+        }
       });
     }
   }

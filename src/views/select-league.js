@@ -204,11 +204,11 @@ export function renderSelectLeague(container, callbacks) {
                     <div style="display: flex; gap: 1.5rem; background: rgba(255,255,255,0.02); padding: 0.65rem 0.85rem; border-radius: 6px; border: 1.5px solid var(--border-color-glow);">
                       <label style="display: flex; align-items: center; gap: 0.4rem; color: var(--text-light); font-size: 0.8rem; cursor: pointer; font-weight: 600;">
                         <input type="radio" name="league-type" value="manual" checked style="accent-color: var(--accent);" />
-                        Liga Fantasy (Manual)
+                        Fantasy
                       </label>
                       <label style="display: flex; align-items: center; gap: 0.4rem; color: var(--text-light); font-size: 0.8rem; cursor: pointer; font-weight: 600;">
                         <input type="radio" name="league-type" value="biwenger" style="accent-color: var(--accent);" />
-                        Liga Biwenger
+                        Biwenger
                       </label>
                     </div>
                   </div>

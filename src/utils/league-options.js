@@ -115,19 +115,21 @@ export async function openLeagueSettings(leagueId, callbacks) {
             <input type="text" id="edit-league-name" class="input-field" value="${leagueData.name}" required style="border: 1.5px solid var(--border-color-glow); font-weight: 700; background: var(--bg-input); width: 100%; padding: 0.65rem 0.85rem;" />
           </div>
 
-          <div class="form-group" style="margin-bottom: 0;">
-            <label style="color: var(--text-light); font-weight: 700; font-size: 0.8rem; display: block; margin-bottom: 0.35rem;">Tipo de Liga / Sincronización</label>
-            <div style="display: flex; gap: 1rem; background: rgba(255,255,255,0.02); padding: 0.55rem 0.75rem; border-radius: 6px; border: 1.5px solid var(--border-color-glow);">
-              <label style="display: flex; align-items: center; gap: 0.35rem; color: var(--text-light); font-size: 0.78rem; cursor: pointer; font-weight: 600;">
-                <input type="radio" name="edit-league-type" value="manual" ${leagueData.sync_source !== 'biwenger' ? 'checked' : ''} style="accent-color: var(--accent);" />
-                Manual (Fantasy)
-              </label>
-              <label style="display: flex; align-items: center; gap: 0.35rem; color: var(--text-light); font-size: 0.78rem; cursor: pointer; font-weight: 600;">
-                <input type="radio" name="edit-league-type" value="biwenger" ${leagueData.sync_source === 'biwenger' ? 'checked' : ''} style="accent-color: var(--accent);" />
-                Biwenger 🔄
-              </label>
+          ${leagueData.sync_source === 'biwenger' ? `
+            <div class="form-group" style="margin-bottom: 0;">
+              <label style="color: var(--text-light); font-weight: 700; font-size: 0.8rem; display: block; margin-bottom: 0.35rem;">Tipo de Liga / Sincronización</label>
+              <div style="display: flex; gap: 1rem; background: rgba(255,255,255,0.02); padding: 0.55rem 0.75rem; border-radius: 6px; border: 1.5px solid var(--border-color-glow);">
+                <label style="display: flex; align-items: center; gap: 0.35rem; color: var(--text-light); font-size: 0.78rem; cursor: pointer; font-weight: 600;">
+                  <input type="radio" name="edit-league-type" value="manual" ${leagueData.sync_source !== 'biwenger' ? 'checked' : ''} style="accent-color: var(--accent);" />
+                  Fantasy
+                </label>
+                <label style="display: flex; align-items: center; gap: 0.35rem; color: var(--text-light); font-size: 0.78rem; cursor: pointer; font-weight: 600;">
+                  <input type="radio" name="edit-league-type" value="biwenger" ${leagueData.sync_source === 'biwenger' ? 'checked' : ''} style="accent-color: var(--accent);" />
+                  Biwenger
+                </label>
+              </div>
             </div>
-          </div>
+          ` : ''}
 
           <!-- Fields to configure Biwenger credentials -->
           <div id="edit-biwenger-fields" style="display: ${leagueData.sync_source === 'biwenger' ? 'flex' : 'none'}; flex-direction: column; gap: 0.75rem; border-top: 1.5px dashed var(--border-color-glow); padding-top: 0.75rem; margin-top: 0.15rem;">
@@ -173,7 +175,7 @@ export async function openLeagueSettings(leagueId, callbacks) {
       <!-- Vincular Usuario Biwenger (Solo si la liga es de tipo Biwenger) -->
       ${leagueData.sync_source === 'biwenger' ? `
         <div style="margin-bottom: 1.75rem; background: rgba(222, 237, 0, 0.02); padding: 1rem; border-radius: 10px; border: 1.5px solid var(--border-color-glow);">
-          <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px; display: block; margin-bottom: 0.5rem;">🔗 Vincular tu usuario de Biwenger</span>
+          <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px; display: block; margin-bottom: 0.5rem;">Vincular tu usuario de Biwenger</span>
           <p style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 0.75rem; line-height: 1.35;">
             Selecciona tu participante de Biwenger para que las sincronizaciones te reconozcan automáticamente.
           </p>
@@ -194,12 +196,12 @@ export async function openLeagueSettings(leagueId, callbacks) {
         <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px; margin-bottom: 0.25rem; display: block;">Acciones de Liga</span>
         
         <button class="btn-league-danger-outline" id="btn-leave-league" style="width: 100%; padding: 0.75rem; font-weight: 800; text-transform: uppercase; font-family: var(--font-display); cursor: pointer;">
-          🚪 Salirse de la Liga
+          Salirse de la Liga
         </button>
 
         ${isAdmin ? `
           <button class="btn-league-danger-solid" id="btn-delete-league" style="width: 100%; padding: 0.75rem; font-weight: 800; text-transform: uppercase; font-family: var(--font-display); cursor: pointer;">
-            🗑️ Eliminar Liga
+            Eliminar Liga
           </button>
         ` : ''}
       </div>
@@ -246,7 +248,8 @@ export async function openLeagueSettings(leagueId, callbacks) {
         e.preventDefault();
         const saveBtn = settingsForm.querySelector('#btn-save-settings');
         const newName = settingsForm.querySelector('#edit-league-name').value.trim();
-        const newType = settingsForm.querySelector('input[name="edit-league-type"]:checked').value;
+        const typeRadio = settingsForm.querySelector('input[name="edit-league-type"]:checked');
+        const newType = typeRadio ? typeRadio.value : (leagueData.sync_source || 'manual');
 
         saveBtn.disabled = true;
         saveBtn.innerHTML = '<span class="spinner"></span>';

@@ -3955,14 +3955,9 @@ input, select, textarea, button {
 
 #morosos-card ul li {
   border: 1px solid var(--border-color) !important;
-  border-left: 5px solid var(--accent) !important;
   border-radius: 6px !important;
   background: rgba(255, 255, 255, 0.01) !important;
   box-shadow: none !important;
-}
-
-#morosos-card ul li:first-child {
-  border-left-color: var(--danger) !important;
 }
 
 #view-container div[style*="border-style: dashed"],
