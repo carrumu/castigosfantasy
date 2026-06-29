@@ -2377,6 +2377,28 @@ input, select, textarea, button {
     color: var(--accent);
   }
 
+  /* Highlighted center action item for Ligas */
+  .mobile-nav-item.mobile-nav-item-highlight {
+    background-color: var(--bg-sidebar) !important;
+    color: var(--text-light) !important;
+    border: 2px solid var(--accent) !important;
+    transform: translateY(-8px) scale(1.08);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4) !important;
+    border-radius: 12px;
+    z-index: 10;
+  }
+  
+  .mobile-nav-item.mobile-nav-item-highlight.active {
+    background-color: var(--accent) !important;
+    color: #000000 !important;
+    border: 2.5px solid #000000 !important;
+    box-shadow: 3px 3px 0px #000000, 0 0 10px rgba(222, 237, 0, 0.4) !important;
+  }
+  
+  .mobile-nav-item .mobile-nav-label {
+    font-size: 7.5px; /* Slightly smaller to fit COMUNIDAD and HERRAM. perfectly */
+  }
+
   .menu-toggle-btn {
     display: none !important;
   }

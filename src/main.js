@@ -230,29 +230,35 @@ function renderMainLayout(isGuest, currentUser = null) {
 
       <!-- Navegación Inferior para Móvil -->
       <nav class="mobile-bottom-nav">
+        <!-- 1. Panel -->
         <button class="mobile-nav-item ${currentView === 'inicio' ? 'active' : ''}" data-nav="inicio" title="Panel principal">
           <span class="material-symbols-outlined">grid_view</span>
           <span class="mobile-nav-label">PANEL</span>
         </button>
-        <button class="mobile-nav-item ${currentView === 'herramientas' || currentView === 'ruleta' || currentView === 'generador' ? 'active' : ''}" data-nav="herramientas" title="Herramientas">
-          <span class="material-symbols-outlined">casino</span>
-          <span class="mobile-nav-label">HERRAM.</span>
+        <!-- 2. Comunidad -->
+        <button class="mobile-nav-item ${currentView === 'comunidad' || currentView === 'bufon' || currentView === 'foro' ? 'active' : ''}" data-nav="comunidad" title="Comunidad">
+          <span class="material-symbols-outlined">groups</span>
+          <span class="mobile-nav-label">COMUNIDAD</span>
         </button>
+        <!-- 3. Ligas (Destacado) -->
+        <button class="mobile-nav-item mobile-nav-item-highlight ${currentView === 'mis-ligas' || currentView === 'menu-liga' || currentView === 'muro' ? 'active' : ''}" data-nav="mis-ligas" title="Mis ligas">
+          <span class="material-symbols-outlined">shield</span>
+          <span class="mobile-nav-label">LIGAS</span>
+        </button>
+        <!-- 4. Juegos -->
+        <button class="mobile-nav-item ${currentView === 'juegos' || currentView === 'adivina-jugador' || currentView === 'top-10' ? 'active' : ''}" data-nav="juegos" title="Juegos interactivos">
+          <span class="material-symbols-outlined">sports_esports</span>
+          <span class="mobile-nav-label">JUEGOS</span>
+        </button>
+        <!-- 5. Retos -->
         <button class="mobile-nav-item ${currentView === 'retos' ? 'active' : ''}" data-nav="retos" title="Reto semanal">
           <span class="material-symbols-outlined">emoji_events</span>
           <span class="mobile-nav-label">RETOS</span>
         </button>
-        <button class="mobile-nav-item ${currentView === 'comunidad' || currentView === 'bufon' || currentView === 'foro' ? 'active' : ''}" data-nav="comunidad" title="Comunidad">
-          <span class="material-symbols-outlined">groups</span>
-          <span class="mobile-nav-label">COM.</span>
-        </button>
-        <button class="mobile-nav-item ${currentView === 'juegos' || currentView === 'adivina-jugador' ? 'active' : ''}" data-nav="juegos" title="Juegos interactivos">
-          <span class="material-symbols-outlined">sports_esports</span>
-          <span class="mobile-nav-label">JUEGOS</span>
-        </button>
-        <button class="mobile-nav-item ${currentView === 'mis-ligas' || currentView === 'menu-liga' ? 'active' : ''}" data-nav="mis-ligas" title="Mis ligas">
-          <span class="material-symbols-outlined">shield</span>
-          <span class="mobile-nav-label">LIGAS</span>
+        <!-- 6. Herramientas -->
+        <button class="mobile-nav-item ${currentView === 'herramientas' || currentView === 'ruleta' || currentView === 'generador' ? 'active' : ''}" data-nav="herramientas" title="Herramientas">
+          <span class="material-symbols-outlined">casino</span>
+          <span class="mobile-nav-label">HERRAM.</span>
         </button>
       </nav>
 
