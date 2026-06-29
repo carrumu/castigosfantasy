@@ -16,6 +16,7 @@ import { renderComunidad } from './views/comunidad';
 import { renderForo } from './views/foro';
 import { renderHerramientas } from './views/herramientas';
 import { renderTop10 } from './views/top10';
+import { renderMuro } from './views/muro';
 
 // Initialize Theme (Force Dark Mode)
 document.body.classList.remove('light-theme');
@@ -370,6 +371,12 @@ function renderMainLayout(isGuest, currentUser = null) {
     renderForo(viewContainer, {
       isGuest,
       currentUser: currentUser,
+      onNavigate: navigate,
+      showToast
+    });
+  } else if (currentView === 'muro') {
+    renderMuro(viewContainer, {
+      isGuest,
       onNavigate: navigate,
       showToast
     });

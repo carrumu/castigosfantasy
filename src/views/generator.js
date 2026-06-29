@@ -403,7 +403,28 @@ export function renderGenerator(container, callbacks) {
   // League details & members resolving
   const activeLeagueId = localStorage.getItem('CF_ACTIVE_LEAGUE_ID');
   let members = [];
+  let fullMembersList = [];
   let currentUserApodo = "Entrenador Anónimo";
+
+  async function savePunishmentEvent(punishmentName, status, targetProfileId) {
+    if (isGuest || !activeLeagueId) return;
+    try {
+      const user = supabase.auth.user ? supabase.auth.user() : (await supabase.auth.getUser()).data.user;
+      const finalProfileId = targetProfileId || (user ? user.id : null);
+      if (finalProfileId) {
+        await supabase
+          .from('punishment_events')
+          .insert({
+            league_id: activeLeagueId,
+            profile_id: finalProfileId,
+            punishment_name: punishmentName,
+            status: status
+          });
+      }
+    } catch (e) {
+      console.error('Error saving punishment event to Supabase:', e);
+    }
+  }
 
   // Anti-cheat auto register on page unload or reload
   function autoRegisterRejection() {
@@ -420,6 +441,7 @@ export function renderGenerator(container, callbacks) {
         };
         rejectedList.push(rejectedItem);
         localStorage.setItem('CF_REJECTED_PUNISHMENTS', JSON.stringify(rejectedList));
+        savePunishmentEvent(currentPunishment.name, 'rechazado', null);
       }
     }
   }
@@ -462,7 +484,11 @@ export function renderGenerator(container, callbacks) {
           .eq('league_id', activeLeagueId);
         
         if (!error && list) {
-          members = list.map(m => m.profiles?.apodo || m.profiles?.display_name || 'Desconocido');
+          fullMembersList = list.map(m => ({
+            id: m.profile_id,
+            name: m.profiles?.apodo || m.profiles?.display_name || 'Desconocido'
+          }));
+          members = fullMembersList.map(m => m.name);
         }
       } catch (e) {
         console.error('Error fetching league members for generator:', e);
@@ -690,6 +716,7 @@ export function renderGenerator(container, callbacks) {
         if (!savedList.some(x => x.id === currentPunishment.id)) {
           savedList.push(currentPunishment);
           localStorage.setItem('CF_ACCEPTED_PUNISHMENTS', JSON.stringify(savedList));
+          savePunishmentEvent(currentPunishment.name, 'aceptado', null);
         }
         
         callbacks.showToast(`Castigo aceptado y guardado`, "success");
@@ -733,9 +760,17 @@ export function renderGenerator(container, callbacks) {
           if (!currentPunishment) return;
 
           let player = selectRejectPlayer.value;
+          let targetProfileId = null;
+          
           if (player === 'custom') {
             player = inputRejectCustom.value.trim();
+          } else {
+            const match = fullMembersList.find(m => m.name === player);
+            if (match) {
+              targetProfileId = match.id;
+            }
           }
+          
           if (!player) {
             player = 'Desconocido';
           }
@@ -750,6 +785,7 @@ export function renderGenerator(container, callbacks) {
           rejectedList.push(rejectedItem);
           localStorage.setItem('CF_REJECTED_PUNISHMENTS', JSON.stringify(rejectedList));
           
+          savePunishmentEvent(currentPunishment.name, 'rechazado', targetProfileId);
           callbacks.showToast(`Rechazo registrado para ${player}`, "info");
 
           // Reset card state

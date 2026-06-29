@@ -19,7 +19,7 @@ export function renderComunidad(container, callbacks) {
       </div>
 
       <!-- Options Grid -->
-      <div class="brutalist-grid-2" style="max-width: 900px; margin: 0 auto; gap: 2rem;">
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; max-width: 960px; margin: 0 auto;">
         
         <!-- Foro Card -->
         <article class="brutalist-card concrete-bg" id="comunidad-foro-card" style="cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; min-height: 260px; position: relative;">
@@ -52,6 +52,22 @@ export function renderComunidad(container, callbacks) {
           </button>
         </article>
 
+        <!-- Muro de la Vergüenza Card (New) -->
+        <article class="brutalist-card concrete-bg" id="comunidad-muro-card" style="cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; min-height: 260px; position: relative;">
+          <div>
+            <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid #000000; padding-bottom: 0.75rem; margin-bottom: 1rem;">
+              <h2 style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 800; text-transform: uppercase;">Muro de la Vergüenza</h2>
+              <span class="material-symbols-outlined" style="font-size: 2rem;">gavel</span>
+            </div>
+            <p style="font-size: 0.95rem; color: var(--text-light); line-height: 1.5; margin-bottom: 1.5rem;">
+              Historial de castigos aceptados y registro de cobardes que han rechazado sus penitencias en la liga.
+            </p>
+          </div>
+          <button class="brutalist-btn" style="margin-top: auto; pointer-events: none; width: 100%;">
+            Entrar al Muro <span class="material-symbols-outlined" style="font-size: 1.2rem;">chevron_right</span>
+          </button>
+        </article>
+
       </div>
     </div>
   `;
@@ -71,6 +87,15 @@ export function renderComunidad(container, callbacks) {
     foroCard.addEventListener('click', () => {
       if (callbacks.onNavigate) {
         callbacks.onNavigate('foro');
+      }
+    });
+  }
+
+  const muroCard = container.querySelector('#comunidad-muro-card');
+  if (muroCard) {
+    muroCard.addEventListener('click', () => {
+      if (callbacks.onNavigate) {
+        callbacks.onNavigate('muro');
       }
     });
   }
