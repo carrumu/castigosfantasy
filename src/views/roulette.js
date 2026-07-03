@@ -21,6 +21,11 @@ export function renderRoulette(container, callbacks) {
   let currentUser = null;
   let showLegend = false; // State to control legend visibility
 
+  // Idle spin state
+  let idleAngle = 0;
+  let idleSpeed = 0.1; // degrees per frame
+  let idleReq = null;
+
   // Shared colors array for the wheel slices and the legend
   const WHEEL_COLORS = [
     '#6366f1', // indigo
@@ -401,6 +406,32 @@ export function renderRoulette(container, callbacks) {
     const canvas = container.querySelector('#wheel-canvas');
     drawWheel(canvas);
 
+    // Cancel any previous idle spin
+    if (idleReq) cancelAnimationFrame(idleReq);
+
+    // Idle spin loop
+    function idleLoop() {
+      if (isSpinning) return;
+      idleAngle = (idleAngle + idleSpeed) % 360;
+      if (canvas) {
+        canvas.style.transform = `rotate(${idleAngle}deg)`;
+      }
+      idleReq = requestAnimationFrame(idleLoop);
+    }
+    
+    // Start idle spin
+    idleReq = requestAnimationFrame(idleLoop);
+
+    // Speed up on hover
+    if (canvas) {
+      canvas.addEventListener('mouseenter', () => {
+        if (!isSpinning) idleSpeed = 1.0;
+      });
+      canvas.addEventListener('mouseleave', () => {
+        if (!isSpinning) idleSpeed = 0.1;
+      });
+    }
+
     // Event listeners
     const spinBtn = container.querySelector('#spin-btn');
     if (spinBtn) {
@@ -622,7 +653,17 @@ export function renderRoulette(container, callbacks) {
 
     const sliceAngle = 360 / sectorsCount;
     const winningMidAngle = (winningIdx * sliceAngle) + (sliceAngle / 2);
-    const finalRot = 1800 + (270 - winningMidAngle);
+    
+    // Stop idle loop
+    if (idleReq) cancelAnimationFrame(idleReq);
+    
+    // Calculate how much more to rotate so it lands correctly, 
+    // adding multiple full spins (e.g. 1800 deg = 5 spins)
+    const normalizedIdle = idleAngle % 360;
+    const targetOffset = (270 - winningMidAngle + 360) % 360;
+    let additionalRotation = targetOffset - normalizedIdle;
+    if (additionalRotation <= 0) additionalRotation += 360;
+    const finalRot = idleAngle + 1800 + additionalRotation;
 
     canvas.style.transition = 'transform 4.5s cubic-bezier(0.15, 0.95, 0.35, 1)';
     canvas.style.transform = `rotate(${finalRot}deg)`;
@@ -667,8 +708,15 @@ export function renderRoulette(container, callbacks) {
 
       setTimeout(() => {
         canvas.style.transition = 'none';
-        const normalizedAngle = finalRot % 360;
-        canvas.style.transform = `rotate(${normalizedAngle}deg)`;
+        idleAngle = finalRot % 360;
+        canvas.style.transform = `rotate(${idleAngle}deg)`;
+        
+        // Resume idle spin after a short delay
+        setTimeout(() => {
+          if (!isSpinning && document.body.contains(canvas)) {
+            idleReq = requestAnimationFrame(idleLoop);
+          }
+        }, 1500);
       }, 500);
 
     }, { once: true });

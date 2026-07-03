@@ -18,6 +18,8 @@ export function renderHerramientas(container, callbacks) {
   let isAdmin = false;
   let isLoadingData = false;
   let savedContract = '';
+  let isMorososLoading = false;
+  let morososData = [];
 
   // Client-side funny legal formalization generator (no emojis!)
   function formalizeRule(rule, index) {
@@ -114,6 +116,58 @@ Firmado y jurado por todos los miembros del grupo de WhatsApp.`;
     }
   }
 
+  async function loadMorososData() {
+    isMorososLoading = true;
+    render();
+
+    try {
+      if (activeLeagueId !== 'default') {
+        const { data, error } = await supabase
+          .from('matchday_records')
+          .select(`
+            id,
+            matchday_number,
+            amount_owed,
+            created_at,
+            trash_talk_phrase,
+            loser_profile:profiles!loser_profile_id(display_name, apodo),
+            punishment:punishments(name)
+          `)
+          .eq('league_id', activeLeagueId)
+          .order('matchday_number', { ascending: false });
+
+        if (!error && data) {
+          morososData = data;
+        }
+      } else {
+        // Mock data
+        morososData = [
+          {
+            id: 1,
+            matchday_number: 8,
+            amount_owed: 5.00,
+            created_at: new Date().toISOString(),
+            loser_profile: { display_name: 'Paco', apodo: 'El notas' },
+            punishment: { name: 'Disfraz en la cena' }
+          },
+          {
+            id: 2,
+            matchday_number: 7,
+            amount_owed: 5.00,
+            created_at: new Date(Date.now() - 86400000 * 7).toISOString(),
+            loser_profile: { display_name: 'Juan', apodo: 'Juanito' },
+            punishment: { name: 'Invitar a rondas' }
+          }
+        ];
+      }
+    } catch (e) {
+      console.error('Error loading morosos:', e);
+    } finally {
+      isMorososLoading = false;
+      render();
+    }
+  }
+
   function render() {
     if (subview === 'grid') {
       container.innerHTML = `
@@ -196,6 +250,22 @@ Firmado y jurado por todos los miembros del grupo de WhatsApp.`;
               </div>
             </button>
 
+            <!-- Historial de Morosos Card (5th) -->
+            <button id="tool-morosos-btn" class="tool-card-btn">
+              <div class="tool-card-inner">
+                <div class="tool-card-icon-wrap" style="background: var(--primary); color: #000;">
+                  <span class="material-symbols-outlined" style="font-size: 32px;">receipt_long</span>
+                </div>
+                <div class="tool-card-text">
+                  <h2 class="tool-card-title">Historial de Morosos</h2>
+                  <p class="tool-card-desc">Consulta los movimientos de la liga, quién paga y quién debe dinero.</p>
+                </div>
+                <div class="tool-card-arrow">
+                  <span class="material-symbols-outlined">arrow_forward</span>
+                </div>
+              </div>
+            </button>
+
           </div>
         </div>
       `;
@@ -215,6 +285,91 @@ Firmado y jurado por todos los miembros del grupo de WhatsApp.`;
 
       container.querySelector('#tool-calculadora-btn').addEventListener('click', () => {
         subview = 'calculadora';
+        render();
+      });
+
+      container.querySelector('#tool-morosos-btn').addEventListener('click', () => {
+        subview = 'morosos';
+        loadMorososData();
+      });
+
+    } else if (subview === 'morosos') {
+      if (isMorososLoading) {
+        container.innerHTML = `
+          <div class="container fade-in-up" style="max-width: 500px; margin: 0 auto; text-align: center; padding: 4rem 1rem;">
+            <div style="background: var(--bg-card); border: 3px solid #000; box-shadow: 6px 6px 0 #000; border-radius: 8px; padding: 3rem 2rem;">
+              <div class="loading-spinner" style="border: 4px solid rgba(255,255,255,0.1); border-left-color: var(--accent); border-radius: 50%; width: 45px; height: 45px; animation: spin 1s linear infinite; margin: 0 auto 1.5rem;"></div>
+              <h2 style="font-family: var(--font-display); font-size: 1.35rem; font-weight: 900; text-transform: uppercase; color: var(--text-light); margin-bottom: 0.75rem;">
+                Cargando Historial
+              </h2>
+              <p style="color: var(--text-muted); font-size: 0.85rem; line-height: 1.4; margin: 0;">
+                Recopilando los datos financieros de la liga...
+              </p>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = `
+        <div class="container fade-in-up">
+          <!-- Header -->
+          <div style="margin-bottom: 2rem; display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+            <button id="btn-back-to-var" class="btn-primary" style="width: auto; padding: 0.5rem 1rem; display: flex; align-items: center; justify-content: center; background: transparent; color: var(--text-light); border: 2px solid var(--border-color); box-shadow: 2px 2px 0 #000;" title="Volver al VAR">
+              <span class="material-symbols-outlined" style="font-size: 18px;">arrow_back</span>
+            </button>
+            <div>
+              <span style="font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); font-family: var(--font-display);">Auditoría</span>
+              <h1 class="gradient-text-green" style="font-family: var(--font-display); font-size: 1.8rem; font-weight: 900; text-transform: uppercase; margin: 0;">
+                Historial de Morosos
+              </h1>
+            </div>
+          </div>
+
+          <div style="background: var(--bg-card); border: 3px solid #000; box-shadow: 6px 6px 0 #000; border-radius: 8px; padding: 1.5rem;">
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;">
+              Registro oficial de todos los castigados por jornada, el dinero acumulado y las penalizaciones asignadas.
+            </p>
+
+            ${morososData.length === 0 ? `
+              <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                <span class="material-symbols-outlined" style="font-size: 48px; margin-bottom: 1rem; opacity: 0.5;">check_circle</span>
+                <p>No hay registros de morosos todavía. La liga está limpia.</p>
+              </div>
+            ` : `
+              <div style="display: flex; flex-direction: column; gap: 1rem;">
+                ${morososData.map(record => {
+                  const date = new Date(record.created_at).toLocaleDateString();
+                  const loserName = record.loser_profile?.apodo || record.loser_profile?.display_name || 'Desconocido';
+                  const punishmentName = record.punishment?.name || 'Castigo pendiente';
+                  return `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: rgba(0,0,0,0.2); border: 1.5px solid var(--border-color); border-radius: 6px; flex-wrap: wrap; gap: 1rem;">
+                      <div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+                          <span style="font-size: 0.75rem; font-weight: 800; color: var(--accent); text-transform: uppercase; background: rgba(222, 237, 0, 0.1); padding: 0.15rem 0.4rem; border-radius: 4px;">Jornada ${record.matchday_number}</span>
+                          <span style="font-size: 0.7rem; color: var(--text-muted);">${date}</span>
+                        </div>
+                        <div style="font-size: 1.15rem; font-weight: 800; color: var(--text-light); margin-bottom: 0.25rem;">${loserName}</div>
+                        <div style="font-size: 0.85rem; color: var(--text-muted);">
+                          <span class="material-symbols-outlined" style="font-size: 14px; vertical-align: middle; margin-right: 0.2rem;">gavel</span>
+                          Castigo: ${punishmentName}
+                        </div>
+                      </div>
+                      <div style="text-align: right; min-width: 100px;">
+                        <span style="font-size: 1.5rem; font-weight: 900; color: var(--danger);">-${Number(record.amount_owed).toFixed(2).replace('.', ',')}€</span>
+                        <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.15rem; font-weight: 800; letter-spacing: 1px;">DEUDA</div>
+                      </div>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            `}
+          </div>
+        </div>
+      `;
+
+      container.querySelector('#btn-back-to-var').addEventListener('click', () => {
+        subview = 'grid';
         render();
       });
 

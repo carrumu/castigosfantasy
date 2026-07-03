@@ -25,9 +25,9 @@ export function renderBufon(container, callbacks) {
   let currentLeagueName = 'Global';
 
   const DEFAULT_DEMO_NOMINEES = [
-    { id: 'd-nom-1', name: "Robert Lewandowski", team: "FC Barcelona", reason: "Falló tres mano a mano claros contra el portero y falló un penalti en el minuto 90.", votes: 14, nominated_by: "d-member-1" },
-    { id: 'd-nom-2', name: "Vinicius Jr.", team: "Real Madrid", reason: "Vio una tarjeta amarilla por protestar en el minuto 5 y luego fue expulsado por doble amarilla tras una simulación en el área.", votes: 18, nominated_by: "d-member-2" },
-    { id: 'd-nom-3', name: "Frenkie de Jong", team: "FC Barcelona", reason: "Marcó un autogol espectacular al intentar despejar de cabeza de espaldas a su portería.", votes: 6, nominated_by: "d-member-3" }
+    { id: 'd-nom-1', name: "Marc Cucurella", team: "Chelsea FC", reason: "Marcó un autogol espectacular al intentar despejar de cabeza de espaldas a su portería.", votes: 0, nominated_by: "d-member-1" },
+    { id: 'd-nom-2', name: "Lamine Yamal", team: "FC Barcelona", reason: "Falló tres mano a mano claros contra el portero y un penalti decisivo en el último minuto.", votes: 0, nominated_by: "d-member-2" },
+    { id: 'd-nom-3', name: "Hjulsem", team: "Real Madrid", reason: "Vio una tarjeta amarilla por protestar nada más entrar al campo y luego fue expulsado por doble amarilla.", votes: 0, nominated_by: "d-member-3" }
   ];
 
   const DEFAULT_DEMO_HISTORY = [
@@ -43,9 +43,10 @@ export function renderBufon(container, callbacks) {
     votingStartTime = new Date(Date.now() - 3600 * 4 * 1000).toISOString();
 
     let demoNominees = JSON.parse(localStorage.getItem('CF_DEMO_JESTER_NOMINEES') || 'null');
-    if (!demoNominees) {
+    if (!demoNominees || !demoNominees.some(n => n.name.includes("Yamal"))) {
       demoNominees = DEFAULT_DEMO_NOMINEES;
       localStorage.setItem('CF_DEMO_JESTER_NOMINEES', JSON.stringify(demoNominees));
+      localStorage.removeItem('CF_DEMO_JESTER_USER_VOTE');
     }
     nominees = demoNominees;
 
@@ -530,7 +531,7 @@ export function renderBufon(container, callbacks) {
                                 ${escapeHTML(n.team)}
                               </span>
                             </div>
-                            <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.4;">${escapeHTML(n.reason)}</p>
+                            ${n.reason && n.reason !== 'Sin razón adicional' ? `<p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.4;">${escapeHTML(n.reason)}</p>` : ''}
                           </div>
                           <div style="text-align: right; min-width: 80px;">
                             <span style="font-weight: 800; font-size: 1.2rem; color: var(--accent);">${percent}%</span>
@@ -586,21 +587,11 @@ export function renderBufon(container, callbacks) {
                 </p>
 
                 <form id="nominate-form" style="display: flex; flex-direction: column; gap: 1rem;">
-                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                    <div class="form-group">
-                      <label for="nom-name" style="font-size: 0.75rem; margin-bottom: 0.35rem; display: block; color: var(--text-muted);">Nombre del Futbolista</label>
-                      <input type="text" id="nom-name" class="input-field" required />
-                    </div>
-                    <div class="form-group">
-                      <label for="nom-team" style="font-size: 0.75rem; margin-bottom: 0.35rem; display: block; color: var(--text-muted);">Equipo de LaLiga</label>
-                      <input type="text" id="nom-team" class="input-field" required />
-                    </div>
-                  </div>
-
                   <div class="form-group">
-                    <label for="nom-reason" style="font-size: 0.75rem; margin-bottom: 0.35rem; display: block; color: var(--text-muted);">Razón de la nominación</label>
-                    <textarea id="nom-reason" class="input-field" rows="2" style="resize: none; font-family: var(--font-sans);" required></textarea>
+                    <label for="nom-name" style="font-size: 0.75rem; margin-bottom: 0.35rem; display: block; color: var(--text-muted);">Nombre del Futbolista</label>
+                    <input type="text" id="nom-name" class="input-field" required autocomplete="off" placeholder="Ej: Vinicius Jr." />
                   </div>
+                  <input type="hidden" id="nom-team" />
 
                   <button type="submit" class="btn-primary" style="font-weight: 700; width: 100%; padding: 0.75rem;">
                     Añadir Candidato a Votación
@@ -645,9 +636,10 @@ export function renderBufon(container, callbacks) {
                       <h4 style="font-size: 0.95rem; font-weight: 800; margin-bottom: 0.25rem; color: var(--text-light);">
                         ${escapeHTML(h.name)}
                       </h4>
+                      ${h.reason && h.reason !== 'Sin razón adicional' ? `
                       <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.35; font-style: italic; margin-bottom: 0.5rem;">
                         "${escapeHTML(h.reason)}"
-                      </p>
+                      </p>` : ''}
                     </div>
                   `;
                 }).join('')}
@@ -698,9 +690,9 @@ export function renderBufon(container, callbacks) {
       nominateForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const name = nameInput.value.trim();
-        const team = teamInput.value.trim();
-        const reason = nominateForm.querySelector('#nom-reason').value.trim();
-        if (!name || !team || !reason) return;
+        const team = teamInput ? teamInput.value.trim() : 'Desconocido';
+        const reason = "Sin razón adicional";
+        if (!name) return;
         
         handleNominate(name, team, reason);
       });

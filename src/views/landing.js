@@ -238,14 +238,9 @@ export function renderLanding(container, callbacks) {
             <article class="brutalist-card" style="background: var(--primary-green); color: #000000; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
               <h2 style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 900; text-transform: uppercase; margin-bottom: 1.5rem; line-height: 1;">Ruleta de Sentencias</h2>
               
-              <!-- Mock Wheel Graphic -->
-              <div style="width: 120px; height: 120px; border-radius: 50%; border: 6px solid #000000; margin-bottom: 1.5rem; position: relative; overflow: hidden; background: #ffffff; box-shadow: inset 0px 0px 10px rgba(0,0,0,0.5);">
-                <div style="position: absolute; inset: 0; background: var(--danger); clip-path: polygon(50% 50%, 100% 0, 100% 100%);"></div>
-                <div style="position: absolute; inset: 0; background: #ffe16d; clip-path: polygon(50% 50%, 0 100%, 0 0);"></div>
-                <div style="position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 4px; height: 20px; background: #000000; z-index: 20;"></div>
-                <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 10;">
-                  <span style="font-family: var(--font-display); font-size: 2.5rem; font-weight: 900; color: #000000; opacity: 0.25;">?</span>
-                </div>
+              <!-- Mock Wheel Graphic (Replaced with Logo) -->
+              <div style="width: 120px; height: 120px; border-radius: 50%; border: 6px solid #000000; margin-bottom: 1.5rem; position: relative; overflow: hidden; background: #000000; box-shadow: inset 0px 0px 10px rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center;">
+                <img src="/ruleta-brutalista.png" class="ruleta-logo-spin" alt="Ruleta Brutalista" style="width: 125%; height: 125%; object-fit: cover;" />
               </div>
 
               <button class="brutalist-btn brutalist-btn-black" id="landing-ruleta-btn">GIRAR</button>
