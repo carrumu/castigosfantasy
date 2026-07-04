@@ -149,7 +149,7 @@ export function renderRoulette(container, callbacks) {
           .from('punishments')
           .insert(insertList)
           .select();
-        
+
         if (insErr) throw insErr;
         punishments = insertedData;
       } else {
@@ -296,8 +296,8 @@ export function renderRoulette(container, callbacks) {
                 margin-top: 0.75rem;
               ">
                 ${punishments.map((p, idx) => {
-                  const color = WHEEL_COLORS[idx % WHEEL_COLORS.length];
-                  return `
+      const color = WHEEL_COLORS[idx % WHEEL_COLORS.length];
+      return `
                     <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; min-width: 0;">
                       <span style="width: 10px; height: 10px; border-radius: 50%; background: ${color}; border: 1.5px solid #000; flex-shrink: 0;"></span>
                       <span style="font-weight: 700; color: var(--text-light); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${escapeHTML(p.name)}: ${escapeHTML(p.description || '')}">
@@ -305,7 +305,7 @@ export function renderRoulette(container, callbacks) {
                       </span>
                     </div>
                   `;
-                }).join('')}
+    }).join('')}
               </div>
             </div>
           </div>
@@ -418,7 +418,7 @@ export function renderRoulette(container, callbacks) {
       }
       idleReq = requestAnimationFrame(idleLoop);
     }
-    
+
     // Start idle spin
     idleReq = requestAnimationFrame(idleLoop);
 
@@ -437,7 +437,7 @@ export function renderRoulette(container, callbacks) {
     if (spinBtn) {
       spinBtn.addEventListener('click', () => {
         if (isSpinning) return;
-        
+
         // Enforce loser spin rule in database mode
         if (!isLocalMode && pendingRecord) {
           if (!isLoser) {
@@ -445,7 +445,7 @@ export function renderRoulette(container, callbacks) {
             return;
           }
         }
-        
+
         spinWheel(canvas);
       });
     }
@@ -455,10 +455,10 @@ export function renderRoulette(container, callbacks) {
     if (toggleLegendBtn) {
       toggleLegendBtn.addEventListener('click', () => {
         showLegend = !showLegend;
-        
+
         const contentEl = container.querySelector('#roulette-legend-content');
         const indicatorEl = container.querySelector('#legend-toggle-indicator');
-        
+
         if (contentEl && indicatorEl) {
           if (showLegend) {
             contentEl.style.display = 'grid';
@@ -517,7 +517,7 @@ export function renderRoulette(container, callbacks) {
 
     // Modal result confirmations
     const resModal = container.querySelector('#result-modal');
-    
+
     const finishSession = () => {
       resModal.classList.remove('active');
       loadData();
@@ -617,18 +617,18 @@ export function renderRoulette(container, callbacks) {
       ctx.fillStyle = "#ffffff";
       ctx.shadowColor = "rgba(0,0,0,0.95)";
       ctx.shadowBlur = 6;
-      
+
       const nameText = punishments[i].name;
-      
+
       // Significantly enlarged font size parameters for 800x800 canvas
       let fontSize = 28;
       if (nameText.length > 15) fontSize = 24;
       if (nameText.length > 22) fontSize = 20;
       if (nameText.length > 30) fontSize = 16;
       if (nameText.length > 38) fontSize = 13;
-      
+
       ctx.font = `bold ${fontSize}px Space Grotesk, sans-serif`;
-      
+
       let displayName = nameText;
       if (nameText.length > 45) {
         displayName = nameText.substring(0, 42) + "...";
@@ -653,10 +653,10 @@ export function renderRoulette(container, callbacks) {
 
     const sliceAngle = 360 / sectorsCount;
     const winningMidAngle = (winningIdx * sliceAngle) + (sliceAngle / 2);
-    
+
     // Stop idle loop
     if (idleReq) cancelAnimationFrame(idleReq);
-    
+
     // Calculate how much more to rotate so it lands correctly, 
     // adding multiple full spins (e.g. 1800 deg = 5 spins)
     const normalizedIdle = idleAngle % 360;
@@ -670,13 +670,13 @@ export function renderRoulette(container, callbacks) {
 
     canvas.addEventListener('transitionend', async function handleEnd() {
       canvas.removeEventListener('transitionend', handleEnd);
-      
+
       isSpinning = false;
       if (spinBtn) spinBtn.disabled = false;
-      
+
       const isLocalMode = isGuest || !activeLeagueId;
       const loserName = pendingRecord ? pendingRecord.display_name : 'Entrenador Aleatorio';
-      
+
       if (!isLocalMode && pendingRecord) {
         try {
           const { error } = await supabase
@@ -685,7 +685,7 @@ export function renderRoulette(container, callbacks) {
             .eq('id', pendingRecord.id);
 
           if (error) throw error;
-          
+
           localStorage.removeItem('CF_PENDING_RECORD_ID');
           pendingRecord = null;
           callbacks.showToast(`¡Castigo guardado para ${loserName}!`, 'success');
@@ -710,7 +710,7 @@ export function renderRoulette(container, callbacks) {
         canvas.style.transition = 'none';
         idleAngle = finalRot % 360;
         canvas.style.transform = `rotate(${idleAngle}deg)`;
-        
+
         // Resume idle spin after a short delay
         setTimeout(() => {
           if (!isSpinning && document.body.contains(canvas)) {

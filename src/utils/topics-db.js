@@ -997,7 +997,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Porteros históricos con mayor número de partidos en Primera (Grupo 11)",
+    "title": "Porteros históricos con mayor número de partidos en Primera",
     "badgeTitle": "PORTEROS PARTIDOS G11",
     "answers": [
       {
@@ -1095,7 +1095,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Equipos históricos de España ordenados por títulos totales (Grupo 12)",
+    "title": "Equipos históricos de España ordenados por títulos totales",
     "badgeTitle": "CLUBES TÍTULOS G12",
     "answers": [
       {
@@ -1195,7 +1195,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Futbolistas que ganaron el Pichichi jugando en LaLiga (Grupo 13)",
+    "title": "Futbolistas que ganaron el Pichichi jugando en LaLiga",
     "badgeTitle": "PICHICHIS LALIGA G13",
     "answers": [
       {
@@ -1294,7 +1294,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Jugadores con más partidos disputados en la Selección de España (Grupo 14)",
+    "title": "Jugadores con más partidos disputados en la Selección de España",
     "badgeTitle": "MÁS SELECCIÓN G14",
     "answers": [
       {
@@ -1391,7 +1391,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Jugadores con la nacionalidad española con más goles (Grupo 15)",
+    "title": "Jugadores con la nacionalidad española con más goles",
     "badgeTitle": "GOLEADORES ESPAÑA G15",
     "answers": [
       {
@@ -1486,7 +1486,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Porteros históricos con mayor número de partidos en Primera (Grupo 16)",
+    "title": "Porteros históricos con mayor número de partidos en Primera",
     "badgeTitle": "PORTEROS PARTIDOS G16",
     "answers": [
       {
@@ -1584,7 +1584,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Equipos históricos de España ordenados por títulos totales (Grupo 17)",
+    "title": "Equipos históricos de España ordenados por títulos totales",
     "badgeTitle": "CLUBES TÍTULOS G17",
     "answers": [
       {
@@ -1684,7 +1684,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Futbolistas que ganaron el Pichichi jugando en LaLiga (Grupo 18)",
+    "title": "Futbolistas que ganaron el Pichichi jugando en LaLiga",
     "badgeTitle": "PICHICHIS LALIGA G18",
     "answers": [
       {
@@ -1783,7 +1783,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Jugadores con más partidos disputados en la Selección de España (Grupo 19)",
+    "title": "Jugadores con más partidos disputados en la Selección de España",
     "badgeTitle": "MÁS SELECCIÓN G19",
     "answers": [
       {
@@ -1880,7 +1880,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Jugadores con la nacionalidad española con más goles (Grupo 20)",
+    "title": "Jugadores con la nacionalidad española con más goles",
     "badgeTitle": "GOLEADORES ESPAÑA G20",
     "answers": [
       {
@@ -1975,7 +1975,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Porteros históricos con mayor número de partidos en Primera (Grupo 21)",
+    "title": "Porteros históricos con mayor número de partidos en Primera",
     "badgeTitle": "PORTEROS PARTIDOS G21",
     "answers": [
       {
@@ -2073,7 +2073,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Equipos históricos de España ordenados por títulos totales (Grupo 22)",
+    "title": "Equipos históricos de España ordenados por títulos totales",
     "badgeTitle": "CLUBES TÍTULOS G22",
     "answers": [
       {
@@ -2173,7 +2173,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Futbolistas que ganaron el Pichichi jugando en LaLiga (Grupo 23)",
+    "title": "Futbolistas que ganaron el Pichichi jugando en LaLiga",
     "badgeTitle": "PICHICHIS LALIGA G23",
     "answers": [
       {
@@ -2272,7 +2272,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Jugadores con más partidos disputados en la Selección de España (Grupo 24)",
+    "title": "Jugadores con más partidos disputados en la Selección de España",
     "badgeTitle": "MÁS SELECCIÓN G24",
     "answers": [
       {
@@ -2369,7 +2369,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Jugadores con la nacionalidad española con más goles (Grupo 25)",
+    "title": "Jugadores con la nacionalidad española con más goles",
     "badgeTitle": "GOLEADORES ESPAÑA G25",
     "answers": [
       {
@@ -2464,7 +2464,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Porteros históricos con mayor número de partidos en Primera (Grupo 26)",
+    "title": "Porteros históricos con mayor número de partidos en Primera",
     "badgeTitle": "PORTEROS PARTIDOS G26",
     "answers": [
       {
@@ -2562,7 +2562,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Equipos históricos de España ordenados por títulos totales (Grupo 27)",
+    "title": "Equipos históricos de España ordenados por títulos totales",
     "badgeTitle": "CLUBES TÍTULOS G27",
     "answers": [
       {
@@ -2662,7 +2662,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Futbolistas que ganaron el Pichichi jugando en LaLiga (Grupo 28)",
+    "title": "Futbolistas que ganaron el Pichichi jugando en LaLiga",
     "badgeTitle": "PICHICHIS LALIGA G28",
     "answers": [
       {
@@ -2761,7 +2761,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Jugadores con más partidos disputados en la Selección de España (Grupo 29)",
+    "title": "Jugadores con más partidos disputados en la Selección de España",
     "badgeTitle": "MÁS SELECCIÓN G29",
     "answers": [
       {
@@ -2858,7 +2858,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Jugadores con la nacionalidad española con más goles (Grupo 30)",
+    "title": "Jugadores con la nacionalidad española con más goles",
     "badgeTitle": "GOLEADORES ESPAÑA G30",
     "answers": [
       {
@@ -2953,7 +2953,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Porteros históricos con mayor número de partidos en Primera (Grupo 31)",
+    "title": "Porteros históricos con mayor número de partidos en Primera",
     "badgeTitle": "PORTEROS PARTIDOS G31",
     "answers": [
       {
@@ -3051,7 +3051,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Equipos históricos de España ordenados por títulos totales (Grupo 32)",
+    "title": "Equipos históricos de España ordenados por títulos totales",
     "badgeTitle": "CLUBES TÍTULOS G32",
     "answers": [
       {
@@ -3151,7 +3151,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Futbolistas que ganaron el Pichichi jugando en LaLiga (Grupo 33)",
+    "title": "Futbolistas que ganaron el Pichichi jugando en LaLiga",
     "badgeTitle": "PICHICHIS LALIGA G33",
     "answers": [
       {
@@ -3250,7 +3250,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Jugadores con más partidos disputados en la Selección de España (Grupo 34)",
+    "title": "Jugadores con más partidos disputados en la Selección de España",
     "badgeTitle": "MÁS SELECCIÓN G34",
     "answers": [
       {
@@ -3347,7 +3347,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Jugadores con la nacionalidad española con más goles (Grupo 35)",
+    "title": "Jugadores con la nacionalidad española con más goles",
     "badgeTitle": "GOLEADORES ESPAÑA G35",
     "answers": [
       {
@@ -3442,7 +3442,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Porteros históricos con mayor número de partidos en Primera (Grupo 36)",
+    "title": "Porteros históricos con mayor número de partidos en Primera",
     "badgeTitle": "PORTEROS PARTIDOS G36",
     "answers": [
       {
@@ -3540,7 +3540,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Equipos históricos de España ordenados por títulos totales (Grupo 37)",
+    "title": "Equipos históricos de España ordenados por títulos totales",
     "badgeTitle": "CLUBES TÍTULOS G37",
     "answers": [
       {
@@ -3640,7 +3640,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Futbolistas que ganaron el Pichichi jugando en LaLiga (Grupo 38)",
+    "title": "Futbolistas que ganaron el Pichichi jugando en LaLiga",
     "badgeTitle": "PICHICHIS LALIGA G38",
     "answers": [
       {
@@ -3739,7 +3739,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Jugadores con más partidos disputados en la Selección de España (Grupo 39)",
+    "title": "Jugadores con más partidos disputados en la Selección de España",
     "badgeTitle": "MÁS SELECCIÓN G39",
     "answers": [
       {
@@ -3836,7 +3836,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Jugadores con la nacionalidad española con más goles (Grupo 40)",
+    "title": "Jugadores con la nacionalidad española con más goles",
     "badgeTitle": "GOLEADORES ESPAÑA G40",
     "answers": [
       {
@@ -3931,7 +3931,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Porteros históricos con mayor número de partidos en Primera (Grupo 41)",
+    "title": "Porteros históricos con mayor número de partidos en Primera",
     "badgeTitle": "PORTEROS PARTIDOS G41",
     "answers": [
       {
@@ -4029,7 +4029,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Equipos históricos de España ordenados por títulos totales (Grupo 42)",
+    "title": "Equipos históricos de España ordenados por títulos totales",
     "badgeTitle": "CLUBES TÍTULOS G42",
     "answers": [
       {
@@ -4129,7 +4129,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Futbolistas que ganaron el Pichichi jugando en LaLiga (Grupo 43)",
+    "title": "Futbolistas que ganaron el Pichichi jugando en LaLiga",
     "badgeTitle": "PICHICHIS LALIGA G43",
     "answers": [
       {
@@ -4228,7 +4228,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Jugadores con más partidos disputados en la Selección de España (Grupo 44)",
+    "title": "Jugadores con más partidos disputados en la Selección de España",
     "badgeTitle": "MÁS SELECCIÓN G44",
     "answers": [
       {
@@ -4325,7 +4325,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Jugadores con la nacionalidad española con más goles (Grupo 45)",
+    "title": "Jugadores con la nacionalidad española con más goles",
     "badgeTitle": "GOLEADORES ESPAÑA G45",
     "answers": [
       {
@@ -4420,7 +4420,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Porteros históricos con mayor número de partidos en Primera (Grupo 46)",
+    "title": "Porteros históricos con mayor número de partidos en Primera",
     "badgeTitle": "PORTEROS PARTIDOS G46",
     "answers": [
       {
@@ -4518,7 +4518,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Equipos históricos de España ordenados por títulos totales (Grupo 47)",
+    "title": "Equipos históricos de España ordenados por títulos totales",
     "badgeTitle": "CLUBES TÍTULOS G47",
     "answers": [
       {
@@ -4618,7 +4618,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Futbolistas que ganaron el Pichichi jugando en LaLiga (Grupo 48)",
+    "title": "Futbolistas que ganaron el Pichichi jugando en LaLiga",
     "badgeTitle": "PICHICHIS LALIGA G48",
     "answers": [
       {
@@ -4717,7 +4717,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Jugadores con más partidos disputados en la Selección de España (Grupo 49)",
+    "title": "Jugadores con más partidos disputados en la Selección de España",
     "badgeTitle": "MÁS SELECCIÓN G49",
     "answers": [
       {
@@ -4814,7 +4814,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Jugadores con la nacionalidad española con más goles (Grupo 50)",
+    "title": "Jugadores con la nacionalidad española con más goles",
     "badgeTitle": "GOLEADORES ESPAÑA G50",
     "answers": [
       {
@@ -4909,7 +4909,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Porteros históricos con mayor número de partidos en Primera (Grupo 51)",
+    "title": "Porteros históricos con mayor número de partidos en Primera",
     "badgeTitle": "PORTEROS PARTIDOS G51",
     "answers": [
       {
@@ -5007,7 +5007,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Equipos históricos de España ordenados por títulos totales (Grupo 52)",
+    "title": "Equipos históricos de España ordenados por títulos totales",
     "badgeTitle": "CLUBES TÍTULOS G52",
     "answers": [
       {
@@ -5107,7 +5107,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Futbolistas que ganaron el Pichichi jugando en LaLiga (Grupo 53)",
+    "title": "Futbolistas que ganaron el Pichichi jugando en LaLiga",
     "badgeTitle": "PICHICHIS LALIGA G53",
     "answers": [
       {
@@ -5206,7 +5206,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Jugadores con más partidos disputados en la Selección de España (Grupo 54)",
+    "title": "Jugadores con más partidos disputados en la Selección de España",
     "badgeTitle": "MÁS SELECCIÓN G54",
     "answers": [
       {
@@ -5303,7 +5303,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Jugadores con la nacionalidad española con más goles (Grupo 55)",
+    "title": "Jugadores con la nacionalidad española con más goles",
     "badgeTitle": "GOLEADORES ESPAÑA G55",
     "answers": [
       {
@@ -5398,7 +5398,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Porteros históricos con mayor número de partidos en Primera (Grupo 56)",
+    "title": "Porteros históricos con mayor número de partidos en Primera",
     "badgeTitle": "PORTEROS PARTIDOS G56",
     "answers": [
       {
@@ -5496,7 +5496,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Equipos históricos de España ordenados por títulos totales (Grupo 57)",
+    "title": "Equipos históricos de España ordenados por títulos totales",
     "badgeTitle": "CLUBES TÍTULOS G57",
     "answers": [
       {
@@ -5596,7 +5596,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Futbolistas que ganaron el Pichichi jugando en LaLiga (Grupo 58)",
+    "title": "Futbolistas que ganaron el Pichichi jugando en LaLiga",
     "badgeTitle": "PICHICHIS LALIGA G58",
     "answers": [
       {
@@ -5695,7 +5695,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Jugadores con más partidos disputados en la Selección de España (Grupo 59)",
+    "title": "Jugadores con más partidos disputados en la Selección de España",
     "badgeTitle": "MÁS SELECCIÓN G59",
     "answers": [
       {
@@ -5792,7 +5792,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Jugadores con la nacionalidad española con más goles (Grupo 60)",
+    "title": "Jugadores con la nacionalidad española con más goles",
     "badgeTitle": "GOLEADORES ESPAÑA G60",
     "answers": [
       {
@@ -5887,7 +5887,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Porteros históricos con mayor número de partidos en Primera (Grupo 61)",
+    "title": "Porteros históricos con mayor número de partidos en Primera",
     "badgeTitle": "PORTEROS PARTIDOS G61",
     "answers": [
       {
@@ -5985,7 +5985,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Equipos históricos de España ordenados por títulos totales (Grupo 62)",
+    "title": "Equipos históricos de España ordenados por títulos totales",
     "badgeTitle": "CLUBES TÍTULOS G62",
     "answers": [
       {
@@ -6085,7 +6085,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Futbolistas que ganaron el Pichichi jugando en LaLiga (Grupo 63)",
+    "title": "Futbolistas que ganaron el Pichichi jugando en LaLiga",
     "badgeTitle": "PICHICHIS LALIGA G63",
     "answers": [
       {
@@ -6184,7 +6184,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Jugadores con más partidos disputados en la Selección de España (Grupo 64)",
+    "title": "Jugadores con más partidos disputados en la Selección de España",
     "badgeTitle": "MÁS SELECCIÓN G64",
     "answers": [
       {
@@ -6281,7 +6281,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Jugadores con la nacionalidad española con más goles (Grupo 65)",
+    "title": "Jugadores con la nacionalidad española con más goles",
     "badgeTitle": "GOLEADORES ESPAÑA G65",
     "answers": [
       {
@@ -6376,7 +6376,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Porteros históricos con mayor número de partidos en Primera (Grupo 66)",
+    "title": "Porteros históricos con mayor número de partidos en Primera",
     "badgeTitle": "PORTEROS PARTIDOS G66",
     "answers": [
       {
@@ -6474,7 +6474,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Equipos históricos de España ordenados por títulos totales (Grupo 67)",
+    "title": "Equipos históricos de España ordenados por títulos totales",
     "badgeTitle": "CLUBES TÍTULOS G67",
     "answers": [
       {
@@ -6574,7 +6574,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Futbolistas que ganaron el Pichichi jugando en LaLiga (Grupo 68)",
+    "title": "Futbolistas que ganaron el Pichichi jugando en LaLiga",
     "badgeTitle": "PICHICHIS LALIGA G68",
     "answers": [
       {
@@ -6673,7 +6673,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Jugadores con más partidos disputados en la Selección de España (Grupo 69)",
+    "title": "Jugadores con más partidos disputados en la Selección de España",
     "badgeTitle": "MÁS SELECCIÓN G69",
     "answers": [
       {
@@ -6770,7 +6770,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Jugadores con la nacionalidad española con más goles (Grupo 70)",
+    "title": "Jugadores con la nacionalidad española con más goles",
     "badgeTitle": "GOLEADORES ESPAÑA G70",
     "answers": [
       {
@@ -6865,7 +6865,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Porteros históricos con mayor número de partidos en Primera (Grupo 71)",
+    "title": "Porteros históricos con mayor número de partidos en Primera",
     "badgeTitle": "PORTEROS PARTIDOS G71",
     "answers": [
       {
@@ -6963,7 +6963,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Equipos históricos de España ordenados por títulos totales (Grupo 72)",
+    "title": "Equipos históricos de España ordenados por títulos totales",
     "badgeTitle": "CLUBES TÍTULOS G72",
     "answers": [
       {
@@ -7063,7 +7063,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Futbolistas que ganaron el Pichichi jugando en LaLiga (Grupo 73)",
+    "title": "Futbolistas que ganaron el Pichichi jugando en LaLiga",
     "badgeTitle": "PICHICHIS LALIGA G73",
     "answers": [
       {
@@ -7162,7 +7162,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Jugadores con más partidos disputados en la Selección de España (Grupo 74)",
+    "title": "Jugadores con más partidos disputados en la Selección de España",
     "badgeTitle": "MÁS SELECCIÓN G74",
     "answers": [
       {
@@ -7259,7 +7259,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Jugadores con la nacionalidad española con más goles (Grupo 75)",
+    "title": "Jugadores con la nacionalidad española con más goles",
     "badgeTitle": "GOLEADORES ESPAÑA G75",
     "answers": [
       {
@@ -7354,7 +7354,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Porteros históricos con mayor número de partidos en Primera (Grupo 76)",
+    "title": "Porteros históricos con mayor número de partidos en Primera",
     "badgeTitle": "PORTEROS PARTIDOS G76",
     "answers": [
       {
@@ -7452,7 +7452,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Equipos históricos de España ordenados por títulos totales (Grupo 77)",
+    "title": "Equipos históricos de España ordenados por títulos totales",
     "badgeTitle": "CLUBES TÍTULOS G77",
     "answers": [
       {
@@ -7552,7 +7552,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Futbolistas que ganaron el Pichichi jugando en LaLiga (Grupo 78)",
+    "title": "Futbolistas que ganaron el Pichichi jugando en LaLiga",
     "badgeTitle": "PICHICHIS LALIGA G78",
     "answers": [
       {
@@ -7651,7 +7651,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Jugadores con más partidos disputados en la Selección de España (Grupo 79)",
+    "title": "Jugadores con más partidos disputados en la Selección de España",
     "badgeTitle": "MÁS SELECCIÓN G79",
     "answers": [
       {
@@ -7748,7 +7748,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Jugadores con la nacionalidad española con más goles (Grupo 80)",
+    "title": "Jugadores con la nacionalidad española con más goles",
     "badgeTitle": "GOLEADORES ESPAÑA G80",
     "answers": [
       {
@@ -7843,7 +7843,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Porteros históricos con mayor número de partidos en Primera (Grupo 81)",
+    "title": "Porteros históricos con mayor número de partidos en Primera",
     "badgeTitle": "PORTEROS PARTIDOS G81",
     "answers": [
       {
@@ -7941,7 +7941,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Equipos históricos de España ordenados por títulos totales (Grupo 82)",
+    "title": "Equipos históricos de España ordenados por títulos totales",
     "badgeTitle": "CLUBES TÍTULOS G82",
     "answers": [
       {
@@ -8041,7 +8041,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Futbolistas que ganaron el Pichichi jugando en LaLiga (Grupo 83)",
+    "title": "Futbolistas que ganaron el Pichichi jugando en LaLiga",
     "badgeTitle": "PICHICHIS LALIGA G83",
     "answers": [
       {
@@ -8140,7 +8140,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Jugadores con más partidos disputados en la Selección de España (Grupo 84)",
+    "title": "Jugadores con más partidos disputados en la Selección de España",
     "badgeTitle": "MÁS SELECCIÓN G84",
     "answers": [
       {
@@ -8237,7 +8237,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Jugadores con la nacionalidad española con más goles (Grupo 85)",
+    "title": "Jugadores con la nacionalidad española con más goles",
     "badgeTitle": "GOLEADORES ESPAÑA G85",
     "answers": [
       {
@@ -8332,7 +8332,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Porteros históricos con mayor número de partidos en Primera (Grupo 86)",
+    "title": "Porteros históricos con mayor número de partidos en Primera",
     "badgeTitle": "PORTEROS PARTIDOS G86",
     "answers": [
       {
@@ -8430,7 +8430,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Equipos históricos de España ordenados por títulos totales (Grupo 87)",
+    "title": "Equipos históricos de España ordenados por títulos totales",
     "badgeTitle": "CLUBES TÍTULOS G87",
     "answers": [
       {
@@ -8530,7 +8530,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Futbolistas que ganaron el Pichichi jugando en LaLiga (Grupo 88)",
+    "title": "Futbolistas que ganaron el Pichichi jugando en LaLiga",
     "badgeTitle": "PICHICHIS LALIGA G88",
     "answers": [
       {
@@ -8629,7 +8629,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Jugadores con más partidos disputados en la Selección de España (Grupo 89)",
+    "title": "Jugadores con más partidos disputados en la Selección de España",
     "badgeTitle": "MÁS SELECCIÓN G89",
     "answers": [
       {
@@ -8726,7 +8726,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Jugadores con la nacionalidad española con más goles (Grupo 90)",
+    "title": "Jugadores con la nacionalidad española con más goles",
     "badgeTitle": "GOLEADORES ESPAÑA G90",
     "answers": [
       {
@@ -8821,7 +8821,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Porteros históricos con mayor número de partidos en Primera (Grupo 91)",
+    "title": "Porteros históricos con mayor número de partidos en Primera",
     "badgeTitle": "PORTEROS PARTIDOS G91",
     "answers": [
       {
@@ -8919,7 +8919,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Equipos históricos de España ordenados por títulos totales (Grupo 92)",
+    "title": "Equipos históricos de España ordenados por títulos totales",
     "badgeTitle": "CLUBES TÍTULOS G92",
     "answers": [
       {
@@ -9019,7 +9019,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Futbolistas que ganaron el Pichichi jugando en LaLiga (Grupo 93)",
+    "title": "Futbolistas que ganaron el Pichichi jugando en LaLiga",
     "badgeTitle": "PICHICHIS LALIGA G93",
     "answers": [
       {
@@ -9118,7 +9118,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Jugadores con más partidos disputados en la Selección de España (Grupo 94)",
+    "title": "Jugadores con más partidos disputados en la Selección de España",
     "badgeTitle": "MÁS SELECCIÓN G94",
     "answers": [
       {
@@ -9215,7 +9215,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Jugadores con la nacionalidad española con más goles (Grupo 95)",
+    "title": "Jugadores con la nacionalidad española con más goles",
     "badgeTitle": "GOLEADORES ESPAÑA G95",
     "answers": [
       {
@@ -9310,7 +9310,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Porteros históricos con mayor número de partidos en Primera (Grupo 96)",
+    "title": "Porteros históricos con mayor número de partidos en Primera",
     "badgeTitle": "PORTEROS PARTIDOS G96",
     "answers": [
       {
@@ -9408,7 +9408,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Equipos históricos de España ordenados por títulos totales (Grupo 97)",
+    "title": "Equipos históricos de España ordenados por títulos totales",
     "badgeTitle": "CLUBES TÍTULOS G97",
     "answers": [
       {
@@ -9508,7 +9508,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Futbolistas que ganaron el Pichichi jugando en LaLiga (Grupo 98)",
+    "title": "Futbolistas que ganaron el Pichichi jugando en LaLiga",
     "badgeTitle": "PICHICHIS LALIGA G98",
     "answers": [
       {
@@ -9607,7 +9607,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Jugadores con más partidos disputados en la Selección de España (Grupo 99)",
+    "title": "Jugadores con más partidos disputados en la Selección de España",
     "badgeTitle": "MÁS SELECCIÓN G99",
     "answers": [
       {
@@ -9704,7 +9704,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Jugadores con la nacionalidad española con más goles (Grupo 100)",
+    "title": "Jugadores con la nacionalidad española con más goles",
     "badgeTitle": "GOLEADORES ESPAÑA G100",
     "answers": [
       {
@@ -9799,7 +9799,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Porteros históricos con mayor número de partidos en Primera (Grupo 101)",
+    "title": "Porteros históricos con mayor número de partidos en Primera",
     "badgeTitle": "PORTEROS PARTIDOS G101",
     "answers": [
       {
@@ -9897,7 +9897,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Equipos históricos de España ordenados por títulos totales (Grupo 102)",
+    "title": "Equipos históricos de España ordenados por títulos totales",
     "badgeTitle": "CLUBES TÍTULOS G102",
     "answers": [
       {
@@ -9997,7 +9997,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Futbolistas que ganaron el Pichichi jugando en LaLiga (Grupo 103)",
+    "title": "Futbolistas que ganaron el Pichichi jugando en LaLiga",
     "badgeTitle": "PICHICHIS LALIGA G103",
     "answers": [
       {
@@ -10096,7 +10096,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Jugadores con más partidos disputados en la Selección de España (Grupo 104)",
+    "title": "Jugadores con más partidos disputados en la Selección de España",
     "badgeTitle": "MÁS SELECCIÓN G104",
     "answers": [
       {
@@ -10193,7 +10193,7 @@ export const LALIGA_TOPICS_DB = [
     ]
   },
   {
-    "title": "Jugadores con la nacionalidad española con más goles (Grupo 105)",
+    "title": "Jugadores con la nacionalidad española con más goles",
     "badgeTitle": "GOLEADORES ESPAÑA G105",
     "answers": [
       {

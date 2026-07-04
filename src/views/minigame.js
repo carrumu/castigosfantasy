@@ -1,3 +1,63 @@
+import { supabase } from '../supabase';
+
+/**
+ * Helper to remove accents and special characters
+ */
+function normalizeString(str) {
+  if (!str) return '';
+  return str
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/ø/g, "o")
+    .replace(/Ø/g, "O")
+    .toUpperCase()
+    .trim();
+}
+
+/**
+ * Helper to parse market value strings like "€150.00m" or "€500k" to numbers
+ */
+function parseMarketValue(valStr) {
+  if (!valStr || valStr === '-') return 0;
+  let numStr = valStr.replace('€', '').replace('m', '').replace('k', '').trim();
+  let num = parseFloat(numStr);
+  if (valStr.includes('m')) return num * 1000000;
+  if (valStr.includes('k')) return num * 1000;
+  return num;
+}
+
+/**
+ * Extracts a valid Wordle name from a full name.
+ * Usually the last word, but must be 4-10 characters, alphabetical only.
+ */
+function getWordleName(fullName) {
+  const cleanName = normalizeString(fullName);
+  const parts = cleanName.split(/[\s-]+/); // split by space or hyphen
+  
+  // Try the last word first (usually last name)
+  let candidate = parts[parts.length - 1];
+  
+  // If the last word is like "JR" or "SR", take the one before it
+  if (parts.length > 1 && (candidate === 'JR' || candidate === 'SR')) {
+    candidate = parts[parts.length - 2];
+  }
+  
+  // Clean non-alphabetical chars from candidate
+  candidate = candidate.replace(/[^A-Z]/g, '');
+  
+  if (candidate.length >= 4 && candidate.length <= 10) {
+    return candidate;
+  }
+  
+  // If last word didn't work, try first word (e.g. "PEDRI")
+  let firstCandidate = parts[0].replace(/[^A-Z]/g, '');
+  if (firstCandidate.length >= 4 && firstCandidate.length <= 10) {
+    return firstCandidate;
+  }
+  
+  return null;
+}
+
 /**
  * Renders the Wordle-style Guess the Player mini-game.
  * Only active First Division players from Spanish LaLiga EA Sports.
@@ -6,62 +66,54 @@
  * @param {Object} callbacks 
  * @param {Function} callbacks.showToast 
  */
-export function renderMinigame(container, callbacks) {
-  // List of active LaLiga players (lengths between 3 and 10 letters for optimal mobile display)
-  const LALIGA_PLAYERS = [
-    "ASPAS",
-    "BELLINGHAM",
-    "GRIEZMANN",
-    "PEDRI",
-    "GAVI",
-    "VINICIUS",
-    "VALVERDE",
-    "KOKE",
-    "MAFFEO",
-    "MURIQI",
-    "ISCO",
-    "RAPHINHA",
-    "KOUNDE",
-    "MODRIC",
-    "SORLOTH",
-    "CHIMY",
-    "SANCET",
-    "GURUZETA",
-    "OYARZABAL",
-    "ZUBIMENDI",
-    "CARVAJAL",
-    "OBLAK",
-    "DEPAUL",
-    "KIRIAN",
-    "LEJEUNE",
-    "ISI",
-    "YAMAL",
-    "GUTIERREZ",
-    "RUDIGER",
-    "CAMAVINGA",
-    "TCHOUAMENI",
-    "BRAHIM",
-    "KUBO",
-    "MENDY",
-    "MILITAO",
-    "FORNALS",
-    "OCAMPOS",
-    "INAKI",
-    "NICO",
-    "UNAI",
-    "VIVIAN",
-    "GIMENEZ",
-    "BARRIOS",
-    "LLORENTE",
-    "CORREA",
-    "HERRERA",
-    "BALDE",
-    "PEPULU",
-    "SOW",
-    "TSYGANKOV",
-    "RADOJA",
-    "DARDER",
-    "GAYA"
+export async function renderMinigame(container, callbacks) {
+  // Show loading state initially
+  container.innerHTML = `
+    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 300px; width: 100%;">
+      <div class="loader" style="border: 4px solid rgba(255,255,255,0.1); border-left-color: var(--primary-green); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite;"></div>
+      <p style="margin-top: 1rem; color: var(--text-muted); font-size: 0.9rem; font-weight: 600;">Cargando jugadores...</p>
+    </div>
+    <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>
+  `;
+
+  let dynamicPlayers = [];
+
+  try {
+    const { data, error } = await supabase.from('football_players').select('name, market_value');
+    if (!error && data && data.length > 0) {
+      // 1. Parse market value
+      const parsedData = data.map(p => ({
+        ...p,
+        valNum: parseMarketValue(p.market_value)
+      }));
+      
+      // 2. Sort by market value desc
+      parsedData.sort((a, b) => b.valNum - a.valNum);
+      
+      // 3. Take top 200 players and extract Wordle names
+      const top200 = parsedData.slice(0, 200);
+      
+      const wordleSet = new Set();
+      top200.forEach(p => {
+        const wName = getWordleName(p.name);
+        if (wName) wordleSet.add(wName);
+      });
+      
+      // 4. Sort alphabetically to guarantee determinism across devices
+      dynamicPlayers = Array.from(wordleSet).sort();
+    }
+  } catch (err) {
+    console.error("Error fetching wordle players:", err);
+  }
+
+  // Fallback if DB fetch fails or has no valid names
+  const LALIGA_PLAYERS = dynamicPlayers.length > 20 ? dynamicPlayers : [
+    "ASPAS", "BELLINGHAM", "GRIEZMANN", "PEDRI", "GAVI", "VINICIUS", "VALVERDE", "KOKE",
+    "MAFFEO", "MURIQI", "ISCO", "RAPHINHA", "KOUNDE", "MODRIC", "SORLOTH", "CHIMY",
+    "SANCET", "GURUZETA", "OYARZABAL", "ZUBIMENDI", "CARVAJAL", "OBLAK", "DEPAUL", "KIRIAN",
+    "LEJEUNE", "YAMAL", "GUTIERREZ", "RUDIGER", "CAMAVINGA", "TCHOUAMENI", "BRAHIM",
+    "KUBO", "MENDY", "MILITAO", "FORNALS", "OCAMPOS", "INAKI", "NICO", "UNAI", "VIVIAN",
+    "GIMENEZ", "BARRIOS", "LLORENTE", "CORREA", "HERRERA", "BALDE", "PEPULU", "SOW"
   ];
 
   // Helper: Get Date String (YYYY-MM-DD)

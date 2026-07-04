@@ -1,6 +1,21 @@
 import { setupAutocomplete } from '../utils/autocomplete';
 import { LALIGA_TOPICS_DB } from '../utils/topics-db';
 import { LALIGA_PLAYERS_DB } from '../utils/players-db';
+import { supabase } from '../supabase';
+
+function parseMarketValue(valStr) {
+  if (!valStr || valStr === '-') return 0;
+  let numStr = valStr.replace('€', '').replace('m', '').replace('k', '').trim();
+  let num = parseFloat(numStr);
+  if (valStr.includes('m')) return num * 1000000;
+  if (valStr.includes('k')) return num * 1000;
+  return num;
+}
+
+function normalizeStr(str) {
+  if (!str) return '';
+  return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/ø/g, "o").replace(/Ø/g, "O").toLowerCase().trim();
+}
 
 // Clean, official names list for Spanish football clubs
 const LALIGA_TEAMS_CLEAN = [
@@ -50,8 +65,75 @@ const LALIGA_TEAMS_CLEAN = [
  * @param {Function} callbacks.onNavigate
  * @param {Function} callbacks.showToast
  */
-export function renderTop10(container, callbacks) {
-  let activeTopic = null; // Topic object from LALIGA_TOPICS_DB
+export async function renderTop10(container, callbacks) {
+  // Show loader
+  container.innerHTML = `
+    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 300px; width: 100%;">
+      <div class="loader" style="border: 4px solid rgba(255,255,255,0.1); border-left-color: var(--primary-green); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite;"></div>
+      <p style="margin-top: 1rem; color: var(--text-muted); font-size: 0.9rem; font-weight: 600;">Cargando Top 10...</p>
+    </div>
+  `;
+
+  let combinedTopics = LALIGA_TOPICS_DB.filter(t => {
+    const title = (t.title || "").toLowerCase();
+    return !title.includes("selección") && !title.includes("seleccion") && !title.includes("mundial") && !title.includes("eurocopa");
+  });
+  let fetchedPlayers = [];
+
+  try {
+    const { data, error } = await supabase.from('football_players').select('*');
+    if (!error && data && data.length > 0) {
+      const parsedData = data.map(p => ({
+        ...p,
+        valNum: parseMarketValue(p.market_value)
+      }));
+      
+      parsedData.sort((a, b) => b.valNum - a.valNum);
+      fetchedPlayers = parsedData;
+      
+      const realMadrid = parsedData.filter(p => p.club && p.club.includes('Real Madrid'));
+      const barcelona = parsedData.filter(p => p.club && p.club.includes('Barcelona'));
+      const atleti = parsedData.filter(p => p.club && (p.club.includes('Atlético') || p.club.includes('Atletico')));
+      const betis = parsedData.filter(p => p.club && p.club.includes('Betis'));
+      
+      const delanteros = parsedData.filter(p => p.position && (p.position.toLowerCase().includes('delantero') || p.position.toLowerCase().includes('extremo')));
+      const medios = parsedData.filter(p => p.position && p.position.toLowerCase().includes('medio'));
+      const defensas = parsedData.filter(p => p.position && (p.position.toLowerCase().includes('defensa') || p.position.toLowerCase().includes('lateral') || p.position.toLowerCase().includes('central')));
+      const porteros = parsedData.filter(p => p.position && p.position.toLowerCase().includes('portero'));
+
+      const createDynamicTopic = (title, badge, list) => {
+        if (list.length < 10) return null;
+        return {
+          title,
+          badgeTitle: badge,
+          answers: list.slice(0, 10).map(p => ({
+            name: p.name,
+            info: `${p.club} - ${p.market_value}`,
+            flag: "🇪🇸",
+            matches: [normalizeStr(p.name)]
+          }))
+        };
+      };
+
+      const topicsToAdd = [
+        createDynamicTopic('Jugadores Más Valiosos de LaLiga', 'MÁS VALIOSOS', parsedData),
+        createDynamicTopic('Delanteros Más Valiosos', 'DELANTEROS VALIOSOS', delanteros),
+        createDynamicTopic('Centrocampistas Más Valiosos', 'MEDIOS VALIOSOS', medios),
+        createDynamicTopic('Defensas Más Valiosos', 'DEFENSAS VALIOSOS', defensas),
+        createDynamicTopic('Porteros Más Valiosos', 'PORTEROS VALIOSOS', porteros),
+        createDynamicTopic('Jugadores Más Valiosos del Real Madrid', 'MÁS VALIOSOS R.MADRID', realMadrid),
+        createDynamicTopic('Jugadores Más Valiosos del FC Barcelona', 'MÁS VALIOSOS BARÇA', barcelona),
+        createDynamicTopic('Jugadores Más Valiosos del Atlético', 'MÁS VALIOSOS ATLETI', atleti),
+        createDynamicTopic('Jugadores Más Valiosos del Real Betis', 'MÁS VALIOSOS BETIS', betis),
+      ].filter(t => t !== null);
+
+      combinedTopics = [...combinedTopics, ...topicsToAdd];
+    }
+  } catch (err) {
+    console.error("Error generating dynamic topics:", err);
+  }
+
+  let activeTopic = null; // Topic object from LALIGA_TOPICS_DB or dynamic
   let topicIndex = -1;
   let guessedIndices = new Set();
   let surrendered = false;
@@ -71,9 +153,9 @@ export function renderTop10(container, callbacks) {
     today.setHours(0, 0, 0, 0);
     const diffDays = Math.floor((today.getTime() - epoch) / (1000 * 60 * 60 * 24));
     // Support wrap-around for index if dates exceed DB length
-    const index = Math.abs(diffDays) % LALIGA_TOPICS_DB.length;
+    const index = Math.abs(diffDays) % combinedTopics.length;
     return {
-      topic: LALIGA_TOPICS_DB[index],
+      topic: combinedTopics[index],
       index: index,
       number: diffDays + 1
     };
@@ -196,7 +278,28 @@ export function renderTop10(container, callbacks) {
     }
 
     // Default to players database
-    return LALIGA_PLAYERS_DB;
+    const db = [...LALIGA_PLAYERS_DB];
+    
+    if (typeof fetchedPlayers !== 'undefined' && Array.isArray(fetchedPlayers)) {
+      fetchedPlayers.forEach(fp => {
+        if (!db.some(x => x.name === fp.name)) {
+          db.push({
+            name: fp.name,
+            team: fp.club,
+            searchKeys: [normalizeStr(fp.name), normalizeStr(fp.club || '')]
+          });
+        }
+      });
+    }
+
+    // Ensure all answers in activeTopic are in the database
+    activeTopic.answers.forEach(ans => {
+      if (!db.some(x => normalizeStr(x.name) === normalizeStr(ans.name))) {
+        db.push({ name: ans.name, team: "", searchKeys: [normalizeStr(ans.name)] });
+      }
+    });
+
+    return db;
   };
 
   const getIncorrectMessage = () => {
@@ -414,6 +517,11 @@ Juega en Castigos Fantasy`;
             `;
           }
 
+          let extraInfoHtml = '';
+          if (isGuessed || revealRed) {
+            extraInfoHtml = ans.info ? `<div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem; font-weight: 600;">${ans.info}</div>` : '';
+          }
+
           return `
             <div style="${cellStyle}">
               <!-- Number badge -->
@@ -425,7 +533,10 @@ Juega en Castigos Fantasy`;
               ${flagHtml}
 
               <!-- Contenido -->
-              ${textHtml}
+              <div style="display: flex; flex-direction: column; justify-content: center;">
+                ${textHtml}
+                ${extraInfoHtml}
+              </div>
             </div>
           `;
         }).join('')}

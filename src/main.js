@@ -17,6 +17,7 @@ import { renderForo } from './views/foro';
 import { renderHerramientas } from './views/herramientas';
 import { renderTop10 } from './views/top10';
 import { renderMuro } from './views/muro';
+import { renderPlayersHub } from './views/players_hub';
 
 // Initialize Theme (Force Dark Mode)
 document.body.classList.remove('light-theme');
@@ -348,6 +349,11 @@ function renderMainLayout(isGuest, currentUser = null) {
     });
   } else if (currentView === 'top-10') {
     renderTop10(viewContainer, {
+      onNavigate: navigate,
+      showToast
+    });
+  } else if (currentView === 'jugadores') {
+    renderPlayersHub(viewContainer, {
       onNavigate: navigate,
       showToast
     });

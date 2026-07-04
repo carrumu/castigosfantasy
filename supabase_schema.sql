@@ -83,5 +83,22 @@ CREATE POLICY "Authenticated Punishments" ON public.punishments FOR ALL USING (a
 CREATE POLICY "Authenticated Records" ON public.matchday_records FOR ALL USING (auth.role() = 'authenticated');
 
 
+-- 6. Jugadores de Fútbol Reales (football_players)
+CREATE TABLE IF NOT EXISTS public.football_players (
+  id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  tm_id text UNIQUE,
+  name text NOT NULL,
+  position text,
+  club text,
+  market_value text,
+  photo_url text,
+  updated_at timestamp with time zone DEFAULT timezone('utc'::text, now())
+);
 
+-- Habilitar RLS en la nueva tabla
+ALTER TABLE public.football_players ENABLE ROW LEVEL SECURITY;
 
+-- Política de lectura pública para los jugadores
+CREATE POLICY "Public Read Players" ON public.football_players FOR SELECT USING (true);
+CREATE POLICY "Authenticated Insert Players" ON public.football_players FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated Update Players" ON public.football_players FOR UPDATE USING (auth.role() = 'authenticated');
