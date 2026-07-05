@@ -106,67 +106,7 @@ export function renderAuth(container, callbacks) {
       return;
     }
 
-    // 2. --- Database Configuration Panel (Supabase URL & Keys) ---
-    if (!isConfigured) {
-      const storedGeminiKey = localStorage.getItem('CF_GEMINI_API_KEY') || '';
-
-      container.innerHTML = `
-        <div class="container" style="display: flex; align-items: center; justify-content: center; min-height: 80vh;">
-          <div class="card glass pitch-card" style="width: 100%; max-width: 400px;">
-            <h2 class="card-title gradient-text-gold">Configurar APIs</h2>
-            <p style="margin-bottom: 1rem; font-size: 0.9rem; line-height: 1.5; color: var(--text-muted);">
-              Copia las credenciales API de tu panel de Supabase para conectar la base de datos persistente.
-            </p>
-            <form id="sb-setup-form">
-              <div class="form-group">
-                <label for="sb-url">Project URL (Supabase)</label>
-                <input type="text" id="sb-url" class="input-field" placeholder="https://xxxx.supabase.co" required />
-              </div>
-              <div class="form-group">
-                <label for="sb-key">API Anon Key (Supabase)</label>
-                <input type="password" id="sb-key" class="input-field" placeholder="eyJhbGciOi..." required />
-              </div>
-              <div class="form-group" style="border-top: 1px solid var(--border-color); padding-top: 1rem; margin-top: 1rem;">
-                <label for="gemini-key">Gemini API Key (Opcional - Lector IA)</label>
-                <input type="password" id="gemini-key" class="input-field" placeholder="AIzaSy..." value="${storedGeminiKey}" />
-              </div>
-              <button type="submit" class="btn-primary">Guardar Configuración</button>
-            </form>
-            
-            <div style="text-align: center; margin-top: 1rem;">
-              <button id="back-to-demo-btn" class="btn-secondary" style="border: none; background: transparent; color: var(--text-muted); font-size: 0.9rem; cursor: pointer;">
-                ← Usar Modo Demo Local
-              </button>
-            </div>
-          </div>
-        </div>
-      `;
-
-      const form = container.querySelector('#sb-setup-form');
-      form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const url = form.querySelector('#sb-url').value;
-        const key = form.querySelector('#sb-key').value;
-        const geminiKey = form.querySelector('#gemini-key').value.trim();
-
-        localStorage.setItem('CF_SUPABASE_URL', url.trim());
-        localStorage.setItem('CF_SUPABASE_ANON_KEY', key.trim());
-        if (geminiKey) {
-          localStorage.setItem('CF_GEMINI_API_KEY', geminiKey);
-        }
-
-        callbacks.showToast('Configuración guardada. Reiniciando...', 'success');
-        setTimeout(() => window.location.reload(), 1500);
-      });
-
-      const backBtn = container.querySelector('#back-to-demo-btn');
-      backBtn.addEventListener('click', () => {
-        callbacks.onAuthSuccess();
-      });
-      return;
-    }
-
-    // 3. --- Login / Signup Panel ---
+    // 2. --- Login / Signup Panel ---
     container.innerHTML = `
       <div class="container" style="display: flex; align-items: center; justify-content: center; min-height: 80vh;">
         <div class="card glass pitch-card" style="width: 100%; max-width: 350px; padding: 2rem 1.5rem;">
@@ -235,9 +175,6 @@ export function renderAuth(container, callbacks) {
             <button id="toggle-mode-btn" style="background: transparent; border: none; color: var(--primary); font-family: var(--font-sans); font-weight: 600; cursor: pointer; font-size: 0.9rem;">
               ${isLoginMode ? '¿No tienes cuenta? Regístrate' : '¿Ya tienes cuenta? Inicia sesión'}
             </button>
-            <button id="back-to-demo-btn" style="background: transparent; border: none; color: var(--text-muted); font-family: var(--font-sans); font-weight: 500; cursor: pointer; font-size: 0.85rem; text-decoration: underline;">
-              ← Volver al Modo Demo
-            </button>
           </div>
         </div>
       </div>
@@ -245,7 +182,6 @@ export function renderAuth(container, callbacks) {
 
     const form = container.querySelector('#auth-form');
     const toggleBtn = container.querySelector('#toggle-mode-btn');
-    const backBtn = container.querySelector('#back-to-demo-btn');
 
     // Eye toggle for password
     const eyeBtn = container.querySelector('#toggle-password');
@@ -269,6 +205,10 @@ export function renderAuth(container, callbacks) {
     if (googleBtn) {
       googleBtn.addEventListener('click', async () => {
         try {
+          if (!isConfigured || !supabase) {
+             callbacks.showToast('Error de conexión con la base de datos.', 'error');
+             return;
+          }
           const redirectTo = window.location.hostname === 'localhost'
             ? window.location.origin
             : 'https://castigosfantasy.com';
@@ -293,10 +233,6 @@ export function renderAuth(container, callbacks) {
       render();
     });
 
-    backBtn.addEventListener('click', () => {
-      callbacks.onAuthSuccess();
-    });
-
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const submitBtn = form.querySelector('#submit-btn');
@@ -307,6 +243,13 @@ export function renderAuth(container, callbacks) {
       submitBtn.innerHTML = '<span class="spinner"></span>';
 
       try {
+        if (!isConfigured || !supabase) {
+          callbacks.showToast('Error de conexión con la base de datos.', 'error');
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = `<span>${isLoginMode ? 'Entrar a la Liga' : 'Crear Cuenta'}</span>`;
+          return;
+        }
+
         if (isLoginMode) {
           const { error } = await supabase.auth.signInWithPassword({ email, password });
           if (error) throw error;

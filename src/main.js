@@ -45,6 +45,15 @@ async function checkAuthAndRender() {
       const session = supabase.auth.session ? supabase.auth.session() : null;
       user = session?.user || (supabase.auth.getUser ? (await supabase.auth.getUser()).data?.user : null);
       if (user) {
+        try {
+          const { data: profile } = await supabase.from('profiles').select('is_superadmin').eq('id', user.id).maybeSingle();
+          if (profile) {
+            user.is_superadmin = !!profile.is_superadmin;
+          }
+        } catch (err) {
+          console.warn('Could not fetch superadmin status:', err);
+        }
+
         // Asynchronously check and notify if this is a new OAuth or email sign up
         checkAndNotifyNewUser(user).catch(err => {
           console.error("Error al verificar/enviar notificación de nuevo usuario:", err);
@@ -217,14 +226,6 @@ function renderMainLayout(isGuest, currentUser = null) {
             `}
           </div>
         </header>
-
-        <!-- Banner de Modo Demo -->
-        ${isGuest ? `
-          <div class="demo-banner">
-            <strong>Modo Demo Activo:</strong> Estás probando la app en local sin cuenta. 
-            <a href="#" id="banner-login-link">Registra tu Liga Real</a>
-          </div>
-        ` : ''}
 
         <!-- Contenedor de la Vista Activa -->
         <main id="view-container" class="container"></main>

@@ -25,14 +25,14 @@ export function renderComunidad(container, callbacks) {
         <article class="brutalist-card concrete-bg" id="comunidad-foro-card" style="cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; min-height: 260px; position: relative;">
           <div>
             <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid #000000; padding-bottom: 0.75rem; margin-bottom: 1rem;">
-              <h2 style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 800; text-transform: uppercase;">Foro de Mánagers</h2>
+              <h2 style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 800; text-transform: uppercase;">El Muro de la Vergüenza</h2>
             </div>
             <p style="font-size: 0.95rem; color: var(--text-light); line-height: 1.5; margin-bottom: 1.5rem;">
-              Debates, estrategias de fichajes, quejas sobre arbitraje y compra-venta de jugadores con el resto de la comunidad.
+              Sube la prueba de tus castigos en vídeo o imagen, ríete de las deudas ajenas y da la cara ante la liga.
             </p>
           </div>
           <button class="brutalist-btn" style="margin-top: auto; pointer-events: none; width: 100%;">
-            Entrar al Foro <span class="material-symbols-outlined" style="font-size: 1.2rem;">chevron_right</span>
+            Entrar al Muro <span class="material-symbols-outlined" style="font-size: 1.2rem;">chevron_right</span>
           </button>
         </article>
 

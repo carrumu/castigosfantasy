@@ -101,35 +101,53 @@ export async function renderForo(container, callbacks) {
           <span class="material-symbols-outlined" style="font-size: 1.05rem;">arrow_back</span>
         </button>
         <h1 class="gradient-text-gold" style="font-size: 1.5rem; font-weight: 900; font-family: var(--font-display); text-transform: uppercase; margin: 0; text-align: center; padding: 0 40px;">
-          Foro de Mánagers
+          El Muro de la Vergüenza
         </h1>
       </div>
 
+      ${!isGuestState ? `
       <!-- Search bar & My Posts filter -->
       <div style="margin-bottom: 2rem; display: flex; gap: 0.5rem;" id="foro-search-bar-container">
-        <input type="text" id="foro-search-input" class="input-field" placeholder="🔎 Buscar publicaciones..." style="border: 3px solid #000; padding: 0.65rem 1rem; font-weight: 700; background: var(--bg-input); flex-grow: 1; box-shadow: 4px 4px 0px #000; font-family: var(--font-sans);" />
+        <input type="text" id="foro-search-input" class="input-field" placeholder="Buscar castigos..." style="border: 3px solid #000; padding: 0.65rem 1rem; font-weight: 700; background: var(--bg-input); flex-grow: 1; box-shadow: 4px 4px 0px #000; font-family: var(--font-sans);" />
         <button id="foro-clear-search-btn" class="brutalist-btn" style="padding: 0.65rem 1rem; font-size: 0.85rem; font-weight: 900; margin: 0; display: none; text-transform: uppercase; width: auto; border: 3px solid #000; box-shadow: 4px 4px 0px #000; background: var(--danger); color: white;">Limpiar</button>
-        ${!isGuestState ? `
-          <button id="foro-my-posts-btn" class="brutalist-btn" style="padding: 0.65rem 1rem; font-size: 0.85rem; font-weight: 900; margin: 0; white-space: nowrap; text-transform: uppercase; width: auto; border: 3px solid #000; box-shadow: 4px 4px 0px #000; background: transparent; color: var(--text-light);">Mis Posts</button>
-        ` : ''}
+        <button id="foro-my-posts-btn" class="brutalist-btn" style="padding: 0.65rem 1rem; font-size: 0.85rem; font-weight: 900; margin: 0; white-space: nowrap; text-transform: uppercase; width: auto; border: 3px solid #000; box-shadow: 4px 4px 0px #000; background: transparent; color: var(--text-light);">Mis Posts</button>
       </div>
+      ` : ''}
 
       <!-- Creation Box -->
-      <div id="foro-creation-zone" style="margin-bottom: 2rem;"></div>
+      <div id="foro-creation-zone" style="margin-bottom: 2rem; ${isGuestState ? 'display: none;' : ''}"></div>
 
-      <!-- Posts Feed Container -->
-      <div id="foro-feed-list" style="display: flex; flex-direction: column; gap: 1.5rem;">
-        <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
-          <span class="spinner" style="display: inline-block; margin-bottom: 0.5rem;"></span>
-          <p style="font-weight: 700;">Cargando debates...</p>
+      <!-- Posts Feed Wrapper -->
+      <div style="position: relative; min-height: 400px;" id="foro-feed-wrapper">
+        <div style="${isGuestState ? 'filter: blur(5px); pointer-events: none; user-select: none; opacity: 0.6;' : ''}">
+          <!-- Posts Feed Container -->
+          <div id="foro-feed-list" style="display: flex; flex-direction: column; gap: 1.5rem;">
+            <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
+              <span class="spinner" style="display: inline-block; margin-bottom: 0.5rem;"></span>
+              <p style="font-weight: 700;">Cargando debates...</p>
+            </div>
+          </div>
+
+          <!-- Load More Button -->
+          <div style="text-align: center; margin-top: 2rem; display: none;" id="load-more-container">
+            <button class="brutalist-btn" id="foro-load-more-btn" style="width: 100%; font-weight: 900; text-transform: uppercase;">
+              Cargar Más Temas
+            </button>
+          </div>
         </div>
-      </div>
 
-      <!-- Load More Button -->
-      <div style="text-align: center; margin-top: 2rem; display: none;" id="load-more-container">
-        <button class="brutalist-btn" id="foro-load-more-btn" style="width: 100%; font-weight: 900; text-transform: uppercase;">
-          Cargar Más Temas
-        </button>
+        ${isGuestState ? `
+        <div style="position: absolute; top: 15%; left: 50%; transform: translateX(-50%); width: 95%; max-width: 420px; z-index: 10;">
+          <div class="brutalist-card concrete-bg" style="border: 4px solid #000; box-shadow: 8px 8px 0px #000; padding: 2.5rem 1.5rem; text-align: center; pointer-events: auto;">
+            <span class="material-symbols-outlined" style="font-size: 3.5rem; margin-bottom: 1rem; color: var(--accent);">sports_soccer</span>
+            <h3 style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 900; text-transform: uppercase; margin-bottom: 1rem; line-height: 1.1;">El Muro de la Vergüenza</h3>
+            <p style="font-size: 0.95rem; color: var(--text-light); margin-bottom: 1.5rem; font-weight: 700; line-height: 1.5;">
+              Para ver los castigos de los demás, reírte de ellos y subir tus propias pruebas, necesitas iniciar sesión.
+            </p>
+            <button class="brutalist-btn" id="foro-login-overlay-btn" style="width: 100%; font-weight: 900; text-transform: uppercase; font-size: 1.05rem; padding: 1rem;">Crear Cuenta / Entrar</button>
+          </div>
+        </div>
+        ` : ''}
       </div>
     </div>
   `;
@@ -141,6 +159,14 @@ export async function renderForo(container, callbacks) {
 
   // Render Creation Zone
   renderCreationForm(container, callbacks);
+
+  // Setup login overlay button if guest
+  const overlayLoginBtn = container.querySelector('#foro-login-overlay-btn');
+  if (overlayLoginBtn) {
+    overlayLoginBtn.addEventListener('click', () => {
+      callbacks.onNavigate('acceso');
+    });
+  }
 
   // Setup Search Input event listener
   const searchInput = container.querySelector('#foro-search-input');
@@ -160,16 +186,18 @@ export async function renderForo(container, callbacks) {
     fetchPostsAndRender(container);
   };
 
-  searchInput.addEventListener('input', () => {
-    clearTimeout(searchTimeout);
-    searchTimeout = setTimeout(triggerSearch, 350); // Debounce of 350ms
-  });
+  if (searchInput) {
+    searchInput.addEventListener('input', () => {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(triggerSearch, 350); // Debounce of 350ms
+    });
 
-  clearSearchBtn.addEventListener('click', () => {
-    searchInput.value = '';
-    clearSearchBtn.style.display = 'none';
-    triggerSearch();
-  });
+    clearSearchBtn.addEventListener('click', () => {
+      searchInput.value = '';
+      clearSearchBtn.style.display = 'none';
+      triggerSearch();
+    });
+  }
 
   // Setup "My Posts" Filter Button listener
   if (myPostsBtn) {
@@ -204,19 +232,9 @@ export async function renderForo(container, callbacks) {
  */
 function renderCreationForm(container, callbacks) {
   const zone = container.querySelector('#foro-creation-zone');
+  if (!zone) return;
   if (isGuestState) {
-    zone.innerHTML = `
-      <div class="brutalist-card" style="background: var(--bg-card); border: 3px solid #000; box-shadow: 4px 4px 0px #000; padding: 1.5rem; text-align: center;">
-        <h3 style="font-family: var(--font-display); font-size: 1.2rem; font-weight: 800; text-transform: uppercase; margin-bottom: 0.5rem;">🔒 ¿Quieres participar en el debate?</h3>
-        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem; font-weight: 500;">
-          Inicia sesión o regístrate para publicar nuevos temas, comentar y dar like a publicaciones de otros mánagers.
-        </p>
-        <button class="brutalist-btn" id="foro-login-btn" style="width: 100%; font-weight: 900; text-transform: uppercase;">Iniciar Sesión</button>
-      </div>
-    `;
-    zone.querySelector('#foro-login-btn').addEventListener('click', () => {
-      callbacks.onNavigate('acceso');
-    });
+    zone.innerHTML = '';
   } else {
     renderCollapsedBox(zone, container, callbacks);
   }
@@ -230,7 +248,7 @@ function renderCollapsedBox(zone, container, callbacks) {
     <div class="brutalist-card concrete-bg" id="foro-collapsed-trigger" style="padding: 0.85rem 1.25rem; border: 3px solid #000; box-shadow: 4px 4px 0px #000; cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: transform var(--transition-fast);">
       <span style="font-weight: 800; font-size: 0.95rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.5rem; user-select: none;">
         <span class="material-symbols-outlined" style="color: var(--accent); font-size: 1.3rem;">add_comment</span>
-        ¿Qué quieres debatir hoy, mánager? Escribe aquí...
+        Comparte la prueba de tu castigo (URL) aquí...
       </span>
       <span class="brutalist-btn" style="margin: 0; padding: 0.25rem 0.75rem; font-size: 0.75rem; font-weight: 900; text-transform: uppercase;">ESCRIBIR</span>
     </div>
@@ -256,7 +274,7 @@ function renderExpandedForm(zone, container, callbacks) {
       <form id="foro-post-form" style="display: flex; flex-direction: column; gap: 0.75rem;">
         <div style="display: grid; grid-template-columns: 1fr; gap: 0.75rem;">
           <div>
-            <textarea id="post-content" class="input-field" placeholder="¿Qué quieres debatir hoy? (máx. 280 caracteres)" rows="3" required maxlength="280" style="width: 100%; border: 2px solid #000; padding: 0.65rem; font-family: var(--font-sans); font-weight: 700; background: var(--bg-input); resize: none;"></textarea>
+            <textarea id="post-content" class="input-field" placeholder="Pega el enlace a tu vídeo pagando el castigo (TikTok, YouTube, etc.) (máx. 280 caracteres)" rows="3" required maxlength="280" style="width: 100%; border: 2px solid #000; padding: 0.65rem; font-family: var(--font-sans); font-weight: 700; background: var(--bg-input); resize: none;"></textarea>
             <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.25rem;">
               <span id="post-spam-warning" style="font-size: 0.75rem; color: var(--danger); font-weight: 800;"></span>
               <span id="char-counter" style="font-size: 0.75rem; color: var(--text-muted); font-weight: 800;">280 caracteres restantes</span>
@@ -449,8 +467,8 @@ function renderFeed(container, newPosts) {
         <span class="material-symbols-outlined" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 0.5rem;">search_off</span>
         <h3 style="font-family: var(--font-display); text-transform: uppercase; font-size: 1.1rem; font-weight: 800; margin-bottom: 0.5rem;">Sin resultados</h3>
         <p style="font-size: 0.85rem; color: var(--text-muted); max-width: 320px; margin: 0 auto;">
-          ${searchQuery ? `No encontramos publicaciones que coincidan con la búsqueda de "<strong>${searchQuery}</strong>".` : 
-            filterMyPosts ? 'No has publicado ningún post todavía en el foro.' : 'Nadie ha publicado nada todavía. ¡Sé el primero en iniciar el debate!'}
+          ${searchQuery ? `No encontramos castigos que coincidan con la búsqueda de "<strong>${searchQuery}</strong>".` : 
+            filterMyPosts ? 'No has subido ningún castigo todavía.' : 'Nadie ha subido su castigo todavía. ¡Sé el primero en dar la cara!'}
         </p>
       </div>
     `;
@@ -486,7 +504,7 @@ function renderFeed(container, newPosts) {
       }
     });
 
-    const isAuthor = !isGuestState && currentUserState && post.profile_id === currentUserState.id;
+    const canDelete = !isGuestState && currentUserState && (post.profile_id === currentUserState.id || currentUserState.is_superadmin);
 
     card.innerHTML = `
       <div style="display: flex; align-items: flex-start; justify-content: space-between; border-bottom: 3px solid #000; padding-bottom: 0.65rem; margin-bottom: 1rem;">
@@ -510,7 +528,7 @@ function renderFeed(container, newPosts) {
         <!-- Likes Button -->
         <div style="display: flex; gap: 0.3rem;" class="likes-wrapper">
           <button class="like-btn brutalist-btn-small ${userLiked ? 'is-active' : ''}">
-            ❤️ <span class="count">${likeCount}</span>
+            Me Gusta <span class="count">${likeCount}</span>
           </button>
         </div>
         
@@ -523,9 +541,9 @@ function renderFeed(container, newPosts) {
           <button class="share-post-btn brutalist-btn-small" title="Copiar enlace al post">
             <span class="material-symbols-outlined" style="font-size: 1.1rem; vertical-align: middle;">share</span>
           </button>
-          ${isAuthor ? `
-            <button class="delete-post-btn brutalist-btn-small btn-danger" title="Eliminar publicación">
-              <span class="material-symbols-outlined" style="font-size: 1.1rem; vertical-align: middle;">delete</span>
+          ${canDelete ? `
+            <button class="delete-post-btn brutalist-btn-small btn-danger" title="Eliminar publicación" style="font-weight: bold; font-family: var(--font-sans);">
+              Eliminar post ✕
             </button>
           ` : ''}
         </div>
@@ -859,7 +877,7 @@ async function fetchCommentsAndRender(postId, listContainer) {
         <!-- Comment Actions -->
         <div style="display: flex; gap: 0.35rem; align-items: center; margin-top: 0.25rem; justify-content: flex-end;">
           <button class="comment-like-btn brutalist-btn-small ${userLiked ? 'is-active' : ''}" style="padding: 0.15rem 0.45rem; font-size: 0.72rem;">
-            ❤️ <span class="count">${likeCount}</span>
+            Me Gusta <span class="count">${likeCount}</span>
           </button>
           ${!isGuestState ? `
             <button class="comment-reply-btn brutalist-btn-small" style="padding: 0.15rem 0.45rem; font-size: 0.72rem;">

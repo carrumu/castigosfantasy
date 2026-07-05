@@ -329,7 +329,6 @@ export function renderLanding(container, callbacks) {
                 <div>
                   <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid #000000; padding-bottom: 0.75rem; margin-bottom: 1rem;">
                     <h3 style="font-family: var(--font-display); font-size: 1.3rem; font-weight: 800; text-transform: uppercase; margin: 0;">El Bufón de la Corte</h3>
-                    <span class="material-symbols-outlined" style="font-size: 1.8rem; color: var(--accent);">sports_kabaddi</span>
                   </div>
                   <p style="font-size: 0.85rem; color: var(--text-light); opacity: 0.8; line-height: 1.4; margin-bottom: 1rem;">
                     Vota y señala al peor futbolista de la jornada. Quien dé menos puntos en el fantasy paga las consecuencias.
@@ -344,15 +343,14 @@ export function renderLanding(container, callbacks) {
               <article class="brutalist-card concrete-bg" style="display: flex; flex-direction: column; justify-content: space-between; min-height: 200px;">
                 <div>
                   <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid #000000; padding-bottom: 0.75rem; margin-bottom: 1rem;">
-                    <h3 style="font-family: var(--font-display); font-size: 1.3rem; font-weight: 800; text-transform: uppercase; margin: 0;">Foro de Mánagers</h3>
-                    <span class="material-symbols-outlined" style="font-size: 1.8rem; color: var(--primary-green);">forum</span>
+                    <h3 style="font-family: var(--font-display); font-size: 1.3rem; font-weight: 800; text-transform: uppercase; margin: 0;">El Muro de la Vergüenza</h3>
                   </div>
                   <p style="font-size: 0.85rem; color: var(--text-light); opacity: 0.8; line-height: 1.4; margin-bottom: 1rem;">
-                    Discute fichajes, llora por las lesiones, pacta traspasos y debate estrategias con los otros mánagers.
+                    Sube la prueba de tus castigos en vídeo o imagen, ríete de las deudas ajenas y da la cara ante la liga.
                   </p>
                 </div>
                 <button class="brutalist-btn" id="landing-foro-btn" style="width: 100%;">
-                  Ir al Foro
+                  Ir al Muro
                 </button>
               </article>
             </div>
