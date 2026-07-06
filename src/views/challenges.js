@@ -1,4 +1,5 @@
 import { supabase, isConfigured } from '../supabase';
+import { getMatchdayClosingTime } from '../utils/calendar';
 
 /**
  * Renders the Weekly Challenges view (Reto Semanal).
@@ -17,6 +18,9 @@ export function renderChallenges(container, callbacks) {
   let userVotedId = null;
   let currentMatchday = 5;
   let isLoading = true;
+  let matchdayClosingTime = null;
+  let isVotingClosed = false;
+  let countdownInterval = null;
 
   async function loadMatchday() {
     if (activeLeagueId && isConfigured && !isGuest) {
@@ -30,6 +34,15 @@ export function renderChallenges(container, callbacks) {
           currentMatchday = league.jester_current_matchday;
         }
       } catch (_) {}
+    }
+
+    try {
+      matchdayClosingTime = await getMatchdayClosingTime(currentMatchday);
+      if (matchdayClosingTime) {
+        isVotingClosed = Date.now() >= matchdayClosingTime.getTime();
+      }
+    } catch (_) {
+      console.error('Could not get matchday closing time');
     }
   }
 
@@ -129,6 +142,11 @@ export function renderChallenges(container, callbacks) {
   }
 
   async function castVote(challengeId) {
+    if (isVotingClosed) {
+      callbacks.showToast('La votación ya ha cerrado', 'error');
+      return;
+    }
+
     if (isGuest || !isConfigured) {
       // Local Guest mode voting toggle
       if (userVotedId == challengeId) {
@@ -195,6 +213,7 @@ export function renderChallenges(container, callbacks) {
               Cargando Votos
             </h2>
             <p style="color: var(--text-muted); font-size: 0.85rem; line-height: 1.4; margin: 0;">
+            <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.4; margin: 0;">
               Obteniendo los retos semanales y recuento de votos en tiempo real de Supabase...
             </p>
           </div>
@@ -204,6 +223,28 @@ export function renderChallenges(container, callbacks) {
     }
 
     const totalVotes = challenges.reduce((sum, c) => sum + c.votes, 0);
+
+    // Identify winner if closed
+    let winnerId = null;
+    if (isVotingClosed && challenges.length > 0) {
+      const sorted = [...challenges].sort((a, b) => b.votes - a.votes);
+      winnerId = sorted[0].id; // The one with most votes
+    }
+
+    // Countdown HTML
+    let countdownHtml = '';
+    if (matchdayClosingTime) {
+      if (isVotingClosed) {
+        countdownHtml = `<div style="background: var(--danger); color: #fff; padding: 0.5rem 1rem; border: 2px solid #000; font-family: var(--font-display); font-weight: 800; font-size: 0.9rem; text-transform: uppercase;">
+          Votación Cerrada
+        </div>`;
+      } else {
+        countdownHtml = `<div style="background: var(--accent); color: #000; padding: 0.5rem 1rem; border: 2px solid #000; font-family: var(--font-sans); font-weight: 800; font-size: 0.85rem; display: flex; align-items: center; gap: 0.5rem;">
+          <span class="material-symbols-outlined" style="font-size: 1.2rem;">timer</span>
+          <span id="voting-countdown">Calculando...</span>
+        </div>`;
+      }
+    }
 
     container.innerHTML = `
       <div class="container">
@@ -216,56 +257,54 @@ export function renderChallenges(container, callbacks) {
             </h1>
             <p style="font-size: 0.85rem; color: var(--text-muted);">Decide democráticamente qué penitencia tendrá que realizar el último de esta jornada.</p>
           </div>
+          ${countdownHtml}
         </div>
 
         <div class="dashboard-grid">
           <!-- Columna Izquierda: Votaciones -->
           <div class="card glass pitch-card" style="margin-bottom: 0;">
-            <h2 class="card-title gradient-text-gold">Votación en Curso</h2>
-            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;">Elige la putada de esta semana. El perdedor tendrá que cumplir la más votada.</p>
+            <h2 class="card-title gradient-text-gold">${isVotingClosed ? 'Resultado Final' : 'Votación en Curso'}</h2>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;">
+              ${isVotingClosed ? 'El plazo ha terminado. El castigo resaltado es la sentencia definitiva.' : 'Elige la putada de esta semana. El perdedor tendrá que cumplir la más votada.'}
+            </p>
             
             <div style="display: flex; flex-direction: column; gap: 1.25rem;" id="poll-container">
               ${challenges.map(item => {
                 const percent = totalVotes > 0 ? Math.round((item.votes / totalVotes) * 100) : 0;
                 const isThisVoted = userVotedId == item.id;
+                const isWinner = winnerId === item.id;
+                const borderStyle = isWinner ? '3px solid var(--accent)' : (isThisVoted ? '1px solid var(--primary)' : '1px solid var(--border-color)');
+                const bgColor = isWinner ? 'rgba(222, 237, 0, 0.1)' : 'rgba(255, 255, 255, 0.02)';
+                
                 return `
-                  <div class="card" style="background: rgba(255, 255, 255, 0.02); border: 1px solid ${isThisVoted ? 'var(--primary)' : 'var(--border-color)'}; padding: 1.25rem; margin: 0; position: relative; overflow: hidden; border-radius: 12px;">
+                  <div class="card" style="background: ${bgColor}; border: ${borderStyle}; padding: 1.25rem; margin: 0; position: relative; overflow: hidden; border-radius: 12px; ${isWinner ? 'box-shadow: 0 0 15px rgba(222, 237, 0, 0.3);' : ''}">
+                    ${isWinner ? `<div style="position: absolute; top: -10px; right: -20px; background: var(--accent); color: #000; font-weight: 900; font-size: 0.7rem; text-transform: uppercase; padding: 1rem 2rem 0.25rem; transform: rotate(45deg); z-index: 10;">Ganador</div>` : ''}
                     <!-- Background fill for progress bar -->
                     <div style="position: absolute; left: 0; top: 0; bottom: 0; width: ${percent}%; background: rgba(var(--primary-rgb), 0.04); transition: width 0.6s ease; pointer-events: none; z-index: 1;"></div>
                     
                     <div style="position: relative; z-index: 2; display: flex; justify-content: space-between; align-items: start; gap: 1rem;">
                       <div style="flex-grow: 1;">
-                        <h4 style="font-size: 1.05rem; font-weight: 700; color: ${isThisVoted ? 'var(--primary)' : 'var(--text-light)'}; margin-bottom: 0.25rem;">
+                        <h4 style="font-size: 1.05rem; font-weight: 700; color: ${isWinner ? 'var(--accent)' : (isThisVoted ? 'var(--primary)' : 'var(--text-light)')}; margin-bottom: 0.25rem;">
                           ${item.title}
                         </h4>
                         <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.4;">${item.desc}</p>
                       </div>
                       <div style="text-align: right; min-width: 80px;">
-                        <span style="font-weight: 800; font-size: 1.15rem; color: var(--primary);">${percent}%</span>
+                        <span style="font-weight: 800; font-size: 1.15rem; color: ${isWinner ? 'var(--accent)' : 'var(--primary)'};">${percent}%</span>
                         <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.1rem;">${item.votes} votos</div>
                       </div>
                     </div>
 
                     <div style="margin-top: 1rem; display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 2;">
                       <!-- Progress bar slider -->
-                      <div style="flex-grow: 1; height: 6px; background: rgba(255, 255, 255, 0.05); border-radius: 3px; margin-right: 1.5rem; overflow: hidden;">
-                        <div style="height: 100%; width: ${percent}%; background: ${isThisVoted ? 'var(--primary)' : 'var(--text-muted)'}; border-radius: 3px; transition: width 0.6s ease;"></div>
+                      <div style="flex-grow: 1; height: 6px; background: rgba(0,0,0,0.4); border-radius: 3px; margin-right: 1rem; overflow: hidden; border: 1px solid rgba(255,255,255,0.05);">
+                        <div style="height: 100%; width: ${percent}%; background: ${isWinner ? 'var(--accent)' : 'var(--primary)'}; border-radius: 3px; transition: width 0.6s ease;"></div>
                       </div>
-                      
-                      <button class="btn-vote" data-id="${item.id}" style="
-                        background: ${isThisVoted ? 'var(--primary)' : 'rgba(255, 255, 255, 0.05)'};
-                        color: ${isThisVoted ? '#fff' : 'var(--text-light)'};
-                        border: 1px solid ${isThisVoted ? 'var(--primary)' : 'var(--border-color)'};
-                        font-family: var(--font-sans);
-                        font-weight: 700;
-                        font-size: 0.75rem;
-                        padding: 0.4rem 0.85rem;
-                        border-radius: 6px;
-                        cursor: pointer;
-                        transition: var(--transition-fast);
-                      ">
-                        ${isThisVoted ? 'Votado ✓' : 'Votar'}
-                      </button>
+                      ${!isVotingClosed ? `
+                        <button class="brutalist-btn-small btn-vote ${isThisVoted ? 'is-active' : ''}" data-id="${item.id}" style="padding: 0.35rem 0.75rem; font-size: 0.7rem; border-radius: 4px;">
+                          ${isThisVoted ? '✔ Tu Voto' : 'Votar'}
+                        </button>
+                      ` : ''}
                     </div>
                   </div>
                 `;
@@ -300,7 +339,7 @@ export function renderChallenges(container, callbacks) {
                 </div>
               </div>
               <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem; text-align: center;">
-                Las votaciones cierran cada domingo de jornada a las 20:00h.
+                Las votaciones cierran al arrancar el último partido de la jornada actual.
               </p>
             </div>
 
@@ -337,26 +376,56 @@ export function renderChallenges(container, callbacks) {
 
     const updateTimer = () => {
       const now = new Date();
-      const nextSunday = new Date();
-      const dayOffset = (7 - now.getDay()) % 7;
-      nextSunday.setDate(now.getDate() + dayOffset);
-      nextSunday.setHours(20, 0, 0, 0);
+      let targetTime;
 
-      if (now.getDay() === 0 && now.getHours() >= 20) {
-        nextSunday.setDate(nextSunday.getDate() + 7);
+      if (matchdayClosingTime) {
+        targetTime = matchdayClosingTime;
+      } else {
+        targetTime = new Date();
+        const dayOffset = (7 - now.getDay()) % 7;
+        targetTime.setDate(now.getDate() + dayOffset);
+        targetTime.setHours(20, 0, 0, 0);
+
+        if (now.getDay() === 0 && now.getHours() >= 20) {
+          targetTime.setDate(targetTime.getDate() + 7);
+        }
       }
 
-      const diff = nextSunday.getTime() - now.getTime();
+      const diff = targetTime.getTime() - now.getTime();
       
-      const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      const s = Math.floor((diff % (1000 * 60)) / 1000);
+      let d = 0, h = 0, m = 0, s = 0;
+      let closed = false;
 
-      dVal.innerText = d.toString().padStart(2, '0');
-      hVal.innerText = h.toString().padStart(2, '0');
-      mVal.innerText = m.toString().padStart(2, '0');
-      sVal.innerText = s.toString().padStart(2, '0');
+      if (diff > 0) {
+        d = Math.floor(diff / (1000 * 60 * 60 * 24));
+        h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        s = Math.floor((diff % (1000 * 60)) / 1000);
+      } else {
+        closed = true;
+      }
+
+      if (dVal && hVal && mVal && sVal) {
+        dVal.innerText = d.toString().padStart(2, '0');
+        hVal.innerText = h.toString().padStart(2, '0');
+        mVal.innerText = m.toString().padStart(2, '0');
+        sVal.innerText = s.toString().padStart(2, '0');
+      }
+
+      const headerCountdown = container.querySelector('#voting-countdown');
+      if (headerCountdown) {
+        if (closed) {
+          headerCountdown.innerText = 'CERRADO';
+        } else {
+          headerCountdown.innerText = `${d}d ${h}h ${m}m ${s}s`;
+        }
+      }
+
+      if (closed && !isVotingClosed) {
+        isVotingClosed = true;
+        // Re-render to block buttons and show winner
+        renderView();
+      }
     };
 
     updateTimer();
