@@ -661,8 +661,58 @@ async function openProfileModal(user) {
 // Listen for Auth Session changes
 if (isConfigured) {
   supabase.auth.onAuthStateChange((event, session) => {
-    if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
+    if (event === 'PASSWORD_RECOVERY') {
+      showUpdatePasswordModal();
+    } else if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
       checkAuthAndRender();
+    }
+  });
+}
+
+function showUpdatePasswordModal() {
+  const existing = document.querySelector('#update-password-modal');
+  if (existing) existing.remove();
+
+  const modal = document.createElement('div');
+  modal.id = 'update-password-modal';
+  modal.className = 'modal-overlay active';
+  modal.innerHTML = `
+    <div class="modal-content glass" style="max-width: 400px; padding: 2rem; border: 2px solid var(--primary); box-shadow: 0 0 20px rgba(var(--primary-rgb), 0.2);">
+      <h2 class="gradient-text-green" style="font-family: var(--font-display); text-transform: uppercase; margin-bottom: 1rem; text-align: center;">Nueva Contraseña</h2>
+      <p style="font-size: 0.85rem; color: var(--text-muted); text-align: center; margin-bottom: 1.5rem;">Por favor, ingresa tu nueva contraseña para acceder a la liga.</p>
+      <form id="update-password-form">
+        <div class="form-group">
+          <label for="new-password">Nueva Contraseña</label>
+          <input type="password" id="new-password" class="input-field" placeholder="Mínimo 6 caracteres" required minlength="6" />
+        </div>
+        <button type="submit" class="btn-primary" id="update-password-btn" style="margin-top: 1rem; width: 100%;">
+          <span>Actualizar Contraseña</span>
+        </button>
+      </form>
+    </div>
+  `;
+  document.body.appendChild(modal);
+
+  modal.querySelector('#update-password-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = modal.querySelector('#update-password-btn');
+    const newPassword = modal.querySelector('#new-password').value;
+    
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>';
+
+    try {
+      const { error } = await supabase.auth.updateUser({ password: newPassword });
+      if (error) throw error;
+      
+      showToast('Contraseña actualizada con éxito. ¡Bienvenido de nuevo!', 'success');
+      modal.remove();
+      navigate('inicio');
+    } catch (err) {
+      console.error(err);
+      showToast('Hubo un error al actualizar la contraseña.', 'error');
+      btn.disabled = false;
+      btn.innerHTML = '<span>Actualizar Contraseña</span>';
     }
   });
 }

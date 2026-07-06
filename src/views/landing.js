@@ -240,7 +240,18 @@ export function renderLanding(container, callbacks) {
               
               <!-- Mock Wheel Graphic (Replaced with Logo) -->
               <div style="width: 120px; height: 120px; border-radius: 50%; border: 6px solid #000000; margin-bottom: 1.5rem; position: relative; overflow: hidden; background: #000000; box-shadow: inset 0px 0px 10px rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center;">
-                <img src="/ruleta-brutalista.png" class="ruleta-logo-spin" alt="Ruleta Brutalista" style="width: 125%; height: 125%; object-fit: cover;" />
+                <svg viewBox="0 0 100 100" class="ruleta-logo-spin" style="width: 115%; height: 115%;">
+                  <g transform="translate(50, 50)" stroke="#000" stroke-width="4">
+                    <path d="M 0 0 L 0 -50 A 50 50 0 0 1 43.301 -25 Z" fill="#ffffff"/>
+                    <path d="M 0 0 L 43.301 -25 A 50 50 0 0 1 43.301 25 Z" fill="var(--danger)"/>
+                    <path d="M 0 0 L 43.301 25 A 50 50 0 0 1 0 50 Z" fill="var(--bg-obsidian)"/>
+                    <path d="M 0 0 L 0 50 A 50 50 0 0 1 -43.301 25 Z" fill="#ffffff"/>
+                    <path d="M 0 0 L -43.301 25 A 50 50 0 0 1 -43.301 -25 Z" fill="var(--accent)"/>
+                    <path d="M 0 0 L -43.301 -25 A 50 50 0 0 1 0 -50 Z" fill="var(--bg-obsidian)"/>
+                    <circle cx="0" cy="0" r="10" fill="#000" />
+                    <circle cx="0" cy="0" r="4" fill="#fff" />
+                  </g>
+                </svg>
               </div>
 
               <button class="brutalist-btn brutalist-btn-black" id="landing-ruleta-btn">GIRAR</button>

@@ -87,15 +87,15 @@ export async function renderTop10(container, callbacks) {
         ...p,
         valNum: parseMarketValue(p.market_value)
       }));
-      
+
       parsedData.sort((a, b) => b.valNum - a.valNum);
       fetchedPlayers = parsedData;
-      
+
       const realMadrid = parsedData.filter(p => p.club && p.club.includes('Real Madrid'));
       const barcelona = parsedData.filter(p => p.club && p.club.includes('Barcelona'));
       const atleti = parsedData.filter(p => p.club && (p.club.includes('Atlético') || p.club.includes('Atletico')));
       const betis = parsedData.filter(p => p.club && p.club.includes('Betis'));
-      
+
       const delanteros = parsedData.filter(p => p.position && (p.position.toLowerCase().includes('delantero') || p.position.toLowerCase().includes('extremo')));
       const medios = parsedData.filter(p => p.position && p.position.toLowerCase().includes('medio'));
       const defensas = parsedData.filter(p => p.position && (p.position.toLowerCase().includes('defensa') || p.position.toLowerCase().includes('lateral') || p.position.toLowerCase().includes('central')));
@@ -141,17 +141,26 @@ export async function renderTop10(container, callbacks) {
   let autocompleteCleanup = null;
   let feedbackMessage = "";
 
-  // Helper: Get Date String (YYYY-MM-DD)
-  const getDateString = (date = new Date()) => {
-    return date.toISOString().split('T')[0];
+  // Helper: Get Game Date String (YYYY-MM-DD) based on Spain timezone (reset at 08:00 AM)
+  const getGameDateString = (date = new Date()) => {
+    const spainTimeStr = date.toLocaleString("en-US", { timeZone: "Europe/Madrid" });
+    const spainDate = new Date(spainTimeStr);
+    spainDate.setHours(spainDate.getHours() - 8); // Shift 8 hours back so 00:00 - 07:59 maps to previous day
+    
+    const yyyy = spainDate.getFullYear();
+    const mm = String(spainDate.getMonth() + 1).padStart(2, '0');
+    const dd = String(spainDate.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
   };
 
   // Helper: Get Daily Topic from date seed
   const getDailyTopic = () => {
-    const epoch = new Date(2026, 0, 1).getTime(); // Reference point: Jan 1, 2026
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const diffDays = Math.floor((today.getTime() - epoch) / (1000 * 60 * 60 * 24));
+    const gameDateStr = getGameDateString();
+    const gameDate = new Date(gameDateStr + "T00:00:00Z"); // Use UTC midnight of the game date
+    const epoch = new Date(Date.UTC(2026, 0, 1)); // Reference point: Jan 1, 2026 UTC
+    
+    const diffDays = Math.floor((gameDate.getTime() - epoch.getTime()) / (1000 * 60 * 60 * 24));
+    
     // Support wrap-around for index if dates exceed DB length
     const index = Math.abs(diffDays) % combinedTopics.length;
     return {
@@ -163,14 +172,14 @@ export async function renderTop10(container, callbacks) {
 
   // Initialize Daily Game State
   function initGame() {
-    const todayStr = getDateString();
+    const gameDateStr = getGameDateString();
     const savedState = JSON.parse(localStorage.getItem('CF_TOP10_DAILY_STATE') || 'null');
     const dailyInfo = getDailyTopic();
     activeTopic = dailyInfo.topic;
     topicIndex = dailyInfo.index;
     dailyNumber = dailyInfo.number;
 
-    if (savedState && savedState.date === todayStr && savedState.topicIndex === topicIndex) {
+    if (savedState && savedState.date === gameDateStr && savedState.topicIndex === topicIndex) {
       guessedIndices = new Set(savedState.guessedIndices || []);
       surrendered = savedState.surrendered || false;
     } else {
@@ -182,9 +191,9 @@ export async function renderTop10(container, callbacks) {
 
   // Save State
   function saveDailyState() {
-    const todayStr = getDateString();
+    const gameDateStr = getGameDateString();
     localStorage.setItem('CF_TOP10_DAILY_STATE', JSON.stringify({
-      date: todayStr,
+      date: gameDateStr,
       topicIndex: topicIndex,
       guessedIndices: Array.from(guessedIndices),
       surrendered: surrendered
@@ -216,7 +225,7 @@ export async function renderTop10(container, callbacks) {
       const letter2 = String.fromCharCode(97 + char2);
       return (letter1 + letter2).toLowerCase();
     }
-    
+
     // Fallback dictionary for string flags
     const flagLower = flag.toLowerCase();
     if (flagLower.includes("es") || flagLower.includes("esp")) return "es";
@@ -233,7 +242,7 @@ export async function renderTop10(container, callbacks) {
     if (flagLower.includes("si") || flagLower.includes("slo")) return "si";
     if (flagLower.includes("cl") || flagLower.includes("chi")) return "cl";
     if (flagLower.includes("ph") || flagLower.includes("fil")) return "ph";
-    
+
     return "es";
   };
 
@@ -261,10 +270,10 @@ export async function renderTop10(container, callbacks) {
     } else if (badge.includes("ESTADIOS") || title.includes("estadio")) {
       // It is a stadium topic
       const SPAIN_STADIUMS = [
-        "Camp Nou", "Santiago Bernabéu", "Metropolitano", "Benito Villamarín", "San Mamés", 
-        "Mestalla", "Sánchez-Pizjuán", "RCD Stadium", "Reale Arena", "La Cartuja", 
-        "La Rosaleda", "Riazor", "El Molinón", "Martínez Valero", "Estadi Montilivi", 
-        "Estadio de la Cerámica", "El Sadar", "Coliseum", "Vallecas", 
+        "Camp Nou", "Santiago Bernabéu", "Metropolitano", "Benito Villamarín", "San Mamés",
+        "Mestalla", "Sánchez-Pizjuán", "RCD Stadium", "Reale Arena", "La Cartuja",
+        "La Rosaleda", "Riazor", "El Molinón", "Martínez Valero", "Estadi Montilivi",
+        "Estadio de la Cerámica", "El Sadar", "Coliseum", "Vallecas",
         "Nuevo Mirandilla", "Gran Canaria", "Son Moix", "Mendizorrotza", "Balaídos"
       ];
       const db = SPAIN_STADIUMS.map(s => ({ name: s, team: "", searchKeys: [cleanString(s)] }));
@@ -279,7 +288,7 @@ export async function renderTop10(container, callbacks) {
 
     // Default to players database
     const db = [...LALIGA_PLAYERS_DB];
-    
+
     if (typeof fetchedPlayers !== 'undefined' && Array.isArray(fetchedPlayers)) {
       fetchedPlayers.forEach(fp => {
         if (!db.some(x => x.name === fp.name)) {
@@ -328,7 +337,7 @@ export async function renderTop10(container, callbacks) {
 
       const ans = topicData.answers[i];
       const cleanAnsName = cleanString(ans.name);
-      
+
       // Let's test if there is a match:
       // 1. Direct match
       let isMatch = cleanAnsName === normalizedGuess;
@@ -363,7 +372,7 @@ export async function renderTop10(container, callbacks) {
       guessedIndices.add(foundIndex);
       saveDailyState();
       callbacks.showToast(`¡Correcto! ${topicData.answers[foundIndex].name} está en el puesto ${foundIndex + 1}`, 'success');
-      
+
       feedbackMessage = "";
       const feedbackEl = container.querySelector('#feedback-message');
       if (feedbackEl) {
@@ -394,7 +403,7 @@ export async function renderTop10(container, callbacks) {
       }
 
       callbacks.showToast(feedbackMessage, 'error');
-      
+
       // Clear the input field for incorrect guesses as requested
       if (inputField) inputField.value = '';
     }
@@ -472,10 +481,10 @@ Juega en Castigos Fantasy`;
     let listHtml = `
       <div style="display: flex; flex-direction: column; gap: 0.6rem; width: 100%; margin: 0 auto 1.5rem; box-sizing: border-box;">
         ${topicData.answers.map((ans, idx) => {
-          const isGuessed = guessedIndices.has(idx);
-          const revealRed = surrendered && !isGuessed;
+      const isGuessed = guessedIndices.has(idx);
+      const revealRed = surrendered && !isGuessed;
 
-          let cellStyle = `
+      let cellStyle = `
             background: var(--bg-obsidian);
             border: 2px solid var(--border-color);
             border-radius: 8px;
@@ -489,40 +498,40 @@ Juega en Castigos Fantasy`;
             width: 100%;
             box-sizing: border-box;
           `;
-          
-          if (isGuessed) {
-            cellStyle += ` border-color: var(--primary-green); box-shadow: 4px 4px 0px rgba(34,197,94,0.15);`;
-          } else if (revealRed) {
-            cellStyle += ` border-color: var(--danger); box-shadow: 4px 4px 0px rgba(239,68,68,0.15);`;
-          }
 
-          let flagHtml = `
+      if (isGuessed) {
+        cellStyle += ` border-color: var(--primary-green); box-shadow: 4px 4px 0px rgba(34,197,94,0.15);`;
+      } else if (revealRed) {
+        cellStyle += ` border-color: var(--danger); box-shadow: 4px 4px 0px rgba(239,68,68,0.15);`;
+      }
+
+      let flagHtml = `
             <span style="margin-right: 1rem; width: 28px; display: inline-flex; align-items: center; justify-content: center;">
               ${getFlagHtml(ans.flag)}
             </span>
           `;
 
-          let textHtml = '';
-          if (isGuessed) {
-            textHtml = `
+      let textHtml = '';
+      if (isGuessed) {
+        textHtml = `
               <span style="font-weight: 800; color: var(--text-light); font-size: 0.95rem;">${ans.name}</span>
             `;
-          } else if (revealRed) {
-            textHtml = `
+      } else if (revealRed) {
+        textHtml = `
               <span style="font-weight: 800; color: #f87171; font-size: 0.95rem; text-decoration: line-through;">${ans.name}</span>
             `;
-          } else {
-            textHtml = `
+      } else {
+        textHtml = `
               <span style="font-family: var(--font-display); font-weight: 800; color: var(--text-muted); letter-spacing: 2px; font-size: 0.85rem; opacity: 0.3;">???????????</span>
             `;
-          }
+      }
 
-          let extraInfoHtml = '';
-          if (isGuessed || revealRed) {
-            extraInfoHtml = ans.info ? `<div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem; font-weight: 600;">${ans.info}</div>` : '';
-          }
+      let extraInfoHtml = '';
+      if (isGuessed || revealRed) {
+        extraInfoHtml = ans.info ? `<div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem; font-weight: 600;">${ans.info}</div>` : '';
+      }
 
-          return `
+      return `
             <div style="${cellStyle}">
               <!-- Number badge -->
               <span style="font-family: var(--font-display); font-weight: 900; font-size: 0.95rem; color: ${isGuessed ? 'var(--primary-green)' : (revealRed ? 'var(--danger)' : 'var(--text-muted)')}; margin-right: 0.75rem; width: 20px; text-align: right; display: inline-block;">
@@ -539,7 +548,7 @@ Juega en Castigos Fantasy`;
               </div>
             </div>
           `;
-        }).join('')}
+    }).join('')}
       </div>
     `;
 
@@ -563,26 +572,30 @@ Juega en Castigos Fantasy`;
             
             <!-- Surrender flag button -->
             <button id="btn-surrender" style="
-              width: 50px;
-              height: 48px;
+              width: 42px;
+              height: 42px;
               display: flex;
               align-items: center;
               justify-content: center;
-              background: #ffe16d;
+              background: var(--danger);
+              color: #ffffff;
               border: 2.5px solid #000000;
-              box-shadow: 4px 4px 0px #000000;
+              box-shadow: 3px 3px 0px #000000;
               border-radius: 8px;
               cursor: pointer;
               transition: transform 0.05s ease, box-shadow 0.05s ease;
               flex-shrink: 0;
             "
             title="Rendirse y revelar respuestas"
-            onmouseover="this.style.transform='translate(-1px,-1px)'; this.style.boxShadow='5px 5px 0px #000000';"
-            onmouseout="this.style.transform=''; this.style.boxShadow='4px 4px 0px #000000';"
+            onmouseover="this.style.transform='translate(-1px,-1px)'; this.style.boxShadow='4px 4px 0px #000000';"
+            onmouseout="this.style.transform=''; this.style.boxShadow='3px 3px 0px #000000';"
             onmousedown="this.style.transform='translate(2px,2px)'; this.style.boxShadow='0px 0px 0px #000000';"
-            onmouseup="this.style.transform='translate(-1px,-1px)'; this.style.boxShadow='5px 5px 0px #000000';"
+            onmouseup="this.style.transform='translate(-1px,-1px)'; this.style.boxShadow='4px 4px 0px #000000';"
             >
-              <span style="font-size: 1.4rem;">🏳️</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
+                <line x1="4" y1="22" x2="4" y2="15"></line>
+              </svg>
             </button>
           </div>
 
@@ -617,7 +630,14 @@ Juega en Castigos Fantasy`;
             </p>
             <div style="display: flex; gap: 0.65rem; justify-content: center; flex-wrap: wrap; width: 100%; box-sizing: border-box;">
               <button id="btn-share-top10" class="btn-primary" style="width: auto; padding: 0.65rem 1.5rem; font-weight: 800; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 0.5rem; box-shadow: 4px 4px 0px #000;">
-                <span>📢</span> Compartir Resultados
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="18" cy="5" r="3"></circle>
+                  <circle cx="6" cy="12" r="3"></circle>
+                  <circle cx="18" cy="19" r="3"></circle>
+                  <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                  <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                </svg>
+                Compartir Resultados
               </button>
               <button id="btn-back-hub" class="btn-secondary" style="width: auto; padding: 0.65rem 1.5rem; font-weight: 800; font-size: 0.85rem; box-shadow: 4px 4px 0px #000;">
                 Volver a Juegos
@@ -639,7 +659,7 @@ Juega en Castigos Fantasy`;
     // Setup autocomplete dropdown list if game is active
     if (!isFinished) {
       const inputEl = container.querySelector('#guess-input');
-      
+
       // Cleanup previous binding if exists
       if (autocompleteCleanup) {
         autocompleteCleanup();

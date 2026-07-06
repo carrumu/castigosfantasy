@@ -1,22 +1,7 @@
 import { LALIGA_PLAYERS_DB } from './players-db';
 import { supabase } from '../supabase';
 
-let SUPABASE_PLAYERS = null;
-async function getSupabasePlayers() {
-  if (SUPABASE_PLAYERS) return SUPABASE_PLAYERS;
-  try {
-    const { data, error } = await supabase.from('football_players').select('name, club');
-    if (!error && data && data.length > 0) {
-      SUPABASE_PLAYERS = data.map(p => ({
-        name: p.name,
-        team: p.club,
-        searchKeys: [p.name.toLowerCase(), p.club.toLowerCase()]
-      }));
-      return SUPABASE_PLAYERS;
-    }
-  } catch(e) {}
-  return null;
-}
+// No global supabase player fetching here anymore to keep historical data isolated.
 
 /**
  * Helper to display player names as "First Name + First Last Name".
@@ -60,18 +45,6 @@ export function setupAutocomplete(inputEl, onSelect, customDatabase = null) {
   let activeIndex = -1;
   let suggestions = [];
   let dbToSearch = customDatabase || LALIGA_PLAYERS_DB;
-
-  if (!customDatabase) {
-    if (SUPABASE_PLAYERS) {
-      dbToSearch = SUPABASE_PLAYERS;
-    } else {
-      getSupabasePlayers().then(players => {
-        if (players) {
-          dbToSearch = players;
-        }
-      });
-    }
-  }
 
   // Accent and special character normalizer
   function removeAccents(str) {

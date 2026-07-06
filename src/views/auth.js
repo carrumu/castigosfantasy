@@ -11,8 +11,83 @@ import { sendAdminNotification } from '../utils/email';
 export function renderAuth(container, callbacks) {
   let isLoginMode = true;
   let isVerificationPending = false;
+  let isRecoveryMode = false;
 
   function render() {
+    if (isRecoveryMode) {
+      container.innerHTML = `
+        <div class="container" style="display: flex; align-items: center; justify-content: center; min-height: 80vh;">
+          <div class="card glass pitch-card" style="width: 100%; max-width: 350px; padding: 2rem 1.5rem;">
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; border: 1px solid rgba(255, 255, 255, 0.08); padding: 0.75rem 1rem; background: rgba(0,0,0,0.35); border-radius: 12px; margin-bottom: 1.25rem; width: 100%;">
+              <span class="logo-icon" style="width: 44px; height: 32px; flex-shrink: 0; margin-bottom: 0.4rem;"></span>
+              <h1 class="gradient-text-green" style="font-family: var(--font-display); font-size: 1.3rem; font-weight: 900; text-transform: uppercase; letter-spacing: -0.5px; margin: 0; text-align: center;">
+                Castigos Fantasy
+              </h1>
+            </div>
+            
+            <h2 style="font-family: var(--font-display); font-size: 1.25rem; font-weight: 800; text-transform: uppercase; margin-bottom: 0.5rem; text-align: center; color: var(--text-light);">
+              Recuperar Contraseña
+            </h2>
+            <p style="font-size: 0.85rem; color: var(--text-muted); text-align: center; margin-bottom: 1.5rem;">
+              Te enviaremos un correo con un enlace mágico para restablecerla.
+            </p>
+
+            <form id="recovery-form">
+              <div class="form-group">
+                <label for="recovery-email">Email</label>
+                <input type="email" id="recovery-email" class="input-field" placeholder="tu@email.com" required />
+              </div>
+              <button type="submit" class="btn-primary" id="recovery-btn" style="margin-top: 1.5rem;">
+                <span>Enviar Enlace</span>
+              </button>
+            </form>
+
+            <div style="text-align: center; margin-top: 1.25rem;">
+              <button id="back-to-login-from-recovery" style="background: transparent; border: none; color: var(--text-muted); font-family: var(--font-sans); font-weight: 500; cursor: pointer; font-size: 0.85rem; text-decoration: underline;">
+                ← Volver al Inicio de Sesión
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+
+      container.querySelector('#back-to-login-from-recovery').addEventListener('click', () => {
+        isRecoveryMode = false;
+        render();
+      });
+
+      const recoveryForm = container.querySelector('#recovery-form');
+      recoveryForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = container.querySelector('#recovery-email').value.trim();
+        const submitBtn = container.querySelector('#recovery-btn');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="spinner"></span>';
+
+        try {
+          if (!isConfigured || !supabase) throw new Error("Base de datos no conectada");
+          const redirectTo = window.location.hostname === 'localhost'
+            ? window.location.origin
+            : 'https://castigosfantasy.com';
+            
+          const { error } = await supabase.auth.resetPasswordForEmail(email, {
+            redirectTo
+          });
+          if (error) throw error;
+          callbacks.showToast('Correo de recuperación enviado. Revisa tu bandeja de entrada o spam.', 'success');
+          isRecoveryMode = false;
+          render();
+        } catch (err) {
+          console.error(err);
+          callbacks.showToast('Error al intentar recuperar contraseña.', 'error');
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<span>Enviar Enlace</span>';
+        }
+      });
+      return;
+    }
+
     if (isVerificationPending) {
       container.innerHTML = `
         <div class="container" style="display: flex; align-items: center; justify-content: center; min-height: 80vh;">
@@ -150,6 +225,13 @@ export function renderAuth(container, callbacks) {
                   </svg>
                 </button>
               </div>
+              ${isLoginMode ? `
+                <div style="text-align: right; margin-top: 0.5rem;">
+                  <button type="button" id="forgot-password-btn" style="background: transparent; border: none; color: var(--accent); font-family: var(--font-sans); font-size: 0.75rem; font-weight: 600; cursor: pointer;">
+                    ¿Olvidaste tu contraseña?
+                  </button>
+                </div>
+              ` : ''}
             </div>
 
             <button type="submit" class="btn-primary" id="submit-btn" style="margin-top: 1.5rem;">
@@ -182,6 +264,14 @@ export function renderAuth(container, callbacks) {
 
     const form = container.querySelector('#auth-form');
     const toggleBtn = container.querySelector('#toggle-mode-btn');
+    const forgotBtn = container.querySelector('#forgot-password-btn');
+
+    if (forgotBtn) {
+      forgotBtn.addEventListener('click', () => {
+        isRecoveryMode = true;
+        render();
+      });
+    }
 
     // Eye toggle for password
     const eyeBtn = container.querySelector('#toggle-password');

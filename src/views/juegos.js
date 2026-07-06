@@ -11,7 +11,7 @@ export function renderJuegos(container, callbacks) {
     if (stats && typeof stats.currentStreak === 'number') {
       currentStreak = stats.currentStreak;
     }
-  } catch (_) {}
+  } catch (_) { }
 
   container.innerHTML = `
     <div class="container fade-in-up">
@@ -107,8 +107,11 @@ export function renderJuegos(container, callbacks) {
               <div style="flex-grow: 1; border: 1.5px solid #000; background: var(--bg-obsidian); height: 22px; border-radius: 4px; display: flex; align-items: center; padding-left: 6px; font-size: 0.65rem; color: var(--text-muted); font-weight: 700; box-shadow: 2px 2px 0px #000; text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">
                 Escribe aquí...
               </div>
-              <div style="width: 24px; height: 22px; border: 1.5px solid #000; background: #ffe16d; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; box-shadow: 2px 2px 0px #000; flex-shrink: 0;">
-                🏳️
+              <div style="width: 24px; height: 22px; border: 1.5px solid #000; background: var(--danger); color: #fff; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; box-shadow: 2px 2px 0px #000; flex-shrink: 0;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
+                  <line x1="4" y1="22" x2="4" y2="15"></line>
+                </svg>
               </div>
             </div>
           </div>
@@ -116,7 +119,7 @@ export function renderJuegos(container, callbacks) {
           <div class="tool-card-inner" style="padding: 1.25rem 1.25rem; display: flex; flex-direction: column; gap: 0.75rem; flex: 1; justify-content: space-between;">
             <div class="tool-card-text">
               <h2 class="tool-card-title" style="margin-bottom: 0.35rem;">LaLiga Top 10</h2>
-              <p class="tool-card-desc">¿Adivinarás el Top 10 histórico? Responde las preguntas diarias sobre goleadores, partidos y clubes.</p>
+              <p class="tool-card-desc">¿Adivinarás el Top 10 histórico?</p>
             </div>
             <div class="tool-card-arrow" style="align-self: flex-end;">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
