@@ -301,40 +301,32 @@ export function renderSelectLeague(container, callbacks) {
 
       try {
         const currentUser = supabase.auth.user ? supabase.auth.user() : (await supabase.auth.getUser()).data.user;
-        
-        // Find league by code
-        const { data: targetLeague, error: findErr } = await supabase
-          .from('leagues')
-          .select('*')
-          .eq('invite_code', code)
-          .maybeSingle();
+        // Join league via RPC (bypasses RLS to validate code)
+        const { data: joinedLeagueId, error: rpcErr } = await supabase
+          .rpc('join_league_by_code', { invite_code_arg: code });
 
-        if (findErr) throw findErr;
-        if (!targetLeague) {
-          callbacks.showToast('Código de invitación no válido', 'error');
+        if (rpcErr) {
+          if (rpcErr.message.includes('inválido') || rpcErr.message.includes('inexistente')) {
+            callbacks.showToast('Código de invitación no válido', 'error');
+          } else {
+            callbacks.showToast('Error al unirse a la liga', 'error');
+            console.error(rpcErr);
+          }
           btn.disabled = false;
           btn.innerHTML = 'Unirse a la Liga';
           return;
         }
 
-        // Join league
-        const { error: joinErr } = await supabase
-          .from('league_members')
-          .insert({
-            league_id: targetLeague.id,
-            profile_id: currentUser.id,
-            is_admin: false
-          });
+        // Now that we are members, we can read the league data
+        const { data: targetLeague, error: findErr } = await supabase
+          .from('leagues')
+          .select('*')
+          .eq('id', joinedLeagueId)
+          .single();
 
-        if (joinErr) {
-          if (joinErr.code === '23505') {
-            callbacks.showToast('Ya formas parte de esta liga', 'info');
-          } else {
-            throw joinErr;
-          }
-        } else {
-          callbacks.showToast(`¡Te has unido a "${targetLeague.name}"!`, 'success');
-        }
+        if (findErr) throw findErr;
+
+        callbacks.showToast(`¡Te has unido a "${targetLeague.name}"!`, 'success');
 
         // Set joined league as active
         localStorage.setItem('CF_ACTIVE_LEAGUE_ID', targetLeague.id);

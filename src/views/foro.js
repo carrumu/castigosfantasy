@@ -1,4 +1,5 @@
 import { supabase } from '../supabase.js';
+import { escapeHTML } from '../utils/security.js';
 
 let postsOffset = 0;
 const postsLimit = 10;
@@ -340,7 +341,9 @@ function renderExpandedForm(zone, container, callbacks) {
       await fetchPostsAndRender(container);
     } catch (err) {
       console.error('Error al guardar publicación:', err);
-      if (err.message && err.message.includes('limite diario')) {
+      if (err.message && err.message.includes('RATE_LIMIT_EXCEEDED')) {
+        showForoAlert('Por favor, espera unos segundos antes de volver a publicar.', 'error');
+      } else if (err.message && err.message.includes('limite diario')) {
         showForoAlert('Has alcanzado el límite diario de 10 publicaciones.', 'error');
       } else {
         showForoAlert('Error al publicar. Inténtalo de nuevo.', 'error');
@@ -510,10 +513,10 @@ function renderFeed(container, newPosts) {
       <div style="display: flex; align-items: flex-start; justify-content: space-between; border-bottom: 3px solid #000; padding-bottom: 0.65rem; margin-bottom: 1rem;">
         <div style="display: flex; align-items: center; gap: 0.5rem;">
           <div style="width: 34px; height: 34px; border: 2.5px solid #000; border-radius: 50%; background: var(--accent); color: #000; display: flex; align-items: center; justify-content: center; font-weight: 900; font-family: var(--font-display); font-size: 0.95rem; box-shadow: 1.5px 1.5px 0px #000;">
-            ${post.profiles?.apodo ? post.profiles.apodo.charAt(0).toUpperCase() : '?'}
+            ${post.profiles?.apodo ? escapeHTML(post.profiles.apodo.charAt(0).toUpperCase()) : '?'}
           </div>
           <div>
-            <span style="font-weight: 800; font-size: 0.95rem; display: block; line-height: 1.1;">@${post.profiles?.apodo || 'Mánager'}</span>
+            <span style="font-weight: 800; font-size: 0.95rem; display: block; line-height: 1.1;">@${escapeHTML(post.profiles?.apodo || 'Mánager')}</span>
             <span style="font-size: 0.72rem; color: var(--text-muted); font-weight: 700;">${new Date(post.created_at).toLocaleString()}</span>
           </div>
         </div>
@@ -643,7 +646,11 @@ function setupCardListeners(card, post, container) {
         }
       } catch (err) {
         console.error('Error al guardar comentario:', err);
-        showForoAlert('Error al guardar el comentario.', 'error');
+        if (err.message && err.message.includes('RATE_LIMIT_EXCEEDED')) {
+          showForoAlert('Por favor, espera unos segundos antes de responder de nuevo.', 'error');
+        } else {
+          showForoAlert('Error al guardar el comentario.', 'error');
+        }
       } finally {
         submitBtn.disabled = false;
         submitBtn.textContent = 'RESPONDER';
@@ -860,13 +867,13 @@ async function fetchCommentsAndRender(postId, listContainer) {
       if (comment.parent_id) {
         const targetComment = commentMap[comment.parent_id];
         const targetName = targetComment?.profiles?.apodo || 'Mánager';
-        replyIndicator = `<span style="font-size: 0.7rem; color: var(--accent); font-weight: 700; margin-bottom: 0.15rem;">↳ En respuesta a @${targetName}</span>`;
+        replyIndicator = `<span style="font-size: 0.7rem; color: var(--accent); font-weight: 700; margin-bottom: 0.15rem;">↳ En respuesta a @${escapeHTML(targetName)}</span>`;
       }
 
       el.innerHTML = `
         <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.75rem; font-weight: 800; border-bottom: 1.5px dashed #000; padding-bottom: 0.25rem; margin-bottom: 0.25rem;">
           <div style="display: flex; align-items: center; gap: 0.35rem;">
-            <span style="color: var(--accent);">@${comment.profiles?.apodo || 'Mánager'}</span>
+            <span style="color: var(--accent);">@${escapeHTML(comment.profiles?.apodo || 'Mánager')}</span>
             <span style="color: var(--text-muted); font-size: 0.7rem;">(${new Date(comment.created_at).toLocaleTimeString()})</span>
           </div>
         </div>
@@ -894,7 +901,7 @@ async function fetchCommentsAndRender(postId, listContainer) {
         <!-- Inline Reply Input (initially hidden) -->
         <div class="comment-reply-form-zone" style="display: none; margin-top: 0.5rem; border-top: 1.5px dashed #000; padding-top: 0.5rem;">
           <form class="comment-reply-form" style="display: flex; gap: 0.35rem;">
-            <input type="text" class="reply-input input-field" placeholder="Responde a @${comment.profiles?.apodo || 'Mánager'}..." required style="flex-grow: 1; border: 1.5px solid #000; padding: 0.25rem 0.45rem; font-size: 0.78rem; font-weight: 700; background: var(--bg-input);" maxlength="500" />
+            <input type="text" class="reply-input input-field" placeholder="Responde a @${escapeHTML(comment.profiles?.apodo || 'Mánager')}..." required style="flex-grow: 1; border: 1.5px solid #000; padding: 0.25rem 0.45rem; font-size: 0.78rem; font-weight: 700; background: var(--bg-input);" maxlength="500" />
             <button type="submit" class="brutalist-btn-small" style="padding: 0.25rem 0.5rem; font-size: 0.75rem; font-weight: 800; text-transform: uppercase;">Enviar</button>
           </form>
         </div>

@@ -2,6 +2,7 @@ import { supabase } from '../supabase';
 import { openLeagueSettings } from '../utils/league-options';
 import { openBiwengerSyncModal } from '../utils/biwenger-sync-modal';
 import { openBiwengerLinkModal } from '../utils/biwenger-link-modal';
+import { escapeHTML } from '../utils/security';
 
 export async function renderLeagueHub(container, callbacks) {
   const isGuest = callbacks.isGuest;
@@ -236,9 +237,9 @@ async function openMembersModal(leagueId, currentUserId, isAdmin) {
       : members.map(member => `
           <div class="member-row" data-member-id="${member.profile_id}">
             <div class="member-row-left">
-              <div class="member-avatar">${member.name.charAt(0).toUpperCase()}</div>
+              <div class="member-avatar">${escapeHTML(member.name).charAt(0).toUpperCase()}</div>
               <div>
-                <div class="member-name">${member.name}</div>
+                <div class="member-name">${escapeHTML(member.name)}</div>
                 ${member.is_admin
                   ? `<span class="member-badge admin">Admin</span>`
                   : `<span class="member-badge member">Miembro</span>`
