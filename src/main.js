@@ -1,5 +1,6 @@
 import './style.css';
 import { supabase, isConfigured, clearSupabaseConfig } from './supabase';
+import { setSEO } from './utils/seo';
 import { checkAndNotifyNewUser } from './utils/email';
 import { renderAuth } from './views/auth';
 import { renderDashboard } from './views/dashboard';
@@ -733,6 +734,7 @@ function handleRouting() {
   }
   
   currentView = view;
+  setSEO(currentView);
   checkAuthAndRender();
 }
 
