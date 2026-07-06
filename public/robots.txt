@@ -1,0 +1,6 @@
+User-agent: *
+Disallow: /mis-ligas
+Disallow: /menu-liga
+Disallow: /muro
+
+Sitemap: https://castigosfantasy.com/sitemap.xml

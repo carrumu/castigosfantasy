@@ -93,4 +93,14 @@ export function setSEO(view) {
   if (ogDesc) {
     ogDesc.setAttribute('content', seoData.description);
   }
+
+  // Update Canonical URL
+  let canonicalTag = document.querySelector('link[rel="canonical"]');
+  if (!canonicalTag) {
+    canonicalTag = document.createElement('link');
+    canonicalTag.setAttribute('rel', 'canonical');
+    document.head.appendChild(canonicalTag);
+  }
+  const cleanPath = view === 'inicio' ? '' : view;
+  canonicalTag.setAttribute('href', `https://castigosfantasy.com/${cleanPath}`);
 }
