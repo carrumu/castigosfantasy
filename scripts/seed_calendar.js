@@ -20,8 +20,8 @@ async function scrapeMatchdays() {
   for (let matchday = 1; matchday <= 38; matchday++) {
     try {
       // Simular que el último partido es a las 21:00 del Lunes de esa jornada
-      // Jornada 1 empezó el finde del 18 Agosto 2024. Lunes fue 19 de Agosto.
-      const baseDate = new Date('2024-08-19T21:00:00.000Z'); 
+      // Jornada 1 empieza el finde del 15 Agosto 2026. Lunes es 17 de Agosto.
+      const baseDate = new Date('2026-08-17T21:00:00.000Z'); 
       baseDate.setDate(baseDate.getDate() + ((matchday - 1) * 7));
       
       const closingDate = baseDate.toISOString();
