@@ -4045,3 +4045,58 @@ input, select, textarea, button {
 .ruleta-logo-spin:hover {
   animation-duration: 5s;
 }
+
+/* Debt Ticker Marquee (Frontend Design) */
+.debt-ticker-container {
+  width: 100%;
+  overflow: hidden;
+  background-color: var(--accent);
+  color: #000000;
+  border-bottom: 4px solid #000000;
+  border-top: 4px solid #000000;
+  padding: 0.5rem 0;
+  display: flex;
+  white-space: nowrap;
+  box-shadow: 0px 4px 0px #000000;
+  position: relative;
+  z-index: 10;
+}
+
+.debt-ticker-content {
+  display: inline-block;
+  animation: marquee 30s linear infinite;
+  font-family: var(--font-sans);
+  font-weight: 800;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.debt-ticker-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 2rem;
+}
+
+.debt-ticker-item.danger {
+  color: var(--danger);
+}
+
+.debt-ticker-item-separator {
+  display: inline-block;
+  background-color: #000000;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin: 0 1rem;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}

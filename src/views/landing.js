@@ -103,8 +103,29 @@ export function renderLanding(container, callbacks) {
   function renderView() {
     const hasLeagues = currentUser && leagues.length > 0;
 
+    // Debt Ticker Html Generation
+    let tickerHtml = '';
+    if (hasLeagues && leaderboard.length > 0) {
+      // Duplicate items to make the marquee seamless
+      const tickerItems = [...leaderboard, ...leaderboard, ...leaderboard].map(item => `
+        <span class="debt-ticker-item ${item.totalOwed >= 20 ? 'danger' : ''}">
+          ${item.name}: ${item.totalOwed.toFixed(2)}€
+        </span>
+        <span class="debt-ticker-item-separator"></span>
+      `).join('');
+      
+      tickerHtml = `
+        <div class="debt-ticker-container">
+          <div class="debt-ticker-content">
+            ${tickerItems}${tickerItems}
+          </div>
+        </div>
+      `;
+    }
+
     // Render HTML structure matching the Stitch design
     container.innerHTML = `
+      ${tickerHtml}
       <div class="landing-layout-brutalist fade-in-up">
         <!-- Columna izquierda: PUBLICIDAD -->
         <aside class="brutalist-aside">
@@ -153,7 +174,7 @@ export function renderLanding(container, callbacks) {
                     <polyline points="9 18 15 12 9 6"></polyline>
                     <line x1="3" y1="12" x2="15" y2="12"></line>
                   </svg>
-                  Llévame a mi Liga
+                  Inspeccionar Liga
                 ` : `
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
@@ -161,7 +182,7 @@ export function renderLanding(container, callbacks) {
                     <line x1="19" y1="8" x2="19" y2="14"></line>
                     <line x1="22" y1="11" x2="16" y2="11"></line>
                   </svg>
-                  Crea tu Liga
+                  Firmar el Contrato
                 `}
               </button>
             </div>
@@ -199,7 +220,7 @@ export function renderLanding(container, callbacks) {
               <div>
                 ${hasLeagues ? `
                   <button class="brutalist-btn" id="btn-go-morosos" style="width: 100%; margin-top: auto; margin-bottom: 0.75rem;">
-                    Ver Lista Completa
+                    Exponer a los Morosos
                   </button>
                   ${leagues.length > 1 ? `
                     <div style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 0.75rem; margin-top: 0.75rem;">
@@ -227,7 +248,7 @@ export function renderLanding(container, callbacks) {
                 ` : `
                   <div style="margin-top: 1.5rem; text-align: center; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 1.5rem;">
                     <button class="brutalist-btn" id="landing-join-league-btn" style="font-size: 0.8rem; width: 100%;">
-                      Crear o Unirse a Liga
+                      Firmar Contrato de Liga
                     </button>
                   </div>
                 `}
@@ -270,7 +291,7 @@ export function renderLanding(container, callbacks) {
               </p>
               <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
                 <button class="brutalist-btn" style="width: auto; padding: 0.65rem 1.75rem;" id="landing-retos-btn-accept">Votar</button>
-                <button class="brutalist-btn brutalist-btn-secondary" style="width: auto; padding: 0.65rem 1.75rem;" id="landing-retos-btn-details">Ver Detalles</button>
+                <button class="brutalist-btn brutalist-btn-secondary" style="width: auto; padding: 0.65rem 1.75rem;" id="landing-retos-btn-details">Leer el Acta</button>
               </div>
             </div>
           </article>
@@ -308,7 +329,7 @@ export function renderLanding(container, callbacks) {
               </div>
 
               <button class="brutalist-btn" id="landing-juegos-btn" style="width: 100%; margin-top: auto;">
-                Ver Juegos Disponibles
+                Jugar a CastigosFantasy
               </button>
             </article>
 
@@ -324,7 +345,7 @@ export function renderLanding(container, callbacks) {
               </div>
 
               <button class="brutalist-btn" id="landing-generador-btn">
-                Generar Castigo <span class="material-symbols-outlined" style="font-size: 1.2rem;">bolt</span>
+                Dictar Sentencia <span class="material-symbols-outlined" style="font-size: 1.2rem;">bolt</span>
               </button>
             </article>
           </div>
@@ -346,7 +367,7 @@ export function renderLanding(container, callbacks) {
                   </p>
                 </div>
                 <button class="brutalist-btn" id="landing-bufon-btn" style="width: 100%;">
-                  Entrar a la Corte
+                  Juzgar a un Jugador
                 </button>
               </article>
 
@@ -361,7 +382,7 @@ export function renderLanding(container, callbacks) {
                   </p>
                 </div>
                 <button class="brutalist-btn" id="landing-foro-btn" style="width: 100%;">
-                  Ir al Muro
+                  Ver Muro de la Vergüenza
                 </button>
               </article>
             </div>
