@@ -565,14 +565,14 @@ export function renderGenerator(container, callbacks) {
               Limpiar Todo
             </button>
           </div>
-          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 0.75rem;" id="saved-list-container">
+          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); gap: 0.75rem;" id="saved-list-container">
             ${savedList.map((item, idx) => `
               <div class="brutalist-card" style="padding: 0.85rem; background: rgba(0,0,0,0.25); border: 2.5px solid #000; border-left: 4px solid var(--accent); display: flex; justify-content: space-between; align-items: flex-start; border-radius: 4px;">
                 <div style="text-align: left; padding-right: 1rem; flex-grow: 1;">
                   <h4 style="font-size: 0.9rem; font-weight: 800; margin: 0; color: var(--text-light); line-height: 1.2;">${item.name}</h4>
                   <p style="font-size: 0.75rem; color: var(--text-muted); margin: 0.35rem 0 0 0; line-height: 1.3;">${item.description}</p>
                 </div>
-                <button class="brutalist-btn btn-delete-saved" data-idx="${idx}" style="width: 28px !important; height: 28px; padding: 0; background: transparent !important; background-image: none !important; color: #888 !important; border: 1.5px solid #444; border-radius: 4px; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center;" title="Quitar">
+                <button class="brutalist-btn btn-delete-saved" data-idx="${idx}" style="width: 28px !important; min-width: 28px !important; height: 28px; padding: 0; background: transparent !important; background-image: none !important; color: #888 !important; border: 1.5px solid #444; border-radius: 4px; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center;" title="Quitar">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6"></path></svg>
                 </button>
               </div>
@@ -584,13 +584,13 @@ export function renderGenerator(container, callbacks) {
         <div id="rejected-punishments-section" style="margin-top: 2rem; display: ${rejectedList.length > 0 ? 'block' : 'none'};">
           <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2.5px solid #000; padding-bottom: 0.5rem; margin-bottom: 1rem;">
             <h3 style="font-family: var(--font-display); font-size: 1.1rem; font-weight: 900; text-transform: uppercase; color: var(--text-light); margin: 0;">
-              Lista de Cobardes (Rechazados)
+              Lista de Cobardes
             </h3>
             <button class="brutalist-btn" id="btn-clear-all-rejected" style="padding: 0.25rem 0.5rem; font-size: 0.7rem; font-weight: 800; background: #333333 !important; background-image: none !important; color: #ccc !important; border: 2px solid #555; cursor: pointer;">
               Limpiar Todo
             </button>
           </div>
-          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 0.75rem;" id="rejected-list-container">
+          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); gap: 0.75rem;" id="rejected-list-container">
             ${rejectedList.map((item, idx) => `
               <div class="brutalist-card" style="padding: 0.85rem; background: rgba(0,0,0,0.25); border: 2.5px solid #000; border-left: 4px solid #962d2d; display: flex; justify-content: space-between; align-items: flex-start; border-radius: 4px;">
                 <div style="text-align: left; padding-right: 1rem; flex-grow: 1;">
@@ -600,7 +600,7 @@ export function renderGenerator(container, callbacks) {
                   </div>
                   <p style="font-size: 0.75rem; color: var(--text-muted); margin: 0.35rem 0 0 0; line-height: 1.3;">Rechazó cumplir este castigo.</p>
                 </div>
-                <button class="brutalist-btn btn-delete-rejected" data-idx="${idx}" style="width: 28px !important; height: 28px; padding: 0; background: transparent !important; background-image: none !important; color: #888 !important; border: 1.5px solid #444; border-radius: 4px; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center;" title="Quitar">
+                <button class="brutalist-btn btn-delete-rejected" data-idx="${idx}" style="width: 28px !important; min-width: 28px !important; height: 28px; padding: 0; background: transparent !important; background-image: none !important; color: #888 !important; border: 1.5px solid #444; border-radius: 4px; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center;" title="Quitar">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6"></path></svg>
                 </button>
               </div>
