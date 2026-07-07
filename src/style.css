@@ -2354,14 +2354,25 @@ input, select, textarea, button {
   }
   
   .mobile-nav-item .material-symbols-outlined {
-    font-size: 26px !important;
-    margin-bottom: 0px;
+    font-size: 21px !important;
+    margin-bottom: 2px;
     color: var(--text-light);
     transition: color var(--transition-fast);
   }
   
   .mobile-nav-item .mobile-nav-label {
-    display: none !important;
+    font-family: var(--font-sans);
+    font-weight: 800;
+    font-size: 7.5px !important;
+    letter-spacing: 0px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+    text-align: center;
+    color: var(--text-light);
+    transition: color var(--transition-fast);
   }
   
   /* Highlighted active state for ALL items (Flat design) */
