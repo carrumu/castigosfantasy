@@ -535,6 +535,7 @@ export function renderGenerator(container, callbacks) {
         </div>
 
         <!-- Spin Actions -->
+        ${!(hasGenerated && currentPunishment) ? `
         <div style="display: flex; gap: 0.75rem;">
           <button class="brutalist-btn" id="btn-generate-punishment" style="flex: 1; padding: 0.85rem; font-weight: 800; font-size: 0.95rem; background: var(--accent) !important; background-image: none !important; color: #000 !important; border: 3px solid #000; box-shadow: 4px 4px 0px #000; display: flex; align-items: center; justify-content: center; gap: 0.5rem; cursor: pointer;">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -546,6 +547,11 @@ export function renderGenerator(container, callbacks) {
             Ruleta Rápida
           </button>
         </div>
+        ` : `
+        <div style="text-align: center; padding: 0.75rem; background: rgba(0,0,0,0.3); border: 2.5px dashed #444; border-radius: 4px;">
+          <p style="margin: 0; font-size: 0.85rem; font-weight: 700; color: var(--text-muted);">Debes aceptar o rechazar el castigo para generar otro nuevo.</p>
+        </div>
+        `}
 
         <!-- Saved Punishments Section -->
         <div id="saved-punishments-section" style="margin-top: 2rem; display: ${savedList.length > 0 ? 'block' : 'none'};">
