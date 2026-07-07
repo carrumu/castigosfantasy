@@ -319,11 +319,11 @@ export function renderRoulette(container, callbacks) {
               
               <form id="add-punishment-form" style="margin-bottom: 1.5rem;">
                 <div class="form-group">
-                  <label for="new-pun-name">Nombre del Castigo (Ej: Lavar coche del ganador)</label>
+                  <label for="new-pun-name">Nombre del Castigo</label>
                   <input type="text" id="new-pun-name" class="input-field" placeholder="Nombre breve" required />
                 </div>
                 <div class="form-group">
-                  <label for="new-pun-desc">Descripción (Opcional)</label>
+                  <label for="new-pun-desc">Descripción</label>
                   <input type="text" id="new-pun-desc" class="input-field" placeholder="Instrucciones del castigo" />
                 </div>
                 <button type="submit" class="btn-secondary">Añadir Castigo</button>
