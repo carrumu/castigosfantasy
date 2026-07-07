@@ -572,8 +572,8 @@ export function renderGenerator(container, callbacks) {
                   <h4 style="font-size: 0.9rem; font-weight: 800; margin: 0; color: var(--text-light); line-height: 1.2;">${item.name}</h4>
                   <p style="font-size: 0.75rem; color: var(--text-muted); margin: 0.35rem 0 0 0; line-height: 1.3;">${item.description}</p>
                 </div>
-                <button class="brutalist-btn btn-delete-saved" data-idx="${idx}" style="width: 28px !important; min-width: 28px !important; height: 28px; padding: 0; background: transparent !important; background-image: none !important; color: #888 !important; border: 1.5px solid #444; border-radius: 4px; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 900; line-height: 1;" title="Quitar">
-                  ✕
+                <button class="brutalist-btn btn-delete-saved" data-idx="${idx}" style="width: 28px !important; min-width: 28px !important; height: 28px; padding: 0; background: transparent !important; background-image: none !important; color: #888 !important; border: 1.5px solid #444; border-radius: 4px; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center;" title="Quitar">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                 </button>
               </div>
             `).join('')}
@@ -600,8 +600,8 @@ export function renderGenerator(container, callbacks) {
                   </div>
                   <p style="font-size: 0.75rem; color: var(--text-muted); margin: 0.35rem 0 0 0; line-height: 1.3;">Rechazó cumplir este castigo.</p>
                 </div>
-                <button class="brutalist-btn btn-delete-rejected" data-idx="${idx}" style="width: 28px !important; min-width: 28px !important; height: 28px; padding: 0; background: transparent !important; background-image: none !important; color: #888 !important; border: 1.5px solid #444; border-radius: 4px; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 900; line-height: 1;" title="Quitar">
-                  ✕
+                <button class="brutalist-btn btn-delete-rejected" data-idx="${idx}" style="width: 28px !important; min-width: 28px !important; height: 28px; padding: 0; background: transparent !important; background-image: none !important; color: #888 !important; border: 1.5px solid #444; border-radius: 4px; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center;" title="Quitar">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                 </button>
               </div>
             `).join('')}
