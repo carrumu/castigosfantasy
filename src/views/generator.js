@@ -28,11 +28,11 @@ export function renderGenerator(container, callbacks) {
     },
     {
         id: "gen-3",
-        name: "Cumpleaños Feliz",
-        category: "creative",
-        categoryLabel: "Creativo",
-        intensity: 1,
-        description: "Enviar un audio de WhatsApp cantando el cumpleaños feliz al ganador de la jornada."
+        name: "El Baile Viral",
+        category: "public",
+        categoryLabel: "Vergonzoso",
+        intensity: 3,
+        description: "Aprenderse y grabar el baile o trend de TikTok más viral del momento y mandarlo al grupo de WhatsApp."
     },
     {
         id: "gen-4",
@@ -68,11 +68,11 @@ export function renderGenerator(container, callbacks) {
     },
     {
         id: "gen-8",
-        name: "Acento Extranjero",
-        category: "creative",
-        categoryLabel: "Creativo",
-        intensity: 2,
-        description: "Enviar un audio comentando tu jornada en el grupo usando un acento extranjero inventado."
+        name: "Lip Sync de Moda",
+        category: "public",
+        categoryLabel: "Vergonzoso",
+        intensity: 3,
+        description: "Grabar un vídeo haciendo un playback (lip sync) súper exagerado de un audio viral de TikTok y enviarlo al grupo."
     },
     {
         id: "gen-9",
@@ -84,11 +84,11 @@ export function renderGenerator(container, callbacks) {
     },
     {
         id: "gen-10",
-        name: "5 Excusas Absurdas",
-        category: "creative",
-        categoryLabel: "Creativo",
-        intensity: 1,
-        description: "Escribir 5 excusas totalmente absurdas seguidas en el grupo justificando tu derrota."
+        name: "El Filtro Llorón",
+        category: "public",
+        categoryLabel: "Vergonzoso",
+        intensity: 2,
+        description: "Subir una historia de Instagram o mandar un vídeo al grupo usando el filtro viral de cara de asco o llorando para explicar tu derrota."
     },
     {
         id: "gen-11",
@@ -148,11 +148,11 @@ export function renderGenerator(container, callbacks) {
     },
     {
         id: "gen-18",
-        name: "Análisis Pedante",
-        category: "creative",
-        categoryLabel: "Creativo",
-        intensity: 1,
-        description: "Escribir un análisis táctico en el grupo usando palabras excesivamente cultas y rimbombantes."
+        name: "Transición Fallida",
+        category: "public",
+        categoryLabel: "Vergonzoso",
+        intensity: 3,
+        description: "Hacer un vídeo intentando un trend de 'transición de ropa' viral de TikTok y que te salga horriblemente mal a propósito."
     },
     {
         id: "gen-19",
