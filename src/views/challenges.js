@@ -422,6 +422,7 @@ export function renderChallenges(container, callbacks) {
     }, 1000);
   }
 
+  renderView();
   loadMatchday().then(() => {
     loadData();
   });
