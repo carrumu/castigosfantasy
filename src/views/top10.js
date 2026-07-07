@@ -247,9 +247,11 @@ export async function renderTop10(container, callbacks) {
   };
 
   // Render colorful flag img using flagcdn.com (works on all OS including Windows)
+  // If the image fails to load (e.g. adblocker on mobile), fallback to the native emoji
   const getFlagHtml = (flag) => {
     const code = getCountryCode(flag);
-    return `<img src="https://flagcdn.com/w40/${code}.png" style="width: 24px; height: auto; border-radius: 2px; box-shadow: 0 1px 3px rgba(0,0,0,0.3); display: inline-block; vertical-align: middle;" alt="${code.toUpperCase()}" />`;
+    const safeFlag = flag ? flag.replace(/'/g, '&#39;').replace(/"/g, '&quot;') : '';
+    return `<img src="https://flagcdn.com/w40/${code}.png" style="width: 24px; height: auto; border-radius: 2px; box-shadow: 0 1px 3px rgba(0,0,0,0.3); display: inline-block; vertical-align: middle;" alt="${code.toUpperCase()}" onerror="this.outerHTML='<span style=\\'font-size: 1.25rem; display: inline-block; vertical-align: middle;\\'>${safeFlag}</span>'" />`;
   };
 
   // Dynamically resolve autocomplete search database based on topic

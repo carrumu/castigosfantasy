@@ -6,67 +6,83 @@
 const seoMap = {
   'inicio': {
     title: 'Gestor de Castigos y Ligas Fantasy | CastigosFantasy',
-    description: 'Organiza tu liga Biwenger o Fantasy, gestiona botes de dinero y aplica castigos aleatorios con la ruleta de morosos. Disfruta con tus amigos.'
+    description: 'Organiza tu liga Biwenger o Fantasy, gestiona botes de dinero y aplica castigos aleatorios con la ruleta de morosos. Disfruta con tus amigos.',
+    schemaType: 'WebApplication'
   },
   'acceso': {
     title: 'Iniciar Sesión | CastigosFantasy',
-    description: 'Inicia sesión o regístrate en CastigosFantasy para empezar a gestionar tu liga, botes y castigos de forma gratuita.'
+    description: 'Inicia sesión o regístrate en CastigosFantasy para empezar a gestionar tu liga, botes y castigos de forma gratuita.',
+    schemaType: 'WebPage'
   },
   'mis-ligas': {
     title: 'Mis Ligas | CastigosFantasy',
-    description: 'Accede a tus ligas fantasy guardadas, o crea una nueva para invitar a tus amigos y empezar a registrar las jornadas.'
+    description: 'Accede a tus ligas fantasy guardadas, o crea una nueva para invitar a tus amigos y empezar a registrar las jornadas.',
+    schemaType: 'WebApplication'
   },
   'menu-liga': {
     title: 'Dashboard de la Liga | CastigosFantasy',
-    description: 'Vista principal de tu liga. Revisa el tablón, las deudas acumuladas de la jornada y los castigos pendientes.'
+    description: 'Vista principal de tu liga. Revisa el tablón, las deudas acumuladas de la jornada y los castigos pendientes.',
+    schemaType: 'WebApplication'
   },
   'muro': {
     title: 'Muro de la Liga | CastigosFantasy',
-    description: 'Revisa el progreso de tu liga, las deudas acumuladas y toda la actividad reciente de los miembros.'
+    description: 'Revisa el progreso de tu liga, las deudas acumuladas y toda la actividad reciente de los miembros.',
+    schemaType: 'CollectionPage'
   },
   'herramientas': {
     title: 'Sala VAR - Herramientas | CastigosFantasy',
-    description: 'Elige tu castigo o utiliza herramientas generadoras para dar salseo a tu liga fantasy.'
+    description: 'Elige tu castigo o utiliza herramientas generadoras para dar salseo a tu liga fantasy.',
+    schemaType: 'WebPage'
   },
   'ruleta': {
     title: 'Ruleta Aleatoria de Castigos Fantasy | CastigosFantasy',
-    description: 'Gira la ruleta del VAR para decidir los castigos de los perdedores de tu liga. Una forma aleatoria y justa de aplicar penitencias a los últimos.'
+    description: 'Gira la ruleta del VAR para decidir los castigos de los perdedores de tu liga. Una forma aleatoria y justa de aplicar penitencias a los últimos.',
+    schemaType: 'SoftwareApplication'
   },
   'retos': {
     title: 'Retos Semanales para Ligas Fantasy | CastigosFantasy',
-    description: 'Propón y vota retos semanales para dar vida a cada jornada de tu liga. Mantén a todos los managers picados hasta la última jornada.'
+    description: 'Propón y vota retos semanales para dar vida a cada jornada de tu liga. Mantén a todos los managers picados hasta la última jornada.',
+    schemaType: 'CollectionPage'
   },
   'juegos': {
     title: 'Juegos Fantasy | CastigosFantasy',
-    description: 'Juega a adivinar jugadores y ponte a prueba contra el resto de managers de tu liga fantasy.'
+    description: 'Juega a adivinar jugadores y ponte a prueba contra el resto de managers de tu liga fantasy.',
+    schemaType: 'CollectionPage'
   },
   'adivina-jugador': {
     title: 'Adivina el Jugador | CastigosFantasy',
-    description: 'Minijuego diario: Adivina el jugador misterioso con menos intentos posibles. Demuestra quién sabe más de fútbol en tu liga.'
+    description: 'Minijuego diario: Adivina el jugador misterioso con menos intentos posibles. Demuestra quién sabe más de fútbol en tu liga.',
+    schemaType: 'VideoGame'
   },
   'top-10': {
     title: 'Top 10 Morosos | CastigosFantasy',
-    description: 'Descubre quiénes son los peores managers de la plataforma. El muro de la vergüenza de CastigosFantasy.'
+    description: 'Descubre quiénes son los peores managers de la plataforma. El muro de la vergüenza de CastigosFantasy.',
+    schemaType: 'CollectionPage'
   },
   'jugadores': {
     title: 'Buscador de Jugadores | CastigosFantasy',
-    description: 'Consulta los valores de mercado y estadísticas de todos los jugadores de las principales ligas.'
+    description: 'Consulta los valores de mercado y estadísticas de todos los jugadores de las principales ligas.',
+    schemaType: 'CollectionPage'
   },
   'bufon': {
     title: 'El Bufón - Votaciones | CastigosFantasy',
-    description: 'Vota al jugador más decepcionante de la jornada. El perdedor de la jornada tendrá su castigo asegurado.'
+    description: 'Vota al jugador más decepcionante de la jornada. El perdedor de la jornada tendrá su castigo asegurado.',
+    schemaType: 'WebPage'
   },
   'generador': {
     title: 'Generador de Castigos | CastigosFantasy',
-    description: 'Genera ideas de castigos graciosos y pesados para el perdedor de tu liga fantasy.'
+    description: 'Genera ideas de castigos graciosos y pesados para el perdedor de tu liga fantasy.',
+    schemaType: 'SoftwareApplication'
   },
   'comunidad': {
     title: 'Comunidad de Mánagers Fantasy | CastigosFantasy',
-    description: 'Comparte tácticas, lloros y chollos en el foro global de CastigosFantasy. Únete a la comunidad más tóxica (pero sana) de mánagers.'
+    description: 'Comparte tácticas, lloros y chollos en el foro global de CastigosFantasy. Únete a la comunidad más tóxica (pero sana) de mánagers.',
+    schemaType: 'CollectionPage'
   },
   'foro': {
     title: 'Foro de Debate | CastigosFantasy',
-    description: 'Debate con otros mánagers, llora por tus lesiones o chulea de tus clausulazos en el foro de CastigosFantasy.'
+    description: 'Debate con otros mánagers, llora por tus lesiones o chulea de tus clausulazos en el foro de CastigosFantasy.',
+    schemaType: 'DiscussionForumPosting'
   }
 };
 
@@ -103,4 +119,32 @@ export function setSEO(view) {
   }
   const cleanPath = view === 'inicio' ? '' : view;
   canonicalTag.setAttribute('href', `https://castigosfantasy.com/${cleanPath}`);
+
+  // Dynamic JSON-LD (SEO/AEO)
+  const scriptTag = document.querySelector('#seo-json-ld');
+  if (scriptTag) {
+    try {
+      const jsonData = JSON.parse(scriptTag.textContent);
+      // Actualizamos el objeto que representa la aplicación o página dentro de @graph
+      const webAppGraph = jsonData['@graph']?.find(g => 
+        g['@type'] === 'WebApplication' || 
+        g['@type'] === 'WebPage' || 
+        g['@type'] === 'SoftwareApplication' || 
+        g['@type'] === 'CollectionPage' ||
+        g['@type'] === 'VideoGame' ||
+        g['@type'] === 'DiscussionForumPosting'
+      );
+      if (webAppGraph) {
+        webAppGraph.name = seoData.title;
+        webAppGraph.description = seoData.description;
+        webAppGraph.url = `https://castigosfantasy.com/${cleanPath}`;
+        if (seoData.schemaType) {
+          webAppGraph['@type'] = seoData.schemaType;
+        }
+      }
+      scriptTag.textContent = JSON.stringify(jsonData, null, 2);
+    } catch (err) {
+      console.warn('Error parsing or updating JSON-LD:', err);
+    }
+  }
 }

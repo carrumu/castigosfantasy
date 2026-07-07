@@ -147,16 +147,21 @@ export function renderChallenges(container, callbacks) {
       return;
     }
 
-    if (isGuest || !isConfigured) {
-      // Local Guest mode voting toggle
-      if (userVotedId == challengeId) {
-        userVotedId = null;
-        localStorage.removeItem('CF_USER_VOTED_CHALLENGE_ID');
-      } else {
-        userVotedId = challengeId;
-        localStorage.setItem('CF_USER_VOTED_CHALLENGE_ID', challengeId);
-      }
-      callbacks.showToast('Voto local registrado', 'success');
+    if (isGuest) {
+      callbacks.showToast('Debes iniciar sesión para votar', 'warning');
+      if (callbacks.onNavigate) callbacks.onNavigate('acceso');
+      return;
+    }
+
+    if (userVotedId) {
+      callbacks.showToast('Ya has votado. El voto es definitivo.', 'warning');
+      return;
+    }
+
+    if (!isConfigured) {
+      userVotedId = challengeId;
+      localStorage.setItem('CF_USER_VOTED_CHALLENGE_ID', challengeId);
+      callbacks.showToast('Voto local registrado (Demo)', 'success');
       loadData();
       return;
     }
@@ -165,35 +170,15 @@ export function renderChallenges(container, callbacks) {
       const currentUser = supabase.auth.user ? supabase.auth.user() : (await supabase.auth.getUser()).data.user;
       if (!currentUser) return;
 
-      if (userVotedId == challengeId) {
-        // Undo vote
-        await supabase
-          .from('challenge_votes')
-          .delete()
-          .eq('challenge_id', challengeId)
-          .eq('profile_id', currentUser.id);
-        
-        userVotedId = null;
-      } else {
-        // Change vote (delete previous)
-        if (userVotedId) {
-          await supabase
-            .from('challenge_votes')
-            .delete()
-            .eq('challenge_id', userVotedId)
-            .eq('profile_id', currentUser.id);
-        }
-
-        // Insert new vote
-        await supabase
-          .from('challenge_votes')
-          .insert({
-            challenge_id: challengeId,
-            profile_id: currentUser.id
-          });
-        
-        userVotedId = challengeId;
-      }
+      // Insert new vote
+      await supabase
+        .from('challenge_votes')
+        .insert({
+          challenge_id: challengeId,
+          profile_id: currentUser.id
+        });
+      
+      userVotedId = challengeId;
       callbacks.showToast('Voto registrado con éxito', 'success');
     } catch (e) {
       console.error('Error casting challenge vote:', e);
@@ -291,7 +276,6 @@ export function renderChallenges(container, callbacks) {
                       </div>
                       <div style="text-align: right; min-width: 80px;">
                         <span style="font-weight: 800; font-size: 1.15rem; color: ${isWinner ? 'var(--accent)' : 'var(--primary)'};">${percent}%</span>
-                        <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.1rem;">${item.votes} votos</div>
                       </div>
                     </div>
 
@@ -301,8 +285,8 @@ export function renderChallenges(container, callbacks) {
                         <div style="height: 100%; width: ${percent}%; background: ${isWinner ? 'var(--accent)' : 'var(--primary)'}; border-radius: 3px; transition: width 0.6s ease;"></div>
                       </div>
                       ${!isVotingClosed ? `
-                        <button class="brutalist-btn-small btn-vote ${isThisVoted ? 'is-active' : ''}" data-id="${item.id}" style="padding: 0.35rem 0.75rem; font-size: 0.7rem; border-radius: 4px;">
-                          ${isThisVoted ? '✔ Tu Voto' : 'Votar'}
+                        <button class="brutalist-btn-small btn-vote ${isThisVoted ? 'is-active' : ''}" ${userVotedId ? 'disabled' : ''} data-id="${item.id}" style="padding: 0.35rem 0.75rem; font-size: 0.7rem; border-radius: 4px; ${userVotedId ? 'opacity: 0.5; cursor: not-allowed;' : ''}">
+                          ${isThisVoted ? '✔ Votado' : 'Votar'}
                         </button>
                       ` : ''}
                     </div>

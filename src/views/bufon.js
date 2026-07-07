@@ -461,7 +461,6 @@ export function renderBufon(container, callbacks) {
             <div class="card glass">
               <h2 class="card-title gradient-text-gold" style="font-size: 1.15rem; margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
                 <span>Candidatos de la Jornada</span>
-                <span style="font-size: 0.8rem; font-weight: 500; color: var(--text-muted);">${totalVotes} votos totales</span>
               </h2>
 
               <!-- Countdown Banner -->
@@ -535,7 +534,6 @@ export function renderBufon(container, callbacks) {
                           </div>
                           <div style="text-align: right; min-width: 80px;">
                             <span style="font-weight: 800; font-size: 1.2rem; color: var(--accent);">${percent}%</span>
-                            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.1rem;">${n.votes} votos</div>
                           </div>
                         </div>
 
@@ -545,7 +543,7 @@ export function renderBufon(container, callbacks) {
                             <div style="height: 100%; width: ${percent}%; background: ${isVoted ? 'var(--accent)' : 'var(--text-muted)'}; border-radius: 3px; transition: width 0.6s ease;"></div>
                           </div>
 
-                          <button class="btn-vote-bufon brutalist-btn" ${isBtnDisabled && !isVoted ? 'disabled' : ''} data-id="${n.id}" style="
+                          <button class="btn-vote-bufon brutalist-btn" ${isBtnDisabled ? 'disabled' : ''} data-id="${n.id}" style="
                             background: ${isVoted ? 'var(--accent) !important; background-image: none !important; color: #000 !important;' : 'rgba(255, 255, 255, 0.05)'};
                             font-family: var(--font-sans);
                             font-weight: 800;
@@ -554,9 +552,9 @@ export function renderBufon(container, callbacks) {
                             width: auto;
                             border: 2px solid #000;
                             box-shadow: 2px 2px 0px #000;
-                            cursor: ${isBtnDisabled && !isVoted ? 'not-allowed' : 'pointer'};
+                            cursor: ${isBtnDisabled ? 'not-allowed' : 'pointer'};
                             transition: var(--transition-fast);
-                            opacity: ${isBtnDisabled && !isVoted ? '0.4' : '1'};
+                            opacity: ${(isBtnDisabled && !isVoted) ? '0.4' : '1'};
                           ">
                             ${isVoted ? 'Votado ✓' : (isVotingClosed ? 'Cerrado' : 'Votar')}
                           </button>
