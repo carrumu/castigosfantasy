@@ -53,9 +53,9 @@ export function renderChallenges(container, callbacks) {
     if (isGuest || !activeLeagueId || !isConfigured) {
       // Local Guest fallback mode
       const defaultDares = [
-        { id: 'guest-1', title: "El Eterno Rival", desc: "Llevar la camiseta del máximo rival de tu equipo durante un día entero de trabajo/estudios (y subir foto de prueba).", votes: 8 },
-        { id: 'guest-2', title: "El Camarero de la Liga", desc: "Pagarle un café o refresco a cada uno de los miembros de la liga la próxima vez que os veáis.", votes: 5 },
-        { id: 'guest-3', title: "El Cantante de WhatsApp", desc: "Grabar un audio de WhatsApp de al menos 1 minuto cantando a capela el himno del equipo del último clasificado con la mano en el pecho.", votes: 12 }
+        { id: 'guest-1', title: "Outfit de Despedido", desc: "Subir foto al grupo vistiendo la ropa más hortera posible simulando despido. Plazo: 48h.", votes: 8 },
+        { id: 'guest-2', title: "Comentarista Mudo", desc: "Grabar vídeo justificando la derrota solo con mímica sin emitir sonido. Plazo: 48h.", votes: 5 },
+        { id: 'guest-3', title: "El Cantante de WhatsApp", desc: "Grabar un audio de WhatsApp de 1 minuto cantando a capela una balada a tu peor jugador.", votes: 12 }
       ];
       challenges = defaultDares;
       userVotedId = localStorage.getItem('CF_USER_VOTED_CHALLENGE_ID') || null;
@@ -79,9 +79,9 @@ export function renderChallenges(container, callbacks) {
       // Seed default challenges if empty in Supabase database
       if (!remoteChallenges || remoteChallenges.length === 0) {
         const seedDares = [
-          { title: "El Eterno Rival", description: "Llevar la camiseta del máximo rival de tu equipo durante un día entero de trabajo/estudios (y subir foto de prueba)." },
-          { title: "El Camarero de la Liga", description: "Pagarle un café o refresco a cada uno de los miembros de la liga la próxima vez que os veáis." },
-          { title: "El Cantante de WhatsApp", description: "Grabar un audio de WhatsApp de al menos 1 minuto cantando a capela el himno del equipo del último clasificado con la mano en el pecho." }
+          { title: "Outfit de Despedido", description: "Subir foto al grupo vistiendo la ropa más hortera posible simulando despido. Plazo: 48h." },
+          { title: "Comentarista Mudo", description: "Grabar vídeo justificando la derrota solo con mímica sin emitir sonido. Plazo: 48h." },
+          { title: "El Cantante de WhatsApp", description: "Grabar un audio de WhatsApp de 1 minuto cantando a capela una balada a tu peor jugador." }
         ];
         
         const insertList = seedDares.map(d => ({
