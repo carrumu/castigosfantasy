@@ -11,374 +11,310 @@ export function renderGenerator(container, callbacks) {
   // 1. Database of fun, high-quality fantasy football punishments (Emoji-free & Low-cost)
   const PUNISHMENT_IDEAS = [
     {
-      id: "gen-1",
-      name: "La Camiseta de la Vergüenza",
-      category: "public",
-      categoryLabel: "Vergonzoso",
-      intensity: 4,
-      description: "Vestir la camiseta del rival histórico de la liga durante todo el fin de semana, incluyendo salidas con amigos o ir a comprar."
+        id: "gen-1",
+        name: "Foto de Perfil Castigada",
+        category: "public",
+        categoryLabel: "Vergonzoso",
+        intensity: 2,
+        description: "Ponerte una foto de perfil de WhatsApp elegida por el ganador durante 24h."
     },
     {
-      id: "gen-2",
-      name: "El Comentarista Pelma",
-      category: "public",
-      categoryLabel: "Vergonzoso",
-      intensity: 3,
-      description: "Comentar todas y cada una de las publicaciones de Instagram o X del líder con frases de alabanza obligatorias durante 5 días seguidos."
+        id: "gen-2",
+        name: "Estado de Derrota",
+        category: "public",
+        categoryLabel: "Vergonzoso",
+        intensity: 1,
+        description: "Poner un estado de WhatsApp que diga 'Soy el peor mánager de la historia' durante 24h."
     },
     {
-      id: "gen-3",
-      name: "El Doble o Nada",
-      category: "money",
-      categoryLabel: "Económico",
-      intensity: 5,
-      description: "Pagar una pequeña penalización simbólica de 1€ extra al bote común de la liga."
+        id: "gen-3",
+        name: "Cumpleaños Feliz",
+        category: "creative",
+        categoryLabel: "Creativo",
+        intensity: 1,
+        description: "Enviar un audio de WhatsApp cantando el cumpleaños feliz al ganador de la jornada."
     },
     {
-      id: "gen-5",
-      name: "El Menú del Farolillo Rojo",
-      category: "food",
-      categoryLabel: "Alimenticio",
-      intensity: 3,
-      description: "Comprar un donut o bollo para el ganador de la jornada y entregárselo en mano en la próxima quedada."
+        id: "gen-4",
+        name: "Poema al Resto",
+        category: "creative",
+        categoryLabel: "Creativo",
+        intensity: 2,
+        description: "Escribir un poema de 4 líneas dedicado al jugador que más te ha restado y pasarlo al grupo."
     },
     {
-      id: "gen-6",
-      name: "El Avatar del Bufón",
-      category: "public",
-      categoryLabel: "Vergonzoso",
-      intensity: 3,
-      description: "Cambiar tu foto de perfil de WhatsApp por una imagen vergonzosa elegida democráticamente por los miembros de la liga durante 7 días."
+        id: "gen-5",
+        name: "Recreación de Meme",
+        category: "creative",
+        categoryLabel: "Creativo",
+        intensity: 2,
+        description: "Recrear un meme clásico en casa y mandar la foto al grupo."
     },
     {
-      id: "gen-7",
-      name: "El Poeta de la Jornada",
-      category: "creative",
-      categoryLabel: "Creativo",
-      intensity: 2,
-      description: "Escribir un poema lírico de al menos 4 estrofas en honor al ganador de la jornada y recitarlo mediante nota de voz en el chat de la liga."
+        id: "gen-6",
+        name: "Celebración Falsa",
+        category: "sports",
+        categoryLabel: "Deportivo",
+        intensity: 2,
+        description: "Grabar un vídeo de 15s imitando la celebración de un gol famoso en el salón de tu casa."
     },
     {
-      id: "gen-8",
-      name: "La Declaración Pública",
-      category: "public",
-      categoryLabel: "Vergonzoso",
-      intensity: 5,
-      description: "Subir una historia de Instagram declarando tu fanatismo incondicional hacia el jugador o club de fútbol que más detestas en la vida real."
+        id: "gen-7",
+        name: "Close Friends",
+        category: "public",
+        categoryLabel: "Vergonzoso",
+        intensity: 3,
+        description: "Subir foto a 'Mejores Amigos' en Instagram llorando falsamente por la jornada."
     },
     {
-      id: "gen-9",
-      name: "El Mayordomo del Grupo",
-      category: "creative",
-      categoryLabel: "Creativo",
-      intensity: 4,
-      description: "Servir las bebidas, aperitivos y limpiar la mesa de todo el grupo de amigos durante la próxima quedada para ver el fútbol."
+        id: "gen-8",
+        name: "Acento Extranjero",
+        category: "creative",
+        categoryLabel: "Creativo",
+        intensity: 2,
+        description: "Enviar un audio comentando tu jornada en el grupo usando un acento extranjero inventado."
     },
     {
-      id: "gen-10",
-      name: "Pachanga de Cera",
-      category: "sports",
-      categoryLabel: "Deportivo",
-      intensity: 3,
-      description: "Jugar el próximo partido informal del grupo de amigos vistiendo obligatoriamente un chaleco reflectante rosa de tráfico."
+        id: "gen-9",
+        name: "Retrato Robot",
+        category: "creative",
+        categoryLabel: "Creativo",
+        intensity: 2,
+        description: "Dibujar a mano al mánager ganador de la jornada en un papel (versión cutre) y pasar foto."
     },
     {
-      id: "gen-11",
-      name: "Monólogo Autocrítico",
-      category: "creative",
-      categoryLabel: "Creativo",
-      intensity: 4,
-      description: "Enviar un audio continuo de 3 minutos analizando minuciosamente por qué tu estrategia fantasy ha sido un fracaso estrepitoso esta jornada."
+        id: "gen-10",
+        name: "5 Excusas Absurdas",
+        category: "creative",
+        categoryLabel: "Creativo",
+        intensity: 1,
+        description: "Escribir 5 excusas totalmente absurdas seguidas en el grupo justificando tu derrota."
     },
     {
-      id: "gen-12",
-      name: "Cafés Dorados",
-      category: "food",
-      categoryLabel: "Alimenticio",
-      intensity: 2,
-      description: "Invitar a un café (solo uno) al ganador de la jornada en la próxima quedada física de la liga."
+        id: "gen-11",
+        name: "Toques de Papel",
+        category: "sports",
+        categoryLabel: "Deportivo",
+        intensity: 2,
+        description: "Grabar un vídeo intentando dar 10 toques seguidos a un rollo de papel higiénico."
     },
     {
-      id: "gen-13",
-      name: "Unboxing de Risa",
-      category: "public",
-      categoryLabel: "Vergonzoso",
-      intensity: 4,
-      description: "Hacer un vídeo de 'unboxing' premium de un objeto absurdo de tu casa (ej. un calcetín viejo) explicándolo como si fuera un producto de lujo."
+        id: "gen-12",
+        name: "Locutor de Documental",
+        category: "creative",
+        categoryLabel: "Creativo",
+        intensity: 2,
+        description: "Mandar un audio narrando tu derrota como si fueras un locutor de documentales de animales."
     },
     {
-      id: "gen-14",
-      name: "Sin Alineación no hay Paraíso",
-      category: "money",
-      categoryLabel: "Económico",
-      intensity: 4,
-      description: "Multa de 1€ extra directo al bote común si olvidas rellenar la alineación y juegas con algún jugador lesionado o sancionado."
+        id: "gen-13",
+        name: "Mímica del Fracaso",
+        category: "creative",
+        categoryLabel: "Creativo",
+        intensity: 2,
+        description: "Hacer mímica de tu peor jugador de la jornada en un vídeo corto para que el grupo lo adivine."
     },
     {
-      id: "gen-15",
-      name: "Serenata de Medianoche",
-      category: "creative",
-      categoryLabel: "Creativo",
-      intensity: 5,
-      description: "Grabar un audio cantando apasionadamente el himno del equipo rival a capela a medianoche en punto y enviarlo al grupo de WhatsApp."
+        id: "gen-14",
+        name: "Vaso Sin Manos",
+        category: "food",
+        categoryLabel: "Alimenticio",
+        intensity: 3,
+        description: "Grabar un vídeo bebiendo un poco de agua de un vaso apoyado en la mesa, sin usar las manos."
     },
     {
-      id: "gen-16",
-      name: "Ley del Silencio Futbolístico",
-      category: "creative",
-      categoryLabel: "Creativo",
-      intensity: 3,
-      description: "Prohibición absoluta de hablar sobre fútbol, fichajes o quejarte del arbitraje en el grupo de WhatsApp durante 72 horas completas."
+        id: "gen-15",
+        name: "Selfie Recién Levantado",
+        category: "public",
+        categoryLabel: "Vergonzoso",
+        intensity: 2,
+        description: "Mandar un selfie al grupo nada más levantarte por la mañana con 'cara de perdedor'."
     },
     {
-      id: "gen-17",
-      name: "Peluquería Atrevida",
-      category: "public",
-      categoryLabel: "Vergonzoso",
-      intensity: 5,
-      description: "Dejarte teñir o pintar un mechón de pelo con cera lavable de los colores del equipo que decida el líder durante 3 días enteros."
+        id: "gen-16",
+        name: "Nombre Ridículo",
+        category: "public",
+        categoryLabel: "Vergonzoso",
+        intensity: 2,
+        description: "Cambiar el nombre de tu equipo fantasy por uno ridículo que elija el líder durante 1 jornada."
     },
     {
-      id: "gen-18",
-      name: "Batido Explosivo",
-      category: "food",
-      categoryLabel: "Alimenticio",
-      intensity: 4,
-      description: "Beber un vaso pequeño de un batido preparado al azar por tus compañeros de liga (con ingredientes alimenticios reales y aptos, pero combinados maliciosamente)."
+        id: "gen-17",
+        name: "Desayuno Épico",
+        category: "food",
+        categoryLabel: "Alimenticio",
+        intensity: 2,
+        description: "Narrar por audio de WhatsApp cómo te preparas el desayuno usando tono épico de batalla."
     },
     {
-      id: "gen-19",
-      name: "El Árbitro de la Mesa",
-      category: "creative",
-      categoryLabel: "Creativo",
-      intensity: 3,
-      description: "Llevar un silbato y tarjetas oficiales al bar y pitar faltas y sacar tarjetas amarillas reales cada vez que un amigo levante la voz o discuta."
+        id: "gen-18",
+        name: "Análisis Pedante",
+        category: "creative",
+        categoryLabel: "Creativo",
+        intensity: 1,
+        description: "Escribir un análisis táctico en el grupo usando palabras excesivamente cultas y rimbombantes."
     },
     {
-      id: "gen-20",
-      name: "Patrocinio Involuntario",
-      category: "public",
-      categoryLabel: "Vergonzoso",
-      intensity: 4,
-      description: "Llevar puesta una gorra de béisbol o camiseta personalizada con el texto 'Soy el Farolillo Rojo' durante toda una cena o salida grupal."
+        id: "gen-19",
+        name: "Tutorial de Fracaso",
+        category: "creative",
+        categoryLabel: "Creativo",
+        intensity: 3,
+        description: "Hacer un mini-tutorial en vídeo de 30s de 'Cómo NO alinear en un fantasy'."
     },
     {
-      id: "gen-22",
-      name: "El Himno en la Ducha",
-      category: "creative",
-      categoryLabel: "Creativo",
-      intensity: 4,
-      description: "Grabar un video cantando el himno del club rival en la ducha con agua fría vistiendo ropa de baño o impermeable."
+        id: "gen-20",
+        name: "Llantos de Audio",
+        category: "creative",
+        categoryLabel: "Creativo",
+        intensity: 2,
+        description: "Grabar un audio de 20s como si estuvieras llorando amargamente (de broma) por tu derrota."
     },
     {
-      id: "gen-23",
-      name: "La Invitación del Colista",
-      category: "money",
-      categoryLabel: "Económico",
-      intensity: 3,
-      description: "Pagar un único refresco o cerveza al ganador de la jornada la próxima vez que quedéis."
+        id: "gen-21",
+        name: "Bailar la Macarena",
+        category: "public",
+        categoryLabel: "Vergonzoso",
+        intensity: 3,
+        description: "Bailar el estribillo de la Macarena en un vídeo rápido para el grupo."
     },
     {
-      id: "gen-24",
-      name: "El Lustrador de Botas",
-      category: "sports",
-      categoryLabel: "Deportivo",
-      intensity: 3,
-      description: "Limpiar y abrillantar las zapatillas de deporte de todos los miembros de la liga antes del próximo partido de fútbol del grupo."
+        id: "gen-22",
+        name: "Perdón al Capitán",
+        category: "creative",
+        categoryLabel: "Creativo",
+        intensity: 2,
+        description: "Hacer un vídeo corto pidiendo perdón de rodillas a tu capitán fantasy por decepcionarle."
     },
     {
-      id: "gen-25",
-      name: "El Chef del Bote",
-      category: "food",
-      categoryLabel: "Alimenticio",
-      intensity: 4,
-      description: "Cocinar una paella o tortilla de patatas gigante para todo el grupo en la próxima quedada de la jornada de liga."
+        id: "gen-23",
+        name: "Gurú de Palo",
+        category: "public",
+        categoryLabel: "Vergonzoso",
+        intensity: 2,
+        description: "Subir una historia diciendo 'Vendo consejos de Fantasy' con tono irónico."
     },
     {
-      id: "gen-27",
-      name: "El Limpiador de Coches",
-      category: "creative",
-      categoryLabel: "Creativo",
-      intensity: 4,
-      description: "Lavar a mano y dejar impecable el coche del líder de la clasificación antes del siguiente fin de semana."
+        id: "gen-24",
+        name: "Zoológico de Derrotas",
+        category: "creative",
+        categoryLabel: "Creativo",
+        intensity: 2,
+        description: "Enviar un audio imitando el sonido de 3 animales diferentes llorando."
     },
     {
-      id: "gen-28",
-      name: "El Portavoz del Líder",
-      category: "creative",
-      categoryLabel: "Creativo",
-      intensity: 2,
-      description: "Escribir todos tus mensajes en el chat de la liga en tercera persona y refiriéndote al líder como 'Su Majestad' durante una semana completa."
+        id: "gen-25",
+        name: "El GIF Humano",
+        category: "creative",
+        categoryLabel: "Creativo",
+        intensity: 2,
+        description: "Recrear tu reacción al ver los puntos de tu equipo grabando un GIF propio de 3 segundos."
     },
     {
-      id: "gen-29",
-      name: "El Disfraz del Supermercado",
-      category: "public",
-      categoryLabel: "Vergonzoso",
-      intensity: 4,
-      description: "Ir a hacer la compra semanal al supermercado vestido con un traje de gala (esmoquin o vestido de fiesta) y subir una foto en los pasillos."
+        id: "gen-26",
+        name: "Entrenador Pensativo",
+        category: "public",
+        categoryLabel: "Vergonzoso",
+        intensity: 1,
+        description: "Hacerte una foto en el espejo con gesto de entrenador preocupado y mandarla al grupo."
     },
     {
-      id: "gen-31",
-      name: "El Desayuno a Domicilio",
-      category: "food",
-      categoryLabel: "Alimenticio",
-      intensity: 3,
-      description: "Traerle una napolitana de chocolate o un cruasán recién hecho al ganador de la jornada el próximo día que quedéis."
+        id: "gen-27",
+        name: "Elogios Obligados",
+        category: "creative",
+        categoryLabel: "Creativo",
+        intensity: 1,
+        description: "Escribir en el grupo 3 cosas positivas del equipo del ganador sin ningún tipo de sarcasmo."
     },
     {
-      id: "gen-32",
-      name: "El Comprador del Pan",
-      category: "public",
-      categoryLabel: "Vergonzoso",
-      intensity: 4,
-      description: "Ir a comprar el pan el domingo por la mañana vistiendo solo un pijama de una pieza o un disfraz de animal."
+        id: "gen-28",
+        name: "Prensa Falsa",
+        category: "creative",
+        categoryLabel: "Creativo",
+        intensity: 2,
+        description: "Grabar un vídeo dando explicaciones a la prensa usando un cepillo de dientes como micrófono."
     },
     {
-      id: "gen-33",
-      name: "El Crítico de Arte",
-      category: "creative",
-      categoryLabel: "Creativo",
-      intensity: 2,
-      description: "Grabar un audio de 2 minutos analizando de forma absurdamente poética y filosófica el peor gol que se haya marcado en la jornada."
+        id: "gen-29",
+        name: "Minuto de Quejas",
+        category: "creative",
+        categoryLabel: "Creativo",
+        intensity: 1,
+        description: "Mandar un audio de 1 minuto cronometrado hablando sin parar de la mala suerte que tienes."
     },
     {
-      id: "gen-34",
-      name: "La Multa por Tarjeta Roja",
-      category: "money",
-      categoryLabel: "Económico",
-      intensity: 2,
-      description: "Pagar 1€ extra al bote común por cada tarjeta roja que reciba algún jugador de tu alineación titular en la jornada."
+        id: "gen-30",
+        name: "Dibujo Táctico",
+        category: "creative",
+        categoryLabel: "Creativo",
+        intensity: 2,
+        description: "Hacer un dibujo rápido con bolígrafo de tu supuesto 'esquema táctico' y pasarlo al grupo."
     },
     {
-      id: "gen-35",
-      name: "El DJ Castigado",
-      category: "creative",
-      categoryLabel: "Creativo",
-      intensity: 3,
-      description: "Dejar que el ganador de la jornada elija la lista de reproducción musical de tu coche durante todo el siguiente viaje grupal."
+        id: "gen-31",
+        name: "Desorientado",
+        category: "public",
+        categoryLabel: "Vergonzoso",
+        intensity: 2,
+        description: "Ponerte una camiseta del revés y hacerte una foto con cara desorientada para el grupo."
     },
     {
-      id: "gen-36",
-      name: "La Mascota de la Liga",
-      category: "public",
-      categoryLabel: "Vergonzoso",
-      intensity: 3,
-      description: "Llevar puestas unas orejas de conejo o una diadema divertida decidida por el líder durante toda la próxima cena del grupo."
+        id: "gen-32",
+        name: "El Fallo Técnico",
+        category: "sports",
+        categoryLabel: "Deportivo",
+        intensity: 2,
+        description: "Imitar en vídeo el peor gesto técnico (ej. un tropezón) de tu peor jugador de la jornada."
     },
     {
-      id: "gen-37",
-      name: "El Entrenador Personal",
-      category: "sports",
-      categoryLabel: "Deportivo",
-      intensity: 2,
-      description: "Organizar y dirigir una sesión de estiramientos y calentamiento de 20 minutos para el grupo al acabar el próximo partido informal."
+        id: "gen-33",
+        name: "Cantando Bajo la Ducha",
+        category: "creative",
+        categoryLabel: "Creativo",
+        intensity: 3,
+        description: "Grabar un audio de 15s cantando tristemente dentro de la ducha (sin agua)."
     },
     {
-      id: "gen-38",
-      name: "El Mensaje al Streamer",
-      category: "public",
-      categoryLabel: "Vergonzoso",
-      intensity: 3,
-      description: "Escribir en el chat en vivo de un streamer de fútbol famoso una frase graciosa de disculpa decidida por la liga y mandar captura de pantalla."
+        id: "gen-34",
+        name: "Emoji de Payaso",
+        category: "public",
+        categoryLabel: "Vergonzoso",
+        intensity: 1,
+        description: "Poner de estado de WhatsApp un único emoji de payaso 🤡 durante 24h."
     },
     {
-      id: "gen-39",
-      name: "La Cena de los Campeones",
-      category: "creative",
-      categoryLabel: "Creativo",
-      intensity: 3,
-      description: "Servir la mesa con un trapo al hombro y actuar como camarero profesional y servicial para tus amigos durante toda una cena grupal."
+        id: "gen-35",
+        name: "Jeroglífico Fantasy",
+        category: "creative",
+        categoryLabel: "Creativo",
+        intensity: 1,
+        description: "Explicar tu derrota usando únicamente emojis (sin letras) en un mensaje al grupo."
     },
     {
-      id: "gen-40",
-      name: "El Picoteo del Colista",
-      category: "food",
-      categoryLabel: "Alimenticio",
-      intensity: 2,
-      description: "Traer una bolsa de patatas fritas (tamaño estándar) para compartir en la próxima quedada para ver el fútbol."
+        id: "gen-36",
+        name: "Flexiones de Castigo",
+        category: "sports",
+        categoryLabel: "Deportivo",
+        intensity: 2,
+        description: "Grabar un vídeo haciendo 5 flexiones como 'castigo físico' por la mala táctica."
     },
     {
-      id: "gen-41",
-      name: "El Vídeo de Disculpas",
-      category: "creative",
-      categoryLabel: "Creativo",
-      intensity: 3,
-      description: "Grabar un vídeo imitando las ruedas de prensa formales de disculpa de los entrenadores tras una derrota dura, asumiendo la culpa de tu alineación."
+        id: "gen-37",
+        name: "La Llamada del Presi",
+        category: "creative",
+        categoryLabel: "Creativo",
+        intensity: 2,
+        description: "Enviar un audio simulando que estás recibiendo la llamada de despido de la directiva."
     },
     {
-      id: "gen-42",
-      name: "La Tasa de Traspaso",
-      category: "money",
-      categoryLabel: "Económico",
-      intensity: 3,
-      description: "Pagar una tasa de 2€ extra directos al bote común por cada fichaje que realices durante el mercado de fichajes."
-    },
-    {
-      id: "gen-43",
-      name: "El Portador de la Bolsa",
-      category: "sports",
-      categoryLabel: "Deportivo",
-      intensity: 3,
-      description: "Cargar con todas las bolsas de deporte, balones y petos del grupo al ir y volver del próximo partido informal."
-    },
-    {
-      id: "gen-44",
-      name: "El Elogio del Rival",
-      category: "creative",
-      categoryLabel: "Creativo",
-      intensity: 2,
-      description: "Escribir una carta formal a mano elogiando la gran visión futbolística y astucia de tu rival directo en la clasificación."
-    },
-    {
-      id: "gen-45",
-      name: "El Menú de Picante",
-      category: "food",
-      categoryLabel: "Alimenticio",
-      intensity: 4,
-      description: "Comer una cucharada de salsa picante extrema o un chile delante de la cámara en la videollamada semanal de la liga."
-    },
-    {
-      id: "gen-46",
-      name: "El Perfil del Meme",
-      category: "public",
-      categoryLabel: "Vergonzoso",
-      intensity: 3,
-      description: "Cambiar tu descripción de WhatsApp por una frase de disculpa impuesta por la liga durante una semana (ej. 'No sé alinear y pido perdón a España')."
-    },
-    {
-      id: "gen-47",
-      name: "El Guardián del Trofeo",
-      category: "creative",
-      categoryLabel: "Creativo",
-      intensity: 3,
-      description: "Custodiar y limpiar un objeto absurdo que actúe de 'Trofeo del Colista' en tu salón en un lugar visible hasta la próxima jornada."
-    },
-    {
-      id: "gen-48",
-      name: "La Sentencia del Karaoke",
-      category: "creative",
-      categoryLabel: "Creativo",
-      intensity: 4,
-      description: "Cantar una canción elegida por tus compañeros en un karaoke local o grabar una nota de voz cantando el estribillo de un tema cursi."
-    },
-    {
-      id: "gen-49",
-      name: "El Árbitro Asistente",
-      category: "sports",
-      categoryLabel: "Deportivo",
-      intensity: 4,
-      description: "Correr la banda durante el partido informal de tus amigos llevando una bandera improvisada y señalando fueras de juego imaginarios."
-    },
-    {
-      id: "gen-50",
-      name: "El Bote de los Lloros",
-      category: "money",
-      categoryLabel: "Económico",
-      intensity: 2,
-      description: "Pagar 0,50€ al bote de la liga por cada queja explícita sobre el VAR o los puntos recibidos en el chat grupal de WhatsApp."
+        id: "gen-38",
+        name: "Carta de Dimisión",
+        category: "creative",
+        categoryLabel: "Creativo",
+        intensity: 1,
+        description: "Escribir a mano una carta formal de dimisión de broma, firmarla y pasar foto al grupo."
     }
-  ];
+];
 
   // 2. Active state
   let currentPunishment = null;
