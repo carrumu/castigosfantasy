@@ -502,29 +502,31 @@ export function renderGenerator(container, callbacks) {
               ` : `
                 <!-- Standard Action Button Row -->
                 <div style="display: flex; flex-direction: column; gap: 0.6rem; border-top: 2.5px solid #000; padding-top: 1rem; margin-top: auto;">
-                  <div style="display: flex; gap: 0.5rem; align-items: center;">
+                  <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; justify-content: space-between;">
                     <!-- Accept (Green/Lime) & Reject (Muted Dark Red) - Same size, styling forced with !important to bypass global yellow css classes -->
-                    <button class="brutalist-btn" id="btn-accept-punishment" style="flex: 1; padding: 0.65rem 0; font-weight: 800; font-size: 0.85rem; background: var(--accent) !important; background-image: none !important; color: #000 !important; border: 2.5px solid #000 !important; box-shadow: 2px 2px 0px #000 !important; cursor: pointer; text-transform: uppercase; text-align: center;">
+                    <button class="brutalist-btn" id="btn-accept-punishment" style="flex: 1; min-width: 100px; padding: 0.65rem 0; font-weight: 800; font-size: 0.85rem; background: var(--accent) !important; background-image: none !important; color: #000 !important; border: 2.5px solid #000 !important; box-shadow: 2px 2px 0px #000 !important; cursor: pointer; text-transform: uppercase; text-align: center;">
                       Aceptar
                     </button>
-                    <button class="brutalist-btn" id="btn-reject-punishment" style="flex: 1; padding: 0.65rem 0; font-weight: 800; font-size: 0.85rem; background: #962d2d !important; background-image: none !important; color: #fff !important; border: 2.5px solid #000 !important; box-shadow: 2px 2px 0px #000 !important; cursor: pointer; text-transform: uppercase; text-align: center;">
+                    <button class="brutalist-btn" id="btn-reject-punishment" style="flex: 1; min-width: 100px; padding: 0.65rem 0; font-weight: 800; font-size: 0.85rem; background: #962d2d !important; background-image: none !important; color: #fff !important; border: 2.5px solid #000 !important; box-shadow: 2px 2px 0px #000 !important; cursor: pointer; text-transform: uppercase; text-align: center;">
                       No Aceptar
                     </button>
                     
-                    <!-- Copy (Icon only, dark grey background) -->
-                    <button class="brutalist-btn" id="btn-copy-card" style="width: 38px; height: 38px; padding: 0; display: flex; align-items: center; justify-content: center; cursor: pointer; background: #333333 !important; background-image: none !important; color: var(--text-light) !important; border: 2.5px solid #000 !important; box-shadow: 2px 2px 0px #000 !important;" title="Copiar al portapapeles">
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                      </svg>
-                    </button>
-                    
-                    <!-- Share WhatsApp (Icon only, WhatsApp green) -->
-                    <button class="brutalist-btn" id="btn-share-whatsapp" style="width: 38px; height: 38px; padding: 0; display: flex; align-items: center; justify-content: center; cursor: pointer; background: #25d366 !important; background-image: none !important; color: #000 !important; border: 2.5px solid #000 !important; box-shadow: 2px 2px 0px #000 !important;" title="Compartir por WhatsApp">
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
-                      </svg>
-                    </button>
+                    <div style="display: flex; gap: 0.5rem; justify-content: center; flex-shrink: 0;">
+                      <!-- Copy (Icon only, dark grey background) -->
+                      <button class="brutalist-btn" id="btn-copy-card" style="width: 38px; height: 38px; padding: 0; display: flex; align-items: center; justify-content: center; cursor: pointer; background: #333333 !important; background-image: none !important; color: var(--text-light) !important; border: 2.5px solid #000 !important; box-shadow: 2px 2px 0px #000 !important;" title="Copiar al portapapeles">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                      </button>
+                      
+                      <!-- Share WhatsApp (Icon only, WhatsApp green) -->
+                      <button class="brutalist-btn" id="btn-share-whatsapp" style="width: 38px; height: 38px; padding: 0; display: flex; align-items: center; justify-content: center; cursor: pointer; background: #25d366 !important; background-image: none !important; color: #000 !important; border: 2.5px solid #000 !important; box-shadow: 2px 2px 0px #000 !important;" title="Compartir por WhatsApp">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+                        </svg>
+                      </button>
+                    </div>
                   </div>
                 </div>
               `}
