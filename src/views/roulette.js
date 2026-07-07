@@ -26,12 +26,14 @@ export function renderRoulette(container, callbacks) {
   let idleSpeed = 0.1; // degrees per frame
   let idleReq = null;
 
-  // Shared colors array for the wheel slices and the legend (Brutalist theme)
+  // Shared colors array for the wheel slices and the legend
   const WHEEL_COLORS = [
-    '#ffffff', // blanco
-    '#ff453a', // rojo
-    '#111111', // obsidian
-    '#deed00'  // lima
+    '#6366f1', // indigo
+    '#4f46e5', // indigo dark
+    '#f43f5e', // rose
+    '#db2777', // pink/rose dark
+    '#1e293b', // charcoal
+    '#0f172a'  // dark slate
   ];
 
   // Initial default punishments
@@ -237,9 +239,9 @@ export function renderRoulette(container, callbacks) {
 
         <div class="roulette-grid">
           <!-- Columna Izquierda: Componente Ruleta -->
-          <div class="brutalist-card roulette-container" style="background: var(--primary-green); color: #000; margin-bottom: 0; display: flex; flex-direction: column; align-items: center; border: 4px solid #000; box-shadow: 6px 6px 0 #000;">
-            <h2 style="font-family: var(--font-display); font-size: 1.8rem; font-weight: 900; text-transform: uppercase; margin-bottom: 0.5rem; line-height: 1; color: #000;">Ruleta de Sentencias</h2>
-            <p style="font-size: 0.85rem; color: #000; font-weight: 700; margin-bottom: 1.5rem; text-align: center; opacity: 0.8;">
+          <div class="card glass roulette-container" style="margin-bottom: 0;">
+            <h2 class="card-title gradient-text-gold">Ruleta de Castigos</h2>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem; text-align: center;">
               El azar dictará sentencia. Hay <strong>${punishments.length}</strong> castigos cargados.
             </p>
 
@@ -255,20 +257,20 @@ export function renderRoulette(container, callbacks) {
               <div style="background: rgba(239, 68, 68, 0.1); border: 2px solid #ef4444; border-radius: 6px; padding: 0.75rem; font-size: 0.85rem; color: #f87171; text-align: center; margin-bottom: 1rem; width: 100%; max-width: 320px; margin: 0.5rem auto 1.25rem auto; line-height: 1.35;">
                 Solo el jugador castigado, <strong>${escapeHTML(pendingRecord.display_name)}</strong>, puede girar la ruleta. ¡Haz que inicie sesión para tirar!
               </div>
-              <button id="spin-btn" class="brutalist-btn brutalist-btn-black" style="width: 100%; max-width: 250px; opacity: 0.5; cursor: not-allowed; margin-bottom: 0.5rem;" disabled>¡GIRAR!</button>
+              <button id="spin-btn" class="btn-primary" style="max-width: 200px; opacity: 0.5; cursor: not-allowed; margin-bottom: 0.5rem;" disabled>¡GIRAR!</button>
             ` : `
-              <button id="spin-btn" class="brutalist-btn brutalist-btn-black" style="width: 100%; max-width: 250px; margin-bottom: 0.5rem;">¡GIRAR!</button>
+              <button id="spin-btn" class="btn-primary" style="max-width: 200px; margin-bottom: 0.5rem;">¡GIRAR!</button>
             `}
 
             <!-- Color-coded Legend for Roulette Options (Collapsible/Optional) -->
-            <div style="margin-top: 1.5rem; width: 100%; text-align: left; padding: 0.5rem; border-top: 3px solid #000; padding-top: 1.25rem;">
+            <div style="margin-top: 1.5rem; width: 100%; text-align: left; padding: 0.5rem; border-top: 1.5px solid var(--border-color); padding-top: 1.25rem;">
               <button id="btn-toggle-legend" style="
                 background: transparent;
                 border: none;
-                color: #000;
-                font-family: var(--font-display);
-                font-size: 0.9rem;
-                font-weight: 900;
+                color: var(--text-muted);
+                font-family: var(--font-sans);
+                font-size: 0.8rem;
+                font-weight: 800;
                 text-transform: uppercase;
                 cursor: pointer;
                 display: flex;
@@ -279,7 +281,7 @@ export function renderRoulette(container, callbacks) {
                 justify-content: space-between;
               ">
                 <span>Opciones en la Ruleta</span>
-                <span style="font-size: 0.8rem; color: #000;" id="legend-toggle-indicator">
+                <span style="font-size: 0.7rem; color: var(--accent);" id="legend-toggle-indicator">
                   ${showLegend ? 'Ocultar ▲' : 'Mostrar ▼'}
                 </span>
               </button>
@@ -297,8 +299,8 @@ export function renderRoulette(container, callbacks) {
       const color = WHEEL_COLORS[idx % WHEEL_COLORS.length];
       return `
                     <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; min-width: 0;">
-                      <span style="width: 12px; height: 12px; border-radius: 50%; background: ${color}; border: 2px solid #000; flex-shrink: 0;"></span>
-                      <span style="font-weight: 800; color: #000; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${escapeHTML(p.name)}: ${escapeHTML(p.description || '')}">
+                      <span style="width: 10px; height: 10px; border-radius: 50%; background: ${color}; border: 1.5px solid #000; flex-shrink: 0;"></span>
+                      <span style="font-weight: 700; color: var(--text-light); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${escapeHTML(p.name)}: ${escapeHTML(p.description || '')}">
                         ${escapeHTML(p.name)}
                       </span>
                     </div>
@@ -612,17 +614,9 @@ export function renderRoulette(container, callbacks) {
       ctx.translate(center, center);
       ctx.rotate(angle + arcLength / 2);
       ctx.textAlign = "right";
-      
-      const bgColor = WHEEL_COLORS[i % WHEEL_COLORS.length];
-      if (bgColor === '#ffffff' || bgColor === '#deed00') {
-        ctx.fillStyle = "#000000";
-        ctx.shadowColor = "transparent";
-        ctx.shadowBlur = 0;
-      } else {
-        ctx.fillStyle = "#ffffff";
-        ctx.shadowColor = "rgba(0,0,0,0.95)";
-        ctx.shadowBlur = 6;
-      }
+      ctx.fillStyle = "#ffffff";
+      ctx.shadowColor = "rgba(0,0,0,0.95)";
+      ctx.shadowBlur = 6;
 
       const nameText = punishments[i].name;
 
