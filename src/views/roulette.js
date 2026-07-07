@@ -38,12 +38,12 @@ export function renderRoulette(container, callbacks) {
 
   // Initial default punishments
   const DEFAULT_PUNISHMENTS = [
-    { id: 'd-pun-1', name: "Invitar a una ronda de cervezas", description: "En la próxima reunión del grupo." },
-    { id: 'd-pun-2', name: "Llevar la camiseta del rival histórico", description: "Durante todo el próximo fin de semana." },
-    { id: 'd-pun-3', name: "Pagar el doble del bote esta jornada", description: "Suma otros 2€ adicionales al bote." },
-    { id: 'd-pun-4', name: "Hacer de utillero/recogepelotas", description: "En la próxima pachanga del grupo." },
-    { id: 'd-pun-5', name: "Foto a redes elogiando al líder", description: "Subir foto con texto redactado por el líder de la liga." },
-    { id: 'd-pun-6', name: "Comprar una caja de donuts", description: "Traer donuts para desayunar el próximo lunes." }
+    { id: 'd-pun-1', name: "Brindis de la Derrota", description: "Grabar un vídeo haciendo un brindis dramático (con agua) elogiando al ganador. Compartir al grupo en máx 48h." },
+    { id: 'd-pun-2', name: "Baile del Rival Histórico", description: "Grabar un vídeo bailando un trend viral llevando una prenda/bufanda del rival histórico. Vídeo al grupo en máx 48h." },
+    { id: 'd-pun-3', name: "Deuda Moral Política", description: "Grabar un vídeo de 1 min como un político pidiendo perdón a la afición por la bancarrota de puntos. Plazo: 48h." },
+    { id: 'd-pun-4', name: "El Utillero Épico", description: "Narrar con voz exagerada de locutor deportivo cómo recoges/doblas tu ropa de deporte en casa. Vídeo al grupo en 48h." },
+    { id: 'd-pun-5', name: "Elogio Viral al Líder", description: "Subir a Instagram/TikTok un vídeo de 15s alabando al líder usando un filtro deformante vergonzoso. Plazo: 48h." },
+    { id: 'd-pun-6', name: "El Chef del Fracaso", description: "Grabar un vídeo preparando el desayuno mientras cantas una canción triste por tu derrota. Vídeo al grupo en 48h." }
   ];
 
   let activeLeagueId = localStorage.getItem('CF_ACTIVE_LEAGUE_ID');
