@@ -103,29 +103,8 @@ export function renderLanding(container, callbacks) {
   function renderView() {
     const hasLeagues = currentUser && leagues.length > 0;
 
-    // Debt Ticker Html Generation
-    let tickerHtml = '';
-    if (hasLeagues && leaderboard.length > 0) {
-      // Duplicate items to make the marquee seamless
-      const tickerItems = [...leaderboard, ...leaderboard, ...leaderboard].map(item => `
-        <span class="debt-ticker-item ${item.totalOwed >= 20 ? 'danger' : ''}">
-          ${item.name}: ${item.totalOwed.toFixed(2)}€
-        </span>
-        <span class="debt-ticker-item-separator"></span>
-      `).join('');
-      
-      tickerHtml = `
-        <div class="debt-ticker-container">
-          <div class="debt-ticker-content">
-            ${tickerItems}${tickerItems}
-          </div>
-        </div>
-      `;
-    }
-
     // Render HTML structure matching the Stitch design
     container.innerHTML = `
-      ${tickerHtml}
       <div class="landing-layout-brutalist fade-in-up">
         <!-- Columna izquierda: PUBLICIDAD -->
         <aside class="brutalist-aside">

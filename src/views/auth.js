@@ -141,14 +141,9 @@ export function renderAuth(container, callbacks) {
             </div>
 
             <form id="settings-form">
-              <div class="form-group">
-                <label for="settings-gemini-key">Gemini API Key (Para lectura de capturas)</label>
-                <input type="password" id="settings-gemini-key" class="input-field" placeholder="AIzaSy..." value="${storedGeminiKey}" />
-                <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem; line-height: 1.3;">
-                  Permite subir capturas de Comunio, Biwenger, etc., para detectar automáticamente al perdedor. Consíguela gratis en Google AI Studio.
-                </p>
-              </div>
-              <button type="submit" class="btn-primary" style="margin-top: 1rem;">Guardar Cambios</button>
+              <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem; text-align: center;">
+                No hay ajustes configurables en este momento.
+              </p>
             </form>
 
             <div style="border-top: 1px solid var(--border-color); margin-top: 1.5rem; padding-top: 1.5rem; display: flex; flex-direction: column; gap: 0.75rem;">
@@ -159,18 +154,8 @@ export function renderAuth(container, callbacks) {
         </div>
       `;
 
-      const settingsForm = container.querySelector('#settings-form');
-      settingsForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const geminiKey = settingsForm.querySelector('#settings-gemini-key').value.trim();
-        localStorage.setItem('CF_GEMINI_API_KEY', geminiKey);
-        callbacks.showToast('Ajustes guardados con éxito', 'success');
-        callbacks.onAuthSuccess();
-      });
-
       container.querySelector('#sb-disconnect-btn').addEventListener('click', () => {
         if (confirm('¿Estás seguro de que quieres borrar las credenciales de Supabase? Se reiniciará el proyecto.')) {
-          localStorage.removeItem('CF_GEMINI_API_KEY');
           clearSupabaseConfig();
         }
       });
@@ -233,6 +218,8 @@ export function renderAuth(container, callbacks) {
                 </div>
               ` : ''}
             </div>
+
+            <div id="auth-error-msg" style="color: #ff4d4d; font-size: 0.85rem; font-weight: 700; text-align: center; margin-top: 0.5rem; margin-bottom: 0.5rem; display: none;"></div>
 
             <button type="submit" class="btn-primary" id="submit-btn" style="margin-top: 1.5rem;">
               <span>${isLoginMode ? 'Entrar a la Liga' : 'Crear Cuenta'}</span>
@@ -329,6 +316,12 @@ export function renderAuth(container, callbacks) {
       const email = form.querySelector('#email').value;
       const password = form.querySelector('#password').value;
 
+      const errorDiv = form.querySelector('#auth-error-msg');
+      if (errorDiv) {
+        errorDiv.style.display = 'none';
+        errorDiv.textContent = '';
+      }
+
       submitBtn.disabled = true;
       submitBtn.innerHTML = '<span class="spinner"></span>';
 
@@ -374,7 +367,19 @@ export function renderAuth(container, callbacks) {
         }
       } catch (err) {
         console.error(err);
-        callbacks.showToast(err.message || 'Error en la autenticación', 'error');
+        
+        let errorMsg = err.message || 'Error en la autenticación';
+        if (errorMsg === 'Invalid login credentials') errorMsg = 'Correo o contraseña incorrectos.';
+        if (errorMsg === 'User already registered') errorMsg = 'Este correo ya está registrado.';
+
+        callbacks.showToast(errorMsg, 'error');
+
+        const errorDiv = form.querySelector('#auth-error-msg');
+        if (errorDiv) {
+          errorDiv.textContent = errorMsg;
+          errorDiv.style.display = 'block';
+        }
+
         submitBtn.disabled = false;
         submitBtn.innerHTML = `<span>${isLoginMode ? 'Entrar a la Liga' : 'Crear Cuenta'}</span>`;
       }

@@ -171,11 +171,17 @@ export function renderSelectLeague(container, callbacks) {
                 </p>
                 
                 <form id="join-league-form" style="display: flex; flex-direction: column; gap: 1rem;">
-                  <div class="form-group" style="margin-bottom: 0.5rem;">
+                  <div class="form-group" style="margin-bottom: 0.5rem;" id="join-code-group">
                     <label for="join-code" style="color: var(--text-light); font-weight: 700; font-size: 0.8rem;">Código de Invitación</label>
                     <input type="text" id="join-code" class="input-field" placeholder="Ej: AB12CD" style="text-transform: uppercase; border: 1.5px solid var(--border-color-glow); font-weight: 700; background: var(--bg-input);" required />
                   </div>
-                  <button type="submit" class="btn-primary" id="btn-join" style="font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Unirse a la Liga</button>
+                  <div class="form-group" style="margin-bottom: 0.5rem; display: none;" id="join-identity-group">
+                    <label for="join-identity" style="color: var(--text-light); font-weight: 700; font-size: 0.8rem;">¿Quién eres en esta liga?</label>
+                    <select id="join-identity" class="input-field" style="border: 1.5px solid var(--border-color-glow); font-weight: 700; background: var(--bg-input);">
+                      <!-- Opciones dinámicas -->
+                    </select>
+                  </div>
+                  <button type="submit" class="btn-primary" id="btn-join" style="font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Comprobar Código</button>
                 </form>
               </div>
             </div>
@@ -197,6 +203,17 @@ export function renderSelectLeague(container, callbacks) {
                   <div class="form-group" style="margin-bottom: 0.25rem;">
                     <label for="new-league-name" style="color: var(--text-light); font-weight: 700; font-size: 0.8rem;">Nombre de la Liga (Ej: Liga Los Troncos)</label>
                     <input type="text" id="new-league-name" class="input-field" placeholder="Nombre de tu liga fantasy" style="border: 1.5px solid var(--border-color-glow); font-weight: 700; background: var(--bg-input);" required />
+                  </div>
+
+                  <div class="form-group" style="margin-bottom: 0.25rem;">
+                    <label for="new-league-roster-count" style="color: var(--text-light); font-weight: 700; font-size: 0.8rem;">Número de participantes esperados (excluyéndote a ti)</label>
+                    <select id="new-league-roster-count" class="input-field" style="border: 1.5px solid var(--border-color-glow); font-weight: 700; background: var(--bg-input);">
+                      <option value="0">0 (Solo yo por ahora)</option>
+                      ${Array.from({length: 20}, (_, i) => i + 1).map(n => `<option value="${n}">${n}</option>`).join('')}
+                    </select>
+                    <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.4rem;">Tú ya estás incluido como Admin, añade al resto de jugadores de tu liga.</p>
+                  </div>
+                  <div id="roster-inputs-container" style="display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 0.25rem;">
                   </div>
 
                   <div class="form-group" style="margin-bottom: 0.25rem;">
@@ -276,6 +293,23 @@ export function renderSelectLeague(container, callbacks) {
     if (btnCloseJoin) btnCloseJoin.addEventListener('click', closeJoin);
     if (btnCloseCreate) btnCloseCreate.addEventListener('click', closeCreate);
 
+    // Dynamic Roster Inputs Logic
+    const rosterCountSelect = container.querySelector('#new-league-roster-count');
+    const rosterInputsContainer = container.querySelector('#roster-inputs-container');
+    
+    if (rosterCountSelect && rosterInputsContainer) {
+      rosterCountSelect.addEventListener('change', (e) => {
+        const count = parseInt(e.target.value, 10);
+        let inputsHtml = '';
+        for (let i = 1; i <= count; i++) {
+          inputsHtml += `
+            <input type="text" class="input-field roster-dynamic-input" placeholder="Nombre/Apodo del Jugador ${i}" style="border: 1.5px solid var(--border-color-glow); font-weight: 600; background: var(--bg-input); padding: 0.6rem;" required />
+          `;
+        }
+        rosterInputsContainer.innerHTML = inputsHtml;
+      });
+    }
+
     // Close on backdrop click
     if (modalJoinForm) {
       modalJoinForm.addEventListener('click', (e) => {
@@ -291,33 +325,74 @@ export function renderSelectLeague(container, callbacks) {
 
     // Hook Join Liga
     const joinForm = container.querySelector('#join-league-form');
+    let currentRoster = null;
+
     joinForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const btn = joinForm.querySelector('#btn-join');
       const code = joinForm.querySelector('#join-code').value.trim().toUpperCase();
+      const identitySelect = joinForm.querySelector('#join-identity');
+      const identityGroup = joinForm.querySelector('#join-identity-group');
 
       btn.disabled = true;
       btn.innerHTML = '<span class="spinner"></span>';
 
       try {
         const currentUser = supabase.auth.user ? supabase.auth.user() : (await supabase.auth.getUser()).data.user;
-        // Join league via RPC (bypasses RLS to validate code)
+        
+        // Paso 1: Comprobar código y obtener roster si aún no se ha hecho
+        if (!currentRoster) {
+          const { data: roster, error: rosterErr } = await supabase
+            .rpc('get_league_roster_by_code', { invite_code_arg: code });
+          
+          if (rosterErr) {
+            callbacks.showToast('Código de invitación no válido o inexistente', 'error');
+            btn.disabled = false;
+            btn.innerHTML = 'Comprobar Código';
+            return;
+          }
+
+          if (roster && roster.length > 0) {
+            currentRoster = roster;
+            identityGroup.style.display = 'block';
+            joinForm.querySelector('#join-code').readOnly = true;
+            
+            // Llenar select
+            let optionsHtml = '<option value="">-- Selecciona tu identidad --</option>';
+            roster.forEach(r => {
+              if (!r.is_claimed) {
+                optionsHtml += `<option value="${r.id}">${r.name}</option>`;
+              }
+            });
+            optionsHtml += '<option value="new">Nuevo Jugador (No estoy en la lista)</option>';
+            identitySelect.innerHTML = optionsHtml;
+            identitySelect.required = true;
+
+            btn.disabled = false;
+            btn.innerHTML = 'Unirse a la Liga';
+            return;
+          }
+          // Si no hay roster, procede al Paso 2 automáticamente con null
+        }
+
+        // Paso 2: Unirse a la liga
+        let selectedRosterId = null;
+        if (currentRoster && identitySelect.value !== 'new') {
+          selectedRosterId = identitySelect.value;
+        }
+
         const { data: joinedLeagueId, error: rpcErr } = await supabase
-          .rpc('join_league_by_code', { invite_code_arg: code });
+          .rpc('join_league_by_code', { invite_code_arg: code, roster_id_arg: selectedRosterId });
 
         if (rpcErr) {
-          if (rpcErr.message.includes('inválido') || rpcErr.message.includes('inexistente')) {
-            callbacks.showToast('Código de invitación no válido', 'error');
-          } else {
-            callbacks.showToast('Error al unirse a la liga', 'error');
-            console.error(rpcErr);
-          }
+          callbacks.showToast(rpcErr.message || 'Error al unirse a la liga', 'error');
+          console.error(rpcErr);
           btn.disabled = false;
           btn.innerHTML = 'Unirse a la Liga';
           return;
         }
 
-        // Now that we are members, we can read the league data
+        // Leer datos de la liga recién unida
         const { data: targetLeague, error: findErr } = await supabase
           .from('leagues')
           .select('*')
@@ -328,7 +403,6 @@ export function renderSelectLeague(container, callbacks) {
 
         callbacks.showToast(`¡Te has unido a "${targetLeague.name}"!`, 'success');
 
-        // Set joined league as active
         localStorage.setItem('CF_ACTIVE_LEAGUE_ID', targetLeague.id);
         localStorage.setItem('CF_ACTIVE_LEAGUE_NAME', targetLeague.name);
 
@@ -341,9 +415,9 @@ export function renderSelectLeague(container, callbacks) {
         }
       } catch (err) {
         console.error(err);
-        callbacks.showToast('Error al unirse a la liga', 'error');
+        callbacks.showToast('Error al procesar la solicitud', 'error');
         btn.disabled = false;
-        btn.innerHTML = 'Unirse a la Liga';
+        btn.innerHTML = currentRoster ? 'Unirse a la Liga' : 'Comprobar Código';
       }
     });
 
@@ -353,6 +427,8 @@ export function renderSelectLeague(container, callbacks) {
       e.preventDefault();
       const btn = createForm.querySelector('#btn-create');
       const name = createForm.querySelector('#new-league-name').value.trim();
+      const rosterInputs = Array.from(createForm.querySelectorAll('.roster-dynamic-input'));
+      const names = rosterInputs.map(input => input.value.trim()).filter(n => n);
       const inviteCode = generateInviteCode();
       const syncSource = createForm.querySelector('input[name="league-type"]:checked').value;
 
@@ -386,6 +462,19 @@ export function renderSelectLeague(container, callbacks) {
           });
 
         if (memberErr) throw memberErr;
+
+        // Insert roster names
+        if (names.length > 0) {
+          const rosterInserts = names.map(n => ({
+            league_id: newLeague.id,
+            name: n
+          }));
+          const { error: rosterErr } = await supabase
+            .from('league_roster')
+            .insert(rosterInserts);
+          
+          if (rosterErr) console.error('Error inserting roster:', rosterErr);
+        }
 
         callbacks.showToast(`¡Liga "${name}" creada con éxito!`, 'success');
 

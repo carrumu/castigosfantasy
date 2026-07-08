@@ -126,6 +126,25 @@ export function renderDashboard(container, callbacks) {
         biwenger_user_name: m.biwenger_user_name || ''
       }));
 
+      // 5.5. Get unclaimed roster slots
+      const { data: rosterData, error: rosterErr } = await supabase
+        .from('league_roster')
+        .select('*')
+        .eq('league_id', currentLeague.id)
+        .is('claimed_by', null);
+
+      if (!rosterErr && rosterData) {
+        rosterData.forEach(r => {
+          members.push({
+            profile_id: `roster-${r.id}`, // pseudo id
+            display_name: `${r.name} (Pendiente)`,
+            avatar_url: '',
+            biwenger_user_name: '',
+            isUnclaimedRoster: true
+          });
+        });
+      }
+
       // 6. Get records
       const { data: recordsList, error: recErr } = await supabase
         .from('matchday_records')
@@ -133,7 +152,10 @@ export function renderDashboard(container, callbacks) {
         .eq('league_id', currentLeague.id);
 
       if (recErr) throw recErr;
-      records = recordsList;
+      records = recordsList.map(r => ({
+        ...r,
+        loser_profile_id: r.loser_profile_id || (r.loser_roster_id ? `roster-${r.loser_roster_id}` : null)
+      }));
 
       // Start fetching Biwenger standings asynchronously
       fetchBiwengerStandings();
@@ -518,7 +540,7 @@ export function renderDashboard(container, callbacks) {
       if (biwengerLoadError) {
         contentArea.innerHTML = `
           <div style="text-align: center; color: var(--danger); padding: 1.5rem 0; font-size: 0.85rem;">
-            ⚠️ ${biwengerErrorMsg}<br>
+            ${biwengerErrorMsg}<br>
             <button id="btn-retry-biwenger" class="btn-secondary" style="margin-top: 0.75rem; font-size: 0.75rem; padding: 0.4rem 0.75rem; width: auto; display: inline-block;">Reintentar</button>
           </div>
         `;
@@ -647,7 +669,7 @@ export function renderDashboard(container, callbacks) {
             <div class="leaderboard-info">
               <div class="leaderboard-name" style="display: flex; align-items: center; flex-wrap: wrap;">
                 ${m.display_name}
-                <span style="font-size: 0.72rem; color: var(--accent-gold); font-weight: 500; margin-left: 0.35rem;">⚠️ Sin vincular ${linkActionHtml}</span>
+                <span style="font-size: 0.72rem; color: var(--accent-gold); font-weight: 500; margin-left: 0.35rem;">Sin vincular ${linkActionHtml}</span>
               </div>
               <div class="leaderboard-stats">Mánager de CastigosFantasy no asociado a Biwenger</div>
             </div>
@@ -762,18 +784,9 @@ export function renderDashboard(container, callbacks) {
                 </select>
               </div>
 
-              <div class="form-group" style="border-top: 1px solid var(--border-color); padding-top: 1rem; margin-top: 1rem;">
-                <label for="screenshot-upload">O subir captura de clasificación 📸</label>
-                <input type="file" id="screenshot-upload" class="input-field" accept="image/*" />
-                <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">
-                  Compatible con capturas de cualquier aplicación de ligas fantasy.
-                </p>
-              </div>
-              
-              <div id="ia-status-box" style="display: none; margin-bottom: 1.25rem; padding: 0.75rem; border-radius: 8px; font-size: 0.85rem; line-height: 1.4; font-weight: 500;"></div>
 
               <button type="submit" class="btn-primary" id="btn-save-loser" style="margin-top: 0.5rem;">
-                Guardar y Picar 🤫
+                Guardar y Picar
               </button>
             </form>
           </div>
@@ -867,150 +880,7 @@ export function renderDashboard(container, callbacks) {
     const modal = container.querySelector('#loser-modal');
     let lastRecordId = null;
 
-    // Hook IA Screenshot Upload
-    const screenshotInput = container.querySelector('#screenshot-upload');
-    const statusBox = container.querySelector('#ia-status-box');
-    const loserSelect = container.querySelector('#loser-select');
 
-    if (screenshotInput) {
-      // Clear notice if manual change occurs
-      loserSelect.addEventListener('change', () => {
-        if (statusBox.innerHTML.includes('IA detectó') || statusBox.innerHTML.includes('IA leyó')) {
-          statusBox.style.display = 'none';
-        }
-      });
-
-      screenshotInput.addEventListener('change', async (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        const geminiKey = import.meta.env.VITE_GEMINI_API_KEY || localStorage.getItem('CF_GEMINI_API_KEY') || '';
-        if (!geminiKey) {
-          statusBox.style.display = 'block';
-          statusBox.style.background = 'rgba(239, 68, 68, 0.1)';
-          statusBox.style.border = '1px solid rgba(239, 68, 68, 0.3)';
-          statusBox.style.color = '#fca5a5';
-          statusBox.innerHTML = `<strong>Error de configuración:</strong> Configura tu Gemini API Key en Ajustes (icono de ajustes en la cabecera) para poder usar la lectura por IA.`;
-          screenshotInput.value = '';
-          return;
-        }
-
-        // Show loading state
-        statusBox.style.display = 'block';
-        statusBox.style.background = 'rgba(255, 255, 255, 0.03)';
-        statusBox.style.border = '1px solid var(--border-color)';
-        statusBox.style.color = 'var(--text-light)';
-        statusBox.innerHTML = `<span class="spinner" style="vertical-align: middle; margin-right: 0.5rem;"></span> Analizando clasificación con la IA de Gemini...`;
-
-        try {
-          // Read file as Base64
-          const reader = new FileReader();
-          reader.readAsDataURL(file);
-          reader.onload = async () => {
-            try {
-              const base64Data = reader.result.split(',')[1];
-              
-              const prompt = "Analiza esta captura de pantalla de la clasificación de una liga de fútbol fantasy (puede ser Biwenger, Comunio, LaLiga Fantasy, Futmondo, etc.). Extrae la lista de participantes y sus puntuaciones o posiciones en la imagen. Identifica quién ha quedado en la última posición (farolillo rojo) según los puntos o el puesto de la lista de esta jornada. Devuelve únicamente un objeto JSON con el siguiente formato, sin bloques de código de markdown ni comentarios:\\n{\\n  \\\"last_place_name\\\": \\\"Nombre del último clasificado en la imagen\\\",\\n  \\\"all_players\\\": [\\\"Jugador 1\\\", \\\"Jugador 2\\\"]\\n}";
-
-              const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`, {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                  contents: [
-                    {
-                      parts: [
-                        { text: prompt },
-                        {
-                          inlineData: {
-                            mimeType: file.type,
-                            data: base64Data
-                          }
-                        }
-                      ]
-                    }
-                  ]
-                })
-              });
-
-              if (!response.ok) {
-                const errData = await response.json();
-                throw new Error(errData.error?.message || 'Error en la petición a Gemini API');
-              }
-
-              const resData = await response.json();
-              const textOutput = resData.candidates?.[0]?.content?.parts?.[0]?.text;
-              if (!textOutput) {
-                throw new Error('La IA no devolvió ninguna clasificación legible.');
-              }
-
-              // Clean markdown syntax if present
-              let cleanJsonText = textOutput.trim();
-              if (cleanJsonText.startsWith('```')) {
-                cleanJsonText = cleanJsonText.replace(/^```(json)?/, '').replace(/```$/, '').trim();
-              }
-
-              const parsed = JSON.parse(cleanJsonText);
-              const detectedLoserName = parsed.last_place_name;
-
-              if (!detectedLoserName) {
-                throw new Error('No se pudo determinar el último puesto en la imagen.');
-              }
-
-              // Fuzzy match the names
-              const matchedMember = findMatchingMember(detectedLoserName, members);
-
-              if (matchedMember) {
-                loserSelect.value = matchedMember.profile_id;
-                statusBox.style.background = 'rgba(var(--primary-rgb), 0.1)';
-                statusBox.style.border = '1px solid rgba(var(--primary-rgb), 0.3)';
-                statusBox.style.color = 'var(--text-light)';
-                statusBox.innerHTML = `<strong>IA detectó perdedor:</strong> Hemos marcado a <strong>${matchedMember.display_name}</strong> (leído como "${detectedLoserName}"). Confirma los datos o cámbialo si es incorrecto.`;
-              } else {
-                statusBox.style.background = 'rgba(var(--accent-rgb), 0.1)';
-                statusBox.style.border = '1px solid rgba(var(--accent-rgb), 0.3)';
-                statusBox.style.color = 'var(--text-light)';
-                statusBox.innerHTML = `<strong>IA leyó perdedor:</strong> Se detectó a "${detectedLoserName}", pero no coincide con ningún miembro de tu liga. Selecciónalo manualmente.`;
-                screenshotInput.value = '';
-              }
-
-            } catch (innerErr) {
-              console.error(innerErr);
-              statusBox.style.background = 'rgba(239, 68, 68, 0.1)';
-              statusBox.style.border = '1px solid rgba(239, 68, 68, 0.3)';
-              statusBox.style.color = '#fca5a5';
-              statusBox.innerHTML = `<strong>Error de análisis:</strong> ${innerErr.message}`;
-              screenshotInput.value = '';
-            }
-          };
-        } catch (fileErr) {
-          console.error(fileErr);
-          statusBox.style.background = 'rgba(239, 68, 68, 0.1)';
-          statusBox.style.border = '1px solid rgba(239, 68, 68, 0.3)';
-          statusBox.style.color = '#fca5a5';
-          statusBox.innerHTML = `<strong>Error al cargar archivo:</strong> ${fileErr.message}`;
-          screenshotInput.value = '';
-        }
-      });
-    }
-
-    // Helper fuzzy matching function
-    function findMatchingMember(detectedName, membersList) {
-      if (!detectedName) return null;
-      const query = detectedName.toLowerCase().trim();
-      
-      // 1. Exact match
-      let matched = membersList.find(m => m.display_name.toLowerCase().trim() === query);
-      if (matched) return matched;
-      
-      // 2. Substring match
-      matched = membersList.find(m => {
-        const name = m.display_name.toLowerCase().trim();
-        return name.includes(query) || query.includes(name);
-      });
-      return matched || null;
-    }
 
     recordForm.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -1035,16 +905,25 @@ export function renderDashboard(container, callbacks) {
       try {
         const currentUser = supabase.auth.user ? supabase.auth.user() : (await supabase.auth.getUser()).data.user;
 
+        let insertObj = {
+          league_id: currentLeague.id,
+          matchday_number: matchday,
+          amount_owed: amount,
+          trash_talk_phrase: trashPhrase,
+          recorded_by: currentUser.id
+        };
+
+        if (loserId.startsWith('roster-')) {
+          insertObj.loser_roster_id = loserId.replace('roster-', '');
+          insertObj.loser_profile_id = null;
+        } else {
+          insertObj.loser_profile_id = loserId;
+          insertObj.loser_roster_id = null;
+        }
+
         const { data: recordData, error: insertErr } = await supabase
           .from('matchday_records')
-          .insert({
-            league_id: currentLeague.id,
-            matchday_number: matchday,
-            loser_profile_id: loserId,
-            amount_owed: amount,
-            trash_talk_phrase: trashPhrase,
-            recorded_by: currentUser.id
-          })
+          .insert(insertObj)
           .select()
           .single();
 
