@@ -19,7 +19,7 @@ export function renderAuth(container, callbacks) {
         <div class="container" style="display: flex; align-items: center; justify-content: center; min-height: 80vh;">
           <div class="card glass pitch-card" style="width: 100%; max-width: 350px; padding: 2rem 1.5rem;">
             <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; border: 1px solid rgba(255, 255, 255, 0.08); padding: 0.75rem 1rem; background: rgba(0,0,0,0.35); border-radius: 12px; margin-bottom: 1.25rem; width: 100%;">
-              <span class="logo-icon" style="width: 44px; height: 32px; flex-shrink: 0; margin-bottom: 0.4rem;"></span>
+              <img src="/logo.png" alt="Logo" style="width: 54px; height: 54px; object-fit: contain; margin-bottom: 0.4rem; filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.5));" />
               <h1 class="gradient-text-green" style="font-family: var(--font-display); font-size: 1.3rem; font-weight: 900; text-transform: uppercase; letter-spacing: -0.5px; margin: 0; text-align: center;">
                 Castigos Fantasy
               </h1>
@@ -186,7 +186,7 @@ export function renderAuth(container, callbacks) {
       <div class="container" style="display: flex; align-items: center; justify-content: center; min-height: 80vh;">
         <div class="card glass pitch-card" style="width: 100%; max-width: 350px; padding: 2rem 1.5rem;">
             <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; border: 1px solid rgba(255, 255, 255, 0.08); padding: 0.75rem 1rem; background: rgba(0,0,0,0.35); border-radius: 12px; margin-bottom: 1.25rem; width: 100%;">
-              <span class="logo-icon" style="width: 44px; height: 32px; flex-shrink: 0; margin-bottom: 0.4rem;"></span>
+              <img src="/logo.png" alt="Logo" style="width: 54px; height: 54px; object-fit: contain; margin-bottom: 0.4rem; filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.5));" />
               <h1 class="gradient-text-green" style="font-family: var(--font-display); font-size: 1.3rem; font-weight: 900; text-transform: uppercase; letter-spacing: -0.5px; margin: 0; text-align: center;">
                 Castigos Fantasy
               </h1>

@@ -106,14 +106,7 @@ export async function renderForo(container, callbacks) {
         </h1>
       </div>
 
-      ${!isGuestState ? `
-      <!-- Search bar & My Posts filter -->
-      <div style="margin-bottom: 2rem; display: flex; gap: 0.5rem;" id="foro-search-bar-container">
-        <input type="text" id="foro-search-input" class="input-field" placeholder="Buscar castigos..." style="border: 3px solid #000; padding: 0.65rem 1rem; font-weight: 700; background: var(--bg-input); flex-grow: 1; box-shadow: 4px 4px 0px #000; font-family: var(--font-sans);" />
-        <button id="foro-clear-search-btn" class="brutalist-btn" style="padding: 0.65rem 1rem; font-size: 0.85rem; font-weight: 900; margin: 0; display: none; text-transform: uppercase; width: auto; border: 3px solid #000; box-shadow: 4px 4px 0px #000; background: var(--danger); color: white;">Limpiar</button>
-        <button id="foro-my-posts-btn" class="brutalist-btn" style="padding: 0.65rem 1rem; font-size: 0.85rem; font-weight: 900; margin: 0; white-space: nowrap; text-transform: uppercase; width: auto; border: 3px solid #000; box-shadow: 4px 4px 0px #000; background: transparent; color: var(--text-light);">Mis Posts</button>
-      </div>
-      ` : ''}
+
 
       <!-- Creation Box -->
       <div id="foro-creation-zone" style="margin-bottom: 2rem; ${isGuestState ? 'display: none;' : ''}"></div>
@@ -169,57 +162,7 @@ export async function renderForo(container, callbacks) {
     });
   }
 
-  // Setup Search Input event listener
-  const searchInput = container.querySelector('#foro-search-input');
-  const clearSearchBtn = container.querySelector('#foro-clear-search-btn');
-  const myPostsBtn = container.querySelector('#foro-my-posts-btn');
-  let searchTimeout = null;
 
-  const triggerSearch = () => {
-    searchQuery = searchInput.value.trim();
-    if (searchQuery) {
-      clearSearchBtn.style.display = 'block';
-    } else {
-      clearSearchBtn.style.display = 'none';
-    }
-    postsOffset = 0;
-    allPosts = [];
-    fetchPostsAndRender(container);
-  };
-
-  if (searchInput) {
-    searchInput.addEventListener('input', () => {
-      clearTimeout(searchTimeout);
-      searchTimeout = setTimeout(triggerSearch, 350); // Debounce of 350ms
-    });
-
-    clearSearchBtn.addEventListener('click', () => {
-      searchInput.value = '';
-      clearSearchBtn.style.display = 'none';
-      triggerSearch();
-    });
-  }
-
-  // Setup "My Posts" Filter Button listener
-  if (myPostsBtn) {
-    myPostsBtn.addEventListener('click', () => {
-      filterMyPosts = !filterMyPosts;
-      if (filterMyPosts) {
-        myPostsBtn.classList.add('is-active');
-        myPostsBtn.style.background = 'var(--accent)';
-        myPostsBtn.style.color = '#000';
-        myPostsBtn.textContent = '✓ Mis Posts';
-      } else {
-        myPostsBtn.classList.remove('is-active');
-        myPostsBtn.style.background = 'transparent';
-        myPostsBtn.style.color = 'var(--text-light)';
-        myPostsBtn.textContent = 'Mis Posts';
-      }
-      postsOffset = 0;
-      allPosts = [];
-      fetchPostsAndRender(container);
-    });
-  }
 
   // Fetch initial posts
   await fetchPostsAndRender(container);
@@ -234,55 +177,40 @@ export async function renderForo(container, callbacks) {
 function renderCreationForm(container, callbacks) {
   const zone = container.querySelector('#foro-creation-zone');
   if (!zone) return;
+  
   if (isGuestState) {
     zone.innerHTML = '';
-  } else {
-    renderCollapsedBox(zone, container, callbacks);
+    return;
   }
-}
 
-/**
- * Renders the collapsed prompt box (microblog style input field trigger)
- */
-function renderCollapsedBox(zone, container, callbacks) {
   zone.innerHTML = `
-    <div class="brutalist-card concrete-bg" id="foro-collapsed-trigger" style="padding: 0.85rem 1.25rem; border: 3px solid #000; box-shadow: 4px 4px 0px #000; cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: transform var(--transition-fast);">
-      <span style="font-weight: 800; font-size: 0.95rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.5rem; user-select: none;">
-        <span class="material-symbols-outlined" style="color: var(--accent); font-size: 1.3rem;">add_comment</span>
-        Comparte la prueba de tu castigo (URL) aquí...
-      </span>
-      <span class="brutalist-btn" style="margin: 0; padding: 0.25rem 0.75rem; font-size: 0.75rem; font-weight: 900; text-transform: uppercase;">ESCRIBIR</span>
-    </div>
-  `;
-
-  zone.querySelector('#foro-collapsed-trigger').addEventListener('click', () => {
-    renderExpandedForm(zone, container, callbacks);
-  });
-}
-
-/**
- * Renders the expanded form for creating a new post
- */
-function renderExpandedForm(zone, container, callbacks) {
-  zone.innerHTML = `
-    <div class="brutalist-card concrete-bg" style="padding: 1.25rem; border: 3px solid #000; box-shadow: 4px 4px 0px #000; animation: slideDown 0.2s ease-out;">
-      <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid #000; padding-bottom: 0.5rem; margin-bottom: 1rem;">
-        <h3 style="font-family: var(--font-display); font-size: 1.1rem; font-weight: 900; text-transform: uppercase; display: flex; align-items: center; gap: 0.4rem; margin: 0;">
-          <span class="material-symbols-outlined">rate_review</span> Crear Publicación
-        </h3>
-        <button class="brutalist-btn-small" id="foro-cancel-post-btn" style="text-transform: uppercase;">Cancelar</button>
-      </div>
-      <form id="foro-post-form" style="display: flex; flex-direction: column; gap: 0.75rem;">
-        <div style="display: grid; grid-template-columns: 1fr; gap: 0.75rem;">
-          <div>
-            <textarea id="post-content" class="input-field" placeholder="Pega el enlace a tu vídeo pagando el castigo (TikTok, YouTube, etc.) (máx. 280 caracteres)" rows="3" required maxlength="280" style="width: 100%; border: 2px solid #000; padding: 0.65rem; font-family: var(--font-sans); font-weight: 700; background: var(--bg-input); resize: none;"></textarea>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.25rem;">
-              <span id="post-spam-warning" style="font-size: 0.75rem; color: var(--danger); font-weight: 800;"></span>
-              <span id="char-counter" style="font-size: 0.75rem; color: var(--text-muted); font-weight: 800;">280 caracteres restantes</span>
-            </div>
+    <div class="brutalist-card" style="background: var(--bg-card); padding: 1.25rem 1rem; border: 3px solid #000; box-shadow: 4px 4px 0px #000; margin-bottom: 2rem;">
+      <form id="foro-post-form" style="display: flex; gap: 0.85rem; align-items: flex-start;">
+        
+        <!-- Avatar -->
+        <div style="flex-shrink: 0; padding-top: 0.25rem;">
+          <div style="width: 44px; height: 44px; border: 2.5px solid #000; border-radius: 50%; background: var(--accent); color: #000; display: flex; align-items: center; justify-content: center; box-shadow: 2px 2px 0px #000;">
+            <span class="material-symbols-outlined" style="font-size: 1.8rem;">person</span>
           </div>
         </div>
-        <button type="submit" class="brutalist-btn" style="width: 100%; font-weight: 900; text-transform: uppercase;">Publicar en el Foro</button>
+        
+        <!-- Input & Actions -->
+        <div style="flex-grow: 1; display: flex; flex-direction: column;">
+          
+          <textarea id="post-content" placeholder="¿Qué está pasando?" rows="1" required maxlength="280" style="width: 100%; border: none; outline: none; background: transparent; font-family: var(--font-sans); font-weight: 700; font-size: 1.15rem; color: var(--text-light); resize: none; overflow: hidden; padding: 0.5rem 0; min-height: 40px; margin-bottom: 0.5rem;"></textarea>
+          
+          <div style="border-bottom: 1px solid rgba(255,255,255,0.15); margin-bottom: 0.75rem;"></div>
+          
+          <!-- Toolbar -->
+          <div style="display: flex; justify-content: flex-end; align-items: center;">
+            
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <span id="char-counter" style="font-size: 0.8rem; color: var(--text-muted); font-weight: 800; display: none;">280</span>
+              <button type="submit" id="post-submit-btn" class="brutalist-btn" disabled style="border-radius: 9999px; padding: 0.4rem 1.25rem; font-size: 0.95rem; font-weight: 900; background: var(--accent); color: #000; border: 2px solid #000; box-shadow: 2px 2px 0px #000; opacity: 0.5; cursor: not-allowed; text-transform: none; margin: 0; min-width: 90px;">Postear</button>
+            </div>
+          </div>
+          
+        </div>
       </form>
     </div>
   `;
@@ -290,21 +218,30 @@ function renderExpandedForm(zone, container, callbacks) {
   const form = zone.querySelector('#foro-post-form');
   const textarea = form.querySelector('#post-content');
   const charCounter = form.querySelector('#char-counter');
-  const cancelBtn = zone.querySelector('#foro-cancel-post-btn');
+  const submitBtn = form.querySelector('#post-submit-btn');
 
-  // Focus the textarea automatically
-  textarea.focus();
+  // Auto-resize textarea logic
+  textarea.addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = (this.scrollHeight) + 'px';
+    
+    const remaining = 280 - this.value.length;
+    
+    // Show counter only if user has typed something
+    if (this.value.length > 0) {
+      charCounter.style.display = 'inline-block';
+      charCounter.textContent = remaining;
+      submitBtn.disabled = false;
+      submitBtn.style.opacity = '1';
+      submitBtn.style.cursor = 'pointer';
+    } else {
+      charCounter.style.display = 'none';
+      submitBtn.disabled = true;
+      submitBtn.style.opacity = '0.5';
+      submitBtn.style.cursor = 'not-allowed';
+    }
 
-  // Cancel button collapses it back
-  cancelBtn.addEventListener('click', () => {
-    renderCollapsedBox(zone, container, callbacks);
-  });
-
-  // Handle character count
-  textarea.addEventListener('input', () => {
-    const remaining = 280 - textarea.value.length;
-    charCounter.textContent = `${remaining} caracteres restantes`;
-    if (remaining <= 30) {
+    if (remaining <= 20) {
       charCounter.style.color = 'var(--danger)';
     } else {
       charCounter.style.color = 'var(--text-muted)';
@@ -317,9 +254,9 @@ function renderExpandedForm(zone, container, callbacks) {
     const content = textarea.value.trim();
     if (!content) return;
 
-    const submitBtn = form.querySelector('button[type="submit"]');
     submitBtn.disabled = true;
-    submitBtn.textContent = 'PUBLICANDO...';
+    submitBtn.style.opacity = '0.5';
+    submitBtn.textContent = '...';
 
     try {
       const { error } = await supabase
@@ -332,10 +269,18 @@ function renderExpandedForm(zone, container, callbacks) {
 
       if (error) throw error;
 
-      // Reset to collapsed box and reload feed
-      renderCollapsedBox(zone, container, callbacks);
       showForoAlert('¡Publicación creada con éxito!', 'success');
       
+      // Reset form
+      textarea.value = '';
+      textarea.style.height = 'auto';
+      charCounter.style.display = 'none';
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Postear';
+      submitBtn.style.opacity = '0.5';
+      submitBtn.style.cursor = 'not-allowed';
+
+      // Reload feed
       postsOffset = 0;
       allPosts = [];
       await fetchPostsAndRender(container);
@@ -348,9 +293,9 @@ function renderExpandedForm(zone, container, callbacks) {
       } else {
         showForoAlert('Error al publicar. Inténtalo de nuevo.', 'error');
       }
-    } finally {
       submitBtn.disabled = false;
-      submitBtn.textContent = 'PUBLICAR EN EL FORO';
+      submitBtn.style.opacity = '1';
+      submitBtn.textContent = 'Postear';
     }
   });
 }
@@ -512,8 +457,8 @@ function renderFeed(container, newPosts) {
     card.innerHTML = `
       <div style="display: flex; align-items: flex-start; justify-content: space-between; border-bottom: 3px solid #000; padding-bottom: 0.65rem; margin-bottom: 1rem;">
         <div style="display: flex; align-items: center; gap: 0.5rem;">
-          <div style="width: 34px; height: 34px; border: 2.5px solid #000; border-radius: 50%; background: var(--accent); color: #000; display: flex; align-items: center; justify-content: center; font-weight: 900; font-family: var(--font-display); font-size: 0.95rem; box-shadow: 1.5px 1.5px 0px #000;">
-            ${post.profiles?.apodo ? escapeHTML(post.profiles.apodo.charAt(0).toUpperCase()) : '?'}
+          <div style="width: 34px; height: 34px; border: 2.5px solid #000; border-radius: 50%; background: var(--accent); color: #000; display: flex; align-items: center; justify-content: center; box-shadow: 1.5px 1.5px 0px #000;">
+            <span class="material-symbols-outlined" style="font-size: 1.4rem;">person</span>
           </div>
           <div>
             <span style="font-weight: 800; font-size: 0.95rem; display: block; line-height: 1.1;">@${escapeHTML(post.profiles?.apodo || 'Mánager')}</span>
@@ -871,10 +816,15 @@ async function fetchCommentsAndRender(postId, listContainer) {
       }
 
       el.innerHTML = `
-        <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.75rem; font-weight: 800; border-bottom: 1.5px dashed #000; padding-bottom: 0.25rem; margin-bottom: 0.25rem;">
-          <div style="display: flex; align-items: center; gap: 0.35rem;">
-            <span style="color: var(--accent);">@${escapeHTML(comment.profiles?.apodo || 'Mánager')}</span>
-            <span style="color: var(--text-muted); font-size: 0.7rem;">(${new Date(comment.created_at).toLocaleTimeString()})</span>
+        <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.75rem; font-weight: 800; border-bottom: 1.5px dashed #000; padding-bottom: 0.45rem; margin-bottom: 0.45rem;">
+          <div style="display: flex; align-items: center; gap: 0.45rem;">
+            <div style="width: 24px; height: 24px; border: 1.5px solid #000; border-radius: 50%; background: var(--accent); color: #000; display: flex; align-items: center; justify-content: center; box-shadow: 1px 1px 0px #000;">
+              <span class="material-symbols-outlined" style="font-size: 1.1rem;">person</span>
+            </div>
+            <div>
+              <span style="color: var(--text-light); font-weight: 900;">@${escapeHTML(comment.profiles?.apodo || 'Mánager')}</span>
+              <span style="color: var(--text-muted); font-size: 0.7rem; margin-left: 0.25rem;">(${new Date(comment.created_at).toLocaleTimeString()})</span>
+            </div>
           </div>
         </div>
         ${replyIndicator}

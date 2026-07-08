@@ -97,25 +97,53 @@ export function renderBufon(container, callbacks) {
     }
 
     try {
-      // 1. Resolve a single global league container in the database (ordered by created_at)
-      const { data: leagues, error: leagueErr } = await supabase
-        .from('leagues')
-        .select('id, name, jester_current_matchday, jester_voting_start')
-        .order('created_at', { ascending: true })
-        .limit(1);
+      if (!isGuest) {
+        // 1. Resolve a single global league container in the database (ordered by created_at)
+        const { data: leagues, error: leagueErr } = await supabase
+          .from('leagues')
+          .select('id, name, jester_current_matchday, jester_voting_start')
+          .order('created_at', { ascending: true })
+          .limit(1);
 
-      if (leagueErr) throw leagueErr;
+        if (leagueErr) throw leagueErr;
 
-      if (!leagues || leagues.length === 0) {
-        forceDemoMode = true;
-        loadDemoData();
-        return;
+        if (!leagues || leagues.length === 0) {
+          forceDemoMode = true;
+          loadDemoData();
+          return;
+        }
+
+        activeLeagueId = leagues[0].id;
+        currentLeagueName = leagues[0].name;
+        currentMatchday = leagues[0].jester_current_matchday || 5;
+        votingStartTime = leagues[0].jester_voting_start;
+      } else {
+        const { data: histData } = await supabase
+          .from('jester_history')
+          .select('league_id, matchday_number')
+          .order('matchday_number', { ascending: false })
+          .limit(1);
+        
+        const { data: nomData } = await supabase
+          .from('jester_nominees')
+          .select('league_id, matchday_number, created_at')
+          .order('created_at', { ascending: true });
+
+        if (nomData && nomData.length > 0) {
+          activeLeagueId = nomData[0].league_id;
+          currentMatchday = nomData[0].matchday_number;
+          votingStartTime = nomData[0].created_at; 
+        } else if (histData && histData.length > 0) {
+          activeLeagueId = histData[0].league_id;
+          currentMatchday = histData[0].matchday_number + 1;
+          votingStartTime = null;
+        } else {
+          forceDemoMode = true;
+          loadDemoData();
+          return;
+        }
+        currentLeagueName = 'Global';
       }
-
-      activeLeagueId = leagues[0].id;
-      currentLeagueName = leagues[0].name;
-      currentMatchday = leagues[0].jester_current_matchday || 5;
-      votingStartTime = leagues[0].jester_voting_start;
 
       // 2. Load nominees, votes, history for this global league container
       await loadLeagueData();
@@ -433,7 +461,15 @@ export function renderBufon(container, callbacks) {
     const totalVotes = nominees.reduce((sum, n) => sum + n.votes, 0);
 
     container.innerHTML = `
-      <div class="container">
+      <div style="position: relative; width: 100%; min-height: 80vh;">
+        ${isGuest ? `
+          <div style="position: absolute; inset: 0; z-index: 100; display: flex; align-items: flex-start; justify-content: center; padding-top: 2rem;">
+            <div id="bufon-auth-container" style="position: sticky; top: 4rem; width: 100%; max-width: 380px;">
+              <div style="text-align: center; padding: 2rem;"><span class="spinner"></span></div>
+            </div>
+          </div>
+        ` : ''}
+        <div class="container" style="${isGuest ? 'filter: blur(8px); opacity: 0.55; pointer-events: none; user-select: none;' : ''}">
         <!-- Header -->
         <div style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: start; flex-wrap: wrap; gap: 1rem;">
           <div>
@@ -566,18 +602,6 @@ export function renderBufon(container, callbacks) {
               `}
             </div>
 
-            <!-- Formulario Nominar / Guest warning -->
-            ${isGuest ? `
-              <div class="card glass" style="text-align: center; padding: 1.5rem; border: 1.2px dashed var(--border-color-glow);">
-                <h3 class="gradient-text-gold" style="font-size: 1.05rem; font-weight: 800; margin-bottom: 0.35rem;">¿Quieres votar o nominar?</h3>
-                <p style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 1rem;">
-                  La nominación y votación se realiza de manera privada dentro de cada liga fantasy. ¡Inicia sesión para entrar en el Bufón Global!
-                </p>
-                <button id="go-to-login-btn" class="btn-primary" style="font-size: 0.8rem; padding: 0.55rem 1rem; font-weight: 700; width: 100%;">
-                  Iniciar Sesión / Registrarse
-                </button>
-              </div>
-            ` : `
               <div class="card glass">
                 <h3 class="card-title" style="font-size: 1.05rem; margin-bottom: 0.25rem;">Nominar un Candidato</h3>
                 <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 1.25rem;">
@@ -591,12 +615,11 @@ export function renderBufon(container, callbacks) {
                   </div>
                   <input type="hidden" id="nom-team" />
 
-                  <button type="submit" class="btn-primary" style="font-weight: 700; width: 100%; padding: 0.75rem;">
+                  <button type="submit" class="btn-primary" style="font-weight: 700; width: 100%; padding: 0.75rem;" ${isGuest ? 'disabled' : ''}>
                     Añadir Candidato a Votación
                   </button>
                 </form>
               </div>
-            `}
           </div>
 
           <!-- Columna Derecha: Histórico (Hall of Shame) -->
@@ -644,6 +667,7 @@ export function renderBufon(container, callbacks) {
               </div>
             `}
           </div>
+        </div>
         </div>
       </div>
     `;
@@ -711,11 +735,35 @@ export function renderBufon(container, callbacks) {
       });
     }
 
-    // Hook Login Button for guests
-    const loginBtn = container.querySelector('#go-to-login-btn');
-    if (loginBtn) {
-      loginBtn.addEventListener('click', () => {
-        callbacks.onNavigate('acceso');
+    // Mount auth view if guest
+    const authContainer = container.querySelector('#bufon-auth-container');
+    if (authContainer) {
+      import('./auth').then(({ renderAuth }) => {
+        renderAuth(authContainer, {
+          onAuthSuccess: () => {
+            callbacks.showToast('Sesión iniciada correctamente', 'success');
+            callbacks.onNavigate('bufon');
+          },
+          showToast: callbacks.showToast
+        });
+
+        // Remove the 80vh min-height from the injected auth container so it fits in the column
+        setTimeout(() => {
+          const innerCont = authContainer.querySelector('.container');
+          if (innerCont) {
+            innerCont.style.minHeight = 'auto';
+            innerCont.style.padding = '0';
+          }
+          const pitchCard = authContainer.querySelector('.pitch-card');
+          if (pitchCard) {
+            pitchCard.style.boxShadow = 'none';
+            pitchCard.style.border = '1.2px dashed var(--border-color-glow)';
+            pitchCard.style.padding = '1.5rem 1rem';
+          }
+        }, 50);
+      }).catch(err => {
+        console.error('Error loading auth view:', err);
+        authContainer.innerHTML = '<div class="card glass" style="text-align:center; padding:1.5rem;">Error al cargar acceso. <button class="btn-primary" onclick="window.location.reload()">Recargar</button></div>';
       });
     }
   }
