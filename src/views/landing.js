@@ -72,7 +72,6 @@ export function renderLanding(container, callbacks) {
             .eq('league_id', activeLeagueId);
 
           if (membersList) {
-            const mappedMembers = mappedMembers => mappedMembers; // dummy assignment or mapping
             const mappedList = membersList.map(m => ({
               profile_id: m.profile_id,
               display_name: m.profiles?.apodo || m.profiles?.display_name || 'Desconocido'
@@ -106,18 +105,7 @@ export function renderLanding(container, callbacks) {
     // Render HTML structure matching the Stitch design
     container.innerHTML = `
       <div class="landing-layout-brutalist fade-in-up">
-        <!-- Columna izquierda: PUBLICIDAD -->
-        <aside class="brutalist-aside">
-          <div class="ad-card-left">
-            <div class="ad-label">PUB<br/>LICI<br/>DAD</div>
-          </div>
-          <div class="ad-card-sponsor">
-            <span class="material-symbols-outlined" style="font-size: 3.5rem; margin-bottom: 0.75rem; color: #000000;">sports_football</span>
-            <p style="font-family: var(--font-sans); font-weight: 800; font-size: 0.9rem; text-transform: uppercase;">Patrocinador Oficial del Sufrimiento</p>
-          </div>
-        </aside>
-
-        <!-- Columna central: CONTENIDO PRINCIPAL -->
+        <!-- Contenido principal -->
         <main class="brutalist-main">
           <!-- Hero Intro -->
           <section class="brutalist-hero">
@@ -167,7 +155,13 @@ export function renderLanding(container, callbacks) {
             </div>
           </section>
 
-          <!-- Grid Content: Row 1 -->
+          <!-- ===== NIVEL 2: Esta jornada ===== -->
+          <section class="landing-tier">
+            <div class="tier-header">
+              <h2 class="tier-title">Esta jornada</h2>
+              <span class="tier-sub">Lo que está en juego ahora mismo</span>
+            </div>
+
           <div class="brutalist-grid-2">
             <!-- Lista de Morosos Card -->
             <article class="brutalist-card concrete-bg" id="morosos-card" style="display: flex; flex-direction: column; justify-content: space-between;">
@@ -234,27 +228,20 @@ export function renderLanding(container, callbacks) {
               </div>
             </article>
 
-            <!-- Ruleta de Castigos Card -->
-            <article class="brutalist-card" style="background: var(--primary-green); color: #000000; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
-              <h2 style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 900; text-transform: uppercase; margin-bottom: 1.5rem; line-height: 1;">Ruleta de Sentencias</h2>
-              
-              <!-- Mock Wheel Graphic (Replaced with Logo) -->
-              <div style="width: 120px; height: 120px; border-radius: 50%; border: 6px solid #000000; margin-bottom: 1.5rem; position: relative; overflow: hidden; background: #000000; box-shadow: inset 0px 0px 10px rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center;">
-                <svg viewBox="0 0 100 100" class="ruleta-logo-spin" style="width: 115%; height: 115%;">
-                  <g transform="translate(50, 50)" stroke="#000" stroke-width="4">
-                    <path d="M 0 0 L 0 -50 A 50 50 0 0 1 43.301 -25 Z" fill="#ffffff"/>
-                    <path d="M 0 0 L 43.301 -25 A 50 50 0 0 1 43.301 25 Z" fill="var(--danger)"/>
-                    <path d="M 0 0 L 43.301 25 A 50 50 0 0 1 0 50 Z" fill="var(--bg-obsidian)"/>
-                    <path d="M 0 0 L 0 50 A 50 50 0 0 1 -43.301 25 Z" fill="#ffffff"/>
-                    <path d="M 0 0 L -43.301 25 A 50 50 0 0 1 -43.301 -25 Z" fill="var(--accent)"/>
-                    <path d="M 0 0 L -43.301 -25 A 50 50 0 0 1 0 -50 Z" fill="var(--bg-obsidian)"/>
-                    <circle cx="0" cy="0" r="10" fill="#000" />
-                    <circle cx="0" cy="0" r="4" fill="#fff" />
-                  </g>
-                </svg>
+            <!-- El Bufón de la Corte Card -->
+            <article class="brutalist-card concrete-bg" style="display: flex; flex-direction: column; justify-content: space-between;">
+              <div>
+                <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid #000000; padding-bottom: 0.75rem; margin-bottom: 1rem;">
+                  <h2 style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 800; text-transform: uppercase; margin: 0;">El Bufón de la Corte</h2>
+                  <span class="brutalist-badge" style="background: rgba(222,237,0,0.12); color: var(--accent); border-color: rgba(222,237,0,0.3);">Vota</span>
+                </div>
+                <p style="font-size: 0.9rem; color: var(--text-light); opacity: 0.85; line-height: 1.45; margin-bottom: 1.25rem;">
+                  Señala al peor futbolista de la jornada. Quien dé menos puntos en el fantasy paga las consecuencias.
+                </p>
               </div>
-
-              <button class="brutalist-btn brutalist-btn-black" id="landing-ruleta-btn">GIRAR</button>
+              <button class="brutalist-btn" id="landing-bufon-btn" style="width: 100%;">
+                Juzgar a un Jugador
+              </button>
             </article>
           </div>
 
@@ -275,110 +262,74 @@ export function renderLanding(container, callbacks) {
             </div>
           </article>
 
-          <!-- Grid Content: Row 3 -->
-          <div class="brutalist-grid-2">
-            <!-- Juegos Card -->
-            <article class="brutalist-card" id="juegos-card" style="display: flex; flex-direction: column; gap: 1rem; justify-content: space-between; cursor: pointer;">
-              <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid #000000; padding-bottom: 0.75rem; margin-bottom: 0.5rem;">
-                <h2 style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 800; text-transform: uppercase;">Juegos</h2>
-              </div>
-              
-              <!-- Miniature Grid of Available Games -->
-              <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; margin: 0.5rem 0;">
-                <!-- Game 1: Adivina el Jugador -->
-                <div style="background: var(--bg-obsidian); border: 2px solid #000000; box-shadow: 2px 2px 0px #000000; padding: 0.5rem; text-align: center; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 80px;">
-                  <span class="material-symbols-outlined" style="font-size: 1.5rem; color: var(--accent); margin-bottom: 0.25rem;">sports_esports</span>
-                  <span style="font-family: var(--font-sans); font-size: 0.6rem; font-weight: 800; color: var(--text-light); text-transform: uppercase; line-height: 1.1; letter-spacing: 0.5px;">Adivina el Jugador</span>
-                </div>
-                <!-- Game 2: LaLiga Top 10 -->
-                <div style="background: var(--bg-obsidian); border: 2px solid #000000; box-shadow: 2px 2px 0px #000000; padding: 0.5rem; text-align: center; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 80px;">
-                  <span class="material-symbols-outlined" style="font-size: 1.5rem; color: #ffe16d; margin-bottom: 0.25rem;">emoji_events</span>
-                  <span style="font-family: var(--font-sans); font-size: 0.6rem; font-weight: 800; color: var(--text-light); text-transform: uppercase; line-height: 1.1; letter-spacing: 0.5px;">LaLiga Top 10</span>
-                </div>
-                <!-- Game 3: Trivia de Castigos -->
-                <div style="background: var(--bg-obsidian); border: 2px solid #000000; box-shadow: 2px 2px 0px #000000; padding: 0.5rem; text-align: center; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 80px; opacity: 0.75;">
-                  <span class="material-symbols-outlined" style="font-size: 1.5rem; color: var(--primary-green); margin-bottom: 0.25rem;">help</span>
-                  <span style="font-family: var(--font-sans); font-size: 0.6rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; line-height: 1.1; letter-spacing: 0.5px;">Trivia de Castigos</span>
-                </div>
-                <!-- Game 4: Penaltis Fantasy -->
-                <div style="background: var(--bg-obsidian); border: 2px solid #000000; box-shadow: 2px 2px 0px #000000; padding: 0.5rem; text-align: center; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 80px; opacity: 0.75;">
-                  <span class="material-symbols-outlined" style="font-size: 1.5rem; color: var(--danger); margin-bottom: 0.25rem;">sports_soccer</span>
-                  <span style="font-family: var(--font-sans); font-size: 0.6rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; line-height: 1.1; letter-spacing: 0.5px;">Penaltis Fantasy</span>
-                </div>
-              </div>
+          </section>
 
-              <button class="brutalist-btn" id="landing-juegos-btn" style="width: 100%; margin-top: auto;">
-                Jugar a CastigosFantasy
-              </button>
-            </article>
+          <!-- ===== NIVEL 3: Herramientas y juegos ===== -->
+          <section class="landing-tier">
+            <div class="tier-header">
+              <h2 class="tier-title">Herramientas y juegos</h2>
+              <span class="tier-sub">Para amenizar la espera</span>
+            </div>
 
-            <!-- Generador de Castigos Card -->
-            <article class="brutalist-card" style="display: flex; flex-direction: column; justify-content: space-between; gap: 1rem;">
-              <div>
-                <h2 style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 800; text-transform: uppercase; margin-bottom: 0.25rem;">Generador de Castigos</h2>
-                <span style="font-family: var(--font-sans); font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">Inteligencia Artificial del Dolor</span>
-              </div>
-
-              <div style="background: var(--bg-obsidian); border: 3px dashed #474832; padding: 1.25rem; text-align: center; min-height: 90px; display: flex; align-items: center; justify-content: center; margin: 0.5rem 0;">
-                <p style="font-family: var(--font-sans); font-size: 1.05rem; font-weight: 700; color: var(--primary-green);">"PASAR EL DÍA DISFRAZADO DE POLLO..."</p>
-              </div>
-
-              <button class="brutalist-btn" id="landing-generador-btn">
-                Dictar Sentencia <span class="material-symbols-outlined" style="font-size: 1.2rem;">bolt</span>
-              </button>
-            </article>
-          </div>
-
-          <!-- Row 4: Comunidad (El Bufón + Foro de Mánagers) -->
-          <section style="margin-top: 1rem; border-top: 3px solid #000000; padding-top: 1.5rem; width: 100%;">
-            <h2 style="font-family: var(--font-display); font-size: 1.8rem; font-weight: 900; text-transform: uppercase; margin-bottom: 1.25rem; color: var(--text-light); letter-spacing: -0.5px;">
-              Comunidad
-            </h2>
-            <div class="brutalist-grid-2" style="gap: 1.5rem;">
-              <!-- El Bufón de la Corte Card -->
-              <article class="brutalist-card concrete-bg" style="display: flex; flex-direction: column; justify-content: space-between; min-height: 200px;">
-                <div>
-                  <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid #000000; padding-bottom: 0.75rem; margin-bottom: 1rem;">
-                    <h3 style="font-family: var(--font-display); font-size: 1.3rem; font-weight: 800; text-transform: uppercase; margin: 0;">El Bufón de la Corte</h3>
+            <div class="landing-tools-grid">
+              <!-- Ruleta de Sentencias -->
+              <button class="tool-card-btn" id="landing-ruleta-btn">
+                <div class="tool-card-inner">
+                  <div class="tool-card-icon-wrap" style="background: var(--danger);">
+                    <span class="material-symbols-outlined" style="font-size: 1.9rem; color: #ffffff;">casino</span>
                   </div>
-                  <p style="font-size: 0.85rem; color: var(--text-light); opacity: 0.8; line-height: 1.4; margin-bottom: 1rem;">
-                    Vota y señala al peor futbolista de la jornada. Quien dé menos puntos en el fantasy paga las consecuencias.
-                  </p>
-                </div>
-                <button class="brutalist-btn" id="landing-bufon-btn" style="width: 100%;">
-                  Juzgar a un Jugador
-                </button>
-              </article>
-
-              <!-- Foro de Mánagers Card -->
-              <article class="brutalist-card concrete-bg" style="display: flex; flex-direction: column; justify-content: space-between; min-height: 200px;">
-                <div>
-                  <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid #000000; padding-bottom: 0.75rem; margin-bottom: 1rem;">
-                    <h3 style="font-family: var(--font-display); font-size: 1.3rem; font-weight: 800; text-transform: uppercase; margin: 0;">El Muro de la Vergüenza</h3>
+                  <div class="tool-card-text">
+                    <h3 class="tool-card-title">Ruleta de Sentencias</h3>
+                    <p class="tool-card-desc">Gira y acepta tu condena.</p>
                   </div>
-                  <p style="font-size: 0.85rem; color: var(--text-light); opacity: 0.8; line-height: 1.4; margin-bottom: 1rem;">
-                    Sube la prueba de tus castigos en vídeo o imagen, ríete de las deudas ajenas y da la cara ante la liga.
-                  </p>
+                  <span class="material-symbols-outlined tool-card-arrow">arrow_forward</span>
                 </div>
-                <button class="brutalist-btn" id="landing-foro-btn" style="width: 100%;">
-                  Ver Muro de la Vergüenza
-                </button>
-              </article>
+              </button>
+
+              <!-- Generador de Castigos -->
+              <button class="tool-card-btn" id="landing-generador-btn">
+                <div class="tool-card-inner">
+                  <div class="tool-card-icon-wrap" style="background: var(--accent);">
+                    <span class="material-symbols-outlined" style="font-size: 1.9rem; color: #000000;">bolt</span>
+                  </div>
+                  <div class="tool-card-text">
+                    <h3 class="tool-card-title">Generador de Castigos</h3>
+                    <p class="tool-card-desc">Inteligencia artificial del dolor.</p>
+                  </div>
+                  <span class="material-symbols-outlined tool-card-arrow">arrow_forward</span>
+                </div>
+              </button>
+
+              <!-- Juegos -->
+              <button class="tool-card-btn" id="landing-juegos-btn">
+                <div class="tool-card-inner">
+                  <div class="tool-card-icon-wrap" style="background: var(--primary-green);">
+                    <span class="material-symbols-outlined" style="font-size: 1.9rem; color: #000000;">sports_esports</span>
+                  </div>
+                  <div class="tool-card-text">
+                    <h3 class="tool-card-title">Juegos</h3>
+                    <p class="tool-card-desc">Adivina el jugador, Top 10 y más.</p>
+                  </div>
+                  <span class="material-symbols-outlined tool-card-arrow">arrow_forward</span>
+                </div>
+              </button>
+
+              <!-- Muro de la Vergüenza -->
+              <button class="tool-card-btn" id="landing-foro-btn">
+                <div class="tool-card-inner">
+                  <div class="tool-card-icon-wrap" style="background: #ffffff;">
+                    <span class="material-symbols-outlined" style="font-size: 1.9rem; color: #000000;">photo_camera</span>
+                  </div>
+                  <div class="tool-card-text">
+                    <h3 class="tool-card-title">Muro de la Vergüenza</h3>
+                    <p class="tool-card-desc">Sube la prueba de tus castigos.</p>
+                  </div>
+                  <span class="material-symbols-outlined tool-card-arrow">arrow_forward</span>
+                </div>
+              </button>
             </div>
           </section>
         </main>
-
-        <!-- Columna derecha: PUBLICIDAD / ADVERTENCIAS -->
-        <aside class="brutalist-aside">
-          <div class="ad-card-warning">
-            <span class="material-symbols-outlined" style="font-size: 3.5rem; margin-bottom: 0.75rem; color: #ffffff;">warning</span>
-            <h3 style="font-family: var(--font-display); font-size: 1.2rem; font-weight: 800; text-transform: uppercase; margin-bottom: 0.5rem; line-height: 1.1;">Advertencia</h3>
-            <p style="font-size: 0.85rem; opacity: 0.9; line-height: 1.4;">El contenido de esta liga puede causar pérdida permanente de dignidad.</p>
-          </div>
-          <div class="ad-card-left" style="flex: 1;">
-            <div class="ad-label" style="transform: rotate(5deg);">ESPACIO<br/>DISPO<br/>NIBLE</div>
-          </div>
-        </aside>
       </div>
     `;
 
