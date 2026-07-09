@@ -70,6 +70,8 @@ export function renderSelectLeague(container, callbacks) {
 
   function renderView() {
     const activeLeagueId = localStorage.getItem('CF_ACTIVE_LEAGUE_ID');
+    // Tracks the pre-registered roster fetched in step 1 of the 2-step join flow.
+    let currentRoster = null;
 
     container.innerHTML = `
       <div class="container fade-in-up" style="max-width: 800px;">
@@ -282,12 +284,27 @@ export function renderSelectLeague(container, callbacks) {
 
     const closeJoin = () => {
       modalJoinForm.classList.remove('active');
+      // Reset the 2-step join flow so reopening starts fresh; otherwise the
+      // code stays read-only and the modal is stuck on step 2.
+      currentRoster = null;
+      const codeInput = container.querySelector('#join-code');
+      const idGroup = container.querySelector('#join-identity-group');
+      const idSelect = container.querySelector('#join-identity');
+      const joinBtn = container.querySelector('#btn-join');
+      if (codeInput) { codeInput.readOnly = false; codeInput.value = ''; }
+      if (idGroup) idGroup.style.display = 'none';
+      if (idSelect) { idSelect.innerHTML = ''; idSelect.required = false; }
+      if (joinBtn) { joinBtn.disabled = false; joinBtn.innerHTML = 'Comprobar Código'; }
     };
 
     const closeCreate = () => {
       modalCreateForm.classList.remove('active');
       const createForm = container.querySelector('#create-league-form');
       if (createForm) createForm.reset();
+      // form.reset() clears values but leaves the dynamically-added roster
+      // inputs in the DOM (still required), so wipe them out too.
+      const rosterCont = container.querySelector('#roster-inputs-container');
+      if (rosterCont) rosterCont.innerHTML = '';
     };
 
     if (btnCloseJoin) btnCloseJoin.addEventListener('click', closeJoin);
@@ -325,7 +342,6 @@ export function renderSelectLeague(container, callbacks) {
 
     // Hook Join Liga
     const joinForm = container.querySelector('#join-league-form');
-    let currentRoster = null;
 
     joinForm.addEventListener('submit', async (e) => {
       e.preventDefault();
