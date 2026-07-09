@@ -455,16 +455,25 @@ export function renderDashboard(container, callbacks) {
         const loserProfile = members.find(m => m.profile_id === loserId);
         const trashPhrase = getRandomPhrase(loserProfile?.display_name || '', amount);
 
+        const insertObj = {
+          league_id: currentLeague.id,
+          matchday_number: matchday,
+          amount_owed: amount,
+          biwenger_round_id: pending.roundId,
+          trash_talk_phrase: trashPhrase
+        };
+        // Match the manual form: unclaimed roster slots use loser_roster_id.
+        if (loserId.startsWith('roster-')) {
+          insertObj.loser_roster_id = loserId.replace('roster-', '');
+          insertObj.loser_profile_id = null;
+        } else {
+          insertObj.loser_profile_id = loserId;
+          insertObj.loser_roster_id = null;
+        }
+
         const { error: insertErr } = await supabase
           .from('matchday_records')
-          .insert({
-            league_id: currentLeague.id,
-            matchday_number: matchday,
-            loser_profile_id: loserId,
-            amount_owed: amount,
-            biwenger_round_id: pending.roundId,
-            trash_talk_phrase: trashPhrase
-          });
+          .insert(insertObj);
 
         if (insertErr) throw insertErr;
 
@@ -909,8 +918,7 @@ export function renderDashboard(container, callbacks) {
           league_id: currentLeague.id,
           matchday_number: matchday,
           amount_owed: amount,
-          trash_talk_phrase: trashPhrase,
-          recorded_by: currentUser.id
+          trash_talk_phrase: trashPhrase
         };
 
         if (loserId.startsWith('roster-')) {

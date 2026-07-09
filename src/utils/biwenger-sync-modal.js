@@ -362,8 +362,7 @@ export async function openBiwengerSyncModal(leagueId, leagueData, isAdmin, callb
               matchday_number: matchdayNum,
               loser_profile_id: selectedLoserId,
               amount_owed: amountNum,
-              trash_talk_phrase: trashPhrase,
-              recorded_by: currentUser.id
+              trash_talk_phrase: trashPhrase
             });
 
           if (insertErr) throw insertErr;
