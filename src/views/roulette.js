@@ -627,7 +627,7 @@ export function renderRoulette(container, callbacks) {
       if (nameText.length > 30) fontSize = 16;
       if (nameText.length > 38) fontSize = 13;
 
-      ctx.font = `bold ${fontSize}px Space Grotesk, sans-serif`;
+      ctx.font = `bold ${fontSize}px Syne, sans-serif`;
 
       let displayName = nameText;
       if (nameText.length > 45) {
