@@ -111,9 +111,13 @@ export function renderRoulette(container, callbacks) {
             matchday_number,
             amount_owed,
             loser_profile_id,
+            loser_roster_id,
             profiles:loser_profile_id (
               apodo,
               display_name
+            ),
+            roster:loser_roster_id (
+              name
             )
           `)
           .eq('id', pendingId)
@@ -125,7 +129,8 @@ export function renderRoulette(container, callbacks) {
             matchday_number: recData.matchday_number,
             amount_owed: recData.amount_owed,
             loser_profile_id: recData.loser_profile_id,
-            display_name: recData.profiles?.apodo || recData.profiles?.display_name || 'Entrenador'
+            loser_roster_id: recData.loser_roster_id,
+            display_name: recData.profiles?.apodo || recData.profiles?.display_name || recData.roster?.name || 'Entrenador'
           };
         }
       }
@@ -169,6 +174,9 @@ export function renderRoulette(container, callbacks) {
             apodo,
             display_name
           ),
+          roster:loser_roster_id (
+            name
+          ),
           punishments:punishment_id (
             name,
             description
@@ -192,6 +200,9 @@ export function renderRoulette(container, callbacks) {
   function renderView() {
     const isLocalMode = isGuest || !activeLeagueId;
     const isLoser = !isLocalMode && pendingRecord && currentUser && currentUser.id === pendingRecord.loser_profile_id;
+    // Roster losers (pre-registered, unclaimed) have no account, so no real user can
+    // "be" them — let any league member spin on their behalf instead of deadlocking.
+    const isRosterLoser = !isLocalMode && pendingRecord && !pendingRecord.loser_profile_id && !!pendingRecord.loser_roster_id;
 
     container.innerHTML = `
       <div class="container">
@@ -356,7 +367,7 @@ export function renderRoulette(container, callbacks) {
                   ` : history.map(item => `
                     <div class="history-item">
                       <div class="history-header">
-                        <span class="history-loser">${escapeHTML(item.profiles?.apodo || item.profiles?.display_name || 'Entrenador')}</span>
+                        <span class="history-loser">${escapeHTML(item.profiles?.apodo || item.profiles?.display_name || item.roster?.name || 'Entrenador')}</span>
                         <span class="history-date">Jornada ${item.matchday_number} ${item.amount_owed ? `(${item.amount_owed}€)` : ''}</span>
                       </div>
                       <div style="font-weight: 700; color: var(--accent); margin-top: 0.25rem; font-size: 0.95rem;">
@@ -440,7 +451,7 @@ export function renderRoulette(container, callbacks) {
 
         // Enforce loser spin rule in database mode
         if (!isLocalMode && pendingRecord) {
-          if (!isLoser) {
+          if (!isLoser && !isRosterLoser) {
             callbacks.showToast(`Solo el jugador castigado (${pendingRecord.display_name}) puede girar la ruleta`, 'error');
             return;
           }
