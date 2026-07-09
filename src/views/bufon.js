@@ -1,5 +1,6 @@
 import { supabase, isConfigured } from '../supabase';
 import { setupAutocomplete } from '../utils/autocomplete';
+import { LALIGA_PLAYERS_DB } from '../utils/players-db';
 
 /**
  * Renders the "El Bufón" (Matchday's Worst Player) screen.
@@ -24,17 +25,8 @@ export function renderBufon(container, callbacks) {
   let activeLeagueId = null;
   let currentLeagueName = 'Global';
 
-  const DEFAULT_DEMO_NOMINEES = [
-    { id: 'd-nom-1', name: "Marc Cucurella", team: "Chelsea FC", reason: "Marcó un autogol espectacular al intentar despejar de cabeza de espaldas a su portería.", votes: 0, nominated_by: "d-member-1" },
-    { id: 'd-nom-2', name: "Lamine Yamal", team: "FC Barcelona", reason: "Falló tres mano a mano claros contra el portero y un penalti decisivo en el último minuto.", votes: 0, nominated_by: "d-member-2" },
-    { id: 'd-nom-3', name: "Hjulsem", team: "Real Madrid", reason: "Vio una tarjeta amarilla por protestar nada más entrar al campo y luego fue expulsado por doble amarilla.", votes: 0, nominated_by: "d-member-3" }
-  ];
-
-  const DEFAULT_DEMO_HISTORY = [
-    { matchday: 4, name: "Iago Aspas", team: "Celta de Vigo", reason: "Falló dos penaltis en la misma jornada y falló un gol sin portero.", raffleWinner: "Invitado (Liga Demo)", rafflePlayer: "Iago Aspas" },
-    { matchday: 3, name: "Antoine Griezmann", team: "Atlético de Madrid", reason: "Fue sustituido al descanso tras perder 15 balones y dar un pase de gol al rival.", raffleWinner: "Invitado (Liga Demo)", rafflePlayer: "Antoine Griezmann" },
-    { matchday: 2, name: "Alexander Sørloth", team: "Atlético de Madrid", reason: "Remató al palo tres veces seguidas estando a un metro de la línea de gol.", raffleWinner: "Invitado (Liga Demo)", rafflePlayer: "Alexander Sørloth" }
-  ];
+  const DEFAULT_DEMO_NOMINEES = [];
+  const DEFAULT_DEMO_HISTORY = [];
 
   function loadDemoData() {
     forceDemoMode = true;
@@ -43,7 +35,8 @@ export function renderBufon(container, callbacks) {
     votingStartTime = new Date(Date.now() - 3600 * 4 * 1000).toISOString();
 
     let demoNominees = JSON.parse(localStorage.getItem('CF_DEMO_JESTER_NOMINEES') || 'null');
-    if (!demoNominees || !demoNominees.some(n => n.name.includes("Yamal"))) {
+    // Si contiene los falsos antiguos, limpiarlos
+    if (!demoNominees || demoNominees.some(n => n.name.includes("Yamal") || n.name.includes("Cucurella"))) {
       demoNominees = DEFAULT_DEMO_NOMINEES;
       localStorage.setItem('CF_DEMO_JESTER_NOMINEES', JSON.stringify(demoNominees));
       localStorage.removeItem('CF_DEMO_JESTER_USER_VOTE');
@@ -197,7 +190,8 @@ export function renderBufon(container, callbacks) {
         team: n.team,
         reason: n.reason,
         votes: votesMap[n.id] || 0,
-        nominated_by: n.nominated_by
+        nominated_by: n.nominated_by,
+        created_at: n.created_at
       }));
 
       // 3. Load history
@@ -299,10 +293,11 @@ export function renderBufon(container, callbacks) {
   }
 
   async function handleNominate(name, team, reason) {
+    const existing = nominees.find(n => n.name.toLowerCase() === name.toLowerCase());
+
     if (!isConfigured || forceDemoMode) {
-      if (nominees.length >= 6) {
-        callbacks.showToast("Máximo 6 nominados permitidos por jornada", "error");
-        return;
+      if (existing) {
+        return handleVote(existing.id);
       }
       const newNom = {
         id: 'd-nom-' + Date.now(),
@@ -310,7 +305,8 @@ export function renderBufon(container, callbacks) {
         team,
         reason,
         votes: 0,
-        nominated_by: 'd-member-guest'
+        nominated_by: 'd-member-guest',
+        created_at: new Date().toISOString()
       };
       nominees.push(newNom);
       localStorage.setItem('CF_DEMO_JESTER_NOMINEES', JSON.stringify(nominees));
@@ -324,9 +320,9 @@ export function renderBufon(container, callbacks) {
       return;
     }
 
-    if (nominees.length >= 6) {
-      callbacks.showToast("Máximo 6 nominados permitidos por jornada para mantener el orden", "error");
-      return;
+    if (existing) {
+      callbacks.showToast("El jugador ya está nominado. Registrando tu voto...", "info");
+      return handleVote(existing.id);
     }
 
     try {
@@ -528,7 +524,12 @@ export function renderBufon(container, callbacks) {
                 </div>
               ` : `
                 <div style="display: flex; flex-direction: column; gap: 1.15rem;">
-                  ${nominees.map(n => {
+                  ${[...nominees].sort((a, b) => {
+                    if (b.votes !== a.votes) return b.votes - a.votes;
+                    const tA = a.created_at ? new Date(a.created_at).getTime() : 0;
+                    const tB = b.created_at ? new Date(b.created_at).getTime() : 0;
+                    return tB - tA;
+                  }).slice(0, 3).map(n => {
                     const percent = totalVotes > 0 ? Math.round((n.votes / totalVotes) * 100) : 0;
                     const isVoted = userVotedId == n.id;
                     const isVotingClosed = getRemainingTime() <= 0;
@@ -566,7 +567,6 @@ export function renderBufon(container, callbacks) {
                                 ${escapeHTML(n.team)}
                               </span>
                             </div>
-                            ${n.reason && n.reason !== 'Sin razón adicional' ? `<p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.4;">${escapeHTML(n.reason)}</p>` : ''}
                           </div>
                           <div style="text-align: right; min-width: 80px;">
                             <span style="font-weight: 800; font-size: 1.2rem; color: var(--accent);">${percent}%</span>
@@ -657,10 +657,6 @@ export function renderBufon(container, callbacks) {
                       <h4 style="font-size: 0.95rem; font-weight: 800; margin-bottom: 0.25rem; color: var(--text-light);">
                         ${escapeHTML(h.name)}
                       </h4>
-                      ${h.reason && h.reason !== 'Sin razón adicional' ? `
-                      <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.35; font-style: italic; margin-bottom: 0.5rem;">
-                        "${escapeHTML(h.reason)}"
-                      </p>` : ''}
                     </div>
                   `;
                 }).join('')}
@@ -702,11 +698,21 @@ export function renderBufon(container, callbacks) {
       }
 
       if (nameInput) {
+        const validTeams = [
+          'Deportivo Alavés', 'Getafe CF', 'Real Betis', 'Valencia CF', 'Sevilla FC', 
+          'Celta de Vigo', 'Real Sociedad', 'CA Osasuna', 'Rayo Vallecano', 'Villarreal CF', 
+          'Real Madrid', 'FC Barcelona', 'RCD Espanyol', 'Athletic Club', 'Atlético de Madrid',
+          'Girona', 'RCD Mallorca', 'UD Las Palmas', 'CD Leganés', 'Real Valladolid'
+        ];
+        const currentLaLigaPlayers = LALIGA_PLAYERS_DB.filter(p => 
+          validTeams.includes(p.team) && (!p.country || p.country === '')
+        );
+
         nominateAutocompleteCleanup = setupAutocomplete(nameInput, (player) => {
           if (teamInput) {
             teamInput.value = player.team;
           }
-        });
+        }, currentLaLigaPlayers);
       }
 
       nominateForm.addEventListener('submit', (e) => {

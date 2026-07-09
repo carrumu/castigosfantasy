@@ -4,34 +4,12 @@ import { supabase } from '../supabase';
 // No global supabase player fetching here anymore to keep historical data isolated.
 
 /**
- * Helper to display player names as "First Name + First Last Name".
- * Keeps prepositions and compound names (e.g. Alfredo Di Stéfano, José Vicente Train).
+ * Helper to display player names completely.
+ * Now it simply returns the full name without truncating.
  */
 export function formatDisplayName(fullName) {
   if (!fullName) return '';
-  const parts = fullName.trim().split(/\s+/);
-  if (parts.length <= 2) return fullName;
-
-  const secondPart = parts[1].toLowerCase();
-
-  // Prepositions/conjunctions
-  const prepositions = ["de", "del", "di", "da", "la", "y", "van", "von"];
-  if (prepositions.includes(secondPart)) {
-    return parts.slice(0, 3).join(' ');
-  }
-
-  // Common second parts of compound Spanish first names
-  const compoundSecondParts = [
-    "luis", "carlos", "vicente", "maria", "maría", "jose", "josé", "manuel", 
-    "antonio", "francisco", "andres", "andrés", "miguel", "angel", "ángel", 
-    "ramon", "ramón", "ignacio", "javier", "alberto", "david", "fernando"
-  ];
-  if (compoundSecondParts.includes(secondPart)) {
-    return parts.slice(0, 3).join(' ');
-  }
-
-  // Otherwise, default to first name + first last name (first two words)
-  return parts.slice(0, 2).join(' ');
+  return fullName.trim();
 }
 
 /**
