@@ -130,25 +130,6 @@ export function renderJuegos(container, callbacks) {
           </div>
         </button>
 
-        <!-- Base de Datos de Jugadores -->
-        <button id="game-jugadores-btn" class="tool-card-btn" style="overflow: hidden; display: flex; flex-direction: column;">
-          <div style="width: 100%; height: 160px; border-bottom: 3px solid #000000; background: var(--bg-obsidian); display: flex; align-items: center; justify-content: center;">
-            <span class="material-symbols-outlined" style="font-size: 4rem; color: var(--accent);">groups</span>
-          </div>
-          <div class="tool-card-inner" style="padding: 1.25rem 1.25rem; display: flex; flex-direction: column; gap: 0.75rem; flex: 1; justify-content: space-between;">
-            <div class="tool-card-text">
-              <h2 class="tool-card-title" style="margin-bottom: 0.35rem;">Jugadores</h2>
-              <p class="tool-card-desc">Consulta los valores de mercado y estadísticas de todos los jugadores de LaLiga.</p>
-            </div>
-            <div class="tool-card-arrow" style="align-self: flex-end;">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M5 12h14"></path>
-                <path d="m12 5 7 7-7 7"></path>
-              </svg>
-            </div>
-          </div>
-        </button>
-
       </div>
     </div>
   `;
@@ -159,9 +140,5 @@ export function renderJuegos(container, callbacks) {
 
   container.querySelector('#game-top10-btn').addEventListener('click', () => {
     if (callbacks.onNavigate) callbacks.onNavigate('top-10');
-  });
-
-  container.querySelector('#game-jugadores-btn').addEventListener('click', () => {
-    if (callbacks.onNavigate) callbacks.onNavigate('jugadores');
   });
 }
