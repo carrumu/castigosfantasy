@@ -1,4 +1,5 @@
 import { supabase } from '../supabase';
+import { escapeHTML } from '../utils/security.js';
 
 /**
  * Renders the interactive public Punishment Generator.
@@ -485,7 +486,7 @@ export function renderGenerator(container, callbacks) {
                   <div style="text-align: left; margin-bottom: 0.15rem;">
                     <label style="font-size: 0.68rem; font-weight: 800; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 0.25rem;">¿Qué jugador rechaza el castigo?</label>
                     <select id="select-reject-player" style="width: 100%; background: #2a2a2a; border: 2px solid #000; border-radius: 4px; padding: 0.3rem 0.5rem; color: var(--text-light); font-family: var(--font-sans); font-size: 0.8rem; font-weight: 700; cursor: pointer; margin-bottom: 0.4rem;">
-                      ${members.map(m => `<option value="${m}">${m}</option>`).join('')}
+                      ${members.map(m => `<option value="${escapeHTML(m)}">${escapeHTML(m)}</option>`).join('')}
                       <option value="custom">-- Escribir otro nombre --</option>
                     </select>
                     <input type="text" id="input-reject-custom-player" placeholder="Escribe el nombre..." style="display: none; width: 100%; background: rgba(0,0,0,0.25); border: 2px solid #000; border-radius: 4px; padding: 0.3rem 0.5rem; color: var(--text-light); font-family: var(--font-sans); font-size: 0.8rem;">
@@ -569,8 +570,8 @@ export function renderGenerator(container, callbacks) {
             ${savedList.map((item, idx) => `
               <div class="brutalist-card" style="padding: 0.85rem; background: rgba(0,0,0,0.25); border: 2.5px solid #000; border-left: 4px solid var(--accent); display: flex; justify-content: space-between; align-items: center; border-radius: 4px;">
                 <div style="text-align: left; padding-right: 1rem; flex-grow: 1;">
-                  <h4 style="font-size: 0.9rem; font-weight: 800; margin: 0; color: var(--text-light); line-height: 1.2;">${item.name}</h4>
-                  <p style="font-size: 0.75rem; color: var(--text-muted); margin: 0.35rem 0 0 0; line-height: 1.3;">${item.description}</p>
+                  <h4 style="font-size: 0.9rem; font-weight: 800; margin: 0; color: var(--text-light); line-height: 1.2;">${escapeHTML(item.name)}</h4>
+                  <p style="font-size: 0.75rem; color: var(--text-muted); margin: 0.35rem 0 0 0; line-height: 1.3;">${escapeHTML(item.description)}</p>
                 </div>
                 <button class="brutalist-btn btn-delete-saved" data-idx="${idx}" style="width: 28px !important; min-width: 28px !important; height: 28px; padding: 0; background: transparent !important; background-image: none !important; border: 1.5px solid #444; border-radius: 4px; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; position: relative;" title="Quitar">
                   <div style="position: absolute; width: 12px; height: 2px; background: #888; transform: rotate(45deg);"></div>
@@ -595,9 +596,9 @@ export function renderGenerator(container, callbacks) {
             ${rejectedList.map((item, idx) => `
               <div class="brutalist-card" style="padding: 0.85rem; background: rgba(0,0,0,0.25); border: 2.5px solid #000; border-left: 4px solid #962d2d; display: flex; justify-content: space-between; align-items: center; border-radius: 4px;">
                 <div style="text-align: left; padding-right: 1rem; flex-grow: 1;">
-                  <h4 style="font-size: 0.9rem; font-weight: 800; margin: 0; color: var(--text-light); line-height: 1.2;">${item.name}</h4>
+                  <h4 style="font-size: 0.9rem; font-weight: 800; margin: 0; color: var(--text-light); line-height: 1.2;">${escapeHTML(item.name)}</h4>
                   <div style="font-size: 0.65rem; font-weight: 800; color: #ff6b6b; margin-top: 0.25rem; text-transform: uppercase;">
-                    Rechazó: ${item.player}
+                    Rechazó: ${escapeHTML(item.player)}
                   </div>
                   <p style="font-size: 0.75rem; color: var(--text-muted); margin: 0.35rem 0 0 0; line-height: 1.3;">Rechazó cumplir este castigo.</p>
                 </div>
