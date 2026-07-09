@@ -14,6 +14,10 @@ dist-ssr
 .env
 .env.*
 
+# One-off maintenance scripts (may contain secrets)
+delete_leagues.js
+clear_history.cjs
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
