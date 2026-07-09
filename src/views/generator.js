@@ -826,7 +826,7 @@ export function renderGenerator(container, callbacks) {
     if (shareBtn) {
       shareBtn.addEventListener('click', () => {
         if (!currentPunishment) return;
-        const shareText = encodeURIComponent(`*CastigoFantasy: ${currentPunishment.name}* \n\n_${currentPunishment.description}_ \n\nGenera más ideas en http://localhost:3000/generador`);
+        const shareText = encodeURIComponent(`*CastigoFantasy: ${currentPunishment.name}* \n\n_${currentPunishment.description}_ \n\nGenera más ideas en ${window.location.origin}/generador`);
         window.open(`https://api.whatsapp.com/send?text=${shareText}`, '_blank');
       });
     }
