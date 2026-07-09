@@ -593,7 +593,7 @@ export async function renderMinigame(container, callbacks) {
     
     // Header section with action buttons for Mode Toggle
     container.innerHTML = `
-      <div class="container" style="max-width: 600px; padding-top: 0.5rem; display: flex; flex-direction: column; align-items: center;">
+      <div class="container" style="max-width: 600px; padding: 0.5rem 0.35rem 1rem; display: flex; flex-direction: column; align-items: center;">
         
         <!-- Header Info -->
         <div style="width: 100%; text-align: center; margin-bottom: 1rem; position: relative;">
@@ -686,12 +686,12 @@ export async function renderMinigame(container, callbacks) {
 
         <!-- Wordle Grid Container -->
         <div class="wordle-grid" style="
-          display: grid; 
-          grid-template-rows: repeat(6, 1fr); 
-          gap: 0.35rem; 
-          width: 100%; 
-          max-width: ${Math.min(380, secretPlayer.length * 55)}px; 
-          margin-bottom: 1.25rem; 
+          display: grid;
+          grid-template-rows: repeat(6, 1fr);
+          gap: 0.3rem;
+          width: 100%;
+          max-width: ${Math.min(440, secretPlayer.length * 55)}px;
+          margin-bottom: 1.25rem;
           aspect-ratio: ${secretPlayer.length} / 6;
         ">
           ${Array(6).fill(null).map((_, rowIndex) => {
@@ -704,9 +704,9 @@ export async function renderMinigame(container, callbacks) {
 
             return `
               <div class="wordle-row ${isActive && gameStatus === 'IN_PROGRESS' ? 'active' : ''}" data-row-index="${rowIndex}" style="
-                display: grid; 
-                grid-template-columns: repeat(${secretPlayer.length}, 1fr); 
-                gap: 0.35rem;
+                display: grid;
+                grid-template-columns: repeat(${secretPlayer.length}, 1fr);
+                gap: 0.3rem;
               ">
                 ${Array(secretPlayer.length).fill(null).map((_, colIndex) => {
                   let char = "";
@@ -722,20 +722,20 @@ export async function renderMinigame(container, callbacks) {
 
                    return `
                     <div class="wordle-cell ${cellClass}" style="
-                      aspect-ratio: 1; 
-                      border: 3px solid ${char ? 'var(--accent)' : '#000000'};
+                      aspect-ratio: 1;
+                      border: 2.5px solid ${char ? 'var(--accent)' : 'rgba(255,255,255,0.22)'};
                       border-radius: 8px;
                       display: flex;
                       align-items: center;
                       justify-content: center;
-                      font-size: calc(1rem + 0.5vw);
+                      font-size: calc(1.05rem + 0.6vw);
                       font-weight: 800;
                       text-transform: uppercase;
-                      background: var(--bg-card);
+                      background: ${char ? 'var(--bg-card-hover)' : 'var(--bg-card)'};
                       user-select: none;
                       transition: border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
                       transform: ${char && !isFinished ? 'translate(-2px, -2px)' : 'none'};
-                      box-shadow: ${char && !isFinished ? '5px 5px 0px #000000' : '3px 3px 0px #000000'};
+                      box-shadow: ${char && !isFinished ? '4px 4px 0px rgba(0,0,0,0.55)' : 'none'};
                     ">${char}</div>
                   `;
                 }).join('')}
@@ -753,7 +753,7 @@ export async function renderMinigame(container, callbacks) {
           gap: 0.4rem;
           margin-top: auto;
           background: rgba(0,0,0,0.1);
-          padding: 0.5rem;
+          padding: 0.5rem 0.15rem;
           border-radius: 12px;
           border: 1px solid var(--border-color);
           ${gameStatus !== 'IN_PROGRESS' ? 'opacity: 0.5; pointer-events: none;' : ''}
@@ -769,9 +769,10 @@ export async function renderMinigame(container, callbacks) {
                 const isSpecial = key === 'ENTER' || key === 'BACK';
                 return `
                   <button class="keyboard-key ${state}" data-key="${key}" style="
-                    flex: ${isSpecial ? '1.5 1 0px' : '1 1 0px'};
+                    flex: ${key === 'ENTER' ? '2 1 0px' : (key === 'BACK' ? '1.5 1 0px' : '1 1 0px')};
                     min-width: 0;
                     height: 55px;
+                    padding: 0 2px;
                     border-radius: 6px;
                     background: ${
                       state === 'correct' ? '#22c55e' :
@@ -784,15 +785,18 @@ export async function renderMinigame(container, callbacks) {
                       'var(--text-light)'
                     };
                     font-family: var(--font-sans);
-                    font-size: ${isSpecial ? '0.8rem' : '1.05rem'};
+                    font-size: ${key === 'ENTER' ? '0.72rem' : (key === 'BACK' ? '1.1rem' : '1.05rem')};
                     font-weight: 800;
+                    letter-spacing: ${key === 'ENTER' ? '-0.3px' : '0'};
+                    white-space: nowrap;
+                    overflow: hidden;
                     cursor: pointer;
                     display: flex;
                     align-items: center;
                     justify-content: center;
                     user-select: none;
                   ">
-                    ${key === 'BACK' ? '⌫' : key}
+                    ${key === 'BACK' ? '⌫' : (key === 'ENTER' ? '<span class="material-symbols-outlined" style="font-size: 1.5rem; line-height: 1;">keyboard_return</span>' : key)}
                   </button>
                 `;
               }).join('')}

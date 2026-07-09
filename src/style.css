@@ -3668,10 +3668,10 @@ input, select, textarea, button {
 
   /* --- Wordle Game Board specifics --- */
   #view-container .wordle-cell {
-    width: 32px !important;
-    height: 32px !important;
-    font-size: 1rem !important;
-    border-radius: 5px !important;
+    width: 100% !important;
+    height: 100% !important;
+    font-size: 1.15rem !important;
+    border-radius: 6px !important;
   }
 
   #view-container .wordle-grid {
@@ -3684,19 +3684,19 @@ input, select, textarea, button {
   }
 
   #view-container .wordle-keyboard {
-    gap: 4px !important;
-    max-width: 360px !important;
+    gap: 5px !important;
+    max-width: 100% !important;
   }
 
   #view-container .keyboard-row {
-    gap: 4px !important;
-    margin-top: 0.2rem !important;
+    gap: 3px !important;
+    margin-top: 0.3rem !important;
   }
 
   #view-container .keyboard-key {
-    height: 32px !important;
-    font-size: 0.65rem !important;
-    border-radius: 3px !important;
+    height: 56px !important;
+    font-size: 1rem !important;
+    border-radius: 6px !important;
   }
 
   /* --- Weekly Challenges (Retos) specific layouts --- */
