@@ -83,6 +83,11 @@ const seoMap = {
     title: 'Foro de Debate | CastigosFantasy',
     description: 'Debate con otros mánagers, llora por tus lesiones o chulea de tus clausulazos en el foro de CastigosFantasy.',
     schemaType: 'DiscussionForumPosting'
+  },
+  'muro-verguenza': {
+    title: 'Muro de la Vergüenza | CastigosFantasy',
+    description: 'El registro público de castigos aceptados y rechazados de tu liga. Nadie escapa al Muro de la Vergüenza.',
+    schemaType: 'CollectionPage'
   }
 };
 

@@ -315,7 +315,7 @@ export function renderLanding(container, callbacks) {
               </button>
 
               <!-- Muro de la Vergüenza -->
-              <button class="tool-card-btn" id="landing-foro-btn">
+              <button class="tool-card-btn" id="landing-muro-btn">
                 <div class="tool-card-inner">
                   <div class="tool-card-icon-wrap" style="background: #ffffff;">
                     <span class="material-symbols-outlined" style="font-size: 1.9rem; color: #000000;">photo_camera</span>
@@ -371,13 +371,6 @@ export function renderLanding(container, callbacks) {
       });
     });
 
-    const juegosCard = container.querySelector('#juegos-card');
-    if (juegosCard) {
-      juegosCard.addEventListener('click', () => {
-        if (callbacks.onNavigate) callbacks.onNavigate('juegos');
-      });
-    }
-
     const juegosBtn = container.querySelector('#landing-juegos-btn');
     if (juegosBtn) {
       juegosBtn.addEventListener('click', (e) => {
@@ -402,11 +395,11 @@ export function renderLanding(container, callbacks) {
       });
     }
 
-    const foroBtn = container.querySelector('#landing-foro-btn');
-    if (foroBtn) {
-      foroBtn.addEventListener('click', (e) => {
+    const muroBtn = container.querySelector('#landing-muro-btn');
+    if (muroBtn) {
+      muroBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        if (callbacks.onNavigate) callbacks.onNavigate('foro');
+        if (callbacks.onNavigate) callbacks.onNavigate('muro-verguenza');
       });
     }
 

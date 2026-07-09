@@ -382,7 +382,7 @@ function renderMainLayout(isGuest, currentUser = null) {
       onNavigate: navigate,
       showToast
     });
-  } else if (currentView === 'muro') {
+  } else if (currentView === 'muro-verguenza') {
     renderMuro(viewContainer, {
       isGuest,
       onNavigate: navigate,
@@ -732,7 +732,17 @@ function handleRouting() {
   if (parts.length > 0) {
     view = parts[0];
   }
-  
+
+  // Fallback to home for unknown routes so the view never renders blank.
+  const KNOWN_VIEWS = [
+    'inicio', 'acceso', 'mis-ligas', 'menu-liga', 'muro', 'muro-verguenza',
+    'herramientas', 'ruleta', 'retos', 'juegos', 'adivina-jugador', 'top-10',
+    'jugadores', 'bufon', 'generador', 'comunidad', 'foro'
+  ];
+  if (!KNOWN_VIEWS.includes(view)) {
+    view = 'inicio';
+  }
+
   currentView = view;
   setSEO(currentView);
   checkAuthAndRender();
