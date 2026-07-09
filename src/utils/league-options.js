@@ -102,6 +102,21 @@ export async function openLeagueSettings(leagueId, callbacks) {
       display_name: m.profiles?.display_name || 'Entrenador'
     }));
 
+    // Load unclaimed roster slots so admins can prune pre-registered players
+    let rosterSlots = [];
+    if (isAdmin) {
+      const { data: rosterData } = await supabase
+        .from('league_roster')
+        .select('id, name')
+        .eq('league_id', leagueId)
+        .is('claimed_by', null)
+        .order('name');
+      rosterSlots = rosterData || [];
+    }
+
+    // Minimal HTML escaper for user-provided roster names
+    const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
     // Render loaded state
     const bodyEl = modal.querySelector('.modal-body');
     bodyEl.style.textAlign = 'left';
@@ -172,6 +187,22 @@ export async function openLeagueSettings(leagueId, callbacks) {
         </div>
       </div>
 
+      <!-- Plazas de roster pendientes (Admin) -->
+      ${isAdmin && rosterSlots.length > 0 ? `
+        <div style="margin-bottom: 1.75rem; background: rgba(255, 255, 255, 0.02); padding: 0.85rem 1.1rem; border-radius: 10px; border: 1.5px solid var(--border-color);">
+          <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px; display: block; margin-bottom: 0.5rem;">Plazas pendientes (${rosterSlots.length})</span>
+          <p style="font-size: 0.7rem; color: var(--text-muted); margin: 0 0 0.75rem; line-height: 1.35;">Jugadores pre-registrados que aún no han reclamado su plaza. Elimina los que sobren.</p>
+          <div style="display: flex; flex-direction: column; gap: 0.4rem;">
+            ${rosterSlots.map(r => `
+              <div data-roster-row="${r.id}" style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; background: var(--bg-input); border: 1.5px solid var(--border-color); border-radius: 6px; padding: 0.45rem 0.4rem 0.45rem 0.7rem;">
+                <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-light); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${esc(r.name)}</span>
+                <button class="btn-delete-roster" data-roster-id="${r.id}" data-roster-name="${esc(r.name)}" title="Eliminar plaza" style="background: rgba(239, 68, 68, 0.12); border: 1.5px solid rgba(239, 68, 68, 0.4); color: var(--danger); width: 28px; height: 28px; border-radius: 5px; cursor: pointer; font-weight: 900; line-height: 1; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">✕</button>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      ` : ''}
+
       <!-- Vincular Usuario Biwenger (Solo si la liga es de tipo Biwenger) -->
       ${leagueData.sync_source === 'biwenger' ? `
         <div style="margin-bottom: 1.75rem; background: rgba(222, 237, 0, 0.02); padding: 1rem; border-radius: 10px; border: 1.5px solid var(--border-color-glow);">
@@ -238,6 +269,35 @@ export async function openLeagueSettings(leagueId, callbacks) {
         showToast('Código copiado al portapapeles', 'success');
       }).catch(err => {
         console.error(err);
+      });
+    });
+
+    // Hook roster slot deletion (admin only)
+    modal.querySelectorAll('.btn-delete-roster').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        const rosterId = btn.dataset.rosterId;
+        const rosterName = btn.dataset.rosterName;
+        if (!window.confirm(`¿Eliminar la plaza de "${rosterName}"? Se borrará también su historial de deudas pendiente y no se puede deshacer.`)) return;
+
+        btn.disabled = true;
+        btn.textContent = '…';
+
+        const { data, error } = await supabase
+          .from('league_roster')
+          .delete()
+          .eq('id', rosterId)
+          .select();
+
+        // A 0-row result (no error) means RLS blocked it — the DELETE policy is missing.
+        if (error || !data || data.length === 0) {
+          showToast(error ? 'Error al eliminar la plaza' : 'No tienes permiso para eliminar plazas', 'error');
+          btn.disabled = false;
+          btn.textContent = '✕';
+          return;
+        }
+
+        showToast(`Plaza de "${rosterName}" eliminada`, 'success');
+        modal.querySelector(`[data-roster-row="${rosterId}"]`)?.remove();
       });
     });
 
