@@ -322,7 +322,7 @@ export function renderLanding(container, callbacks) {
                   </div>
                   <div class="tool-card-text">
                     <h3 class="tool-card-title">Muro de la Vergüenza</h3>
-                    <p class="tool-card-desc">Sube la prueba de tus castigos.</p>
+                    <p class="tool-card-desc">Quién cumple su castigo y quién se raja.</p>
                   </div>
                   <span class="material-symbols-outlined tool-card-arrow">arrow_forward</span>
                 </div>

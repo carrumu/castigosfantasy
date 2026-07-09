@@ -102,7 +102,7 @@ export async function renderForo(container, callbacks) {
           <span class="material-symbols-outlined" style="font-size: 1.05rem;">arrow_back</span>
         </button>
         <h1 class="gradient-text-gold" style="font-size: 1.5rem; font-weight: 900; font-family: var(--font-display); text-transform: uppercase; margin: 0; text-align: center; padding: 0 40px;">
-          El Muro de la Vergüenza
+          Foro de Mánagers
         </h1>
       </div>
 
@@ -134,7 +134,7 @@ export async function renderForo(container, callbacks) {
         <div style="position: absolute; top: 15%; left: 50%; transform: translateX(-50%); width: 95%; max-width: 420px; z-index: 10;">
           <div class="brutalist-card concrete-bg" style="border: 4px solid #000; box-shadow: 8px 8px 0px #000; padding: 2.5rem 1.5rem; text-align: center; pointer-events: auto;">
             <span class="material-symbols-outlined" style="font-size: 3.5rem; margin-bottom: 1rem; color: var(--accent);">sports_soccer</span>
-            <h3 style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 900; text-transform: uppercase; margin-bottom: 1rem; line-height: 1.1;">El Muro de la Vergüenza</h3>
+            <h3 style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 900; text-transform: uppercase; margin-bottom: 1rem; line-height: 1.1;">Foro de Mánagers</h3>
             <p style="font-size: 0.95rem; color: var(--text-light); margin-bottom: 1.5rem; font-weight: 700; line-height: 1.5;">
               Para ver los castigos de los demás, reírte de ellos y subir tus propias pruebas, necesitas iniciar sesión.
             </p>
