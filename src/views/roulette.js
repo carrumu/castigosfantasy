@@ -19,6 +19,7 @@ export function renderRoulette(container, callbacks) {
   let pendingRecord = null;
   let isSpinning = false;
   let currentUser = null;
+  let currentUserApodo = null;
   let showLegend = false; // State to control legend visibility
 
   // Idle spin state
@@ -66,6 +67,16 @@ export function renderRoulette(container, callbacks) {
 
     try {
       currentUser = supabase.auth.user ? supabase.auth.user() : (await supabase.auth.getUser()).data.user;
+
+      // Load the spinner's own apodo, used as the result label on a free spin
+      if (currentUser) {
+        const { data: ownProfile } = await supabase
+          .from('profiles')
+          .select('apodo, display_name')
+          .eq('id', currentUser.id)
+          .maybeSingle();
+        currentUserApodo = ownProfile?.apodo || ownProfile?.display_name || null;
+      }
 
       // 1. Fetch user's leagues memberships
       const { data: userLeagues, error: leaguesErr } = await supabase
@@ -686,7 +697,7 @@ export function renderRoulette(container, callbacks) {
       if (spinBtn) spinBtn.disabled = false;
 
       const isLocalMode = isGuest || !activeLeagueId;
-      const loserName = pendingRecord ? pendingRecord.display_name : 'Entrenador Aleatorio';
+      const loserName = pendingRecord ? pendingRecord.display_name : (currentUserApodo || 'Entrenador Aleatorio');
 
       if (!isLocalMode && pendingRecord) {
         try {
