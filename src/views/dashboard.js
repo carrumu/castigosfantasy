@@ -712,6 +712,9 @@ export function renderDashboard(container, callbacks) {
 
     leaderboard.sort((a, b) => b.totalOwed - a.totalOwed || b.countLast - a.countLast);
 
+    // Total del bote común: suma de TODAS las deudas de la liga (toda la temporada)
+    const botePot = records.reduce((sum, r) => sum + Number(r.amount_owed), 0);
+
     // Get default next matchday number
     const maxMatchday = records.reduce((max, r) => r.matchday_number > max ? r.matchday_number : max, 0);
     const nextMatchday = maxMatchday + 1;
@@ -750,6 +753,20 @@ export function renderDashboard(container, callbacks) {
             <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem;">
               Ranking del que más debe al bote común y más veces ha sido último.
             </p>
+
+            <!-- Bote Común: total acumulado de toda la liga -->
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; background: linear-gradient(135deg, rgba(222,237,0,0.12), rgba(222,237,0,0.03)); border: 2px solid var(--border-color-glow); border-radius: 10px; padding: 0.9rem 1.1rem; margin-bottom: 1.25rem;">
+              <div style="display: flex; align-items: center; gap: 0.65rem;">
+                <span style="font-size: 1.7rem; line-height: 1;">💰</span>
+                <div>
+                  <div style="font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted);">Bote Común</div>
+                  <div style="font-size: 0.72rem; color: var(--text-muted);">Acumulado de toda la liga</div>
+                </div>
+              </div>
+              <div style="font-family: var(--font-display); font-weight: 900; font-size: 1.9rem; color: var(--accent); text-shadow: 0 0 12px rgba(222,237,0,0.3); line-height: 1; white-space: nowrap;">
+                ${botePot.toFixed(2)}€
+              </div>
+            </div>
 
             ${(currentLeague && currentLeague.sync_source === 'biwenger') ? `
               <div class="biwenger-tabs" style="display: flex; gap: 0.5rem; margin-bottom: 1.25rem; background: rgba(0, 0, 0, 0.2); padding: 0.25rem; border-radius: 8px; border: 1.5px solid var(--border-color);">
