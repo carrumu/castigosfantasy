@@ -593,7 +593,7 @@ export async function renderMinigame(container, callbacks) {
     
     // Header section with action buttons for Mode Toggle
     container.innerHTML = `
-      <div class="container" style="max-width: 600px; padding: 0.5rem 0.35rem 1rem; display: flex; flex-direction: column; align-items: center;">
+      <div class="container minigame-container" style="max-width: 600px; padding: 0.5rem 0.35rem 1rem; display: flex; flex-direction: column; align-items: center;">
         
         <!-- Header Info -->
         <div style="width: 100%; text-align: center; margin-bottom: 1rem; position: relative;">

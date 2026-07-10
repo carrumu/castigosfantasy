@@ -3354,46 +3354,68 @@ input, select, textarea, button {
 @media (max-width: 767px) {
   /* --- General Container & Headings across all views --- */
   .container {
-    padding: 0.5rem !important;
+    padding: 0.85rem !important;
   }
 
   .container-brutalist {
-    padding: 0.5rem !important;
+    padding: 1rem !important;
+  }
+
+  /* Keep the wordle board/keyboard as wide as possible */
+  #view-container .minigame-container {
+    padding: 0.5rem 0.3rem 1rem !important;
   }
 
   .landing-layout-brutalist {
-    gap: 0.5rem !important;
+    gap: 1rem !important;
   }
 
   .brutalist-main {
-    gap: 0.5rem !important;
+    gap: 1.75rem !important;
   }
 
   .brutalist-grid-2 {
-    gap: 0.5rem !important;
+    gap: 0.9rem !important;
   }
 
   #view-container h1,
   #view-container .gradient-text-green,
   #view-container .gradient-text-gold {
-    font-size: 1.25rem !important;
+    font-size: 1.5rem !important;
   }
 
   #view-container h2 {
-    font-size: 0.98rem !important;
+    font-size: 1.1rem !important;
   }
 
   #view-container h3 {
-    font-size: 0.88rem !important;
+    font-size: 0.98rem !important;
   }
 
   #view-container h4 {
-    font-size: 0.82rem !important;
+    font-size: 0.88rem !important;
   }
 
   #view-container p {
-    font-size: 0.76rem !important;
-    line-height: 1.35 !important;
+    font-size: 0.85rem !important;
+    line-height: 1.45 !important;
+  }
+
+  /* The generic tag rules above would flatten every heading to one size.
+     These class rules win on specificity and restore the intended scale:
+     hero > section title > card title. */
+  #view-container .tier-title {
+    font-size: 1.35rem !important;
+  }
+
+  #view-container .tier-sub {
+    font-size: 0.72rem !important;
+    margin-top: 0.3rem !important;
+  }
+
+  #view-container .brutalist-card h2 {
+    font-size: 1.05rem !important;
+    margin-bottom: 0.65rem !important;
   }
 
   /* Spacers and margins */
@@ -3408,14 +3430,14 @@ input, select, textarea, button {
 
   /* --- General Cards & Forms --- */
   #view-container .card {
-    padding: 0.75rem !important;
-    margin-bottom: 0.75rem !important;
+    padding: 1.1rem !important;
+    margin-bottom: 1rem !important;
     border-radius: 8px !important;
   }
 
   #view-container .card-title {
-    font-size: 0.95rem !important;
-    margin-bottom: 0.5rem !important;
+    font-size: 1.15rem !important;
+    margin-bottom: 0.7rem !important;
     gap: 0.35rem !important;
   }
 
@@ -3442,22 +3464,23 @@ input, select, textarea, button {
 
   /* Hero section adjustments */
   .brutalist-hero {
-    padding: 0.75rem 0.35rem !important;
+    padding: 1.35rem 0.5rem !important;
     margin-bottom: 0.5rem !important;
     border-bottom-width: 2.5px !important;
   }
 
-  .brutalist-hero-title {
-    font-size: 1.15rem !important;
-    letter-spacing: -0.6px !important;
-    margin-bottom: 0.35rem !important;
-    text-shadow: 1.5px 1.5px 0px #000000 !important;
-    line-height: 1.2 !important;
+  /* Needs #view-container to outrank the generic h1 rule above */
+  #view-container .brutalist-hero-title {
+    font-size: 2rem !important;
+    letter-spacing: -1px !important;
+    margin-bottom: 0.6rem !important;
+    text-shadow: 2px 2px 0px #000000 !important;
+    line-height: 1.1 !important;
   }
 
-  .brutalist-hero-subtitle {
-    font-size: 0.75rem !important;
-    line-height: 1.35 !important;
+  #view-container .brutalist-hero-subtitle {
+    font-size: 0.88rem !important;
+    line-height: 1.45 !important;
   }
 
   #hero-create-league-btn {
@@ -3478,14 +3501,9 @@ input, select, textarea, button {
 
   /* General Card adjustments */
   .brutalist-card {
-    padding: 0.75rem !important;
+    padding: 1.15rem !important;
     border-width: 2.5px !important;
     box-shadow: 3px 3px 0px 0px #000000 !important;
-  }
-
-  .brutalist-card h2 {
-    font-size: 0.95rem !important;
-    margin-bottom: 0.5rem !important;
   }
 
   .brutalist-card .brutalist-btn {
@@ -3497,8 +3515,8 @@ input, select, textarea, button {
 
   /* Morosos Card specifics */
   #morosos-card p {
-    font-size: 0.7rem !important;
-    margin-bottom: 0.35rem !important;
+    font-size: 0.82rem !important;
+    margin-bottom: 0.6rem !important;
   }
 
   #morosos-card ul {
@@ -3969,16 +3987,16 @@ input, select, textarea, button {
   color: var(--text-light) !important;
 }
 
-/* 6. Mobile specific layout overrides to maintain compactness */
+/* 6. Mobile specific layout overrides */
 @media (max-width: 767px) {
   #view-container .brutalist-card,
   #view-container article.brutalist-card,
   #view-container .league-item,
   #view-container .tool-card-btn,
   #view-container .card {
-    padding: 0.75rem !important;
-    margin-bottom: 0.5rem !important;
-    border-radius: 8px !important;
+    padding: 1.15rem !important;
+    margin-bottom: 1rem !important;
+    border-radius: 10px !important;
   }
 }
 
