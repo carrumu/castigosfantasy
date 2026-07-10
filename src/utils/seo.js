@@ -59,6 +59,11 @@ const seoMap = {
     description: 'Descubre quiénes son los peores managers de la plataforma. El muro de la vergüenza de CastigosFantasy.',
     schemaType: 'CollectionPage'
   },
+  'duelo': {
+    title: 'El Duelo - Más o Menos | CastigosFantasy',
+    description: 'Dos leyendas, un ranking. Adivina quién tiene más goles, partidos o títulos y encadena la racha más larga de tu liga.',
+    schemaType: 'VideoGame'
+  },
   'jugadores': {
     title: 'Buscador de Jugadores | CastigosFantasy',
     description: 'Consulta los valores de mercado y estadísticas de todos los jugadores de las principales ligas.',

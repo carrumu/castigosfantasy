@@ -130,6 +130,38 @@ export function renderJuegos(container, callbacks) {
           </div>
         </button>
 
+        <!-- El Duelo Card -->
+        <button id="game-duelo-btn" class="tool-card-btn" style="overflow: hidden; display: flex; flex-direction: column;">
+
+          <!-- Mini duel preview -->
+          <div style="width: 100%; height: 160px; border-bottom: 3px solid #000000; background: var(--bg-obsidian); display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 1rem; box-sizing: border-box;">
+            <div style="flex: 1; background: var(--bg-card); border: 1.5px solid var(--border-color); border-radius: 6px; padding: 0.5rem 0.25rem; text-align: center; box-shadow: 2px 2px 0px #000;">
+              <div style="font-size: 1rem; line-height: 1;">🇦🇷</div>
+              <div style="font-size: 0.6rem; font-weight: 800; color: var(--text-light); margin: 0.2rem 0; line-height: 1.1;">Messi</div>
+              <div style="font-size: 0.85rem; font-weight: 900; color: var(--accent); line-height: 1;">474</div>
+            </div>
+            <div style="font-family: var(--font-display); font-weight: 900; font-size: 0.75rem; color: var(--text-muted); letter-spacing: 1px; flex-shrink: 0;">VS</div>
+            <div style="flex: 1; background: var(--bg-card); border: 1.5px solid var(--accent); border-radius: 6px; padding: 0.5rem 0.25rem; text-align: center; box-shadow: 2px 2px 0px #000;">
+              <div style="font-size: 1rem; line-height: 1;">🇵🇹</div>
+              <div style="font-size: 0.6rem; font-weight: 800; color: var(--text-light); margin: 0.2rem 0; line-height: 1.1;">Cristiano</div>
+              <div style="font-size: 0.85rem; font-weight: 900; color: var(--text-muted); line-height: 1;">???</div>
+            </div>
+          </div>
+
+          <div class="tool-card-inner" style="padding: 1.25rem 1.25rem; display: flex; flex-direction: column; gap: 0.75rem; flex: 1; justify-content: space-between;">
+            <div class="tool-card-text">
+              <h2 class="tool-card-title" style="margin-bottom: 0.35rem;">El Duelo</h2>
+              <p class="tool-card-desc">Más o menos: dos leyendas de un mismo ranking. Adivina quién manda y encadena tu racha.</p>
+            </div>
+            <div class="tool-card-arrow" style="align-self: flex-end;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 12h14"></path>
+                <path d="m12 5 7 7-7 7"></path>
+              </svg>
+            </div>
+          </div>
+        </button>
+
       </div>
     </div>
   `;
@@ -140,5 +172,9 @@ export function renderJuegos(container, callbacks) {
 
   container.querySelector('#game-top10-btn').addEventListener('click', () => {
     if (callbacks.onNavigate) callbacks.onNavigate('top-10');
+  });
+
+  container.querySelector('#game-duelo-btn').addEventListener('click', () => {
+    if (callbacks.onNavigate) callbacks.onNavigate('duelo');
   });
 }
