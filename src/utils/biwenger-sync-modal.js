@@ -67,7 +67,7 @@ export async function openBiwengerSyncModal(leagueId, leagueData, isAdmin, callb
                 <strong id="biwenger-detected-loser-name" style="color: var(--accent);">--</strong>
               </div>
               <label for="biwenger-loser-select" style="color: var(--text-light); font-weight: 700; font-size: 0.75rem; display: block; margin-bottom: 0.3rem;">Asociar con Manager de la App</label>
-              <select id="biwenger-loser-select" class="input-field" required style="border: 1.5px solid var(--border-color-glow); font-weight: 700; background: var(--bg-input); width: 100%; padding: 0.65rem 0.85rem;">
+              <select id="biwenger-loser-select" class="input-field" required style="border: 1.5px solid var(--border-color-glow); font-weight: 700; background: var(--bg-input); width: 100%; max-width: 100%; box-sizing: border-box; padding: 0.65rem 0.85rem; text-overflow: ellipsis;">
                 <option value="">-- Selecciona el Perdedor --</option>
               </select>
               <p id="biwenger-match-notice" style="font-size: 0.7rem; margin-top: 0.35rem; font-weight: 500;"></p>
@@ -311,7 +311,7 @@ export async function openBiwengerSyncModal(leagueId, leagueData, isAdmin, callb
       }
       const newOpt = document.createElement('option');
       newOpt.value = '__new__';
-      newOpt.textContent = `+ Registrar como jugador nuevo: ${loserBiwengerName}`;
+      newOpt.textContent = `+ Nuevo jugador: ${loserBiwengerName}`;
       selectEl.appendChild(newOpt);
 
       // Find match: explicit biwenger_user_name link first, then name similarity
