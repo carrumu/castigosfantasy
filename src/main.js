@@ -20,6 +20,7 @@ import { renderTop10 } from './views/top10';
 import { renderDuelo } from './views/duelo';
 import { renderMuro } from './views/muro';
 import { renderPlayersHub } from './views/players_hub';
+import { renderLegal } from './views/legal';
 
 // Initialize Theme (Force Dark Mode)
 document.body.classList.remove('light-theme');
@@ -174,6 +175,11 @@ function renderMainLayout(isGuest, currentUser = null) {
           </div>
           <span style="font-weight: 700; color: var(--primary);">Ligas Fútbol Fantasy</span>
           <span class="sidebar-version">Versión 1.1.0</span>
+          <div class="legal-links" style="display:flex;flex-wrap:wrap;gap:0.35rem 0.75rem;margin-top:0.6rem;">
+            <a class="legal-link" data-page="privacidad" style="font-size:0.68rem;color:var(--text-muted);cursor:pointer;">Privacidad</a>
+            <a class="legal-link" data-page="cookies" style="font-size:0.68rem;color:var(--text-muted);cursor:pointer;">Cookies</a>
+            <a class="legal-link" data-page="terminos" style="font-size:0.68rem;color:var(--text-muted);cursor:pointer;">Términos</a>
+          </div>
         </div>
       </aside>
 
@@ -394,6 +400,11 @@ function renderMainLayout(isGuest, currentUser = null) {
       onNavigate: navigate,
       showToast
     });
+  } else if (currentView === 'privacidad' || currentView === 'cookies' || currentView === 'terminos') {
+    renderLegal(viewContainer, {
+      page: currentView,
+      onNavigate: navigate
+    });
   }
 
   // Hook Navigation Elements (Cerrando el sidebar al hacer clic en móvil/escritorio)
@@ -513,6 +524,13 @@ function renderMainLayout(isGuest, currentUser = null) {
       navigate('acceso');
     });
   }
+
+  app.querySelectorAll('.legal-link').forEach(link => {
+    link.addEventListener('click', () => {
+      closeSidebar();
+      navigate(link.dataset.page);
+    });
+  });
 
 
 }
@@ -743,7 +761,8 @@ function handleRouting() {
   const KNOWN_VIEWS = [
     'inicio', 'acceso', 'mis-ligas', 'menu-liga', 'muro', 'muro-verguenza',
     'herramientas', 'ruleta', 'retos', 'juegos', 'adivina-jugador', 'top-10',
-    'duelo', 'jugadores', 'bufon', 'generador', 'comunidad', 'foro'
+    'duelo', 'jugadores', 'bufon', 'generador', 'comunidad', 'foro',
+    'privacidad', 'cookies', 'terminos'
   ];
   if (!KNOWN_VIEWS.includes(view)) {
     view = 'inicio';
@@ -758,6 +777,70 @@ window.addEventListener('popstate', handleRouting);
 
 // Start App: trigger routing on initial load
 handleRouting();
+
+// --- Cookie consent + consent-gated advertising ---
+const COOKIE_CONSENT_KEY = 'CF_COOKIE_CONSENT';
+const ADSENSE_CLIENT = 'ca-pub-7549006958989496';
+
+function loadAdSense() {
+  if (document.querySelector('script[data-adsense]')) return;
+  const s = document.createElement('script');
+  s.async = true;
+  s.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`;
+  s.crossOrigin = 'anonymous';
+  s.setAttribute('data-adsense', 'true');
+  document.head.appendChild(s);
+}
+
+function initCookieConsent() {
+  const consent = localStorage.getItem(COOKIE_CONSENT_KEY);
+  if (consent === 'accepted') {
+    loadAdSense();
+    return;
+  }
+  if (consent === 'rejected') return;
+
+  const banner = document.createElement('div');
+  banner.id = 'cookie-consent-banner';
+  banner.style.cssText = `
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 10000;
+    background: #101010; border-top: 2px solid var(--accent, #deed00);
+    padding: 1rem 1.25rem; display: flex; flex-wrap: wrap; align-items: center;
+    justify-content: center; gap: 0.85rem 1.25rem; box-shadow: 0 -6px 24px rgba(0,0,0,0.5);
+  `;
+  banner.innerHTML = `
+    <p style="margin:0;font-size:0.82rem;line-height:1.45;color:#e8e8e8;max-width:620px;flex:1;min-width:240px;">
+      Usamos cookies técnicas necesarias y, con tu permiso, cookies de terceros
+      (Google) para publicidad. Consulta la
+      <a href="/cookies" id="cookie-policy-link" style="color:var(--accent,#deed00);font-weight:700;">Política de Cookies</a>.
+    </p>
+    <div style="display:flex;gap:0.5rem;flex-shrink:0;">
+      <button id="cookie-reject" style="
+        background:none;color:#cfcfcf;border:1px solid #444;border-radius:6px;
+        padding:0.55rem 1rem;font-size:0.8rem;font-weight:700;cursor:pointer;white-space:nowrap;">Rechazar</button>
+      <button id="cookie-accept" style="
+        background:var(--accent,#deed00);color:#000;border:2px solid #000;border-radius:6px;
+        padding:0.55rem 1.25rem;font-size:0.8rem;font-weight:800;cursor:pointer;white-space:nowrap;">Aceptar</button>
+    </div>
+  `;
+  document.body.appendChild(banner);
+
+  banner.querySelector('#cookie-policy-link').addEventListener('click', (e) => {
+    e.preventDefault();
+    navigate('cookies');
+  });
+  banner.querySelector('#cookie-accept').addEventListener('click', () => {
+    localStorage.setItem(COOKIE_CONSENT_KEY, 'accepted');
+    banner.remove();
+    loadAdSense();
+  });
+  banner.querySelector('#cookie-reject').addEventListener('click', () => {
+    localStorage.setItem(COOKIE_CONSENT_KEY, 'rejected');
+    banner.remove();
+  });
+}
+
+initCookieConsent();
 
 // Support Modal Functionality
 function showSupportModal() {
