@@ -422,7 +422,7 @@ export function renderSelectLeague(container, callbacks) {
         localStorage.setItem('CF_ACTIVE_LEAGUE_ID', targetLeague.id);
         localStorage.setItem('CF_ACTIVE_LEAGUE_NAME', targetLeague.name);
 
-        if (targetLeague.sync_source === 'biwenger' && targetLeague.biwenger_email) {
+        if (targetLeague.sync_source === 'biwenger' && targetLeague.biwenger_league_id) {
           openBiwengerLinkModal(targetLeague.id, currentUser.id, callbacks, () => {
             callbacks.onNavigate('menu-liga');
           });

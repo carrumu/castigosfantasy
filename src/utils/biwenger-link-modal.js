@@ -82,11 +82,9 @@ export async function openBiwengerLinkModal(leagueId, currentUserId, callbacks, 
 
     if (leagueErr) throw leagueErr;
 
-    const email = leagueData.biwenger_email;
-    const password = leagueData.biwenger_password;
-    const bLeagueId = leagueData.biwenger_league_id;
-
-    if (!email || !password || !bLeagueId) {
+    // Credentials are stored server-side (league_secrets) and never fetched
+    // here; we only need to know the league is configured for Biwenger sync.
+    if (!leagueData.biwenger_league_id) {
       throw new Error('Las credenciales de sincronización de Biwenger aún no están configuradas por el administrador.');
     }
 
@@ -119,7 +117,7 @@ export async function openBiwengerLinkModal(leagueId, currentUserId, callbacks, 
         'Authorization': `Bearer ${token}`,
         'apikey': supabaseAnonKey
       },
-      body: JSON.stringify({ email, password, leagueId: bLeagueId })
+      body: JSON.stringify({ appLeagueId: leagueId })
     });
 
     if (res.status !== 200) {

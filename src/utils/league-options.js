@@ -82,6 +82,19 @@ export async function openLeagueSettings(leagueId, callbacks) {
 
     const isAdmin = !!memberData.is_admin;
 
+    // Biwenger email lives in league_secrets now (RLS: only admin/creator can
+    // read it). We fetch it just to pre-fill the settings form; the password is
+    // never read back to the client.
+    let biwengerEmail = '';
+    if (isAdmin && leagueData.sync_source === 'biwenger') {
+      const { data: secretRow } = await supabase
+        .from('league_secrets')
+        .select('biwenger_email')
+        .eq('league_id', leagueId)
+        .maybeSingle();
+      biwengerEmail = secretRow?.biwenger_email || '';
+    }
+
     // Load all members of the league to check for successors
     const { data: membersList, error: listErr } = await supabase
       .from('league_members')
@@ -157,7 +170,7 @@ export async function openLeagueSettings(leagueId, callbacks) {
             
             <div class="form-group" style="margin-bottom: 0;">
               <label for="edit-biwenger-email" style="color: var(--text-light); font-weight: 700; font-size: 0.75rem; display: block; margin-bottom: 0.25rem;">Correo de Biwenger</label>
-              <input type="email" id="edit-biwenger-email" class="input-field" value="${leagueData.biwenger_email || ''}" placeholder="ejemplo@correo.com" style="border: 1.5px solid var(--border-color-glow); font-weight: 700; background: var(--bg-input); width: 100%; padding: 0.55rem 0.75rem;" />
+              <input type="email" id="edit-biwenger-email" class="input-field" value="${biwengerEmail || ''}" placeholder="ejemplo@correo.com" style="border: 1.5px solid var(--border-color-glow); font-weight: 700; background: var(--bg-input); width: 100%; padding: 0.55rem 0.75rem;" />
             </div>
             
             <div class="form-group" style="margin-bottom: 0;">
@@ -321,17 +334,32 @@ export async function openLeagueSettings(leagueId, callbacks) {
           };
 
           if (newType === 'biwenger') {
-            updatePayload.biwenger_email = settingsForm.querySelector('#edit-biwenger-email').value.trim();
+            // Non-sensitive fields stay on `leagues`.
             updatePayload.biwenger_league_id = settingsForm.querySelector('#edit-biwenger-league-id').value.trim();
-            
+
+            // Credentials go to `league_secrets` (admin-only RLS). The password
+            // field is left blank to keep the current one; only overwrite it
+            // when the admin types a new value.
+            const emailVal = settingsForm.querySelector('#edit-biwenger-email').value.trim();
             const newPasswordVal = settingsForm.querySelector('#edit-biwenger-password').value.trim();
+
+            const secretPayload = { league_id: leagueId, biwenger_email: emailVal, updated_at: new Date().toISOString() };
             if (newPasswordVal) {
-              updatePayload.biwenger_password = newPasswordVal;
+              secretPayload.biwenger_password = newPasswordVal;
             }
+
+            const { error: secretErr } = await supabase
+              .from('league_secrets')
+              .upsert(secretPayload, { onConflict: 'league_id' });
+            if (secretErr) throw secretErr;
           } else {
-            updatePayload.biwenger_email = null;
-            updatePayload.biwenger_password = null;
             updatePayload.biwenger_league_id = null;
+            // Drop any stored credentials when leaving Biwenger sync.
+            const { error: delErr } = await supabase
+              .from('league_secrets')
+              .delete()
+              .eq('league_id', leagueId);
+            if (delErr) throw delErr;
           }
 
           const { error } = await supabase
@@ -366,11 +394,7 @@ export async function openLeagueSettings(leagueId, callbacks) {
       const saveBtn = modal.querySelector('#btn-save-user-biwenger');
       const errorMsgEl = modal.querySelector('#biwenger-link-error-msg');
 
-      const emailVal = leagueData.biwenger_email;
-      const passVal = leagueData.biwenger_password;
-      const leagueIdVal = leagueData.biwenger_league_id;
-
-      if (!emailVal || !passVal || !leagueIdVal) {
+      if (!leagueData.biwenger_league_id) {
         if (selectEl) {
           selectEl.innerHTML = '<option value="">-- Credenciales de Liga no configuradas --</option>';
           selectEl.disabled = true;
@@ -396,7 +420,7 @@ export async function openLeagueSettings(leagueId, callbacks) {
                 'Authorization': `Bearer ${token}`,
                 'apikey': supabaseAnonKey
               },
-              body: JSON.stringify({ email: emailVal, password: passVal, leagueId: leagueIdVal })
+              body: JSON.stringify({ appLeagueId: leagueId })
             });
 
             if (res.status !== 200) throw new Error('No se pudo conectar con la API de Biwenger.');

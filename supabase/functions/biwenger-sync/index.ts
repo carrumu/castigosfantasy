@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -10,9 +11,9 @@ const corsHeaders = {
 serve(async (req: Request) => {
   // Handle CORS preflight request with explicit 200 OK status
   if (req.method === "OPTIONS") {
-    return new Response("ok", { 
+    return new Response("ok", {
       status: 200,
-      headers: corsHeaders 
+      headers: corsHeaders
     });
   }
 
@@ -24,16 +25,82 @@ serve(async (req: Request) => {
       });
     }
 
-    const { email, password, leagueId } = await req.json();
+    const { appLeagueId } = await req.json();
 
-    if (!email || !password || !leagueId) {
-      return new Response(JSON.stringify({ error: "Missing required fields: email, password, leagueId" }), {
+    if (!appLeagueId) {
+      return new Response(JSON.stringify({ error: "Missing required field: appLeagueId" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    console.log(`Attempting login for user: ${email} via biwenger.as.com`);
+    // ============================================================
+    // AUTHZ: resolve the caller from their JWT and confirm they are a
+    // member of the requested league before touching any credentials.
+    // ============================================================
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    const anonKey = Deno.env.get("SUPABASE_ANON_KEY");
+
+    if (!supabaseUrl || !serviceRoleKey || !anonKey) {
+      return new Response(JSON.stringify({ error: "Server is not configured (missing Supabase env vars)." }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const authHeader = req.headers.get("Authorization") || "";
+    const jwt = authHeader.replace(/^Bearer\s+/i, "").trim();
+
+    // Identify the caller with an anon client bound to their JWT.
+    const authClient = createClient(supabaseUrl, anonKey);
+    const { data: userData, error: userErr } = await authClient.auth.getUser(jwt);
+    const caller = userData?.user;
+
+    if (userErr || !caller) {
+      return new Response(JSON.stringify({ error: "No autorizado: se requiere una sesion valida." }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Service-role client bypasses RLS for the membership check + secret read.
+    const admin = createClient(supabaseUrl, serviceRoleKey);
+
+    const { data: membership, error: memberErr } = await admin
+      .from("league_members")
+      .select("profile_id")
+      .eq("league_id", appLeagueId)
+      .eq("profile_id", caller.id)
+      .maybeSingle();
+
+    if (memberErr || !membership) {
+      return new Response(JSON.stringify({ error: "No autorizado: no eres miembro de esta liga." }), {
+        status: 403,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // ============================================================
+    // Load the Biwenger credentials server-side. They never reach the client.
+    // ============================================================
+    const [{ data: secretRow }, { data: leagueRow }] = await Promise.all([
+      admin.from("league_secrets").select("biwenger_email, biwenger_password").eq("league_id", appLeagueId).maybeSingle(),
+      admin.from("leagues").select("biwenger_league_id").eq("id", appLeagueId).maybeSingle(),
+    ]);
+
+    const email = secretRow?.biwenger_email;
+    const password = secretRow?.biwenger_password;
+    const leagueId = leagueRow?.biwenger_league_id;
+
+    if (!email || !password || !leagueId) {
+      return new Response(JSON.stringify({ error: "Las credenciales de Biwenger no estan configuradas para esta liga." }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    console.log(`Attempting login for league ${appLeagueId} via biwenger.as.com`);
 
     // 1. Authenticate with Biwenger
     const loginRes = await fetch("https://biwenger.as.com/api/v2/auth/login", {

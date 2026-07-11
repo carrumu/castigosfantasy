@@ -170,11 +170,9 @@ export function renderDashboard(container, callbacks) {
   async function fetchBiwengerStandings() {
     if (!currentLeague || currentLeague.sync_source !== 'biwenger') return;
     
-    const email = currentLeague.biwenger_email;
-    const password = currentLeague.biwenger_password;
-    const bLeagueId = currentLeague.biwenger_league_id;
-
-    if (!email || !password || !bLeagueId) {
+    // Credentials live server-side in league_secrets; we only send the app
+    // league id. The edge function authorizes the caller and reads them.
+    if (!currentLeague.biwenger_league_id) {
       biwengerLoadError = true;
       biwengerErrorMsg = 'Las credenciales de Biwenger no están configuradas en Ajustes.';
       updateLeaderboardView();
@@ -200,7 +198,7 @@ export function renderDashboard(container, callbacks) {
           'Authorization': `Bearer ${token}`,
           'apikey': supabaseAnonKey
         },
-        body: JSON.stringify({ email, password, leagueId: bLeagueId })
+        body: JSON.stringify({ appLeagueId: currentLeague.id })
       });
 
       if (res.status !== 200) {
