@@ -21,6 +21,7 @@ import { renderDuelo } from './views/duelo';
 import { renderMuro } from './views/muro';
 import { renderPlayersHub } from './views/players_hub';
 import { renderLegal } from './views/legal';
+import { renderSeoHome, removeFaqSchema } from './views/seo-home';
 
 // Initialize Theme (Force Dark Mode)
 document.body.classList.remove('light-theme');
@@ -316,11 +317,22 @@ function renderMainLayout(isGuest, currentUser = null) {
   if (backdrop) backdrop.addEventListener('click', closeSidebar);
 
   // Route Views
+  // The FAQ structured data only belongs on the SEO home; clear it on every
+  // route change and let renderSeoHome re-inject it when appropriate.
+  removeFaqSchema();
   if (currentView === 'inicio') {
-    renderLanding(viewContainer, {
-      onNavigate: navigate,
-      showToast
-    });
+    if (currentUser) {
+      // Logged-in users get the app landing.
+      renderLanding(viewContainer, {
+        onNavigate: navigate,
+        showToast
+      });
+    } else {
+      // Non-registered visitors get the SEO content page.
+      renderSeoHome(viewContainer, {
+        onNavigate: navigate
+      });
+    }
   } else if (currentView === 'acceso') {
     renderAuth(viewContainer, {
       onAuthSuccess: () => navigate('mis-ligas'),
