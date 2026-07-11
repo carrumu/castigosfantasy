@@ -4106,3 +4106,116 @@ h1, h2, h3, h4, h5, h6, .card-title {
   font-weight: 800;
   letter-spacing: 0.5px;
 }
+
+/* ===== SEO home (logged-out landing): 3-step + accordions ===== */
+.seo-steps {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+@media (min-width: 640px) {
+  .seo-steps { grid-template-columns: repeat(3, 1fr); }
+}
+.seo-step {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+.seo-step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  background: var(--accent);
+  color: #000;
+  border: 2px solid #000;
+  border-radius: 50%;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 1.1rem;
+  margin-bottom: 0.75rem;
+}
+.seo-step-title {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.5px;
+  color: var(--text-light);
+  margin: 0 0 0.35rem;
+  line-height: 1.1;
+}
+.seo-step-desc {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+  margin: 0;
+}
+
+.seo-acc {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  border-radius: 12px;
+  margin-bottom: 1rem;
+  overflow: hidden;
+}
+.seo-acc > summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 1.1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: -0.4px;
+  color: var(--text-light);
+  line-height: 1.2;
+}
+.seo-acc > summary::-webkit-details-marker { display: none; }
+.seo-acc > summary::after {
+  content: '+';
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  line-height: 1;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+.seo-acc[open] > summary::after { content: '\2013'; }
+.seo-acc[open] > summary {
+  border-bottom: 1px solid var(--border-color);
+}
+.seo-acc-body {
+  padding: 1rem 1.25rem 1.35rem;
+}
+.seo-acc-body p {
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: var(--text-light);
+  margin: 0 0 0.85rem;
+}
+.seo-acc-body h3 {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--accent-gold);
+  margin: 1.4rem 0 0.5rem;
+  line-height: 1.25;
+}
+.seo-acc-body ul {
+  margin: 0 0 0.9rem;
+  padding-left: 1.25rem;
+}
+.seo-acc-body li {
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: var(--text-light);
+  margin-bottom: 0.4rem;
+}
