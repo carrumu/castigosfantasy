@@ -247,45 +247,57 @@ export function renderDashboard(container, callbacks) {
     if (!currentLeague || currentLeague.sync_source !== 'biwenger') return;
     if (biwengerSeasonRounds.length === 0 || biwengerStandings.length === 0) return;
 
-    // Find most recent finished round
+    // All finished rounds, in chronological order
     const finishedRounds = biwengerSeasonRounds.filter(r => r.status === 'finished');
     if (finishedRounds.length === 0) return;
-    const lastFinished = finishedRounds[finishedRounds.length - 1];
+    const latestFinished = finishedRounds[finishedRounds.length - 1];
 
-    // Check if already saved in DB
-    const { data: existing } = await supabase
+    // Which finished rounds already have a punishment recorded?
+    const { data: recorded } = await supabase
       .from('matchday_records')
-      .select('id')
-      .eq('league_id', currentLeague.id)
-      .eq('biwenger_round_id', lastFinished.id)
-      .limit(1);
+      .select('biwenger_round_id')
+      .eq('league_id', currentLeague.id);
+    const recordedIds = new Set(
+      (recorded || []).filter(r => r.biwenger_round_id != null).map(r => Number(r.biwenger_round_id))
+    );
 
-    if (existing && existing.length > 0) {
-      // Already saved, clear any stale localStorage entry
-      localStorage.removeItem(`CF_PENDING_BW_ROUND_${currentLeague.id}`);
+    // Finished rounds still pending a punishment (oldest first). We close them
+    // one at a time so a skipped week doesn't lose a round's debt.
+    const unclosed = finishedRounds.filter(r => !recordedIds.has(Number(r.id)));
+
+    const cacheKey = `CF_PENDING_BW_ROUND_${currentLeague.id}`;
+    if (unclosed.length === 0) {
+      localStorage.removeItem(cacheKey);
       return;
     }
 
-    // Detect colista (lowest lastPoints)
-    const minPts = Math.min(...biwengerStandings.map(s => s.lastPoints));
-    const colistaList = biwengerStandings.filter(s => s.lastPoints === minPts);
-    // Pick the one with the worst overall position in case of tie
-    const colista = colistaList.sort((a, b) => b.position - a.position)[0];
+    const target = unclosed[0];
+    const isLatest = Number(target.id) === Number(latestFinished.id);
 
-    // Cache to localStorage so data survives even if next round starts and lastPoints changes
-    const cacheKey = `CF_PENDING_BW_ROUND_${currentLeague.id}`;
-    const existing_cache = localStorage.getItem(cacheKey);
-    // Only overwrite if round changed or not set yet
-    if (!existing_cache || JSON.parse(existing_cache).roundId !== lastFinished.id) {
-      localStorage.setItem(cacheKey, JSON.stringify({
-        roundId: lastFinished.id,
-        roundName: lastFinished.name || lastFinished.short || `Ronda ${lastFinished.id}`,
-        colistaName: colista.name,
-        colistaPts: colista.lastPoints,
-        isTie: colistaList.length > 1,
-        tieNames: colistaList.map(s => s.name)
-      }));
+    // The colista can only be auto-detected for the most recent round: Biwenger
+    // standings only expose the last round's points (lastPoints). For older
+    // pending rounds the admin picks the loser manually.
+    let colistaName = null, colistaPts = null, isTie = false, tieNames = [];
+    if (isLatest) {
+      const minPts = Math.min(...biwengerStandings.map(s => s.lastPoints));
+      const colistaList = biwengerStandings.filter(s => s.lastPoints === minPts);
+      const colista = colistaList.sort((a, b) => b.position - a.position)[0];
+      colistaName = colista.name;
+      colistaPts = colista.lastPoints;
+      isTie = colistaList.length > 1;
+      tieNames = colistaList.map(s => s.name);
     }
+
+    localStorage.setItem(cacheKey, JSON.stringify({
+      roundId: target.id,
+      roundName: target.name || target.short || `Ronda ${target.id}`,
+      colistaName,
+      colistaPts,
+      isTie,
+      tieNames,
+      autoDetected: isLatest,
+      remaining: unclosed.length
+    }));
 
     // Show admin banner if applicable
     if (isAdmin) showJornadaBanner();
@@ -300,15 +312,20 @@ export function renderDashboard(container, callbacks) {
     const existingBanner = container.querySelector('#jornada-close-banner');
     if (existingBanner) return; // already shown
 
-    // Find linked member for colista
-    const matchedMember = members.find(m =>
+    // Find linked member for colista (only possible when it was auto-detected)
+    const matchedMember = pending.colistaName ? members.find(m =>
       m.biwenger_user_name &&
       m.biwenger_user_name.toLowerCase().trim() === pending.colistaName.toLowerCase().trim()
-    );
+    ) : null;
     const colistaLocalName = matchedMember ? matchedMember.display_name : null;
-    const colistaDisplay = colistaLocalName
-      ? `${colistaLocalName} <span style="color:var(--text-muted);font-size:0.8rem">(${pending.colistaName})</span>`
-      : `<span style="color:var(--accent-gold)">${pending.colistaName} — sin vincular</span>`;
+    let colistaDisplay;
+    if (!pending.colistaName) {
+      colistaDisplay = `<span style="color:var(--text-muted)">jornada atrasada — elige quién quedó último</span>`;
+    } else if (colistaLocalName) {
+      colistaDisplay = `${colistaLocalName} <span style="color:var(--text-muted);font-size:0.8rem">(${pending.colistaName})</span>`;
+    } else {
+      colistaDisplay = `<span style="color:var(--accent-gold)">${pending.colistaName} — sin vincular</span>`;
+    }
 
     const banner = document.createElement('div');
     banner.id = 'jornada-close-banner';
@@ -329,8 +346,9 @@ export function renderDashboard(container, callbacks) {
           Jornada terminada: <span style="color:#f87171">${pending.roundName}</span>
         </div>
         <div style="font-size:0.82rem;color:var(--text-muted);line-height:1.4;">
-          Último: ${colistaDisplay} · ${pending.colistaPts} pts
+          Último: ${colistaDisplay}${pending.colistaPts != null ? ` · ${pending.colistaPts} pts` : ''}
           ${pending.isTie ? `<span style="color:var(--accent-gold);display:block;margin-top:0.2rem;">Empate — elige quién paga</span>` : ''}
+          ${pending.remaining > 1 ? `<span style="color:#f87171;display:block;margin-top:0.2rem;font-weight:700;">Quedan ${pending.remaining} jornadas por cerrar</span>` : ''}
         </div>
       </div>
       <div style="display:flex;gap:0.5rem;">
@@ -388,10 +406,12 @@ export function renderDashboard(container, callbacks) {
         border-radius: 14px; padding: 1.75rem; max-width: 440px; width: 100%;
       ">
         <h3 style="font-weight:900;font-size:1.1rem;margin-bottom:0.25rem;">Cerrar Jornada</h3>
-        <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:1.25rem;">${pending.roundName} · ${pending.colistaPts} pts</p>
+        <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:1.25rem;">${pending.roundName}${pending.colistaPts != null ? ` · ${pending.colistaPts} pts` : ''}</p>
 
         ${!defaultMember ? `<div style="background:rgba(222,237,0,0.08);border:1px solid rgba(222,237,0,0.3);border-radius:6px;padding:0.65rem 0.85rem;font-size:0.8rem;color:var(--accent-gold);margin-bottom:1rem;">
-          <strong>${pending.colistaName}</strong> no tiene mánager vinculado. Selecciona quién paga:
+          ${pending.colistaName
+            ? `<strong>${pending.colistaName}</strong> no tiene mánager vinculado. Selecciona quién paga:`
+            : `Jornada atrasada: selecciona quién quedó último en <strong>${pending.roundName}</strong>.`}
         </div>` : ''}
 
         <div style="display:grid;gap:0.75rem;">
