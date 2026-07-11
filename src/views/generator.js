@@ -281,7 +281,7 @@ export function renderGenerator(container, callbacks) {
         category: "public",
         categoryLabel: "Vergonzoso",
         intensity: 1,
-        description: "Poner de estado de WhatsApp un único emoji de payaso 🤡 durante 24h."
+        description: "Poner de estado de WhatsApp un único emoji de payaso durante 24h."
     },
     {
         id: "gen-35",
