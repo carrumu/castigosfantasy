@@ -400,7 +400,7 @@ export async function renderTop10(container, callbacks) {
       feedbackMessage = getIncorrectMessage();
       const feedbackEl = container.querySelector('#feedback-message');
       if (feedbackEl) {
-        feedbackEl.innerHTML = `❌ ${feedbackMessage}`;
+        feedbackEl.innerHTML = `${feedbackMessage}`;
         feedbackEl.style.display = 'block';
       }
 
@@ -615,7 +615,7 @@ Juega en Castigos Fantasy`;
             padding-left: 0.2rem;
             display: ${feedbackMessage ? 'block' : 'none'};
           ">
-            ${feedbackMessage ? `❌ ${feedbackMessage}` : ''}
+            ${feedbackMessage ? `${feedbackMessage}` : ''}
           </div>
           
           <button id="btn-back-hub" class="btn-secondary" style="width: auto; padding: 0.5rem 1.25rem; font-size: 0.78rem; font-weight: 700; text-transform: uppercase;">

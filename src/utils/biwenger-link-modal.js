@@ -44,7 +44,7 @@ export async function openBiwengerLinkModal(leagueId, currentUserId, callbacks, 
 
         <div style="display: flex; flex-direction: column; gap: 0.65rem; margin-top: 0.5rem;">
           <button id="btn-confirm-link" class="btn-primary" disabled style="font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; border: 2.5px solid #000; box-shadow: 2px 2px 0 #000; background: var(--accent); color: #000; padding: 0.75rem; cursor: not-allowed; opacity: 0.5;">
-            Vincular Cuenta 🔗
+            Vincular Cuenta
           </button>
           <button id="btn-skip-link" class="btn-secondary" style="font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; border: 2.5px solid #000; box-shadow: 2px 2px 0 #000; padding: 0.75rem; cursor: pointer;">
             Hacer más tarde
@@ -172,7 +172,7 @@ export async function openBiwengerLinkModal(leagueId, currentUserId, callbacks, 
         console.error(saveErr);
         callbacks.showToast('Error al guardar la vinculación', 'error');
         confirmBtn.disabled = false;
-        confirmBtn.innerHTML = 'Vincular Cuenta 🔗';
+        confirmBtn.innerHTML = 'Vincular Cuenta';
       }
     });
 

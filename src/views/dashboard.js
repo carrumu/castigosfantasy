@@ -308,7 +308,7 @@ export function renderDashboard(container, callbacks) {
     const colistaLocalName = matchedMember ? matchedMember.display_name : null;
     const colistaDisplay = colistaLocalName
       ? `${colistaLocalName} <span style="color:var(--text-muted);font-size:0.8rem">(${pending.colistaName})</span>`
-      : `<span style="color:var(--accent-gold)">${pending.colistaName} ⚠️ sin vincular</span>`;
+      : `<span style="color:var(--accent-gold)">${pending.colistaName} — sin vincular</span>`;
 
     const banner = document.createElement('div');
     banner.id = 'jornada-close-banner';
@@ -326,14 +326,13 @@ export function renderDashboard(container, callbacks) {
     `;
     banner.innerHTML = `
       <div style="display:flex;align-items:center;gap:0.75rem;flex:1;min-width:0;">
-        <span style="font-size:1.5rem">🔴</span>
         <div>
           <div style="font-weight:800;font-size:0.9rem;color:var(--text-light);margin-bottom:0.2rem;">
             Jornada terminada: <span style="color:#f87171">${pending.roundName}</span>
           </div>
           <div style="font-size:0.82rem;color:var(--text-muted);">
             Último: ${colistaDisplay} · ${pending.colistaPts} pts
-            ${pending.isTie ? `<span style="color:var(--accent-gold);margin-left:0.4rem">⚠️ Empate — elige quién paga</span>` : ''}
+            ${pending.isTie ? `<span style="color:var(--accent-gold);margin-left:0.4rem">Empate — elige quién paga</span>` : ''}
           </div>
         </div>
       </div>
@@ -391,11 +390,11 @@ export function renderDashboard(container, callbacks) {
         background: var(--bg-card); border: 2px solid rgba(239,68,68,0.4);
         border-radius: 14px; padding: 1.75rem; max-width: 440px; width: 100%;
       ">
-        <h3 style="font-weight:900;font-size:1.1rem;margin-bottom:0.25rem;">🔴 Cerrar Jornada</h3>
+        <h3 style="font-weight:900;font-size:1.1rem;margin-bottom:0.25rem;">Cerrar Jornada</h3>
         <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:1.25rem;">${pending.roundName} · ${pending.colistaPts} pts</p>
 
         ${!defaultMember ? `<div style="background:rgba(222,237,0,0.08);border:1px solid rgba(222,237,0,0.3);border-radius:6px;padding:0.65rem 0.85rem;font-size:0.8rem;color:var(--accent-gold);margin-bottom:1rem;">
-          ⚠️ <strong>${pending.colistaName}</strong> no tiene mánager vinculado. Selecciona quién paga:
+          <strong>${pending.colistaName}</strong> no tiene mánager vinculado. Selecciona quién paga:
         </div>` : ''}
 
         <div style="display:grid;gap:0.75rem;">
@@ -755,7 +754,6 @@ export function renderDashboard(container, callbacks) {
             <!-- Bote Común: total acumulado de toda la liga -->
             <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; background: linear-gradient(135deg, rgba(222,237,0,0.12), rgba(222,237,0,0.03)); border: 2px solid var(--border-color-glow); border-radius: 10px; padding: 0.9rem 1.1rem; margin-bottom: 1.25rem;">
               <div style="display: flex; align-items: center; gap: 0.65rem;">
-                <span style="font-size: 1.7rem; line-height: 1;">💰</span>
                 <div>
                   <div style="font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted);">Bote Común</div>
                   <div style="font-size: 0.72rem; color: var(--text-muted);">Acumulado de toda la liga</div>
@@ -961,12 +959,12 @@ export function renderDashboard(container, callbacks) {
 
         recordForm.reset();
         btn.disabled = false;
-        btn.innerHTML = 'Guardar y Picar 🤫';
+        btn.innerHTML = 'Guardar y Picar';
       } catch (err) {
         console.error(err);
         callbacks.showToast('Error al registrar el perdedor', 'error');
         btn.disabled = false;
-        btn.innerHTML = 'Guardar y Picar 🤫';
+        btn.innerHTML = 'Guardar y Picar';
       }
     });
 

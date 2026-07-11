@@ -164,7 +164,7 @@ export function renderSelectLeague(container, callbacks) {
           <div id="modal-join-form" class="modal-overlay">
             <div class="modal-content glass" style="max-width: 450px; border: 1.5px solid var(--border-color-glow); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 0 0 20px rgba(222, 237, 0, 0.15);">
               <div class="modal-header" style="border-bottom: 1px solid var(--border-color-glow);">
-                <h3 class="gradient-text-green" style="font-weight: 900; font-size: 1.35rem; font-family: var(--font-display);">🔑 Unirse a una Liga</h3>
+                <h3 class="gradient-text-green" style="font-weight: 900; font-size: 1.35rem; font-family: var(--font-display);">Unirse a una Liga</h3>
                 <button id="btn-close-join" class="modal-close" style="font-size: 1.2rem;">✕</button>
               </div>
               <div class="modal-body">
@@ -193,7 +193,7 @@ export function renderSelectLeague(container, callbacks) {
           <div id="modal-create-form" class="modal-overlay">
             <div class="modal-content glass" style="max-width: 450px; border: 1.5px solid var(--border-color-glow); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 0 0 20px rgba(222, 237, 0, 0.15);">
               <div class="modal-header" style="border-bottom: 1px solid var(--border-color-glow);">
-                <h3 class="gradient-text-gold" style="font-weight: 900; font-size: 1.35rem; font-family: var(--font-display);">✨ Crear una Liga Nueva</h3>
+                <h3 class="gradient-text-gold" style="font-weight: 900; font-size: 1.35rem; font-family: var(--font-display);">Crear una Liga Nueva</h3>
                 <button id="btn-close-create" class="modal-close" style="font-size: 1.2rem;">✕</button>
               </div>
               <div class="modal-body">

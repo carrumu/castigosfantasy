@@ -286,7 +286,7 @@ export function renderChallenges(container, callbacks) {
                       </div>
                       ${!isVotingClosed ? `
                         <button class="brutalist-btn-small btn-vote ${isThisVoted ? 'is-active' : ''}" ${userVotedId ? 'disabled' : ''} data-id="${item.id}" style="padding: 0.35rem 0.75rem; font-size: 0.7rem; border-radius: 4px; ${userVotedId ? 'opacity: 0.5; cursor: not-allowed;' : ''}">
-                          ${isThisVoted ? '✔ Votado' : 'Votar'}
+                          ${isThisVoted ? 'Votado' : 'Votar'}
                         </button>
                       ` : ''}
                     </div>

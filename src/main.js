@@ -780,7 +780,7 @@ function showSupportModal() {
     <div class="modal-content glass" style="max-width: 500px; animation: slideDown 0.3s ease-out;">
       <div class="modal-header">
         <h3 class="gradient-text-green" style="font-weight: 800; font-size: 1.3rem; display: flex; align-items: center; gap: 0.5rem; color: var(--primary);">
-          📬 Soporte Técnico
+          Soporte Técnico
         </h3>
         <button class="modal-close" id="close-support-btn">✕</button>
       </div>

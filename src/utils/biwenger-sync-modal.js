@@ -42,7 +42,7 @@ export async function openBiwengerSyncModal(leagueId, leagueData, isAdmin, callb
         
         <div id="biwenger-admin-action" style="display: none; border-top: 1.5px dashed var(--border-color-glow); padding-top: 1.25rem; margin-top: 0.5rem;">
           <h4 class="gradient-text-gold" style="font-family: var(--font-display); font-size: 0.9rem; font-weight: 900; margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px;">
-            📝 Registrar Último Puesto por Sincronización
+            Registrar Último Puesto por Sincronización
           </h4>
           <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 1rem; line-height: 1.4;">
             Hemos detectado automáticamente al farolillo rojo de la jornada. Configura la deuda para añadirlo a la lista de morosos.
@@ -74,7 +74,7 @@ export async function openBiwengerSyncModal(leagueId, leagueData, isAdmin, callb
             </div>
 
             <button type="submit" class="btn-primary" id="btn-biwenger-save" style="font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; border: 2.5px solid #000000; box-shadow: 3px 3px 0px #000000; width: 100%; padding: 0.8rem; cursor: pointer; background: var(--accent); color: #000;">
-              Confirmar y Registrar en la Liga 🤫
+              Confirmar y Registrar en la Liga
             </button>
           </form>
         </div>
@@ -210,7 +210,7 @@ export async function openBiwengerSyncModal(leagueId, leagueData, isAdmin, callb
                 return `
                   <tr style="${rowStyle}">
                     <td style="padding: 0.55rem; color: var(--text-muted);">${posText}</td>
-                    <td style="padding: 0.55rem; color: var(--text-light);">${s.name} ${isRoundLoser && sortBy === 'round' ? '⚠️' : ''} <span style="font-size:0.65rem; color:var(--text-muted); font-weight:normal; display:block;">${s.email}</span></td>
+                    <td style="padding: 0.55rem; color: var(--text-light);">${s.name}${isRoundLoser && sortBy === 'round' ? ' <span style="color:var(--danger); font-weight:900;">(último)</span>' : ''} <span style="font-size:0.65rem; color:var(--text-muted); font-weight:normal; display:block;">${s.email}</span></td>
                     <td style="padding: 0.55rem; text-align: right; color: var(--text-light); font-size:0.8rem;">${s.points} pts</td>
                     <td style="padding: 0.55rem; color: var(--accent-gold); font-weight: 900; text-align: right; font-size:0.85rem;">${s.lastPoints} pts</td>
                   </tr>
@@ -266,6 +266,17 @@ export async function openBiwengerSyncModal(leagueId, leagueData, isAdmin, callb
         name: m.profiles?.apodo || m.profiles?.display_name || 'Desconocido'
       }));
 
+      // Also load pre-registered roster slots (players not yet on the app).
+      // A loser can be assigned to one of these so the debt is recorded even if
+      // they haven't signed up; it migrates to their profile when they join.
+      const { data: rosterData } = await supabase
+        .from('league_roster')
+        .select('id, name')
+        .eq('league_id', leagueId)
+        .is('claimed_by', null)
+        .order('name');
+      const rosterSlots = (rosterData || []).map(r => ({ roster_id: r.id, name: r.name }));
+
       // Load matchdays to get next number
       const { data: records, error: recErr } = await supabase
         .from('matchday_records')
@@ -277,7 +288,9 @@ export async function openBiwengerSyncModal(leagueId, leagueData, isAdmin, callb
       const maxMatchday = (records || []).reduce((max, r) => r.matchday_number > max ? r.matchday_number : max, 0);
       modal.querySelector('#biwenger-matchday').value = maxMatchday + 1;
 
-      // Populate select dropdown
+      // Populate select dropdown: app members, then unclaimed roster slots,
+      // then an option to register the detected Biwenger loser as a brand-new
+      // player (creates a roster slot on the fly).
       const selectEl = modal.querySelector('#biwenger-loser-select');
       localMembers.forEach(member => {
         const opt = document.createElement('option');
@@ -285,47 +298,71 @@ export async function openBiwengerSyncModal(leagueId, leagueData, isAdmin, callb
         opt.textContent = member.name;
         selectEl.appendChild(opt);
       });
+      if (rosterSlots.length > 0) {
+        const grp = document.createElement('optgroup');
+        grp.label = 'Jugadores pre-registrados';
+        rosterSlots.forEach(slot => {
+          const opt = document.createElement('option');
+          opt.value = `roster-${slot.roster_id}`;
+          opt.textContent = slot.name;
+          grp.appendChild(opt);
+        });
+        selectEl.appendChild(grp);
+      }
+      const newOpt = document.createElement('option');
+      newOpt.value = '__new__';
+      newOpt.textContent = `+ Registrar como jugador nuevo: ${loserBiwengerName}`;
+      selectEl.appendChild(newOpt);
 
-      // Find match: first check explicit biwenger_user_name, then fallback to name similarity
-      const findMatch = (biwengerName, list) => {
+      // Find match: explicit biwenger_user_name link first, then name similarity
+      // against both app members and pre-registered roster slots.
+      const findMatch = (biwengerName) => {
         if (!biwengerName) return null;
         const query = biwengerName.toLowerCase().trim();
-        
-        // 1. Explicit link (exact match on biwenger_user_name)
-        let matched = list.find(m => m.biwenger_user_name.toLowerCase().trim() === query);
-        if (matched) return { member: matched, type: 'linked' };
 
-        // 2. Exact match on app name
-        matched = list.find(m => m.name.toLowerCase().trim() === query);
-        if (matched) return { member: matched, type: 'fuzzy' };
+        // 1. Explicit link (exact match on biwenger_user_name of a member)
+        let matched = localMembers.find(m => m.biwenger_user_name.toLowerCase().trim() === query);
+        if (matched) return { value: matched.profile_id, name: matched.name, type: 'linked' };
 
-        // 3. Substring match on app name
-        matched = list.find(m => {
+        // 2. Exact match on a member's app name
+        matched = localMembers.find(m => m.name.toLowerCase().trim() === query);
+        if (matched) return { value: matched.profile_id, name: matched.name, type: 'fuzzy' };
+
+        // 3. Exact match on a roster slot name
+        let slot = rosterSlots.find(s => s.name.toLowerCase().trim() === query);
+        if (slot) return { value: `roster-${slot.roster_id}`, name: slot.name, type: 'roster' };
+
+        // 4. Substring match on a member's app name
+        matched = localMembers.find(m => {
           const name = m.name.toLowerCase().trim();
           return name.includes(query) || query.includes(name);
         });
-        if (matched) return { member: matched, type: 'fuzzy' };
+        if (matched) return { value: matched.profile_id, name: matched.name, type: 'fuzzy' };
 
         return null;
       };
 
-      const matchResult = findMatch(loserBiwengerName, localMembers);
-      const matchedMember = matchResult?.member || null;
-      const matchType = matchResult?.type || null;
+      const matchResult = findMatch(loserBiwengerName);
       const noticeEl = modal.querySelector('#biwenger-match-notice');
 
-      if (matchedMember) {
-        selectEl.value = matchedMember.profile_id;
-        if (matchType === 'linked') {
+      if (matchResult) {
+        selectEl.value = matchResult.value;
+        if (matchResult.type === 'linked') {
           noticeEl.style.color = '#88ff88';
-          noticeEl.innerHTML = `✓ Emparejado automáticamente por vinculación con <strong>${matchedMember.name}</strong>.`;
+          noticeEl.innerHTML = `Emparejado automáticamente por vinculación con <strong>${matchResult.name}</strong>.`;
+        } else if (matchResult.type === 'roster') {
+          noticeEl.style.color = 'var(--accent-gold)';
+          noticeEl.innerHTML = `Emparejado con el jugador pre-registrado <strong>${matchResult.name}</strong>.`;
         } else {
           noticeEl.style.color = 'var(--accent-gold)';
-          noticeEl.innerHTML = `✓ Emparejado por similitud de nombre con <strong>${matchedMember.name}</strong>. (Se recomienda vincular en Ajustes).`;
+          noticeEl.innerHTML = `Emparejado por similitud de nombre con <strong>${matchResult.name}</strong>. (Se recomienda vincular en Ajustes).`;
         }
       } else {
-        noticeEl.style.color = 'var(--danger)';
-        noticeEl.innerHTML = `⚠️ No se pudo emparejar. El usuario '${loserBiwengerName}' no está vinculado a ningún manager local. Selecciónalo manualmente.`;
+        // No match: default to creating a new player with the Biwenger name so
+        // the admin can register the debt without the person being on the app.
+        selectEl.value = '__new__';
+        noticeEl.style.color = 'var(--text-muted)';
+        noticeEl.innerHTML = `No hay ningún manager vinculado a '<strong>${loserBiwengerName}</strong>'. Se registrará como jugador nuevo (podrá reclamar su plaza al unirse), o elige otro manualmente.`;
       }
 
       // Show form
@@ -344,24 +381,50 @@ export async function openBiwengerSyncModal(leagueId, leagueData, isAdmin, callb
           return;
         }
 
-        const finalLoserName = localMembers.find(m => m.profile_id === selectedLoserId)?.name || 'Entrenador';
+        // Resolve the loser's display name for the trash-talk phrase.
+        let finalLoserName;
+        if (selectedLoserId === '__new__') {
+          finalLoserName = loserBiwengerName;
+        } else if (selectedLoserId.startsWith('roster-')) {
+          const rid = selectedLoserId.replace('roster-', '');
+          finalLoserName = rosterSlots.find(s => s.roster_id === rid)?.name || loserBiwengerName;
+        } else {
+          finalLoserName = localMembers.find(m => m.profile_id === selectedLoserId)?.name || 'Entrenador';
+        }
         const trashPhrase = getRandomPhrase(finalLoserName, amountNum);
 
         saveBtn.disabled = true;
         saveBtn.innerHTML = '<span class="spinner" style="width:16px;height:16px;"></span> Guardando...';
 
         try {
-          const currentUser = supabase.auth.user ? supabase.auth.user() : (await supabase.auth.getUser()).data.user;
+          const insertObj = {
+            league_id: leagueId,
+            matchday_number: matchdayNum,
+            amount_owed: amountNum,
+            trash_talk_phrase: trashPhrase
+          };
+
+          if (selectedLoserId === '__new__') {
+            // Create a roster slot for the detected Biwenger player, then bill it.
+            const { data: newSlot, error: rosterErr } = await supabase
+              .from('league_roster')
+              .insert({ league_id: leagueId, name: loserBiwengerName })
+              .select('id')
+              .single();
+            if (rosterErr) throw rosterErr;
+            insertObj.loser_roster_id = newSlot.id;
+            insertObj.loser_profile_id = null;
+          } else if (selectedLoserId.startsWith('roster-')) {
+            insertObj.loser_roster_id = selectedLoserId.replace('roster-', '');
+            insertObj.loser_profile_id = null;
+          } else {
+            insertObj.loser_profile_id = selectedLoserId;
+            insertObj.loser_roster_id = null;
+          }
 
           const { error: insertErr } = await supabase
             .from('matchday_records')
-            .insert({
-              league_id: leagueId,
-              matchday_number: matchdayNum,
-              loser_profile_id: selectedLoserId,
-              amount_owed: amountNum,
-              trash_talk_phrase: trashPhrase
-            });
+            .insert(insertObj);
 
           if (insertErr) throw insertErr;
 
@@ -377,7 +440,7 @@ export async function openBiwengerSyncModal(leagueId, leagueData, isAdmin, callb
           console.error(saveErr);
           callbacks.showToast('Error al registrar el perdedor de la jornada.', 'error');
           saveBtn.disabled = false;
-          saveBtn.innerHTML = 'Confirmar y Registrar en la Liga 🤫';
+          saveBtn.innerHTML = 'Confirmar y Registrar en la Liga';
         }
       });
     }
@@ -385,7 +448,7 @@ export async function openBiwengerSyncModal(leagueId, leagueData, isAdmin, callb
   } catch (err) {
     console.error(err);
     statusEl.innerHTML = `
-      <strong style="color:var(--danger);">❌ Error de Sincronización</strong><br/>
+      <strong style="color:var(--danger);">Error de Sincronización</strong><br/>
       <span style="font-size:0.75rem; color:var(--text-muted); display:block; margin-top:0.4rem; line-height:1.45; text-align: left;">
         Detalle del error: <strong style="color: #ff8888;">${err.message}</strong><br/><br/>
         <em>Comprueba que las credenciales de Biwenger de la liga sean correctas en las opciones de configuración de la liga.</em>
