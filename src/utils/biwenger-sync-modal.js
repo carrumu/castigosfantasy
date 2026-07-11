@@ -138,6 +138,11 @@ export async function openBiwengerSyncModal(leagueId, leagueData, isAdmin, callb
     const syncData = await res.json();
     const users = syncData.data?.users || [];
     const standings = syncData.data?.standings || [];
+    // Id of the last finished Biwenger round, used to dedupe against the
+    // dashboard "Cerrar Jornada" banner so the same round isn't charged twice.
+    const seasonRounds = syncData.data?.season_rounds || [];
+    const finishedRounds = seasonRounds.filter(r => r.status === 'finished');
+    const lastFinishedRoundId = finishedRounds.length ? finishedRounds[finishedRounds.length - 1].id : null;
 
     if (standings.length === 0) {
       throw new Error('No se han encontrado clasificaciones en la liga de Biwenger.');
@@ -403,6 +408,9 @@ export async function openBiwengerSyncModal(leagueId, leagueData, isAdmin, callb
             amount_owed: amountNum,
             trash_talk_phrase: trashPhrase
           };
+          if (lastFinishedRoundId != null) {
+            insertObj.biwenger_round_id = lastFinishedRoundId;
+          }
 
           if (selectedLoserId === '__new__') {
             // Create a roster slot for the detected Biwenger player, then bill it.
@@ -427,6 +435,9 @@ export async function openBiwengerSyncModal(leagueId, leagueData, isAdmin, callb
             .insert(insertObj);
 
           if (insertErr) throw insertErr;
+
+          // Clear the dashboard "Cerrar Jornada" pending banner for this round.
+          localStorage.removeItem(`CF_PENDING_BW_ROUND_${leagueId}`);
 
           callbacks.showToast(`¡Jornada ${matchdayNum} registrada para ${finalLoserName} con éxito!`, 'success');
           closeModal();

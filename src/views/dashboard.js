@@ -319,32 +319,29 @@ export function renderDashboard(container, callbacks) {
       padding: 1rem 1.25rem;
       margin-bottom: 1.5rem;
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
-      flex-wrap: wrap;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.85rem;
     `;
     banner.innerHTML = `
-      <div style="display:flex;align-items:center;gap:0.75rem;flex:1;min-width:0;">
-        <div>
-          <div style="font-weight:800;font-size:0.9rem;color:var(--text-light);margin-bottom:0.2rem;">
-            Jornada terminada: <span style="color:#f87171">${pending.roundName}</span>
-          </div>
-          <div style="font-size:0.82rem;color:var(--text-muted);">
-            Último: ${colistaDisplay} · ${pending.colistaPts} pts
-            ${pending.isTie ? `<span style="color:var(--accent-gold);margin-left:0.4rem">Empate — elige quién paga</span>` : ''}
-          </div>
+      <div style="min-width:0;">
+        <div style="font-weight:800;font-size:0.9rem;color:var(--text-light);margin-bottom:0.25rem;line-height:1.3;">
+          Jornada terminada: <span style="color:#f87171">${pending.roundName}</span>
+        </div>
+        <div style="font-size:0.82rem;color:var(--text-muted);line-height:1.4;">
+          Último: ${colistaDisplay} · ${pending.colistaPts} pts
+          ${pending.isTie ? `<span style="color:var(--accent-gold);display:block;margin-top:0.2rem;">Empate — elige quién paga</span>` : ''}
         </div>
       </div>
-      <div style="display:flex;gap:0.5rem;flex-shrink:0;">
+      <div style="display:flex;gap:0.5rem;">
         <button id="btn-confirm-jornada" style="
-          background: var(--danger); color: #fff; border: none; border-radius: 6px;
-          padding: 0.55rem 1rem; font-weight: 800; font-size: 0.8rem; cursor: pointer;
+          flex:1;background: var(--danger); color: #fff; border: none; border-radius: 6px;
+          padding: 0.65rem 1rem; font-weight: 800; font-size: 0.8rem; cursor: pointer;
           text-transform: uppercase; letter-spacing: 0.5px;
         ">Cerrar Jornada</button>
         <button id="btn-dismiss-jornada" style="
           background: none; color: var(--text-muted); border: 1px solid var(--border-color);
-          border-radius: 6px; padding: 0.55rem 0.75rem; font-size: 0.75rem; cursor: pointer;
+          border-radius: 6px; padding: 0.65rem 0.9rem; font-size: 0.75rem; cursor: pointer; white-space:nowrap;
         ">Ignorar</button>
       </div>
     `;
@@ -942,6 +939,16 @@ export function renderDashboard(container, callbacks) {
           insertObj.loser_roster_id = null;
         }
 
+        // If a Biwenger round is pending its punishment, registering here also
+        // closes it: stamp the round id so the "Cerrar Jornada" banner won't
+        // reappear and let the admin charge the same round twice.
+        const pendingKey = `CF_PENDING_BW_ROUND_${currentLeague.id}`;
+        const pendingRaw = localStorage.getItem(pendingKey);
+        const pendingRound = pendingRaw ? JSON.parse(pendingRaw) : null;
+        if (pendingRound && pendingRound.roundId != null) {
+          insertObj.biwenger_round_id = pendingRound.roundId;
+        }
+
         const { data: recordData, error: insertErr } = await supabase
           .from('matchday_records')
           .insert(insertObj)
@@ -949,6 +956,11 @@ export function renderDashboard(container, callbacks) {
           .single();
 
         if (insertErr) throw insertErr;
+
+        if (pendingRound) {
+          localStorage.removeItem(pendingKey);
+          container.querySelector('#jornada-close-banner')?.remove();
+        }
 
         lastRecordId = recordData.id;
         localStorage.setItem('CF_PENDING_RECORD_ID', lastRecordId);
