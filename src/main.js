@@ -237,6 +237,18 @@ function renderMainLayout(isGuest, currentUser = null) {
 
         <!-- Contenedor de la Vista Activa -->
         <main id="view-container" class="container"></main>
+
+        <!-- Pie de página con enlaces legales (visible en todas las vistas) -->
+        <footer class="site-footer" style="border-top: 1px solid var(--border-color); margin-top: 2rem; padding: 1.5rem 1rem calc(1.5rem + 70px); text-align: center; color: var(--text-muted); font-size: 0.78rem; line-height: 1.6;">
+          <div style="margin-bottom: 0.5rem;">© 2026 CastigosFantasy · Ligas de fútbol fantasy entre amigos</div>
+          <div style="display: flex; gap: 0.4rem 1rem; flex-wrap: wrap; justify-content: center;">
+            <a class="legal-link" data-page="privacidad" style="color: var(--text-muted); cursor: pointer; font-weight: 600;">Política de Privacidad</a>
+            <span aria-hidden="true">·</span>
+            <a class="legal-link" data-page="cookies" style="color: var(--text-muted); cursor: pointer; font-weight: 600;">Política de Cookies</a>
+            <span aria-hidden="true">·</span>
+            <a class="legal-link" data-page="terminos" style="color: var(--text-muted); cursor: pointer; font-weight: 600;">Términos y Condiciones</a>
+          </div>
+        </footer>
       </div>
 
       <!-- Navegación Inferior para Móvil -->
