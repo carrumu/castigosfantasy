@@ -36,4 +36,22 @@
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
+  <url>
+    <loc>https://castigosfantasy.com/generador</loc>
+    <lastmod>2026-07-12</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://castigosfantasy.com/bufon</loc>
+    <lastmod>2026-07-12</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://castigosfantasy.com/retos</loc>
+    <lastmod>2026-07-12</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
 </urlset>
