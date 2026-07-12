@@ -188,8 +188,8 @@ export async function openLeagueSettings(leagueId, callbacks) {
               <input type="text" id="edit-comunio-community-id" class="input-field" value="${leagueData.comunio_community_id || ''}" placeholder="Se detecta solo si lo dejas vacío" style="border: 1.5px solid var(--border-color-glow); font-weight: 700; background: var(--bg-input); width: 100%; padding: 0.55rem 0.75rem;" />
             </div>
             <div class="form-group" style="margin-bottom: 0;">
-              <label for="edit-comunio-email" style="color: var(--text-light); font-weight: 700; font-size: 0.75rem; display: block; margin-bottom: 0.25rem;">Correo de Comunio</label>
-              <input type="email" id="edit-comunio-email" class="input-field" value="${comunioEmail || ''}" placeholder="ejemplo@correo.com" style="border: 1.5px solid var(--border-color-glow); font-weight: 700; background: var(--bg-input); width: 100%; padding: 0.55rem 0.75rem;" />
+              <label for="edit-comunio-email" style="color: var(--text-light); font-weight: 700; font-size: 0.75rem; display: block; margin-bottom: 0.25rem;">Usuario / ID de Comunio</label>
+              <input type="text" id="edit-comunio-email" class="input-field" value="${comunioEmail || ''}" placeholder="El usuario/ID con el que entras a Comunio" autocomplete="off" style="border: 1.5px solid var(--border-color-glow); font-weight: 700; background: var(--bg-input); width: 100%; padding: 0.55rem 0.75rem;" />
             </div>
             <div class="form-group" style="margin-bottom: 0;">
               <label for="edit-comunio-password" style="color: var(--text-light); font-weight: 700; font-size: 0.75rem; display: block; margin-bottom: 0.25rem;">Contraseña de Comunio</label>
@@ -357,7 +357,7 @@ export async function openLeagueSettings(leagueId, callbacks) {
         // Require the password each test so you never test with a stale one.
         if (!emailVal || !pwVal) {
           out.style.color = '#ffcc66';
-          out.textContent = '⚠️ Escribe tu correo y tu contraseña de Comunio en los campos de arriba antes de probar (el campo de contraseña arranca vacío a propósito).';
+          out.textContent = '⚠️ Escribe tu usuario/ID y tu contraseña de Comunio en los campos de arriba antes de probar (el campo de contraseña arranca vacío a propósito).';
           return;
         }
         out.style.color = '#8f8';
