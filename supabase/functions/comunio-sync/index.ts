@@ -101,14 +101,14 @@ serve(async (req: Request) => {
     // --- 3. Standings: probe several candidate endpoints and report what each
     //     returns, so the one that holds the ranking can be identified. ---
     const candidates = [
-      `/communities/${communityId}/standings`,
-      `/communities/${communityId}/standings/general`,
-      `/communities/${communityId}/standings/round`,
-      `/communities/${communityId}/ranking`,
-      `/communities/${communityId}/users`,
-      `/communities/${communityId}`,
-      `/players/me`,
-      `/users/me`,
+      `/communities/${communityId}/users/21142044`,
+      `/communities/${communityId}/members`,
+      `/communities/${communityId}/standings?matchday=1`,
+      `/communities/${communityId}/standings?period=SEASON`,
+      `/communities/${communityId}/standings/season`,
+      `/communities/${communityId}/matchdays`,
+      `/communities/${communityId}/season`,
+      `/communities/${communityId}/ranking-list`,
     ];
     const probe: Record<string, any> = {};
     for (const path of candidates) {
