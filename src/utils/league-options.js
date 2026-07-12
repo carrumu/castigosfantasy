@@ -361,13 +361,17 @@ export async function openLeagueSettings(leagueId, callbacks) {
           return;
         }
         out.style.color = '#8f8';
-        out.textContent = 'Guardando credenciales y probando...';
+        out.textContent = `Guardando credenciales (contraseña de ${pwVal.length} caracteres) y probando...`;
         try {
           // Persist current Comunio inputs first so the function can read them.
           const commId = modal.querySelector('#edit-comunio-community-id').value.trim() || null;
-          const secretPayload = { league_id: leagueId, comunio_email: emailVal, updated_at: new Date().toISOString() };
-          if (pwVal) secretPayload.comunio_password = pwVal;
-          await supabase.from('league_secrets').upsert(secretPayload, { onConflict: 'league_id' });
+          const secretPayload = { league_id: leagueId, comunio_email: emailVal, comunio_password: pwVal, updated_at: new Date().toISOString() };
+          const { error: upErr } = await supabase.from('league_secrets').upsert(secretPayload, { onConflict: 'league_id' });
+          if (upErr) {
+            out.style.color = '#ff8888';
+            out.textContent = '❌ No se pudo guardar la contraseña: ' + upErr.message;
+            return;
+          }
           await supabase.from('leagues').update({ comunio_community_id: commId }).eq('id', leagueId);
 
           const base = import.meta.env.VITE_SUPABASE_URL || localStorage.getItem('CF_SUPABASE_URL') || '';
