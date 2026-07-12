@@ -77,8 +77,8 @@ function removeFaqSchema() {
 const FEATURES = [
   {
     icon: 'trending_down', bg: 'var(--danger)', color: '#fff', nav: 'acceso',
-    title: 'Detector de Perdedor',
-    desc: 'Controla quién es el farolillo rojo cada jornada. Automático con Biwenger; y vale para Comunio, LaLiga Fantasy y más. Sin Excel.'
+    title: 'Lista de Morosos',
+    desc: 'El farolillo rojo de cada jornada, a la lista. Automático con Biwenger; y vale para Comunio, LaLiga Fantasy y más. Sin Excel.'
   },
   {
     icon: 'casino', bg: 'var(--accent)', color: '#000', nav: 'ruleta',
