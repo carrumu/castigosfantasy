@@ -373,7 +373,19 @@ export async function openLeagueSettings(leagueId, callbacks) {
             body: JSON.stringify({ appLeagueId: leagueId })
           });
           const data = await res.json();
-          out.textContent = `[HTTP ${res.status}]\n` + JSON.stringify(data, null, 2).slice(0, 4000);
+          const errText = (data && data.error) ? String(data.error) : '';
+          const badCreds = res.status === 401 || /invalid username and password/i.test(errText);
+
+          if (res.ok && !data.error) {
+            out.style.color = '#8f8';
+            out.textContent = '✅ ¡Conectado con Comunio! Clasificación recibida.\n\n' + JSON.stringify(data, null, 2).slice(0, 3500);
+          } else if (badCreds) {
+            out.style.color = '#ff8888';
+            out.textContent = '❌ Usuario o contraseña de Comunio incorrectos.\n\nComprueba el correo y la contraseña. IMPORTANTE: si entras a Comunio con Google, Facebook o Apple, no tienes una contraseña propia de Comunio; créate una en la app de Comunio con "¿Olvidaste tu contraseña?" y úsala aquí.';
+          } else {
+            out.style.color = '#ffcc66';
+            out.textContent = '⚠️ ' + (errText || `Error (HTTP ${res.status}).`);
+          }
         } catch (err) {
           out.textContent = 'Error: ' + (err?.message || String(err));
         }
