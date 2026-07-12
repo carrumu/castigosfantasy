@@ -71,6 +71,15 @@ function saveStats(stats) {
 const randIdx = (n) => Math.floor(Math.random() * n);
 const fmt = (n) => n.toLocaleString('es-ES');
 
+/** Fisher-Yates in-place shuffle. */
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
 /**
  * Renders "El Duelo": guess whether the hidden contender ranks above or below
  * the revealed one within the same ranking.
@@ -87,6 +96,23 @@ export function renderDuelo(container, callbacks) {
   let used = new Set();
   let reference = null;
   let challenger = null;
+
+  // Shuffled deck of topic indices so every category comes up (mixed) before
+  // any repeats — a fresh category each round.
+  let topicDeck = [];
+  let lastTopicIndex = -1;
+
+  function nextTopicIndex() {
+    if (topicDeck.length === 0) {
+      topicDeck = shuffle(topics.map((_, i) => i));
+      // Avoid repeating the same category across the reshuffle seam.
+      if (topics.length > 1 && topicDeck[0] === lastTopicIndex) {
+        topicDeck.push(topicDeck.shift());
+      }
+    }
+    lastTopicIndex = topicDeck.shift();
+    return lastTopicIndex;
+  }
 
   let phase = 'question'; // 'question' | 'reveal' | 'gameover'
   let lastCorrect = false;
@@ -117,10 +143,7 @@ export function renderDuelo(container, callbacks) {
   }
 
   function startTopic() {
-    const previous = topic;
-    do {
-      topic = topics[randIdx(topics.length)];
-    } while (topics.length > 1 && topic === previous);
+    topic = topics[nextTopicIndex()];
 
     used = new Set();
     const i = randIdx(topic.entries.length);
@@ -133,16 +156,9 @@ export function renderDuelo(container, callbacks) {
   }
 
   function advance() {
-    reference = challenger;
-    const next = pickChallenger();
-    if (next) {
-      challenger = next;
-      newCategory = false;
-    } else {
-      // Ranking exhausted: move on to a fresh category.
-      startTopic();
-      newCategory = true;
-    }
+    // A fresh category every round: pick a new topic with a new pair.
+    startTopic();
+    newCategory = false;
   }
 
   function endGame() {

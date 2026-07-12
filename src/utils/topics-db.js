@@ -998,7 +998,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Porteros históricos con mayor número de partidos en Primera",
-    "badgeTitle": "PORTEROS PARTIDOS G11",
+    "badgeTitle": "PORTEROS PARTIDOS",
     "answers": [
       {
         "name": "Andoni Zubizarreta",
@@ -1096,7 +1096,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Equipos históricos de España ordenados por títulos totales",
-    "badgeTitle": "CLUBES TÍTULOS G12",
+    "badgeTitle": "CLUBES TÍTULOS",
     "answers": [
       {
         "name": "Real Madrid",
@@ -1196,7 +1196,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Futbolistas que ganaron el Pichichi jugando en LaLiga",
-    "badgeTitle": "PICHICHIS LALIGA G13",
+    "badgeTitle": "PICHICHIS LALIGA",
     "answers": [
       {
         "name": "Lionel Messi",
@@ -1295,7 +1295,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Jugadores con más partidos disputados en la Selección de España",
-    "badgeTitle": "MÁS SELECCIÓN G14",
+    "badgeTitle": "MÁS SELECCIÓN",
     "answers": [
       {
         "name": "Sergio Ramos",
@@ -1392,7 +1392,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Jugadores con la nacionalidad española con más goles",
-    "badgeTitle": "GOLEADORES ESPAÑA G15",
+    "badgeTitle": "GOLEADORES ESPAÑA",
     "answers": [
       {
         "name": "Telmo Zarra",
@@ -1487,7 +1487,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Porteros históricos con mayor número de partidos en Primera",
-    "badgeTitle": "PORTEROS PARTIDOS G16",
+    "badgeTitle": "PORTEROS PARTIDOS",
     "answers": [
       {
         "name": "Andoni Zubizarreta",
@@ -1585,7 +1585,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Equipos históricos de España ordenados por títulos totales",
-    "badgeTitle": "CLUBES TÍTULOS G17",
+    "badgeTitle": "CLUBES TÍTULOS",
     "answers": [
       {
         "name": "Real Madrid",
@@ -1685,7 +1685,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Futbolistas que ganaron el Pichichi jugando en LaLiga",
-    "badgeTitle": "PICHICHIS LALIGA G18",
+    "badgeTitle": "PICHICHIS LALIGA",
     "answers": [
       {
         "name": "Lionel Messi",
@@ -1784,7 +1784,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Jugadores con más partidos disputados en la Selección de España",
-    "badgeTitle": "MÁS SELECCIÓN G19",
+    "badgeTitle": "MÁS SELECCIÓN",
     "answers": [
       {
         "name": "Sergio Ramos",
@@ -1881,7 +1881,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Jugadores con la nacionalidad española con más goles",
-    "badgeTitle": "GOLEADORES ESPAÑA G20",
+    "badgeTitle": "GOLEADORES ESPAÑA",
     "answers": [
       {
         "name": "Telmo Zarra",
@@ -1976,7 +1976,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Porteros históricos con mayor número de partidos en Primera",
-    "badgeTitle": "PORTEROS PARTIDOS G21",
+    "badgeTitle": "PORTEROS PARTIDOS",
     "answers": [
       {
         "name": "Andoni Zubizarreta",
@@ -2074,7 +2074,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Equipos históricos de España ordenados por títulos totales",
-    "badgeTitle": "CLUBES TÍTULOS G22",
+    "badgeTitle": "CLUBES TÍTULOS",
     "answers": [
       {
         "name": "Real Madrid",
@@ -2174,7 +2174,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Futbolistas que ganaron el Pichichi jugando en LaLiga",
-    "badgeTitle": "PICHICHIS LALIGA G23",
+    "badgeTitle": "PICHICHIS LALIGA",
     "answers": [
       {
         "name": "Lionel Messi",
@@ -2273,7 +2273,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Jugadores con más partidos disputados en la Selección de España",
-    "badgeTitle": "MÁS SELECCIÓN G24",
+    "badgeTitle": "MÁS SELECCIÓN",
     "answers": [
       {
         "name": "Sergio Ramos",
@@ -2370,7 +2370,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Jugadores con la nacionalidad española con más goles",
-    "badgeTitle": "GOLEADORES ESPAÑA G25",
+    "badgeTitle": "GOLEADORES ESPAÑA",
     "answers": [
       {
         "name": "Telmo Zarra",
@@ -2465,7 +2465,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Porteros históricos con mayor número de partidos en Primera",
-    "badgeTitle": "PORTEROS PARTIDOS G26",
+    "badgeTitle": "PORTEROS PARTIDOS",
     "answers": [
       {
         "name": "Andoni Zubizarreta",
@@ -2563,7 +2563,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Equipos históricos de España ordenados por títulos totales",
-    "badgeTitle": "CLUBES TÍTULOS G27",
+    "badgeTitle": "CLUBES TÍTULOS",
     "answers": [
       {
         "name": "Real Madrid",
@@ -2663,7 +2663,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Futbolistas que ganaron el Pichichi jugando en LaLiga",
-    "badgeTitle": "PICHICHIS LALIGA G28",
+    "badgeTitle": "PICHICHIS LALIGA",
     "answers": [
       {
         "name": "Lionel Messi",
@@ -2762,7 +2762,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Jugadores con más partidos disputados en la Selección de España",
-    "badgeTitle": "MÁS SELECCIÓN G29",
+    "badgeTitle": "MÁS SELECCIÓN",
     "answers": [
       {
         "name": "Sergio Ramos",
@@ -2859,7 +2859,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Jugadores con la nacionalidad española con más goles",
-    "badgeTitle": "GOLEADORES ESPAÑA G30",
+    "badgeTitle": "GOLEADORES ESPAÑA",
     "answers": [
       {
         "name": "Telmo Zarra",
@@ -2954,7 +2954,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Porteros históricos con mayor número de partidos en Primera",
-    "badgeTitle": "PORTEROS PARTIDOS G31",
+    "badgeTitle": "PORTEROS PARTIDOS",
     "answers": [
       {
         "name": "Andoni Zubizarreta",
@@ -3052,7 +3052,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Equipos históricos de España ordenados por títulos totales",
-    "badgeTitle": "CLUBES TÍTULOS G32",
+    "badgeTitle": "CLUBES TÍTULOS",
     "answers": [
       {
         "name": "Real Madrid",
@@ -3152,7 +3152,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Futbolistas que ganaron el Pichichi jugando en LaLiga",
-    "badgeTitle": "PICHICHIS LALIGA G33",
+    "badgeTitle": "PICHICHIS LALIGA",
     "answers": [
       {
         "name": "Lionel Messi",
@@ -3251,7 +3251,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Jugadores con más partidos disputados en la Selección de España",
-    "badgeTitle": "MÁS SELECCIÓN G34",
+    "badgeTitle": "MÁS SELECCIÓN",
     "answers": [
       {
         "name": "Sergio Ramos",
@@ -3348,7 +3348,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Jugadores con la nacionalidad española con más goles",
-    "badgeTitle": "GOLEADORES ESPAÑA G35",
+    "badgeTitle": "GOLEADORES ESPAÑA",
     "answers": [
       {
         "name": "Telmo Zarra",
@@ -3443,7 +3443,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Porteros históricos con mayor número de partidos en Primera",
-    "badgeTitle": "PORTEROS PARTIDOS G36",
+    "badgeTitle": "PORTEROS PARTIDOS",
     "answers": [
       {
         "name": "Andoni Zubizarreta",
@@ -3541,7 +3541,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Equipos históricos de España ordenados por títulos totales",
-    "badgeTitle": "CLUBES TÍTULOS G37",
+    "badgeTitle": "CLUBES TÍTULOS",
     "answers": [
       {
         "name": "Real Madrid",
@@ -3641,7 +3641,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Futbolistas que ganaron el Pichichi jugando en LaLiga",
-    "badgeTitle": "PICHICHIS LALIGA G38",
+    "badgeTitle": "PICHICHIS LALIGA",
     "answers": [
       {
         "name": "Lionel Messi",
@@ -3740,7 +3740,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Jugadores con más partidos disputados en la Selección de España",
-    "badgeTitle": "MÁS SELECCIÓN G39",
+    "badgeTitle": "MÁS SELECCIÓN",
     "answers": [
       {
         "name": "Sergio Ramos",
@@ -3837,7 +3837,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Jugadores con la nacionalidad española con más goles",
-    "badgeTitle": "GOLEADORES ESPAÑA G40",
+    "badgeTitle": "GOLEADORES ESPAÑA",
     "answers": [
       {
         "name": "Telmo Zarra",
@@ -3932,7 +3932,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Porteros históricos con mayor número de partidos en Primera",
-    "badgeTitle": "PORTEROS PARTIDOS G41",
+    "badgeTitle": "PORTEROS PARTIDOS",
     "answers": [
       {
         "name": "Andoni Zubizarreta",
@@ -4030,7 +4030,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Equipos históricos de España ordenados por títulos totales",
-    "badgeTitle": "CLUBES TÍTULOS G42",
+    "badgeTitle": "CLUBES TÍTULOS",
     "answers": [
       {
         "name": "Real Madrid",
@@ -4130,7 +4130,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Futbolistas que ganaron el Pichichi jugando en LaLiga",
-    "badgeTitle": "PICHICHIS LALIGA G43",
+    "badgeTitle": "PICHICHIS LALIGA",
     "answers": [
       {
         "name": "Lionel Messi",
@@ -4229,7 +4229,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Jugadores con más partidos disputados en la Selección de España",
-    "badgeTitle": "MÁS SELECCIÓN G44",
+    "badgeTitle": "MÁS SELECCIÓN",
     "answers": [
       {
         "name": "Sergio Ramos",
@@ -4326,7 +4326,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Jugadores con la nacionalidad española con más goles",
-    "badgeTitle": "GOLEADORES ESPAÑA G45",
+    "badgeTitle": "GOLEADORES ESPAÑA",
     "answers": [
       {
         "name": "Telmo Zarra",
@@ -4421,7 +4421,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Porteros históricos con mayor número de partidos en Primera",
-    "badgeTitle": "PORTEROS PARTIDOS G46",
+    "badgeTitle": "PORTEROS PARTIDOS",
     "answers": [
       {
         "name": "Andoni Zubizarreta",
@@ -4519,7 +4519,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Equipos históricos de España ordenados por títulos totales",
-    "badgeTitle": "CLUBES TÍTULOS G47",
+    "badgeTitle": "CLUBES TÍTULOS",
     "answers": [
       {
         "name": "Real Madrid",
@@ -4619,7 +4619,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Futbolistas que ganaron el Pichichi jugando en LaLiga",
-    "badgeTitle": "PICHICHIS LALIGA G48",
+    "badgeTitle": "PICHICHIS LALIGA",
     "answers": [
       {
         "name": "Lionel Messi",
@@ -4718,7 +4718,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Jugadores con más partidos disputados en la Selección de España",
-    "badgeTitle": "MÁS SELECCIÓN G49",
+    "badgeTitle": "MÁS SELECCIÓN",
     "answers": [
       {
         "name": "Sergio Ramos",
@@ -4815,7 +4815,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Jugadores con la nacionalidad española con más goles",
-    "badgeTitle": "GOLEADORES ESPAÑA G50",
+    "badgeTitle": "GOLEADORES ESPAÑA",
     "answers": [
       {
         "name": "Telmo Zarra",
@@ -4910,7 +4910,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Porteros históricos con mayor número de partidos en Primera",
-    "badgeTitle": "PORTEROS PARTIDOS G51",
+    "badgeTitle": "PORTEROS PARTIDOS",
     "answers": [
       {
         "name": "Andoni Zubizarreta",
@@ -5008,7 +5008,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Equipos históricos de España ordenados por títulos totales",
-    "badgeTitle": "CLUBES TÍTULOS G52",
+    "badgeTitle": "CLUBES TÍTULOS",
     "answers": [
       {
         "name": "Real Madrid",
@@ -5108,7 +5108,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Futbolistas que ganaron el Pichichi jugando en LaLiga",
-    "badgeTitle": "PICHICHIS LALIGA G53",
+    "badgeTitle": "PICHICHIS LALIGA",
     "answers": [
       {
         "name": "Lionel Messi",
@@ -5207,7 +5207,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Jugadores con más partidos disputados en la Selección de España",
-    "badgeTitle": "MÁS SELECCIÓN G54",
+    "badgeTitle": "MÁS SELECCIÓN",
     "answers": [
       {
         "name": "Sergio Ramos",
@@ -5304,7 +5304,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Jugadores con la nacionalidad española con más goles",
-    "badgeTitle": "GOLEADORES ESPAÑA G55",
+    "badgeTitle": "GOLEADORES ESPAÑA",
     "answers": [
       {
         "name": "Telmo Zarra",
@@ -5399,7 +5399,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Porteros históricos con mayor número de partidos en Primera",
-    "badgeTitle": "PORTEROS PARTIDOS G56",
+    "badgeTitle": "PORTEROS PARTIDOS",
     "answers": [
       {
         "name": "Andoni Zubizarreta",
@@ -5497,7 +5497,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Equipos históricos de España ordenados por títulos totales",
-    "badgeTitle": "CLUBES TÍTULOS G57",
+    "badgeTitle": "CLUBES TÍTULOS",
     "answers": [
       {
         "name": "Real Madrid",
@@ -5597,7 +5597,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Futbolistas que ganaron el Pichichi jugando en LaLiga",
-    "badgeTitle": "PICHICHIS LALIGA G58",
+    "badgeTitle": "PICHICHIS LALIGA",
     "answers": [
       {
         "name": "Lionel Messi",
@@ -5696,7 +5696,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Jugadores con más partidos disputados en la Selección de España",
-    "badgeTitle": "MÁS SELECCIÓN G59",
+    "badgeTitle": "MÁS SELECCIÓN",
     "answers": [
       {
         "name": "Sergio Ramos",
@@ -5793,7 +5793,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Jugadores con la nacionalidad española con más goles",
-    "badgeTitle": "GOLEADORES ESPAÑA G60",
+    "badgeTitle": "GOLEADORES ESPAÑA",
     "answers": [
       {
         "name": "Telmo Zarra",
@@ -5888,7 +5888,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Porteros históricos con mayor número de partidos en Primera",
-    "badgeTitle": "PORTEROS PARTIDOS G61",
+    "badgeTitle": "PORTEROS PARTIDOS",
     "answers": [
       {
         "name": "Andoni Zubizarreta",
@@ -5986,7 +5986,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Equipos históricos de España ordenados por títulos totales",
-    "badgeTitle": "CLUBES TÍTULOS G62",
+    "badgeTitle": "CLUBES TÍTULOS",
     "answers": [
       {
         "name": "Real Madrid",
@@ -6086,7 +6086,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Futbolistas que ganaron el Pichichi jugando en LaLiga",
-    "badgeTitle": "PICHICHIS LALIGA G63",
+    "badgeTitle": "PICHICHIS LALIGA",
     "answers": [
       {
         "name": "Lionel Messi",
@@ -6185,7 +6185,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Jugadores con más partidos disputados en la Selección de España",
-    "badgeTitle": "MÁS SELECCIÓN G64",
+    "badgeTitle": "MÁS SELECCIÓN",
     "answers": [
       {
         "name": "Sergio Ramos",
@@ -6282,7 +6282,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Jugadores con la nacionalidad española con más goles",
-    "badgeTitle": "GOLEADORES ESPAÑA G65",
+    "badgeTitle": "GOLEADORES ESPAÑA",
     "answers": [
       {
         "name": "Telmo Zarra",
@@ -6377,7 +6377,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Porteros históricos con mayor número de partidos en Primera",
-    "badgeTitle": "PORTEROS PARTIDOS G66",
+    "badgeTitle": "PORTEROS PARTIDOS",
     "answers": [
       {
         "name": "Andoni Zubizarreta",
@@ -6475,7 +6475,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Equipos históricos de España ordenados por títulos totales",
-    "badgeTitle": "CLUBES TÍTULOS G67",
+    "badgeTitle": "CLUBES TÍTULOS",
     "answers": [
       {
         "name": "Real Madrid",
@@ -6575,7 +6575,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Futbolistas que ganaron el Pichichi jugando en LaLiga",
-    "badgeTitle": "PICHICHIS LALIGA G68",
+    "badgeTitle": "PICHICHIS LALIGA",
     "answers": [
       {
         "name": "Lionel Messi",
@@ -6674,7 +6674,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Jugadores con más partidos disputados en la Selección de España",
-    "badgeTitle": "MÁS SELECCIÓN G69",
+    "badgeTitle": "MÁS SELECCIÓN",
     "answers": [
       {
         "name": "Sergio Ramos",
@@ -6771,7 +6771,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Jugadores con la nacionalidad española con más goles",
-    "badgeTitle": "GOLEADORES ESPAÑA G70",
+    "badgeTitle": "GOLEADORES ESPAÑA",
     "answers": [
       {
         "name": "Telmo Zarra",
@@ -6866,7 +6866,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Porteros históricos con mayor número de partidos en Primera",
-    "badgeTitle": "PORTEROS PARTIDOS G71",
+    "badgeTitle": "PORTEROS PARTIDOS",
     "answers": [
       {
         "name": "Andoni Zubizarreta",
@@ -6964,7 +6964,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Equipos históricos de España ordenados por títulos totales",
-    "badgeTitle": "CLUBES TÍTULOS G72",
+    "badgeTitle": "CLUBES TÍTULOS",
     "answers": [
       {
         "name": "Real Madrid",
@@ -7064,7 +7064,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Futbolistas que ganaron el Pichichi jugando en LaLiga",
-    "badgeTitle": "PICHICHIS LALIGA G73",
+    "badgeTitle": "PICHICHIS LALIGA",
     "answers": [
       {
         "name": "Lionel Messi",
@@ -7163,7 +7163,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Jugadores con más partidos disputados en la Selección de España",
-    "badgeTitle": "MÁS SELECCIÓN G74",
+    "badgeTitle": "MÁS SELECCIÓN",
     "answers": [
       {
         "name": "Sergio Ramos",
@@ -7260,7 +7260,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Jugadores con la nacionalidad española con más goles",
-    "badgeTitle": "GOLEADORES ESPAÑA G75",
+    "badgeTitle": "GOLEADORES ESPAÑA",
     "answers": [
       {
         "name": "Telmo Zarra",
@@ -7355,7 +7355,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Porteros históricos con mayor número de partidos en Primera",
-    "badgeTitle": "PORTEROS PARTIDOS G76",
+    "badgeTitle": "PORTEROS PARTIDOS",
     "answers": [
       {
         "name": "Andoni Zubizarreta",
@@ -7453,7 +7453,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Equipos históricos de España ordenados por títulos totales",
-    "badgeTitle": "CLUBES TÍTULOS G77",
+    "badgeTitle": "CLUBES TÍTULOS",
     "answers": [
       {
         "name": "Real Madrid",
@@ -7553,7 +7553,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Futbolistas que ganaron el Pichichi jugando en LaLiga",
-    "badgeTitle": "PICHICHIS LALIGA G78",
+    "badgeTitle": "PICHICHIS LALIGA",
     "answers": [
       {
         "name": "Lionel Messi",
@@ -7652,7 +7652,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Jugadores con más partidos disputados en la Selección de España",
-    "badgeTitle": "MÁS SELECCIÓN G79",
+    "badgeTitle": "MÁS SELECCIÓN",
     "answers": [
       {
         "name": "Sergio Ramos",
@@ -7749,7 +7749,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Jugadores con la nacionalidad española con más goles",
-    "badgeTitle": "GOLEADORES ESPAÑA G80",
+    "badgeTitle": "GOLEADORES ESPAÑA",
     "answers": [
       {
         "name": "Telmo Zarra",
@@ -7844,7 +7844,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Porteros históricos con mayor número de partidos en Primera",
-    "badgeTitle": "PORTEROS PARTIDOS G81",
+    "badgeTitle": "PORTEROS PARTIDOS",
     "answers": [
       {
         "name": "Andoni Zubizarreta",
@@ -7942,7 +7942,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Equipos históricos de España ordenados por títulos totales",
-    "badgeTitle": "CLUBES TÍTULOS G82",
+    "badgeTitle": "CLUBES TÍTULOS",
     "answers": [
       {
         "name": "Real Madrid",
@@ -8042,7 +8042,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Futbolistas que ganaron el Pichichi jugando en LaLiga",
-    "badgeTitle": "PICHICHIS LALIGA G83",
+    "badgeTitle": "PICHICHIS LALIGA",
     "answers": [
       {
         "name": "Lionel Messi",
@@ -8141,7 +8141,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Jugadores con más partidos disputados en la Selección de España",
-    "badgeTitle": "MÁS SELECCIÓN G84",
+    "badgeTitle": "MÁS SELECCIÓN",
     "answers": [
       {
         "name": "Sergio Ramos",
@@ -8238,7 +8238,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Jugadores con la nacionalidad española con más goles",
-    "badgeTitle": "GOLEADORES ESPAÑA G85",
+    "badgeTitle": "GOLEADORES ESPAÑA",
     "answers": [
       {
         "name": "Telmo Zarra",
@@ -8333,7 +8333,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Porteros históricos con mayor número de partidos en Primera",
-    "badgeTitle": "PORTEROS PARTIDOS G86",
+    "badgeTitle": "PORTEROS PARTIDOS",
     "answers": [
       {
         "name": "Andoni Zubizarreta",
@@ -8431,7 +8431,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Equipos históricos de España ordenados por títulos totales",
-    "badgeTitle": "CLUBES TÍTULOS G87",
+    "badgeTitle": "CLUBES TÍTULOS",
     "answers": [
       {
         "name": "Real Madrid",
@@ -8531,7 +8531,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Futbolistas que ganaron el Pichichi jugando en LaLiga",
-    "badgeTitle": "PICHICHIS LALIGA G88",
+    "badgeTitle": "PICHICHIS LALIGA",
     "answers": [
       {
         "name": "Lionel Messi",
@@ -8630,7 +8630,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Jugadores con más partidos disputados en la Selección de España",
-    "badgeTitle": "MÁS SELECCIÓN G89",
+    "badgeTitle": "MÁS SELECCIÓN",
     "answers": [
       {
         "name": "Sergio Ramos",
@@ -8727,7 +8727,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Jugadores con la nacionalidad española con más goles",
-    "badgeTitle": "GOLEADORES ESPAÑA G90",
+    "badgeTitle": "GOLEADORES ESPAÑA",
     "answers": [
       {
         "name": "Telmo Zarra",
@@ -8822,7 +8822,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Porteros históricos con mayor número de partidos en Primera",
-    "badgeTitle": "PORTEROS PARTIDOS G91",
+    "badgeTitle": "PORTEROS PARTIDOS",
     "answers": [
       {
         "name": "Andoni Zubizarreta",
@@ -8920,7 +8920,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Equipos históricos de España ordenados por títulos totales",
-    "badgeTitle": "CLUBES TÍTULOS G92",
+    "badgeTitle": "CLUBES TÍTULOS",
     "answers": [
       {
         "name": "Real Madrid",
@@ -9020,7 +9020,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Futbolistas que ganaron el Pichichi jugando en LaLiga",
-    "badgeTitle": "PICHICHIS LALIGA G93",
+    "badgeTitle": "PICHICHIS LALIGA",
     "answers": [
       {
         "name": "Lionel Messi",
@@ -9119,7 +9119,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Jugadores con más partidos disputados en la Selección de España",
-    "badgeTitle": "MÁS SELECCIÓN G94",
+    "badgeTitle": "MÁS SELECCIÓN",
     "answers": [
       {
         "name": "Sergio Ramos",
@@ -9216,7 +9216,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Jugadores con la nacionalidad española con más goles",
-    "badgeTitle": "GOLEADORES ESPAÑA G95",
+    "badgeTitle": "GOLEADORES ESPAÑA",
     "answers": [
       {
         "name": "Telmo Zarra",
@@ -9311,7 +9311,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Porteros históricos con mayor número de partidos en Primera",
-    "badgeTitle": "PORTEROS PARTIDOS G96",
+    "badgeTitle": "PORTEROS PARTIDOS",
     "answers": [
       {
         "name": "Andoni Zubizarreta",
@@ -9409,7 +9409,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Equipos históricos de España ordenados por títulos totales",
-    "badgeTitle": "CLUBES TÍTULOS G97",
+    "badgeTitle": "CLUBES TÍTULOS",
     "answers": [
       {
         "name": "Real Madrid",
@@ -9509,7 +9509,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Futbolistas que ganaron el Pichichi jugando en LaLiga",
-    "badgeTitle": "PICHICHIS LALIGA G98",
+    "badgeTitle": "PICHICHIS LALIGA",
     "answers": [
       {
         "name": "Lionel Messi",
@@ -9608,7 +9608,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Jugadores con más partidos disputados en la Selección de España",
-    "badgeTitle": "MÁS SELECCIÓN G99",
+    "badgeTitle": "MÁS SELECCIÓN",
     "answers": [
       {
         "name": "Sergio Ramos",
@@ -9705,7 +9705,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Jugadores con la nacionalidad española con más goles",
-    "badgeTitle": "GOLEADORES ESPAÑA G100",
+    "badgeTitle": "GOLEADORES ESPAÑA",
     "answers": [
       {
         "name": "Telmo Zarra",
@@ -9800,7 +9800,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Porteros históricos con mayor número de partidos en Primera",
-    "badgeTitle": "PORTEROS PARTIDOS G101",
+    "badgeTitle": "PORTEROS PARTIDOS",
     "answers": [
       {
         "name": "Andoni Zubizarreta",
@@ -9898,7 +9898,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Equipos históricos de España ordenados por títulos totales",
-    "badgeTitle": "CLUBES TÍTULOS G102",
+    "badgeTitle": "CLUBES TÍTULOS",
     "answers": [
       {
         "name": "Real Madrid",
@@ -9998,7 +9998,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Futbolistas que ganaron el Pichichi jugando en LaLiga",
-    "badgeTitle": "PICHICHIS LALIGA G103",
+    "badgeTitle": "PICHICHIS LALIGA",
     "answers": [
       {
         "name": "Lionel Messi",
@@ -10097,7 +10097,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Jugadores con más partidos disputados en la Selección de España",
-    "badgeTitle": "MÁS SELECCIÓN G104",
+    "badgeTitle": "MÁS SELECCIÓN",
     "answers": [
       {
         "name": "Sergio Ramos",
@@ -10194,7 +10194,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Jugadores con la nacionalidad española con más goles",
-    "badgeTitle": "GOLEADORES ESPAÑA G105",
+    "badgeTitle": "GOLEADORES ESPAÑA",
     "answers": [
       {
         "name": "Telmo Zarra",
