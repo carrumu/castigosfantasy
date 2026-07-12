@@ -76,7 +76,7 @@ function removeFaqSchema() {
 
 const FEATURES = [
   {
-    icon: 'sports_score', bg: 'var(--danger)', color: '#fff', nav: 'acceso',
+    icon: 'trending_down', bg: 'var(--danger)', color: '#fff', nav: 'acceso',
     title: 'Farolillo Rojo',
     desc: 'Sincroniza Biwenger y detecta solo quién ha quedado último. Sin Excel.'
   },
@@ -86,7 +86,7 @@ const FEATURES = [
     desc: 'Sortea el castigo del perdedor. Que decida el azar, sin favoritismos.'
   },
   {
-    icon: 'sentiment_very_dissatisfied', bg: 'var(--primary-green)', color: '#000', nav: 'bufon',
+    icon: 'theater_comedy', bg: 'var(--primary-green)', color: '#000', nav: 'bufon',
     title: 'El Bufón de la Corte',
     desc: 'Votad al peor jugador de la jornada. El que menos puntúe, paga.'
   },
