@@ -4190,6 +4190,25 @@ h1, h2, h3, h4, h5, h6, .card-title {
   letter-spacing: 0.5px; font-weight: 700; margin-top: 0.1rem;
 }
 
+/* ===== SEO home (logged-out landing): hero trust chips ===== */
+.seo-hero-chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1.25rem;
+}
+.seo-chip {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-light);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 0.3rem 0.8rem;
+  white-space: nowrap;
+}
+
 /* ===== SEO home (logged-out landing): feature cards ===== */
 .seo-features {
   display: grid;

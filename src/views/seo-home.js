@@ -100,7 +100,7 @@ const FEATURES = [
 const STEPS = [
   { n: '1', title: 'Conecta tu liga', desc: 'Sincroniza Biwenger y la clasificación se importa sola; en Comunio, LaLiga Fantasy y demás, registras al último en un toque.' },
   { n: '2', title: 'Invita y sortea', desc: 'Comparte el enlace por WhatsApp y sortea el primer castigo con el grupo.' },
-  { n: '3', title: 'Deja que registre', desc: 'Cada jornada se guarda sola: quién perdió, qué castigo y si lo cumplió.' }
+  { n: '3', title: 'Se registra solo', desc: 'Cada jornada se guarda sola: quién perdió, qué castigo y si lo cumplió.' }
 ];
 
 export function renderSeoHome(container, { onNavigate } = {}) {
@@ -124,6 +124,11 @@ export function renderSeoHome(container, { onNavigate } = {}) {
           Vale para tu liga de Biwenger, Comunio, LaLiga Fantasy y más: detecta al farolillo rojo (automático con Biwenger) y organiza los castigos, el bote y los piques. Sin Excel y sin perseguir a nadie por WhatsApp.
         </p>
         ${heroCta}
+        <div class="seo-hero-chips">
+          <span class="seo-chip">100% Gratis</span>
+          <span class="seo-chip">Sin descargas</span>
+          <span class="seo-chip">Biwenger · Comunio · LaLiga Fantasy</span>
+        </div>
       </section>
 
       <!-- FEATURES -->
