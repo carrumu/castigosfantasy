@@ -98,35 +98,42 @@ serve(async (req: Request) => {
       }
     }
 
-    // --- 3. Standings: probe several candidate endpoints and report what each
-    //     returns, so the one that holds the ranking can be identified. ---
-    const candidates = [
-      `/communities/${communityId}/users/21142044`,
-      `/communities/${communityId}/members`,
-      `/communities/${communityId}/standings?matchday=1`,
-      `/communities/${communityId}/standings?period=SEASON`,
-      `/communities/${communityId}/standings/season`,
-      `/communities/${communityId}/matchdays`,
-      `/communities/${communityId}/season`,
-      `/communities/${communityId}/ranking-list`,
-    ];
-    const probe: Record<string, any> = {};
-    for (const path of candidates) {
-      try {
-        const r = await fetch(`${COMUNIO_API}${path}`, { headers: authHeaders });
-        const t = await r.text();
-        let parsed: any = t;
-        try { parsed = JSON.parse(t); } catch (_) {}
-        // Truncate big bodies so the debug payload stays readable.
-        const preview = typeof parsed === "string" ? parsed.slice(0, 400) : JSON.parse(JSON.stringify(parsed));
-        probe[path] = { status: r.status, body: preview };
-        console.log(`[comunio] ${path} -> ${r.status} ${t.slice(0, 300)}`);
-      } catch (e) {
-        probe[path] = { status: "ERR", body: String(e) };
-      }
-    }
+    // --- 3. Community info (name) + members + standings ---
+    const [commRes, memRes, stRes] = await Promise.all([
+      fetch(`${COMUNIO_API}/communities/${communityId}`, { headers: authHeaders }),
+      fetch(`${COMUNIO_API}/communities/${communityId}/members`, { headers: authHeaders }),
+      fetch(`${COMUNIO_API}/communities/${communityId}/standings`, { headers: authHeaders }),
+    ]);
 
-    return json({ ok: true, communityId, probe }, 200);
+    const commJson = await commRes.json().catch(() => ({}));
+    const memJson = await memRes.json().catch(() => ({}));
+    const stText = await stRes.text();
+    let standingsRaw: any = null;
+    try { standingsRaw = stText ? JSON.parse(stText) : null; } catch (_) { standingsRaw = null; }
+
+    const members = (memJson?.members || []).map((m: any) => ({
+      id: m.id,
+      login: m.login,
+      name: m.firstName || m.login || "Mánager",
+      leader: !!m.leader,
+    }));
+
+    // Standings hold the points once the season has started; empty in preseason.
+    const standingsArr = Array.isArray(standingsRaw?.items) ? standingsRaw.items
+      : Array.isArray(standingsRaw?.standings) ? standingsRaw.standings
+      : Array.isArray(standingsRaw) ? standingsRaw : [];
+    const seasonStarted = standingsArr.length > 0;
+
+    console.log(`[comunio] community=${communityId} members=${members.length} standings=${standingsArr.length}`);
+
+    return json({
+      ok: true,
+      community: { id: communityId, name: commJson?.name || "Comunio" },
+      members,
+      standings: standingsArr,
+      seasonStarted,
+      standingsRaw: seasonStarted ? undefined : standingsRaw, // keep raw only when unexpected
+    }, 200);
   } catch (e) {
     console.error("comunio-sync error:", e);
     return json({ error: e instanceof Error ? e.message : String(e) }, 500);
