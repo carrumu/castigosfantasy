@@ -4190,6 +4190,13 @@ h1, h2, h3, h4, h5, h6, .card-title {
   letter-spacing: 0.5px; font-weight: 700; margin-top: 0.1rem;
 }
 
+/* ===== SEO home (logged-out landing): tighter rhythm on mobile ===== */
+@media (max-width: 640px) {
+  #view-container .seo-home { gap: 1.75rem !important; }
+  #view-container .seo-home .landing-tier { gap: 1rem !important; }
+  #view-container .seo-home .brutalist-hero { padding: 1.25rem 0.5rem !important; }
+}
+
 /* ===== SEO home (logged-out landing): hero trust chips ===== */
 .seo-hero-chips {
   display: flex;
