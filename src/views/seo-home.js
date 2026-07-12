@@ -77,7 +77,7 @@ function removeFaqSchema() {
 const FEATURES = [
   {
     icon: 'sports_score', bg: 'var(--danger)', color: '#fff', nav: 'acceso',
-    title: 'Farolillo Rojo Automático',
+    title: 'Farolillo Rojo',
     desc: 'Sincroniza Biwenger y detecta solo quién ha quedado último. Sin Excel.'
   },
   {
@@ -132,19 +132,16 @@ export function renderSeoHome(container, { onNavigate } = {}) {
           <h2 class="tier-title">Todo lo que tu liga necesita</h2>
           <span class="tier-sub">Y que Biwenger no te da</span>
         </div>
-        <div class="landing-tools-grid">
+        <div class="seo-features">
           ${FEATURES.map(f => `
-            <button class="tool-card-btn seo-nav" data-nav="${f.nav}">
-              <div class="tool-card-inner">
-                <div class="tool-card-icon-wrap" style="background:${f.bg};">
-                  <span class="material-symbols-outlined" style="font-size:1.9rem;color:${f.color};">${f.icon}</span>
-                </div>
-                <div class="tool-card-text">
-                  <h3 class="tool-card-title">${f.title}</h3>
-                  <p class="tool-card-desc">${f.desc}</p>
-                </div>
-                <span class="material-symbols-outlined tool-card-arrow">arrow_forward</span>
-              </div>
+            <button class="seo-feature seo-nav" data-nav="${f.nav}">
+              <span class="seo-feature-icon" style="background:${f.bg};">
+                <span class="material-symbols-outlined" style="font-size:1.6rem;color:${f.color};">${f.icon}</span>
+              </span>
+              <span class="seo-feature-text">
+                <h3 class="seo-feature-title">${f.title}</h3>
+                <p class="seo-feature-desc">${f.desc}</p>
+              </span>
             </button>
           `).join('')}
         </div>

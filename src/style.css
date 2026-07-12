@@ -4107,6 +4107,63 @@ h1, h2, h3, h4, h5, h6, .card-title {
   letter-spacing: 0.5px;
 }
 
+/* ===== SEO home (logged-out landing): feature cards ===== */
+.seo-features {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+@media (min-width: 720px) {
+  .seo-features { grid-template-columns: 1fr 1fr; }
+}
+.seo-feature {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  width: 100%;
+  text-align: left;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  border-radius: 12px;
+  padding: 1.25rem;
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.seo-feature:hover {
+  transform: translateY(-2px);
+  border-color: rgba(var(--accent-rgb), 0.4);
+  box-shadow: 0 6px 24px rgba(var(--accent-rgb), 0.1);
+}
+.seo-feature-icon {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.seo-feature-text { flex: 1; min-width: 0; }
+/* High-specificity + !important so the mobile tag rules can't flatten these. */
+#view-container .seo-feature-title {
+  font-family: var(--font-display) !important;
+  font-weight: 800 !important;
+  font-size: 1.05rem !important;
+  text-transform: uppercase;
+  letter-spacing: -0.3px;
+  color: var(--text-light) !important;
+  line-height: 1.1 !important;
+  margin: 0 0 0.35rem !important;
+}
+#view-container .seo-feature-desc {
+  font-size: 0.85rem !important;
+  color: var(--text-muted) !important;
+  line-height: 1.45 !important;
+  margin: 0 !important;
+  font-weight: 500;
+}
+
 /* ===== SEO home (logged-out landing): 3-step + accordions ===== */
 .seo-steps {
   display: grid;
