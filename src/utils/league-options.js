@@ -197,6 +197,7 @@ export async function openLeagueSettings(leagueId, callbacks) {
             </div>
             <button type="button" id="btn-test-comunio" class="brutalist-btn-small" style="text-transform: uppercase; font-weight: 800;">Probar sincronización</button>
             <pre id="comunio-test-out" style="display:none; white-space:pre-wrap; word-break:break-word; font-size:0.68rem; background:#000; color:#8f8; padding:0.5rem; border:1.5px solid var(--border-color-glow); max-height:180px; overflow:auto; margin:0;"></pre>
+            <button type="button" id="btn-copy-comunio" class="brutalist-btn-small" style="display:none; text-transform: uppercase; font-weight: 800;">Copiar resultado</button>
           </div>
 
           <button type="submit" class="btn-primary" id="btn-save-settings" style="width: 100%; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; padding: 0.65rem 1rem; border: 2px solid #000000; box-shadow: 2px 2px 0px #000000; cursor: pointer; background: var(--accent); color: #000;">
@@ -352,6 +353,7 @@ export async function openLeagueSettings(leagueId, callbacks) {
       testComunioBtn.addEventListener('click', async () => {
         const out = modal.querySelector('#comunio-test-out');
         out.style.display = 'block';
+        modal.querySelector('#btn-copy-comunio').style.display = 'block';
         const emailVal = modal.querySelector('#edit-comunio-email').value.trim();
         const pwVal = modal.querySelector('#edit-comunio-password').value.trim();
         // Require the password each test so you never test with a stale one.
@@ -400,6 +402,18 @@ export async function openLeagueSettings(leagueId, callbacks) {
           }
         } catch (err) {
           out.textContent = 'Error: ' + (err?.message || String(err));
+        }
+      });
+    }
+
+    const copyComunioBtn = modal.querySelector('#btn-copy-comunio');
+    if (copyComunioBtn) {
+      copyComunioBtn.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(modal.querySelector('#comunio-test-out').textContent || '');
+          showToast('Resultado copiado. Pégaselo al desarrollador.', 'success');
+        } catch (_) {
+          showToast('No se pudo copiar; selecciona el texto a mano.', 'error');
         }
       });
     }
