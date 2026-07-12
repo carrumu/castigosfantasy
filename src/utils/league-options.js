@@ -352,11 +352,18 @@ export async function openLeagueSettings(leagueId, callbacks) {
       testComunioBtn.addEventListener('click', async () => {
         const out = modal.querySelector('#comunio-test-out');
         out.style.display = 'block';
+        const emailVal = modal.querySelector('#edit-comunio-email').value.trim();
+        const pwVal = modal.querySelector('#edit-comunio-password').value.trim();
+        // Require the password each test so you never test with a stale one.
+        if (!emailVal || !pwVal) {
+          out.style.color = '#ffcc66';
+          out.textContent = '⚠️ Escribe tu correo y tu contraseña de Comunio en los campos de arriba antes de probar (el campo de contraseña arranca vacío a propósito).';
+          return;
+        }
+        out.style.color = '#8f8';
         out.textContent = 'Guardando credenciales y probando...';
         try {
           // Persist current Comunio inputs first so the function can read them.
-          const emailVal = modal.querySelector('#edit-comunio-email').value.trim();
-          const pwVal = modal.querySelector('#edit-comunio-password').value.trim();
           const commId = modal.querySelector('#edit-comunio-community-id').value.trim() || null;
           const secretPayload = { league_id: leagueId, comunio_email: emailVal, updated_at: new Date().toISOString() };
           if (pwVal) secretPayload.comunio_password = pwVal;
