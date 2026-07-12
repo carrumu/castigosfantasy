@@ -86,13 +86,15 @@ export async function openLeagueSettings(leagueId, callbacks) {
     // read it). We fetch it just to pre-fill the settings form; the password is
     // never read back to the client.
     let biwengerEmail = '';
-    if (isAdmin && leagueData.sync_source === 'biwenger') {
+    let comunioEmail = '';
+    if (isAdmin) {
       const { data: secretRow } = await supabase
         .from('league_secrets')
-        .select('biwenger_email')
+        .select('biwenger_email, comunio_email')
         .eq('league_id', leagueId)
         .maybeSingle();
       biwengerEmail = secretRow?.biwenger_email || '';
+      comunioEmail = secretRow?.comunio_email || '';
     }
 
     // Load all members of the league to check for successors
@@ -143,40 +145,58 @@ export async function openLeagueSettings(leagueId, callbacks) {
             <input type="text" id="edit-league-name" class="input-field" value="${leagueData.name}" required style="border: 1.5px solid var(--border-color-glow); font-weight: 700; background: var(--bg-input); width: 100%; padding: 0.65rem 0.85rem;" />
           </div>
 
-          ${leagueData.sync_source === 'biwenger' ? `
-            <div class="form-group" style="margin-bottom: 0;">
-              <label style="color: var(--text-light); font-weight: 700; font-size: 0.8rem; display: block; margin-bottom: 0.35rem;">Tipo de Liga / Sincronización</label>
-              <div style="display: flex; gap: 1rem; background: rgba(255,255,255,0.02); padding: 0.55rem 0.75rem; border-radius: 6px; border: 1.5px solid var(--border-color-glow);">
-                <label style="display: flex; align-items: center; gap: 0.35rem; color: var(--text-light); font-size: 0.78rem; cursor: pointer; font-weight: 600;">
-                  <input type="radio" name="edit-league-type" value="manual" ${leagueData.sync_source !== 'biwenger' ? 'checked' : ''} style="accent-color: var(--accent);" />
-                  Fantasy
-                </label>
-                <label style="display: flex; align-items: center; gap: 0.35rem; color: var(--text-light); font-size: 0.78rem; cursor: pointer; font-weight: 600;">
-                  <input type="radio" name="edit-league-type" value="biwenger" ${leagueData.sync_source === 'biwenger' ? 'checked' : ''} style="accent-color: var(--accent);" />
-                  Biwenger
-                </label>
-              </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label style="color: var(--text-light); font-weight: 700; font-size: 0.8rem; display: block; margin-bottom: 0.35rem;">Tipo de Liga / Sincronización</label>
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap; background: rgba(255,255,255,0.02); padding: 0.55rem 0.75rem; border-radius: 6px; border: 1.5px solid var(--border-color-glow);">
+              <label style="display: flex; align-items: center; gap: 0.35rem; color: var(--text-light); font-size: 0.78rem; cursor: pointer; font-weight: 600;">
+                <input type="radio" name="edit-league-type" value="manual" ${(!leagueData.sync_source || leagueData.sync_source === 'manual') ? 'checked' : ''} style="accent-color: var(--accent);" />
+                Fantasy
+              </label>
+              <label style="display: flex; align-items: center; gap: 0.35rem; color: var(--text-light); font-size: 0.78rem; cursor: pointer; font-weight: 600;">
+                <input type="radio" name="edit-league-type" value="biwenger" ${leagueData.sync_source === 'biwenger' ? 'checked' : ''} style="accent-color: var(--accent);" />
+                Biwenger
+              </label>
+              <label style="display: flex; align-items: center; gap: 0.35rem; color: var(--text-light); font-size: 0.78rem; cursor: pointer; font-weight: 600;">
+                <input type="radio" name="edit-league-type" value="comunio" ${leagueData.sync_source === 'comunio' ? 'checked' : ''} style="accent-color: var(--accent);" />
+                Comunio
+              </label>
             </div>
-          ` : ''}
+          </div>
 
           <!-- Fields to configure Biwenger credentials -->
           <div id="edit-biwenger-fields" style="display: ${leagueData.sync_source === 'biwenger' ? 'flex' : 'none'}; flex-direction: column; gap: 0.75rem; border-top: 1.5px dashed var(--border-color-glow); padding-top: 0.75rem; margin-top: 0.15rem;">
             <span style="font-size: 0.72rem; color: var(--accent-gold); font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Automatización Biwenger</span>
-            
             <div class="form-group" style="margin-bottom: 0;">
               <label for="edit-biwenger-league-id" style="color: var(--text-light); font-weight: 700; font-size: 0.75rem; display: block; margin-bottom: 0.25rem;">Código de Liga Biwenger</label>
               <input type="text" id="edit-biwenger-league-id" class="input-field" value="${leagueData.biwenger_league_id || ''}" placeholder="Ej: cwRzHsqCc6nx" style="border: 1.5px solid var(--border-color-glow); font-weight: 700; background: var(--bg-input); width: 100%; padding: 0.55rem 0.75rem;" />
             </div>
-            
             <div class="form-group" style="margin-bottom: 0;">
               <label for="edit-biwenger-email" style="color: var(--text-light); font-weight: 700; font-size: 0.75rem; display: block; margin-bottom: 0.25rem;">Correo de Biwenger</label>
               <input type="email" id="edit-biwenger-email" class="input-field" value="${biwengerEmail || ''}" placeholder="ejemplo@correo.com" style="border: 1.5px solid var(--border-color-glow); font-weight: 700; background: var(--bg-input); width: 100%; padding: 0.55rem 0.75rem;" />
             </div>
-            
             <div class="form-group" style="margin-bottom: 0;">
               <label for="edit-biwenger-password" style="color: var(--text-light); font-weight: 700; font-size: 0.75rem; display: block; margin-bottom: 0.25rem;">Contraseña de Biwenger</label>
               <input type="password" id="edit-biwenger-password" class="input-field" placeholder="Dejar en blanco para no cambiar" style="border: 1.5px solid var(--border-color-glow); font-weight: 700; background: var(--bg-input); width: 100%; padding: 0.55rem 0.75rem;" />
             </div>
+          </div>
+
+          <!-- Fields to configure Comunio credentials -->
+          <div id="edit-comunio-fields" style="display: ${leagueData.sync_source === 'comunio' ? 'flex' : 'none'}; flex-direction: column; gap: 0.75rem; border-top: 1.5px dashed var(--border-color-glow); padding-top: 0.75rem; margin-top: 0.15rem;">
+            <span style="font-size: 0.72rem; color: var(--accent-gold); font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Automatización Comunio</span>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label for="edit-comunio-community-id" style="color: var(--text-light); font-weight: 700; font-size: 0.75rem; display: block; margin-bottom: 0.25rem;">ID de Comunidad Comunio <span style="color: var(--text-muted); font-weight: 500;">(opcional)</span></label>
+              <input type="text" id="edit-comunio-community-id" class="input-field" value="${leagueData.comunio_community_id || ''}" placeholder="Se detecta solo si lo dejas vacío" style="border: 1.5px solid var(--border-color-glow); font-weight: 700; background: var(--bg-input); width: 100%; padding: 0.55rem 0.75rem;" />
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label for="edit-comunio-email" style="color: var(--text-light); font-weight: 700; font-size: 0.75rem; display: block; margin-bottom: 0.25rem;">Correo de Comunio</label>
+              <input type="email" id="edit-comunio-email" class="input-field" value="${comunioEmail || ''}" placeholder="ejemplo@correo.com" style="border: 1.5px solid var(--border-color-glow); font-weight: 700; background: var(--bg-input); width: 100%; padding: 0.55rem 0.75rem;" />
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label for="edit-comunio-password" style="color: var(--text-light); font-weight: 700; font-size: 0.75rem; display: block; margin-bottom: 0.25rem;">Contraseña de Comunio</label>
+              <input type="password" id="edit-comunio-password" class="input-field" placeholder="Dejar en blanco para no cambiar" style="border: 1.5px solid var(--border-color-glow); font-weight: 700; background: var(--bg-input); width: 100%; padding: 0.55rem 0.75rem;" />
+            </div>
+            <button type="button" id="btn-test-comunio" class="brutalist-btn-small" style="text-transform: uppercase; font-weight: 800;">Probar sincronización</button>
+            <pre id="comunio-test-out" style="display:none; white-space:pre-wrap; word-break:break-word; font-size:0.68rem; background:#000; color:#8f8; padding:0.5rem; border:1.5px solid var(--border-color-glow); max-height:180px; overflow:auto; margin:0;"></pre>
           </div>
 
           <button type="submit" class="btn-primary" id="btn-save-settings" style="width: 100%; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; padding: 0.65rem 1rem; border: 2px solid #000000; box-shadow: 2px 2px 0px #000000; cursor: pointer; background: var(--accent); color: #000;">
@@ -314,6 +334,52 @@ export async function openLeagueSettings(leagueId, callbacks) {
       });
     });
 
+    // Toggle the Biwenger / Comunio credential blocks with the type selector.
+    const biwengerFields = modal.querySelector('#edit-biwenger-fields');
+    const comunioFields = modal.querySelector('#edit-comunio-fields');
+    modal.querySelectorAll('input[name="edit-league-type"]').forEach(radio => {
+      radio.addEventListener('change', () => {
+        const val = modal.querySelector('input[name="edit-league-type"]:checked')?.value;
+        if (biwengerFields) biwengerFields.style.display = val === 'biwenger' ? 'flex' : 'none';
+        if (comunioFields) comunioFields.style.display = val === 'comunio' ? 'flex' : 'none';
+      });
+    });
+
+    // "Probar sincronización" for Comunio: calls the edge function and shows the
+    // raw result so the response shape can be confirmed while we build it.
+    const testComunioBtn = modal.querySelector('#btn-test-comunio');
+    if (testComunioBtn) {
+      testComunioBtn.addEventListener('click', async () => {
+        const out = modal.querySelector('#comunio-test-out');
+        out.style.display = 'block';
+        out.textContent = 'Guardando credenciales y probando...';
+        try {
+          // Persist current Comunio inputs first so the function can read them.
+          const emailVal = modal.querySelector('#edit-comunio-email').value.trim();
+          const pwVal = modal.querySelector('#edit-comunio-password').value.trim();
+          const commId = modal.querySelector('#edit-comunio-community-id').value.trim() || null;
+          const secretPayload = { league_id: leagueId, comunio_email: emailVal, updated_at: new Date().toISOString() };
+          if (pwVal) secretPayload.comunio_password = pwVal;
+          await supabase.from('league_secrets').upsert(secretPayload, { onConflict: 'league_id' });
+          await supabase.from('leagues').update({ comunio_community_id: commId }).eq('id', leagueId);
+
+          const base = import.meta.env.VITE_SUPABASE_URL || localStorage.getItem('CF_SUPABASE_URL') || '';
+          const anon = import.meta.env.VITE_SUPABASE_ANON_KEY || localStorage.getItem('CF_SUPABASE_ANON_KEY') || '';
+          let token = anon;
+          try { const s = await supabase.auth.getSession(); if (s.data?.session?.access_token) token = s.data.session.access_token; } catch (_) {}
+          const res = await fetch(`${base}/functions/v1/comunio-sync`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`, 'apikey': anon },
+            body: JSON.stringify({ appLeagueId: leagueId })
+          });
+          const data = await res.json();
+          out.textContent = `[HTTP ${res.status}]\n` + JSON.stringify(data, null, 2).slice(0, 4000);
+        } catch (err) {
+          out.textContent = 'Error: ' + (err?.message || String(err));
+        }
+      });
+    }
+
     // Hook Save settings (Admin name/type/sync settings edit)
     const settingsForm = modal.querySelector('#league-settings-form');
     if (settingsForm) {
@@ -333,32 +399,31 @@ export async function openLeagueSettings(leagueId, callbacks) {
             sync_source: newType
           };
 
+          // Credentials go to `league_secrets` (admin-only RLS). A blank password
+          // field keeps the current one; only overwrite when a new value is typed.
           if (newType === 'biwenger') {
-            // Non-sensitive fields stay on `leagues`.
             updatePayload.biwenger_league_id = settingsForm.querySelector('#edit-biwenger-league-id').value.trim();
-
-            // Credentials go to `league_secrets` (admin-only RLS). The password
-            // field is left blank to keep the current one; only overwrite it
-            // when the admin types a new value.
+            updatePayload.comunio_community_id = null;
             const emailVal = settingsForm.querySelector('#edit-biwenger-email').value.trim();
             const newPasswordVal = settingsForm.querySelector('#edit-biwenger-password').value.trim();
-
-            const secretPayload = { league_id: leagueId, biwenger_email: emailVal, updated_at: new Date().toISOString() };
-            if (newPasswordVal) {
-              secretPayload.biwenger_password = newPasswordVal;
-            }
-
-            const { error: secretErr } = await supabase
-              .from('league_secrets')
-              .upsert(secretPayload, { onConflict: 'league_id' });
+            const secretPayload = { league_id: leagueId, biwenger_email: emailVal, comunio_email: null, comunio_password: null, updated_at: new Date().toISOString() };
+            if (newPasswordVal) secretPayload.biwenger_password = newPasswordVal;
+            const { error: secretErr } = await supabase.from('league_secrets').upsert(secretPayload, { onConflict: 'league_id' });
+            if (secretErr) throw secretErr;
+          } else if (newType === 'comunio') {
+            updatePayload.comunio_community_id = settingsForm.querySelector('#edit-comunio-community-id').value.trim() || null;
+            updatePayload.biwenger_league_id = null;
+            const emailVal = settingsForm.querySelector('#edit-comunio-email').value.trim();
+            const newPasswordVal = settingsForm.querySelector('#edit-comunio-password').value.trim();
+            const secretPayload = { league_id: leagueId, comunio_email: emailVal, biwenger_email: null, biwenger_password: null, updated_at: new Date().toISOString() };
+            if (newPasswordVal) secretPayload.comunio_password = newPasswordVal;
+            const { error: secretErr } = await supabase.from('league_secrets').upsert(secretPayload, { onConflict: 'league_id' });
             if (secretErr) throw secretErr;
           } else {
             updatePayload.biwenger_league_id = null;
-            // Drop any stored credentials when leaving Biwenger sync.
-            const { error: delErr } = await supabase
-              .from('league_secrets')
-              .delete()
-              .eq('league_id', leagueId);
+            updatePayload.comunio_community_id = null;
+            // Drop any stored credentials when leaving automatic sync.
+            const { error: delErr } = await supabase.from('league_secrets').delete().eq('league_id', leagueId);
             if (delErr) throw delErr;
           }
 
