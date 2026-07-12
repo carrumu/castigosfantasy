@@ -98,20 +98,35 @@ serve(async (req: Request) => {
       }
     }
 
-    // --- 3. Standings ---
-    const standRes = await fetch(`${COMUNIO_API}/communities/${communityId}/standings`, { headers: authHeaders });
-    const standText = await standRes.text();
-    let standings: any = {};
-    try { standings = JSON.parse(standText); } catch (_) {}
-    console.log(`[comunio] standings status=${standRes.status} community=${communityId} body=${standText.slice(0, 800)}`);
-
-    if (standRes.status !== 200) {
-      return json({ error: `Comunio: no se pudieron leer las clasificaciones (${standRes.status}).`, _debug: standings }, standRes.status);
+    // --- 3. Standings: probe several candidate endpoints and report what each
+    //     returns, so the one that holds the ranking can be identified. ---
+    const candidates = [
+      `/communities/${communityId}/standings`,
+      `/communities/${communityId}/standings/general`,
+      `/communities/${communityId}/standings/round`,
+      `/communities/${communityId}/ranking`,
+      `/communities/${communityId}/users`,
+      `/communities/${communityId}`,
+      `/players/me`,
+      `/users/me`,
+    ];
+    const probe: Record<string, any> = {};
+    for (const path of candidates) {
+      try {
+        const r = await fetch(`${COMUNIO_API}${path}`, { headers: authHeaders });
+        const t = await r.text();
+        let parsed: any = t;
+        try { parsed = JSON.parse(t); } catch (_) {}
+        // Truncate big bodies so the debug payload stays readable.
+        const preview = typeof parsed === "string" ? parsed.slice(0, 400) : JSON.parse(JSON.stringify(parsed));
+        probe[path] = { status: r.status, body: preview };
+        console.log(`[comunio] ${path} -> ${r.status} ${t.slice(0, 300)}`);
+      } catch (e) {
+        probe[path] = { status: "ERR", body: String(e) };
+      }
     }
 
-    // Return the raw standings for now; normalization is tightened once the real
-    // shape is confirmed from the logs above.
-    return json({ ok: true, communityId, data: standings }, 200);
+    return json({ ok: true, communityId, probe }, 200);
   } catch (e) {
     console.error("comunio-sync error:", e);
     return json({ error: e instanceof Error ? e.message : String(e) }, 500);

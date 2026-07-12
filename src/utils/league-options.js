@@ -389,7 +389,7 @@ export async function openLeagueSettings(leagueId, callbacks) {
 
           if (res.ok && !data.error) {
             out.style.color = '#8f8';
-            out.textContent = '✅ ¡Conectado con Comunio! Clasificación recibida.\n\n' + JSON.stringify(data, null, 2).slice(0, 3500);
+            out.textContent = '✅ ¡Conectado con Comunio!\n\n' + JSON.stringify(data, null, 2).slice(0, 9000);
           } else if (badCreds) {
             out.style.color = '#ff8888';
             out.textContent = '❌ Usuario o contraseña de Comunio incorrectos.\n\nComprueba el correo y la contraseña. IMPORTANTE: si entras a Comunio con Google, Facebook o Apple, no tienes una contraseña propia de Comunio; créate una en la app de Comunio con "¿Olvidaste tu contraseña?" y úsala aquí.';
