@@ -9,6 +9,8 @@
  * (YouTube thumbnail, direct image, or a generic favicon + domain card).
  */
 
+import { supabase } from '../supabase.js';
+
 const URL_RE = /(https?:\/\/[^\s<]+)/g;
 
 /**
@@ -146,7 +148,75 @@ function genericCard(url, host) {
   open.textContent = 'open_in_new';
   card.appendChild(open);
 
+  // Upgrade to a rich Open Graph card (image + title + description) in the
+  // background; if it fails or has no data, the favicon card stays.
+  enhanceWithOpenGraph(card, url, host).catch(() => {});
+
   return card;
+}
+
+async function fetchOpenGraph(url) {
+  try {
+    const base = import.meta.env.VITE_SUPABASE_URL || localStorage.getItem('CF_SUPABASE_URL') || '';
+    const anon = import.meta.env.VITE_SUPABASE_ANON_KEY || localStorage.getItem('CF_SUPABASE_ANON_KEY') || '';
+    if (!base) return null;
+
+    let token = anon;
+    try {
+      const s = await supabase.auth.getSession();
+      if (s.data?.session?.access_token) token = s.data.session.access_token;
+    } catch (_) {}
+
+    const res = await fetch(`${base}/functions/v1/link-preview`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`, 'apikey': anon },
+      body: JSON.stringify({ url })
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return (data && (data.title || data.image)) ? data : null;
+  } catch (_) {
+    return null;
+  }
+}
+
+async function enhanceWithOpenGraph(card, url, host) {
+  const og = await fetchOpenGraph(url);
+  if (!og || !card.isConnected) return;
+
+  card.textContent = '';
+  card.classList.remove('link-preview-video', 'link-preview-image');
+  card.classList.add('link-preview-rich');
+
+  if (og.image) {
+    const img = document.createElement('img');
+    img.className = 'link-preview-rich-img';
+    img.loading = 'lazy';
+    img.alt = '';
+    img.src = og.image; // property assignment: no CSS/HTML injection
+    img.addEventListener('error', () => img.remove());
+    card.appendChild(img);
+  }
+
+  const body = document.createElement('div');
+  body.className = 'link-preview-rich-body';
+  if (og.title) {
+    const t = document.createElement('span');
+    t.className = 'link-preview-title';
+    t.textContent = og.title;
+    body.appendChild(t);
+  }
+  if (og.description) {
+    const d = document.createElement('span');
+    d.className = 'link-preview-desc';
+    d.textContent = og.description;
+    body.appendChild(d);
+  }
+  const dm = document.createElement('span');
+  dm.className = 'link-preview-domain-sm';
+  dm.textContent = og.siteName || host;
+  body.appendChild(dm);
+  card.appendChild(body);
 }
 
 function buildBody(host, url, label) {
