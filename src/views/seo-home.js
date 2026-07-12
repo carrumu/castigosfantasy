@@ -78,7 +78,7 @@ const FEATURES = [
   {
     icon: 'trending_down', bg: 'var(--danger)', color: '#fff', nav: 'acceso',
     title: 'Lista de Morosos',
-    desc: 'El farolillo rojo de cada jornada, a la lista. Automático con Biwenger; y vale para Comunio, LaLiga Fantasy y más. Sin Excel.'
+    desc: 'El farolillo rojo de cada jornada va directo a la lista, sin Excel. Automático con Biwenger; compatible con Comunio, LaLiga Fantasy y más.'
   },
   {
     icon: 'casino', bg: 'var(--accent)', color: '#000', nav: 'ruleta',
