@@ -16,8 +16,8 @@ const FAQS = [
     a: 'Castigos Fantasy es una aplicación web gratuita que añade la parte social y de castigos a tu liga de fútbol fantasy (Biwenger, Comunio, Mister...). No gestiona tu equipo ni tus fichajes, eso lo sigues haciendo en tu app de fantasy de siempre. Lo que hace Castigos Fantasy es detectar automáticamente quién queda último cada jornada, llevar el control del bote común y darte herramientas para sortear castigos, votar al peor jugador y dejar constancia de quién cumple y quién se raja.'
   },
   {
-    q: '¿Castigos Fantasy sustituye a Biwenger o a Comunio?',
-    a: 'No, es un complemento, no un sustituto. Sigues jugando tu liga exactamente igual en Biwenger o Comunio. Castigos Fantasy se conecta a tu liga (por ahora con sincronización activa con Biwenger) y añade encima la capa de castigos, bote y humor que esas apps no tienen. Piensa en ello como el "módulo social" que le faltaba a tu liga.'
+    q: '¿Castigos Fantasy sustituye a Biwenger, Comunio o LaLiga Fantasy?',
+    a: 'No, es un complemento, no un sustituto. Sigues jugando tu liga exactamente igual en Biwenger, Comunio, LaLiga Fantasy o donde juegues. Castigos Fantasy se conecta a tu liga (con sincronización automática en Biwenger) y añade encima la capa de castigos, bote y humor que esas apps no tienen. Piensa en ello como el "módulo social" que le faltaba a tu liga.'
   },
   {
     q: '¿Es gratis Castigos Fantasy?',
@@ -40,8 +40,8 @@ const FAQS = [
     a: 'Para sacarle todo el partido sí conviene que el grupo se una, porque las herramientas como la votación al Bufón de la Corte o los Retos de la Semana funcionan mejor cuantos más participáis. Pero el flujo normal es que una persona (el admin de la liga) cree el grupo en Castigos Fantasy y comparta la invitación por WhatsApp, igual que ya se comparte cualquier otra cosa en el grupo de la liga.'
   },
   {
-    q: '¿Qué diferencia hay entre castigos de Biwenger y castigos de Comunio?',
-    a: 'Ninguna a nivel de concepto: el "el último paga" existe igual en cualquier plataforma de fantasy. Lo único que cambia es de dónde se importa la clasificación. Hoy la sincronización automática está activa con Biwenger; si tu liga juega en Comunio, Mister u otra plataforma, puedes seguir usando la app para gestionar el bote, sortear castigos y llevar el muro de la vergüenza, solo que tendrás que confirmar tú manualmente quién ha quedado último.'
+    q: '¿Qué diferencia hay entre castigos de Biwenger, Comunio o LaLiga Fantasy?',
+    a: 'Ninguna a nivel de concepto: el "el último paga" existe igual en cualquier plataforma de fantasy. Lo único que cambia es de dónde se importa la clasificación. Hoy la sincronización automática está activa con Biwenger; si tu liga juega en Comunio, LaLiga Fantasy, Mister u otra plataforma, puedes seguir usando la app para gestionar el bote, sortear castigos y llevar el muro de la vergüenza, solo que tendrás que confirmar tú manualmente quién ha quedado último.'
   },
   {
     q: '¿Sirve Castigos Fantasy para gestionar el bote común de la liga, no solo los castigos?',
@@ -78,7 +78,7 @@ const FEATURES = [
   {
     icon: 'trending_down', bg: 'var(--danger)', color: '#fff', nav: 'acceso',
     title: 'Detector de Perdedor',
-    desc: 'Sincroniza Biwenger y detecta al farolillo rojo de la jornada. Sin Excel.'
+    desc: 'Controla quién es el farolillo rojo cada jornada. Automático con Biwenger; y vale para Comunio, LaLiga Fantasy y más. Sin Excel.'
   },
   {
     icon: 'casino', bg: 'var(--accent)', color: '#000', nav: 'ruleta',
@@ -98,7 +98,7 @@ const FEATURES = [
 ];
 
 const STEPS = [
-  { n: '1', title: 'Sincroniza tu liga', desc: 'Conecta tu cuenta de Biwenger y la app importa la clasificación sola.' },
+  { n: '1', title: 'Conecta tu liga', desc: 'Sincroniza Biwenger y la clasificación se importa sola; en Comunio, LaLiga Fantasy y demás, registras al último en un toque.' },
   { n: '2', title: 'Invita y sortea', desc: 'Comparte el enlace por WhatsApp y sortea el primer castigo con el grupo.' },
   { n: '3', title: 'Deja que registre', desc: 'Cada jornada se guarda sola: quién perdió, qué castigo y si lo cumplió.' }
 ];
@@ -121,7 +121,7 @@ export function renderSeoHome(container, { onNavigate } = {}) {
         <h1 class="brutalist-hero-title" style="margin-bottom:0.75rem;">Castigos Fantasy: que el último de tu liga no se escape</h1>
         <p class="brutalist-hero-subtitle" style="margin-bottom:0.5rem;font-weight:700;color:var(--accent-gold);">Cada jornada hay un último. La pregunta es qué pasa después.</p>
         <p class="brutalist-hero-subtitle" style="margin-bottom:1.75rem;">
-          Sincroniza tu liga de Biwenger o Comunio, detecta al farolillo rojo automáticamente y organiza los castigos, el bote y los piques. Sin Excel y sin perseguir a nadie por WhatsApp.
+          Vale para tu liga de Biwenger, Comunio, LaLiga Fantasy y más: detecta al farolillo rojo (automático con Biwenger) y organiza los castigos, el bote y los piques. Sin Excel y sin perseguir a nadie por WhatsApp.
         </p>
         ${heroCta}
       </section>
@@ -130,7 +130,7 @@ export function renderSeoHome(container, { onNavigate } = {}) {
       <section class="landing-tier">
         <div class="tier-header">
           <h2 class="tier-title">Todo lo que tu liga necesita</h2>
-          <span class="tier-sub">Y que Biwenger no te da</span>
+          <span class="tier-sub">Y que tu app de fantasy no te da</span>
         </div>
         <div class="seo-features">
           ${FEATURES.map(f => `
@@ -180,7 +180,7 @@ export function renderSeoHome(container, { onNavigate } = {}) {
             <h3>El farolillo rojo: quién queda último cada jornada</h3>
             <p>En el argot del fantasy, el "farolillo rojo" es el que va colista. Castigos Fantasy sincroniza tu clasificación de Biwenger y detecta automáticamente quién ha sido el farolillo rojo de la jornada, sin que tengas que revisar nada a mano. En cuanto se cierra la jornada, la app ya sabe quién es el candidato al castigo.</p>
             <h3>Castigos Biwenger vs. castigos Comunio: ¿es lo mismo?</h3>
-            <p>Sí. El concepto de "el último paga" existe igual en Biwenger, Comunio, Mister o cualquier otra plataforma de fantasy. Lo único que cambia es de dónde importamos tu clasificación. Hoy la sincronización automática está activa con Biwenger; en otras plataformas puedes gestionar el bote y los castigos confirmando tú quién ha quedado último.</p>
+            <p>Sí. El concepto de "el último paga" existe igual en Biwenger, Comunio, LaLiga Fantasy, Mister o cualquier otra plataforma de fantasy. Lo único que cambia es de dónde importamos tu clasificación. Hoy la sincronización automática está activa con Biwenger; en otras plataformas puedes gestionar el bote y los castigos confirmando tú quién ha quedado último.</p>
           </div>
         </details>
 
