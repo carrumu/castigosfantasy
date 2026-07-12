@@ -1,5 +1,6 @@
 import { supabase } from '../supabase.js';
 import { escapeHTML } from '../utils/security.js';
+import { linkifyInto, createLinkPreview } from '../utils/richtext.js';
 
 let postsOffset = 0;
 const postsLimit = 10;
@@ -515,8 +516,14 @@ function renderFeed(container, newPosts) {
       </div>
     `;
 
-    // Inject Text safely to avoid HTML injection/XSS
-    card.querySelector('.post-text-container').textContent = post.content;
+    // Inject text safely (DOM nodes + clickable links, no innerHTML → no XSS)
+    // and add a preview card for the first link to drive interaction.
+    const textEl = card.querySelector('.post-text-container');
+    const firstUrl = linkifyInto(textEl, post.content);
+    if (firstUrl) {
+      const preview = createLinkPreview(firstUrl);
+      if (preview) textEl.insertAdjacentElement('afterend', preview);
+    }
 
     // Attach Event Listeners to Card Buttons
     setupCardListeners(card, post, container);
@@ -857,7 +864,7 @@ async function fetchCommentsAndRender(postId, listContainer) {
         </div>
       `;
 
-      el.querySelector('.comment-text-content').textContent = comment.content;
+      linkifyInto(el.querySelector('.comment-text-content'), comment.content);
 
       // Event listeners
       const likeBtn = el.querySelector('.comment-like-btn');
