@@ -220,7 +220,7 @@ export function renderSelectLeague(container, callbacks) {
 
                   <div class="form-group" style="margin-bottom: 0.25rem;">
                     <label style="color: var(--text-light); font-weight: 700; font-size: 0.8rem; display: block; margin-bottom: 0.4rem;">Tipo de Liga</label>
-                    <div style="display: flex; gap: 1.5rem; background: rgba(255,255,255,0.02); padding: 0.65rem 0.85rem; border-radius: 6px; border: 1.5px solid var(--border-color-glow);">
+                    <div style="display: flex; gap: 1.25rem; flex-wrap: wrap; background: rgba(255,255,255,0.02); padding: 0.65rem 0.85rem; border-radius: 6px; border: 1.5px solid var(--border-color-glow);">
                       <label style="display: flex; align-items: center; gap: 0.4rem; color: var(--text-light); font-size: 0.8rem; cursor: pointer; font-weight: 600;">
                         <input type="radio" name="league-type" value="manual" checked style="accent-color: var(--accent);" />
                         Fantasy
@@ -229,7 +229,12 @@ export function renderSelectLeague(container, callbacks) {
                         <input type="radio" name="league-type" value="biwenger" style="accent-color: var(--accent);" />
                         Biwenger
                       </label>
+                      <label style="display: flex; align-items: center; gap: 0.4rem; color: var(--text-light); font-size: 0.8rem; cursor: pointer; font-weight: 600;">
+                        <input type="radio" name="league-type" value="comunio" style="accent-color: var(--accent);" />
+                        Comunio
+                      </label>
                     </div>
+                    <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.4rem;">Si eliges Biwenger o Comunio, configura tus credenciales después en Ajustes de la liga.</p>
                   </div>
 
                   <button type="submit" class="btn-primary" id="btn-create" style="font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Crear Liga</button>
