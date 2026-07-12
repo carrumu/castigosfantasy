@@ -77,8 +77,8 @@ function removeFaqSchema() {
 const FEATURES = [
   {
     icon: 'trending_down', bg: 'var(--danger)', color: '#fff', nav: 'acceso',
-    title: 'Farolillo Rojo',
-    desc: 'Sincroniza Biwenger y detecta solo quién ha quedado último. Sin Excel.'
+    title: 'Detector de Perdedor',
+    desc: 'Sincroniza Biwenger y detecta al farolillo rojo de la jornada. Sin Excel.'
   },
   {
     icon: 'casino', bg: 'var(--accent)', color: '#000', nav: 'ruleta',
