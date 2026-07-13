@@ -32,6 +32,7 @@ const app = document.querySelector('#app');
 
 // State
 let currentView = 'inicio'; // 'inicio', 'muro', 'ruleta', 'retos', or 'acceso'
+let preAuthView = 'mis-ligas'; // view to return to once login/signup from 'acceso' succeeds
 let supportBubblePos = null; // { left, top }
 
 // Dynamic Toast Helper
@@ -335,7 +336,7 @@ function renderMainLayout(isGuest, currentUser = null) {
     }
   } else if (currentView === 'acceso') {
     renderAuth(viewContainer, {
-      onAuthSuccess: () => navigate('mis-ligas'),
+      onAuthSuccess: () => navigate(preAuthView),
       showToast
     });
   } else if (currentView === 'mis-ligas') {
@@ -790,6 +791,12 @@ function handleRouting() {
   ];
   if (!KNOWN_VIEWS.includes(view)) {
     view = 'inicio';
+  }
+
+  // Remember where the user was before landing on the login/signup screen,
+  // so a successful login returns them there instead of always to 'mis-ligas'.
+  if (view === 'acceso' && currentView !== 'acceso') {
+    preAuthView = currentView;
   }
 
   currentView = view;
