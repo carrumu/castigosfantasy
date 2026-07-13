@@ -98,9 +98,9 @@ const FEATURES = [
 ];
 
 const STEPS = [
-  { n: '1', title: 'Conecta tu liga', desc: 'Sincroniza Biwenger y la clasificación se importa sola; en Comunio, LaLiga Fantasy y demás, registras al último en un toque.' },
-  { n: '2', title: 'Invita y sortea', desc: 'Comparte el enlace por WhatsApp y sortea el primer castigo con el grupo.' },
-  { n: '3', title: 'Se registra solo', desc: 'Cada jornada se guarda sola: quién perdió, qué castigo y si lo cumplió.' }
+  { n: '1', icon: 'link', bg: '#ffffff', color: '#000', title: 'Ficha tu liga', desc: 'Biwenger se sincroniza solo y ya sabe quién va último. ¿Comunio, LaLiga Fantasy u otra? Lo marcas tú en un toque.' },
+  { n: '2', icon: 'campaign', bg: 'var(--accent)', color: '#000', title: 'Corre la voz', desc: 'Manda el enlace al grupo y deja que la Ruleta de Sentencias reparta el primer castigo.' },
+  { n: '3', icon: 'gavel', bg: 'var(--danger)', color: '#fff', title: 'Que no haya escapatoria', desc: 'Quién quedó último, qué castigo le tocó y si lo cumplió: todo queda anotado en el Muro, jornada tras jornada.' }
 ];
 
 export function renderSeoHome(container, { onNavigate } = {}) {
@@ -113,6 +113,12 @@ export function renderSeoHome(container, { onNavigate } = {}) {
       onmouseover="this.style.transform='translate(-2px,-2px)';this.style.boxShadow='7px 7px 0 #000';"
       onmouseout="this.style.transform='';this.style.boxShadow='5px 5px 0 #000';">Crea tu liga gratis →</button>`;
 
+  const loginNudge = `
+    <p class="seo-login-nudge">
+      ¿Tu grupo ya está en Castigos Fantasy?
+      <button class="seo-nav" data-nav="acceso" style="background:transparent;border:none;padding:0;margin-left:0.25rem;color:var(--accent);font-weight:800;text-decoration:underline;text-underline-offset:2px;cursor:pointer;font-size:inherit;font-family:inherit;">Inicia sesión →</button>
+    </p>`;
+
   container.innerHTML = `
     <div class="seo-home fade-in-up" style="max-width:920px;margin:0 auto;display:flex;flex-direction:column;gap:2.5rem;">
 
@@ -124,6 +130,7 @@ export function renderSeoHome(container, { onNavigate } = {}) {
           Vale para tu liga de Biwenger, Comunio, LaLiga Fantasy y más: detecta al farolillo rojo (automático con Biwenger) y organiza los castigos, el bote y los piques. Sin Excel y sin perseguir a nadie por WhatsApp.
         </p>
         ${heroCta}
+        ${loginNudge}
         <div class="seo-hero-chips">
           <span class="seo-chip">100% Gratis</span>
           <span class="seo-chip">Sin descargas</span>
@@ -158,74 +165,23 @@ export function renderSeoHome(container, { onNavigate } = {}) {
           <h2 class="tier-title">Cómo funciona</h2>
           <span class="tier-sub">En 3 pasos y menos de 2 minutos</span>
         </div>
-        <div class="seo-steps">
-          ${STEPS.map(s => `
+        <div class="seo-steps-flow">
+          ${STEPS.map((s, i) => `
             <div class="seo-step">
-              <span class="seo-step-num">${s.n}</span>
+              <span class="seo-step-bignum">${s.n}</span>
+              <span class="seo-step-icon-wrap" style="background:${s.bg};">
+                <span class="material-symbols-outlined" style="color:${s.color};">${s.icon}</span>
+              </span>
               <h3 class="seo-step-title">${s.title}</h3>
               <p class="seo-step-desc">${s.desc}</p>
             </div>
+            ${i < STEPS.length - 1 ? `<span class="seo-step-connector material-symbols-outlined">arrow_forward</span>` : ''}
           `).join('')}
         </div>
-        <div style="text-align:center;margin-top:1.75rem;">${heroCta}</div>
-      </section>
-
-      <!-- SEO CONTENT (collapsible) -->
-      <section class="landing-tier">
-        <div class="tier-header">
-          <h2 class="tier-title">Aprende más sobre los castigos fantasy</h2>
-          <span class="tier-sub">Ideas, cómo funciona y dudas</span>
+        <div style="text-align:center;margin-top:1.75rem;">
+          ${heroCta}
+          ${loginNudge}
         </div>
-
-        <details class="seo-acc">
-          <summary>¿Qué son los castigos fantasy y cómo funcionan?</summary>
-          <div class="seo-acc-body">
-            <p>Un castigo fantasy es la consecuencia que le toca al jugador que queda último en la clasificación de la jornada de tu liga de fútbol fantasy. Puede ser pagar al bote común, cumplir una prenda, o las dos cosas. Es una tradición tan vieja como el propio fantasy: alguien pierde, alguien paga.</p>
-            <p>El problema no es la idea, es la gestión: saber quién ha quedado último cada semana, apuntarlo, decidir el castigo y asegurarte de que se cumple. Normalmente acaba en un Excel que nadie actualiza o en un grupo de WhatsApp donde el "eh, te toca pagar" se pierde entre memes. Castigos Fantasy automatiza toda esa parte.</p>
-            <h3>El farolillo rojo: quién queda último cada jornada</h3>
-            <p>En el argot del fantasy, el "farolillo rojo" es el que va colista. Castigos Fantasy sincroniza tu clasificación de Biwenger y detecta automáticamente quién ha sido el farolillo rojo de la jornada, sin que tengas que revisar nada a mano. En cuanto se cierra la jornada, la app ya sabe quién es el candidato al castigo.</p>
-            <h3>Castigos Biwenger vs. castigos Comunio: ¿es lo mismo?</h3>
-            <p>Sí. El concepto de "el último paga" existe igual en Biwenger, Comunio, LaLiga Fantasy, Mister o cualquier otra plataforma de fantasy. Lo único que cambia es de dónde importamos tu clasificación. Hoy la sincronización automática está activa con Biwenger; en otras plataformas puedes gestionar el bote y los castigos confirmando tú quién ha quedado último.</p>
-          </div>
-        </details>
-
-        <details class="seo-acc">
-          <summary>Ideas de castigos para el último de la liga fantasy</summary>
-          <div class="seo-acc-body">
-            <p>Si no tienes claro qué castigo ponerle al farolillo rojo, aquí tienes ideas reales que otros grupos ya usan. Puedes sortearlas con la Ruleta de Sentencias o dejar que el Generador de Castigos te proponga una al momento.</p>
-            <h3>Castigos económicos para el bote común</h3>
-            <ul>
-              <li>Aportar una cuota fija a la caja común de la jornada.</li>
-              <li>Pagar la próxima ronda cuando quedéis en persona.</li>
-              <li>Invitar a cenar o a comer al resto del grupo.</li>
-              <li>Aportar el doble si queda último dos jornadas seguidas.</li>
-            </ul>
-            <h3>Castigos graciosos y virales para el grupo de WhatsApp</h3>
-            <ul>
-              <li>Cambiar la foto de perfil del grupo por la que decida el resto durante una semana.</li>
-              <li>Subir una foto o vídeo cumpliendo una prenda decidida por votación.</li>
-              <li>Llevar el nombre del grupo con un apodo humillante hasta la siguiente jornada.</li>
-              <li>Hacer de "secretario" del grupo: redactar el resumen de la jornada con memes.</li>
-            </ul>
-            <h3>Castigos sin dinero de por medio</h3>
-            <ul>
-              <li>Renunciar a hacer cambios en su equipo la próxima jornada.</li>
-              <li>Dejar que el resto del grupo le fiche un jugador random.</li>
-              <li>Cumplir una prenda física acordada por el grupo (ridícula y fotografiable).</li>
-              <li>Quedar "señalado" en el Muro de la Vergüenza hasta que otro ocupe su lugar.</li>
-            </ul>
-          </div>
-        </details>
-
-        <details class="seo-acc">
-          <summary>Preguntas frecuentes sobre castigos fantasy</summary>
-          <div class="seo-acc-body">
-            ${FAQS.slice(0, 6).map(f => `
-              <h3>${f.q}</h3>
-              <p>${f.a}</p>
-            `).join('')}
-          </div>
-        </details>
       </section>
 
       <!-- FINAL CTA -->
@@ -234,7 +190,71 @@ export function renderSeoHome(container, { onNavigate } = {}) {
           Crea tu liga y deja de perseguir<br/>a tus amigos por WhatsApp
         </p>
         ${heroCta}
+        ${loginNudge}
       </section>
+
+      <!-- SEO CONTENT (collapsed, tucked below the fold so it doesn't compete with the CTAs) -->
+      <details class="seo-faq-wrap">
+        <summary class="seo-faq-summary">¿Tienes dudas? Preguntas frecuentes y más información</summary>
+        <div class="seo-faq-inner">
+          <section class="landing-tier">
+            <div class="tier-header">
+              <h2 class="tier-title">Aprende más sobre los castigos fantasy</h2>
+              <span class="tier-sub">Ideas, cómo funciona y dudas</span>
+            </div>
+
+            <details class="seo-acc">
+              <summary>¿Qué son los castigos fantasy y cómo funcionan?</summary>
+              <div class="seo-acc-body">
+                <p>Un castigo fantasy es la consecuencia que le toca al jugador que queda último en la clasificación de la jornada de tu liga de fútbol fantasy. Puede ser pagar al bote común, cumplir una prenda, o las dos cosas. Es una tradición tan vieja como el propio fantasy: alguien pierde, alguien paga.</p>
+                <p>El problema no es la idea, es la gestión: saber quién ha quedado último cada semana, apuntarlo, decidir el castigo y asegurarte de que se cumple. Normalmente acaba en un Excel que nadie actualiza o en un grupo de WhatsApp donde el "eh, te toca pagar" se pierde entre memes. Castigos Fantasy automatiza toda esa parte.</p>
+                <h3>El farolillo rojo: quién queda último cada jornada</h3>
+                <p>En el argot del fantasy, el "farolillo rojo" es el que va colista. Castigos Fantasy sincroniza tu clasificación de Biwenger y detecta automáticamente quién ha sido el farolillo rojo de la jornada, sin que tengas que revisar nada a mano. En cuanto se cierra la jornada, la app ya sabe quién es el candidato al castigo.</p>
+                <h3>Castigos Biwenger vs. castigos Comunio: ¿es lo mismo?</h3>
+                <p>Sí. El concepto de "el último paga" existe igual en Biwenger, Comunio, LaLiga Fantasy, Mister o cualquier otra plataforma de fantasy. Lo único que cambia es de dónde importamos tu clasificación. Hoy la sincronización automática está activa con Biwenger; en otras plataformas puedes gestionar el bote y los castigos confirmando tú quién ha quedado último.</p>
+              </div>
+            </details>
+
+            <details class="seo-acc">
+              <summary>Ideas de castigos para el último de la liga fantasy</summary>
+              <div class="seo-acc-body">
+                <p>Si no tienes claro qué castigo ponerle al farolillo rojo, aquí tienes ideas reales que otros grupos ya usan. Puedes sortearlas con la Ruleta de Sentencias o dejar que el Generador de Castigos te proponga una al momento.</p>
+                <h3>Castigos económicos para el bote común</h3>
+                <ul>
+                  <li>Aportar una cuota fija a la caja común de la jornada.</li>
+                  <li>Pagar la próxima ronda cuando quedéis en persona.</li>
+                  <li>Invitar a cenar o a comer al resto del grupo.</li>
+                  <li>Aportar el doble si queda último dos jornadas seguidas.</li>
+                </ul>
+                <h3>Castigos graciosos y virales para el grupo de WhatsApp</h3>
+                <ul>
+                  <li>Cambiar la foto de perfil del grupo por la que decida el resto durante una semana.</li>
+                  <li>Subir una foto o vídeo cumpliendo una prenda decidida por votación.</li>
+                  <li>Llevar el nombre del grupo con un apodo humillante hasta la siguiente jornada.</li>
+                  <li>Hacer de "secretario" del grupo: redactar el resumen de la jornada con memes.</li>
+                </ul>
+                <h3>Castigos sin dinero de por medio</h3>
+                <ul>
+                  <li>Renunciar a hacer cambios en su equipo la próxima jornada.</li>
+                  <li>Dejar que el resto del grupo le fiche un jugador random.</li>
+                  <li>Cumplir una prenda física acordada por el grupo (ridícula y fotografiable).</li>
+                  <li>Quedar "señalado" en el Muro de la Vergüenza hasta que otro ocupe su lugar.</li>
+                </ul>
+              </div>
+            </details>
+
+            <details class="seo-acc">
+              <summary>Preguntas frecuentes sobre castigos fantasy</summary>
+              <div class="seo-acc-body">
+                ${FAQS.slice(0, 6).map(f => `
+                  <h3>${f.q}</h3>
+                  <p>${f.a}</p>
+                `).join('')}
+              </div>
+            </details>
+          </section>
+        </div>
+      </details>
     </div>
   `;
 
