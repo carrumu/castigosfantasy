@@ -22,6 +22,8 @@ import { renderMuro } from './views/muro';
 import { renderPlayersHub } from './views/players_hub';
 import { renderLegal } from './views/legal';
 import { renderSeoHome, removeFaqSchema } from './views/seo-home';
+import { renderAbout, renderContacto } from './views/about';
+import { renderGuias } from './views/guias';
 
 // Initialize Theme (Force Dark Mode)
 document.body.classList.remove('light-theme');
@@ -243,6 +245,13 @@ function renderMainLayout(isGuest, currentUser = null) {
         <!-- Pie de página con enlaces legales (visible en todas las vistas) -->
         <footer class="site-footer" style="border-top: 1px solid var(--border-color); margin-top: 2rem; padding: 1.5rem 1rem calc(1.5rem + 70px); text-align: center; color: var(--text-muted); font-size: 0.78rem; line-height: 1.6;">
           <div style="margin-bottom: 0.5rem;">© 2026 CastigosFantasy · Ligas de fútbol fantasy entre amigos</div>
+          <div style="display: flex; gap: 0.4rem 1rem; flex-wrap: wrap; justify-content: center; margin-bottom: 0.4rem;">
+            <a class="legal-link" data-page="sobre-nosotros" style="color: var(--text-muted); cursor: pointer; font-weight: 600;">Sobre nosotros</a>
+            <span aria-hidden="true">·</span>
+            <a class="legal-link" data-page="guias" style="color: var(--text-muted); cursor: pointer; font-weight: 600;">Guías</a>
+            <span aria-hidden="true">·</span>
+            <a class="legal-link" data-page="contacto" style="color: var(--text-muted); cursor: pointer; font-weight: 600;">Contacto</a>
+          </div>
           <div style="display: flex; gap: 0.4rem 1rem; flex-wrap: wrap; justify-content: center;">
             <a class="legal-link" data-page="privacidad" style="color: var(--text-muted); cursor: pointer; font-weight: 600;">Política de Privacidad</a>
             <span aria-hidden="true">·</span>
@@ -430,6 +439,12 @@ function renderMainLayout(isGuest, currentUser = null) {
       page: currentView,
       onNavigate: navigate
     });
+  } else if (currentView === 'sobre-nosotros') {
+    renderAbout(viewContainer, { onNavigate: navigate });
+  } else if (currentView === 'contacto') {
+    renderContacto(viewContainer, { onNavigate: navigate });
+  } else if (currentView === 'guias') {
+    renderGuias(viewContainer, { onNavigate: navigate });
   }
 
   // Hook Navigation Elements (Cerrando el sidebar al hacer clic en móvil/escritorio)
@@ -787,7 +802,8 @@ function handleRouting() {
     'inicio', 'acceso', 'mis-ligas', 'menu-liga', 'muro', 'muro-verguenza',
     'herramientas', 'ruleta', 'retos', 'juegos', 'adivina-jugador', 'top-10',
     'duelo', 'jugadores', 'bufon', 'generador', 'comunidad', 'foro',
-    'privacidad', 'cookies', 'terminos'
+    'privacidad', 'cookies', 'terminos',
+    'sobre-nosotros', 'contacto', 'guias'
   ];
   if (!KNOWN_VIEWS.includes(view)) {
     view = 'inicio';

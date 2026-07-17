@@ -93,6 +93,21 @@ const seoMap = {
     title: 'Muro de la Vergüenza | CastigosFantasy',
     description: 'El registro público de castigos aceptados y rechazados de tu liga. Nadie escapa al Muro de la Vergüenza.',
     schemaType: 'CollectionPage'
+  },
+  'sobre-nosotros': {
+    title: 'Sobre nosotros | CastigosFantasy',
+    description: 'Somos unos chavales de Sevilla que creamos Castigos Fantasy en 2026 para mejorar la comunidad fantasy: castigos, bote y piques para tu liga de Biwenger, Comunio o LaLiga Fantasy.',
+    schemaType: 'AboutPage'
+  },
+  'contacto': {
+    title: 'Contacto | CastigosFantasy',
+    description: 'Contacta con el equipo de Castigos Fantasy en soporte@castigosfantasy.com para soporte, sugerencias o cualquier duda sobre tu liga.',
+    schemaType: 'ContactPage'
+  },
+  'guias': {
+    title: 'Guías de Castigos Fantasy: ideas, bote y farolillo rojo | CastigosFantasy',
+    description: 'Guías para tu liga fantasy: ideas de castigos para el último, cómo detectar al farolillo rojo, cómo gestionar el bote y las diferencias entre Biwenger, Comunio y LaLiga Fantasy.',
+    schemaType: 'Article'
   }
 };
 
@@ -136,13 +151,16 @@ export function setSEO(view) {
     try {
       const jsonData = JSON.parse(scriptTag.textContent);
       // Actualizamos el objeto que representa la aplicación o página dentro de @graph
-      const webAppGraph = jsonData['@graph']?.find(g => 
-        g['@type'] === 'WebApplication' || 
-        g['@type'] === 'WebPage' || 
-        g['@type'] === 'SoftwareApplication' || 
+      const webAppGraph = jsonData['@graph']?.find(g =>
+        g['@type'] === 'WebApplication' ||
+        g['@type'] === 'WebPage' ||
+        g['@type'] === 'SoftwareApplication' ||
         g['@type'] === 'CollectionPage' ||
         g['@type'] === 'VideoGame' ||
-        g['@type'] === 'DiscussionForumPosting'
+        g['@type'] === 'DiscussionForumPosting' ||
+        g['@type'] === 'AboutPage' ||
+        g['@type'] === 'ContactPage' ||
+        g['@type'] === 'Article'
       );
       if (webAppGraph) {
         webAppGraph.name = seoData.title;

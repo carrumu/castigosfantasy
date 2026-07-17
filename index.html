@@ -75,20 +75,66 @@
   </head>
   <body class="bg-background text-on-surface antialiased">
     <div id="app">
-      <!-- SEO Fallback estático para indexación inicial (sr-only) -->
-      <div style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(1px, 1px, 1px, 1px); white-space: nowrap; border: 0;">
-        <h1>Castigos Fantasy - Gestor de Ligas Biwenger, Mister y Comunio</h1>
-        <h2>Ruleta de morosos y herramientas para tu liga Fantasy</h2>
-        <p>Organiza tu liga Biwenger o Fantasy, gestiona botes de dinero y aplica castigos aleatorios con la ruleta de morosos. Disfruta con tus amigos castigando a los últimos clasificados de la jornada.</p>
-        <p>Enlaces de interés y herramientas:</p>
-        <ul>
-          <li><a href="/ruleta">Ruleta de Castigos Fantasy</a></li>
-          <li><a href="/juegos">Juegos y Adivina el Jugador</a></li>
-          <li><a href="/comunidad">Comunidad y Foro Fantasy</a></li>
-          <li><a href="/herramientas">Generador de Castigos y Sala VAR</a></li>
-          <li><a href="/top-10">Top 10 Morosos</a></li>
-        </ul>
-      </div>
+      <!--
+        Contenido estático real y visible para la indexación inicial (SEO/AdSense).
+        La aplicación (src/main.js) reemplaza este contenido al arrancar para los
+        usuarios con JavaScript. Los robots y los usuarios sin JS ven contenido
+        real y útil, no una página vacía.
+      -->
+      <main id="static-seo-home" style="max-width:920px;margin:0 auto;padding:2rem 1.25rem;color:#e5e2e1;font-family:'Syne',system-ui,sans-serif;line-height:1.6;">
+        <header style="text-align:center;margin-bottom:2.5rem;">
+          <img src="/logo.png" alt="Logo de Castigos Fantasy" width="72" height="72" style="width:72px;height:72px;object-fit:contain;margin-bottom:0.75rem;" />
+          <h1 style="font-size:2rem;font-weight:900;text-transform:uppercase;line-height:1.1;margin:0 0 0.5rem;">Castigos Fantasy: que el último de tu liga no se escape</h1>
+          <p style="font-size:1.05rem;color:#c8c8ab;margin:0 auto;max-width:640px;">La app gratuita que le añade a tu liga de Biwenger, Comunio o LaLiga Fantasy los castigos, el bote común y los piques de cada jornada. Sin Excel y sin perseguir a nadie por WhatsApp.</p>
+        </header>
+
+        <section style="margin-bottom:2.5rem;">
+          <h2 style="font-size:1.4rem;font-weight:900;text-transform:uppercase;margin:0 0 0.75rem;">Qué es Castigos Fantasy</h2>
+          <p style="margin:0 0 1rem;">Castigos Fantasy es una aplicación web gratuita que añade la parte social y de castigos a tu liga de fútbol fantasy. No sustituye a Biwenger, Comunio ni LaLiga Fantasy: sigues jugando tu liga donde ya lo haces y esto se conecta por encima. La app detecta automáticamente quién queda último cada jornada (el "farolillo rojo"), lleva el control del bote común y te da herramientas para sortear castigos, votar al peor jugador y dejar constancia de quién cumple y quién se raja.</p>
+        </section>
+
+        <section style="margin-bottom:2.5rem;">
+          <h2 style="font-size:1.4rem;font-weight:900;text-transform:uppercase;margin:0 0 0.75rem;">Todo lo que tu liga necesita</h2>
+          <ul style="padding-left:1.25rem;margin:0;">
+            <li style="margin-bottom:0.6rem;"><strong>Lista de Morosos:</strong> el farolillo rojo de cada jornada va directo a la lista, sin Excel. Automático con Biwenger; compatible con Comunio, LaLiga Fantasy y más.</li>
+            <li style="margin-bottom:0.6rem;"><strong>Ruleta de Sentencias:</strong> sortea el castigo del perdedor. Que decida el azar, sin favoritismos.</li>
+            <li style="margin-bottom:0.6rem;"><strong>Generador de Castigos:</strong> ideas de castigos al instante, del bote común a las prendas más ridículas.</li>
+            <li style="margin-bottom:0.6rem;"><strong>El Bufón de la Corte:</strong> votad al peor jugador de la jornada. El que menos puntúe, paga.</li>
+            <li style="margin-bottom:0.6rem;"><strong>Muro de la Vergüenza:</strong> queda constancia de quién cumple su castigo y quién se raja.</li>
+          </ul>
+        </section>
+
+        <section style="margin-bottom:2.5rem;">
+          <h2 style="font-size:1.4rem;font-weight:900;text-transform:uppercase;margin:0 0 0.75rem;">Cómo funciona, en 3 pasos</h2>
+          <ol style="padding-left:1.25rem;margin:0;">
+            <li style="margin-bottom:0.6rem;"><strong>Ficha tu liga:</strong> sincroniza Biwenger y la clasificación se importa sola; en Comunio, LaLiga Fantasy y demás, marcas al último en un toque.</li>
+            <li style="margin-bottom:0.6rem;"><strong>Invita al grupo:</strong> comparte el enlace por WhatsApp y sortea el primer castigo con la liga.</li>
+            <li style="margin-bottom:0.6rem;"><strong>Se registra solo:</strong> cada jornada se guarda quién perdió, qué castigo le tocó y si lo cumplió.</li>
+          </ol>
+        </section>
+
+        <section style="margin-bottom:2.5rem;">
+          <h2 style="font-size:1.4rem;font-weight:900;text-transform:uppercase;margin:0 0 0.75rem;">Preguntas frecuentes</h2>
+          <h3 style="font-size:1.05rem;font-weight:800;margin:1rem 0 0.35rem;">¿Es gratis Castigos Fantasy?</h3>
+          <p style="margin:0 0 1rem;">Sí, es completamente gratis. Crear tu liga, sincronizar con Biwenger y usar todas las herramientas no tiene coste.</p>
+          <h3 style="font-size:1.05rem;font-weight:800;margin:1rem 0 0.35rem;">¿Sustituye a Biwenger, Comunio o LaLiga Fantasy?</h3>
+          <p style="margin:0 0 1rem;">No, es un complemento. Sigues jugando tu liga igual y Castigos Fantasy añade encima la capa de castigos, bote y humor que esas apps no tienen.</p>
+          <h3 style="font-size:1.05rem;font-weight:800;margin:1rem 0 0.35rem;">¿Cómo detecta quién ha quedado último?</h3>
+          <p style="margin:0 0 1rem;">En cuanto sincronizas tu liga de Biwenger, importa la clasificación de la jornada y detecta al farolillo rojo automáticamente. En otras plataformas, lo confirmas tú en un toque.</p>
+        </section>
+
+        <nav aria-label="Enlaces del sitio" style="border-top:1px solid #333;padding-top:1.5rem;text-align:center;color:#c8c8ab;font-size:0.9rem;">
+          <p style="margin:0 0 0.75rem;font-weight:700;">Más información:</p>
+          <p style="margin:0;display:flex;gap:0.5rem 1rem;flex-wrap:wrap;justify-content:center;">
+            <a href="/sobre-nosotros" style="color:#deed00;">Sobre nosotros</a>
+            <a href="/guias" style="color:#deed00;">Guías</a>
+            <a href="/contacto" style="color:#deed00;">Contacto</a>
+            <a href="/privacidad" style="color:#deed00;">Privacidad</a>
+            <a href="/cookies" style="color:#deed00;">Cookies</a>
+            <a href="/terminos" style="color:#deed00;">Términos</a>
+          </p>
+        </nav>
+      </main>
     </div>
     <noscript>
       <div style="padding: 2rem; text-align: center; font-family: sans-serif;">
