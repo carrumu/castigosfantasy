@@ -18,33 +18,51 @@ const GUIDES = [
     id: 'ideas-de-castigos',
     title: 'Ideas de castigos para el último de tu liga fantasy',
     html: `
-      <p style="${P}">Si tu liga funciona con el clásico "el último paga", tarde o temprano llega la pregunta: ¿y qué castigo le ponemos? Aquí tienes ideas reales que usan otros grupos, organizadas por tipo. Puedes sortearlas con la <a href="/ruleta" class="cf-link" data-nav="ruleta" style="color:var(--accent);">Ruleta de Sentencias</a> o dejar que el <a href="/generador" class="cf-link" data-nav="generador" style="color:var(--accent);">Generador de Castigos</a> te proponga una al momento.</p>
+      <p style="${P}">Aportar al bote y poco más se queda corto enseguida. El buen castigo pica sin hacer daño, da para meme en el grupo y, a ser posible, duele dentro del propio fantasy. Aquí tienes ideas concretas, ordenadas de más suave a más cruel. Puedes sortearlas con la <a href="/ruleta" class="cf-link" data-nav="ruleta" style="color:var(--accent);">Ruleta de Sentencias</a> o dejar que el <a href="/generador" class="cf-link" data-nav="generador" style="color:var(--accent);">Generador de Castigos</a> te proponga una al momento.</p>
 
-      <h3 style="${H3}">Castigos económicos para el bote común</h3>
+      <h3 style="${H3}">Los que duelen dentro del fantasy (los mejores)</h3>
+      <p style="${P}">Estos son los que de verdad escuecen, porque afectan a tu equipo la jornada siguiente:</p>
       <ul style="${UL}">
-        <li style="${LI}">Aportar una cuota fija a la caja común de la jornada.</li>
-        <li style="${LI}">Pagar la próxima ronda cuando quedéis en persona.</li>
-        <li style="${LI}">Invitar a cenar o a comer al resto del grupo.</li>
-        <li style="${LI}">Aportar el doble si queda último dos jornadas seguidas.</li>
+        <li style="${LI}"><strong>Once intervenido:</strong> la próxima alineación la decide el grupo por votación, capitán incluido. Tú solo miras.</li>
+        <li style="${LI}"><strong>Capitán regalado:</strong> cedes tu capitán de la siguiente jornada al jugador que elija el ganador.</li>
+        <li style="${LI}"><strong>Mercado cerrado:</strong> una semana sin fichar ni vender. Te aguantas con la plantilla que tienes.</li>
+        <li style="${LI}"><strong>Cambio de nombre forzoso:</strong> tu equipo se llama lo que decida el grupo hasta que otro quede último.</li>
+        <li style="${LI}"><strong>Fichaje impuesto:</strong> el resto te obliga a alinear a un jugador cualquiera de tu banquillo, sí o sí.</li>
       </ul>
 
-      <h3 style="${H3}">Castigos graciosos y virales para el grupo de WhatsApp</h3>
+      <h3 style="${H3}">Comparecencia ante la afición (el toque "juicio")</h3>
       <ul style="${UL}">
-        <li style="${LI}">Cambiar la foto de perfil del grupo por la que decida el resto durante una semana.</li>
-        <li style="${LI}">Subir una foto o vídeo cumpliendo una prenda decidida por votación.</li>
-        <li style="${LI}">Llevar un apodo humillante en la liga hasta la siguiente jornada.</li>
-        <li style="${LI}">Hacer de "secretario" del grupo: redactar el resumen de la jornada con memes.</li>
+        <li style="${LI}"><strong>Rueda de prensa:</strong> audio de 1 minuto al grupo "dando explicaciones" por el fracaso, con tono de entrenador cesado.</li>
+        <li style="${LI}"><strong>Narración de la tragedia:</strong> nota de voz relatando tu propia derrota como si fuera el minuto 93 de una final perdida.</li>
+        <li style="${LI}"><strong>Firma del acta:</strong> te declaras "farolillo rojo oficial" de la jornada y quedas en el <a href="/muro-verguenza" class="cf-link" data-nav="muro-verguenza" style="color:var(--accent);">Muro de la Vergüenza</a> hasta que otro te releve.</li>
+        <li style="${LI}"><strong>Elogio obligado:</strong> escribes en el grupo tres virtudes del equipo del ganador, sin una gota de sarcasmo.</li>
       </ul>
 
-      <h3 style="${H3}">Castigos sin dinero de por medio</h3>
+      <h3 style="${H3}">Redes y foto de perfil (públicos y virales)</h3>
       <ul style="${UL}">
-        <li style="${LI}">Renunciar a hacer cambios en su equipo la próxima jornada.</li>
-        <li style="${LI}">Dejar que el resto del grupo le fiche un jugador al azar.</li>
-        <li style="${LI}">Cumplir una prenda física acordada por el grupo (ridícula y fotografiable).</li>
-        <li style="${LI}">Quedar señalado en el Muro de la Vergüenza hasta que otro ocupe su lugar.</li>
+        <li style="${LI}">Foto de perfil de WhatsApp durante una semana: un montaje (cuanto más cutre, mejor) que te prepara el ganador.</li>
+        <li style="${LI}">Estado de WhatsApp 48 horas: "Busco entrenador para mi Fantasy, el actual es un fraude".</li>
+        <li style="${LI}">Story de Instagram enseñando el once de esa jornada con la leyenda "así se pierde una liga, tomad nota".</li>
+        <li style="${LI}">Story cantando (mal) el himno del rival más odiado del grupo.</li>
       </ul>
 
-      <p style="${P}">El mejor castigo es el que hace reír a todo el grupo sin cruzar líneas personales. Acordad entre todos un catálogo al empezar la temporada y dejad que el azar elija: así nadie puede quejarse de favoritismos.</p>
+      <h3 style="${H3}">Prendas y retos fotografiables</h3>
+      <ul style="${UL}">
+        <li style="${LI}">Vídeo dando 10 toques a un rollo de papel higiénico. Si fallas, se repite hasta que salga.</li>
+        <li style="${LI}">Recrear un meme clásico en casa y mandar la foto al grupo.</li>
+        <li style="${LI}">Grabarte imitando la celebración de gol más ridícula que se te ocurra en el salón.</li>
+        <li style="${LI}">Enseñar el "desayuno del perdedor" con cara de circunstancias en un vídeo de 15 segundos.</li>
+      </ul>
+
+      <h3 style="${H3}">Para el bote común (con vuelta de tuerca)</h3>
+      <ul style="${UL}">
+        <li style="${LI}"><strong>Impuesto de reincidencia:</strong> si eres último dos jornadas seguidas, la aportación se dobla.</li>
+        <li style="${LI}">Pagar el bote de la jornada en monedas pequeñas, contadas delante del grupo.</li>
+        <li style="${LI}">El último paga, pero el penúltimo decide a qué se destina esta semana.</li>
+        <li style="${LI}">Costear el "premio simbólico" (un trofeo de bazar) para el ganador de la jornada.</li>
+      </ul>
+
+      <p style="${P}">Una regla de oro: el mejor castigo hace reír a todo el grupo, también al que lo cumple, y nunca cruza lo personal. Acordad un catálogo al empezar la temporada, metedlo en la ruleta y que decida el azar; así nadie puede quejarse de favoritismos.</p>
     `
   },
   {
