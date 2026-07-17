@@ -178,83 +178,27 @@ export function renderSeoHome(container, { onNavigate } = {}) {
             ${i < STEPS.length - 1 ? `<span class="seo-step-connector material-symbols-outlined">arrow_forward</span>` : ''}
           `).join('')}
         </div>
-        <div style="text-align:center;margin-top:1.75rem;">
-          ${heroCta}
-          ${loginNudge}
-        </div>
       </section>
 
-      <!-- FINAL CTA -->
-      <section style="text-align:center;padding:1rem 0 0.5rem;">
-        <p style="font-family:var(--font-display);font-weight:900;font-size:1.3rem;text-transform:uppercase;letter-spacing:-0.5px;color:var(--text-light);margin-bottom:1.25rem;line-height:1.1;">
-          Crea tu liga y deja de perseguir<br/>a tus amigos por WhatsApp
-        </p>
+      <!-- FINAL CTA (banda de cierre, único CTA además del hero) -->
+      <section class="seo-final-cta">
+        <h2 class="seo-final-cta-title">Crea tu liga y deja de perseguir a tus amigos por WhatsApp</h2>
+        <p class="seo-final-cta-sub">Gratis, en menos de 2 minutos. Sincroniza Biwenger o empieza a mano y que empiece el juicio.</p>
         ${heroCta}
         ${loginNudge}
       </section>
 
-      <!-- SEO CONTENT (collapsed, tucked below the fold so it doesn't compete with the CTAs) -->
-      <details class="seo-faq-wrap">
-        <summary class="seo-faq-summary">¿Tienes dudas? Preguntas frecuentes y más información</summary>
-        <div class="seo-faq-inner">
-          <section class="landing-tier">
-            <div class="tier-header">
-              <h2 class="tier-title">Aprende más sobre los castigos fantasy</h2>
-              <span class="tier-sub">Ideas, cómo funciona y dudas</span>
-            </div>
-
-            <details class="seo-acc">
-              <summary>¿Qué son los castigos fantasy y cómo funcionan?</summary>
-              <div class="seo-acc-body">
-                <p>Un castigo fantasy es la consecuencia que le toca al jugador que queda último en la clasificación de la jornada de tu liga de fútbol fantasy. Puede ser pagar al bote común, cumplir una prenda, o las dos cosas. Es una tradición tan vieja como el propio fantasy: alguien pierde, alguien paga.</p>
-                <p>El problema no es la idea, es la gestión: saber quién ha quedado último cada semana, apuntarlo, decidir el castigo y asegurarte de que se cumple. Normalmente acaba en un Excel que nadie actualiza o en un grupo de WhatsApp donde el "eh, te toca pagar" se pierde entre memes. Castigos Fantasy automatiza toda esa parte.</p>
-                <h3>El farolillo rojo: quién queda último cada jornada</h3>
-                <p>En el argot del fantasy, el "farolillo rojo" es el que va colista. Castigos Fantasy sincroniza tu clasificación de Biwenger y detecta automáticamente quién ha sido el farolillo rojo de la jornada, sin que tengas que revisar nada a mano. En cuanto se cierra la jornada, la app ya sabe quién es el candidato al castigo.</p>
-                <h3>Castigos Biwenger vs. castigos Comunio: ¿es lo mismo?</h3>
-                <p>Sí. El concepto de "el último paga" existe igual en Biwenger, Comunio, LaLiga Fantasy, Mister o cualquier otra plataforma de fantasy. Lo único que cambia es de dónde importamos tu clasificación. Hoy la sincronización automática está activa con Biwenger; en otras plataformas puedes gestionar el bote y los castigos confirmando tú quién ha quedado último.</p>
-              </div>
-            </details>
-
-            <details class="seo-acc">
-              <summary>Ideas de castigos para el último de la liga fantasy</summary>
-              <div class="seo-acc-body">
-                <p>Si no tienes claro qué castigo ponerle al farolillo rojo, aquí tienes ideas reales que otros grupos ya usan. Puedes sortearlas con la Ruleta de Sentencias o dejar que el Generador de Castigos te proponga una al momento.</p>
-                <h3>Castigos económicos para el bote común</h3>
-                <ul>
-                  <li>Aportar una cuota fija a la caja común de la jornada.</li>
-                  <li>Pagar la próxima ronda cuando quedéis en persona.</li>
-                  <li>Invitar a cenar o a comer al resto del grupo.</li>
-                  <li>Aportar el doble si queda último dos jornadas seguidas.</li>
-                </ul>
-                <h3>Castigos graciosos y virales para el grupo de WhatsApp</h3>
-                <ul>
-                  <li>Cambiar la foto de perfil del grupo por la que decida el resto durante una semana.</li>
-                  <li>Subir una foto o vídeo cumpliendo una prenda decidida por votación.</li>
-                  <li>Llevar el nombre del grupo con un apodo humillante hasta la siguiente jornada.</li>
-                  <li>Hacer de "secretario" del grupo: redactar el resumen de la jornada con memes.</li>
-                </ul>
-                <h3>Castigos sin dinero de por medio</h3>
-                <ul>
-                  <li>Renunciar a hacer cambios en su equipo la próxima jornada.</li>
-                  <li>Dejar que el resto del grupo le fiche un jugador random.</li>
-                  <li>Cumplir una prenda física acordada por el grupo (ridícula y fotografiable).</li>
-                  <li>Quedar "señalado" en el Muro de la Vergüenza hasta que otro ocupe su lugar.</li>
-                </ul>
-              </div>
-            </details>
-
-            <details class="seo-acc">
-              <summary>Preguntas frecuentes sobre castigos fantasy</summary>
-              <div class="seo-acc-body">
-                ${FAQS.slice(0, 6).map(f => `
-                  <h3>${f.q}</h3>
-                  <p>${f.a}</p>
-                `).join('')}
-              </div>
-            </details>
-          </section>
-        </div>
-      </details>
+      <!-- GUÍAS: enlace limpio al contenido (antes había un FAQ que duplicaba /guias) -->
+      <section class="landing-tier">
+        <button class="seo-nav seo-guias-card" data-nav="guias">
+          <span class="seo-guias-card-text">
+            <span class="seo-guias-card-eyebrow">Guías y consejos</span>
+            <span class="seo-guias-card-title">Ideas de castigos para tu liga</span>
+            <span class="seo-guias-card-desc">Ideas para el último de la jornada, cómo gestionar el bote y trucos para que la liga no se apague en toda la temporada.</span>
+          </span>
+          <span class="seo-guias-card-arrow material-symbols-outlined">arrow_forward</span>
+        </button>
+      </section>
     </div>
   `;
 
