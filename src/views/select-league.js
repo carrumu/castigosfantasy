@@ -20,7 +20,23 @@ export function renderSelectLeague(container, callbacks) {
     return;
   }
 
+  // Anti-abuse: a user may belong to at most 5 leagues (created or joined).
+  // Enforced hard in the DB via a trigger on league_members; this frontend
+  // guard just gives a friendly message before hitting that limit.
+  const MAX_LEAGUES = 5;
+
   let leagues = [];
+
+  // True once the user is at the league cap; blocks creating/joining more.
+  const atLeagueLimit = () => leagues.length >= MAX_LEAGUES;
+
+  // Detects the DB trigger's exception so we can show a friendly message even
+  // if the cap is hit by a race or a direct API call. PostgREST may surface the
+  // raised message in any of message/details/hint, so check them all.
+  const isLeagueLimitError = (err) =>
+    !!err && ['message', 'details', 'hint'].some(
+      (k) => typeof err[k] === 'string' && err[k].includes('LEAGUE_LIMIT_REACHED')
+    );
 
   // Helper to generate a random 6-character invite code
   function generateInviteCode() {
@@ -279,10 +295,18 @@ export function renderSelectLeague(container, callbacks) {
 
     if (btnShowJoin && btnShowCreate) {
       btnShowJoin.addEventListener('click', () => {
+        if (atLeagueLimit()) {
+          callbacks.showToast(`Has alcanzado el máximo de ${MAX_LEAGUES} ligas. Sal de alguna para unirte a otra.`, 'error');
+          return;
+        }
         modalJoinForm.classList.add('active');
       });
 
       btnShowCreate.addEventListener('click', () => {
+        if (atLeagueLimit()) {
+          callbacks.showToast(`Has alcanzado el máximo de ${MAX_LEAGUES} ligas. Sal de alguna para crear otra.`, 'error');
+          return;
+        }
         modalCreateForm.classList.add('active');
       });
     }
@@ -350,6 +374,12 @@ export function renderSelectLeague(container, callbacks) {
 
     joinForm.addEventListener('submit', async (e) => {
       e.preventDefault();
+
+      if (atLeagueLimit()) {
+        callbacks.showToast(`Has alcanzado el máximo de ${MAX_LEAGUES} ligas. Sal de alguna para unirte a otra.`, 'error');
+        return;
+      }
+
       const btn = joinForm.querySelector('#btn-join');
       const code = joinForm.querySelector('#join-code').value.trim().toUpperCase();
       const identitySelect = joinForm.querySelector('#join-identity');
@@ -406,7 +436,10 @@ export function renderSelectLeague(container, callbacks) {
           .rpc('join_league_by_code', { invite_code_arg: code, roster_id_arg: selectedRosterId });
 
         if (rpcErr) {
-          callbacks.showToast(rpcErr.message || 'Error al unirse a la liga', 'error');
+          const msg = isLeagueLimitError(rpcErr)
+            ? `Has alcanzado el máximo de ${MAX_LEAGUES} ligas. Sal de alguna para unirte a otra.`
+            : (rpcErr.message || 'Error al unirse a la liga');
+          callbacks.showToast(msg, 'error');
           console.error(rpcErr);
           btn.disabled = false;
           btn.innerHTML = 'Unirse a la Liga';
@@ -446,6 +479,12 @@ export function renderSelectLeague(container, callbacks) {
     const createForm = container.querySelector('#create-league-form');
     createForm.addEventListener('submit', async (e) => {
       e.preventDefault();
+
+      if (atLeagueLimit()) {
+        callbacks.showToast(`Has alcanzado el máximo de ${MAX_LEAGUES} ligas. Sal de alguna para crear otra.`, 'error');
+        return;
+      }
+
       const btn = createForm.querySelector('#btn-create');
       const name = createForm.querySelector('#new-league-name').value.trim();
       const rosterInputs = Array.from(createForm.querySelectorAll('.roster-dynamic-input'));
@@ -482,7 +521,19 @@ export function renderSelectLeague(container, callbacks) {
             is_admin: true
           });
 
-        if (memberErr) throw memberErr;
+        if (memberErr) {
+          // The DB caps membership at 5. If we hit it here, the league row was
+          // already created, so roll it back to avoid an orphan league.
+          await supabase.from('leagues').delete().eq('id', newLeague.id);
+
+          const msg = isLeagueLimitError(memberErr)
+            ? `Has alcanzado el máximo de ${MAX_LEAGUES} ligas. Sal de alguna para crear otra.`
+            : 'No se pudo crear la liga';
+          callbacks.showToast(msg, 'error');
+          btn.disabled = false;
+          btn.innerHTML = 'Crear Liga';
+          return;
+        }
 
         // Insert roster names
         if (names.length > 0) {
