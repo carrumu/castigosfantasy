@@ -105,8 +105,8 @@ const seoMap = {
     schemaType: 'ContactPage'
   },
   'guias': {
-    title: 'Guías de Castigos Fantasy: ideas, bote y farolillo rojo | CastigosFantasy',
-    description: 'Guías para tu liga fantasy: ideas de castigos para el último, cómo detectar al farolillo rojo, cómo gestionar el bote y las diferencias entre Biwenger, Comunio y LaLiga Fantasy.',
+    title: 'Guías Fantasy: castigos, capitanías, chollos y cláusulas | CastigosFantasy',
+    description: 'Guías prácticas para tu liga fantasy: ideas de castigos, cómo elegir capitán, encontrar chollos, usar cláusulas, errores de novato y cómo gestionar el bote en Biwenger, Comunio y LaLiga Fantasy.',
     schemaType: 'Article'
   }
 };

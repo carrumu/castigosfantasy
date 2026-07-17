@@ -120,6 +120,100 @@ const GUIDES = [
       <h3 style="${H3}">Marcas y afiliación</h3>
       <p style="${P}">Castigos Fantasy no está asociado ni patrocinado por Biwenger, Comunio, Mister ni LaLiga. Son marcas de sus respectivos titulares; nosotros solo añadimos la capa social de castigos por encima de tu liga.</p>
     `
+  },
+  {
+    id: 'como-elegir-capitan',
+    title: 'Cómo elegir capitán en tu liga fantasy (y no fallar cada jornada)',
+    html: `
+      <p style="${P}">La capitanía dobla los puntos de un jugador, así que es la decisión que más pesa cada jornada. Acertar con el capitán es, muchas veces, la diferencia entre ser el líder o acabar de farolillo rojo pagando el bote.</p>
+
+      <h3 style="${H3}">Mira el partido, no solo el nombre</h3>
+      <p style="${P}">La tentación es capitanear siempre a tu estrella, pero el rival importa tanto como el jugador. Un delantero top contra un equipo que encaja pocos goles rendirá menos que un jugador en forma con un partido asequible en casa. Revisa el calendario: local o visitante, rival de la zona baja y descanso reciente son buenas señales.</p>
+
+      <h3 style="${H3}">Titularidad y minutos garantizados</h3>
+      <p style="${P}">De poco sirve un capitán que se queda en el banquillo. Antes de cerrar la jornada, comprueba alineaciones probables, sanciones y rotaciones, sobre todo en semanas de dos partidos o competiciones europeas de por medio.</p>
+
+      <h3 style="${H3}">Diferénciate del grupo</h3>
+      <p style="${P}">Si todos capitanean al mismo, acertar solo te mantiene a la par. Cuando vas por detrás en la clasificación, una capitanía diferencial (un jugador menos evidente con buen partido) es la forma de recuperar terreno. Si vas líder, cubrirte con la opción segura suele ser lo más sensato.</p>
+    `
+  },
+  {
+    id: 'encontrar-chollos',
+    title: 'Chollos en el fantasy: cómo encontrar jugadores baratos que puntúan',
+    html: `
+      <p style="${P}">Un chollo es ese jugador barato que rinde muy por encima de su precio y te libera dinero para reforzar el resto del equipo. Encontrarlos a tiempo es lo que separa a los mánagers que pelean arriba de los que se quedan enganchados a fichajes caros que no rinden.</p>
+
+      <h3 style="${H3}">Fíjate en los recién ascendidos y los cambios de equipo</h3>
+      <p style="${P}">Los jugadores de equipos modestos suelen empezar baratos. Si uno se hace titular indiscutible y su equipo compite, su precio tardará en subir mientras tú ya sumas puntos. Los que cambian de club en verano también arrancan a precios que aún no reflejan su nuevo rol.</p>
+
+      <h3 style="${H3}">Titularidad por encima de talento</h3>
+      <p style="${P}">Un crack que juega media hora puntúa menos que un jugador correcto que disputa los 90 minutos cada jornada. Para chollos, prioriza minutos asegurados y un rol claro en el equipo por delante del nombre.</p>
+
+      <h3 style="${H3}">Defensas y porteros de equipos sólidos</h3>
+      <p style="${P}">Los defensas y porteros de equipos que encajan poco acumulan puntos por portería a cero de forma constante y suelen ser mucho más baratos que los centrocampistas y delanteros. Son la base perfecta para un equipo equilibrado sin arruinarte.</p>
+
+      <h3 style="${H3}">Reacciona rápido</h3>
+      <p style="${P}">El valor de un chollo dura poco: en cuanto rinde, su precio sube y todos lo quieren. Revisa el mercado cada jornada y no esperes a estar seguro del todo, porque para entonces ya no será un chollo.</p>
+    `
+  },
+  {
+    id: 'clausulas-de-rescision',
+    title: 'Cláusulas de rescisión: cómo usarlas (y cómo protegerte)',
+    html: `
+      <p style="${P}">En muchas ligas fantasy puedes fichar a un jugador de otro mánager pagando su cláusula de rescisión, aunque no esté en venta. Es una de las mecánicas más divertidas y polémicas, y saber manejarla te da ventaja tanto para atacar como para defender tu plantilla.</p>
+
+      <h3 style="${H3}">Cuándo lanzar una cláusula</h3>
+      <p style="${P}">Tiene sentido pagar una cláusula cuando el jugador vale claramente más de lo que te cuesta, cuando resuelve una carencia de tu equipo o cuando quieres debilitar a un rival directo por el título. Echa cuentas: no te descapitalices por un fichaje impulsivo que te deje sin margen el resto de la temporada.</p>
+
+      <h3 style="${H3}">Protege a tus mejores jugadores</h3>
+      <p style="${P}">Si tu liga lo permite, sube la cláusula de tus intocables para que a los demás les salga carísimo llevárselos. Cuidado con dejar a un crack con la cláusula baja justo después de una gran jornada: es cuando más papeletas tiene de que te lo quiten.</p>
+
+      <h3 style="${H3}">Vigila tu saldo y el mercado</h3>
+      <p style="${P}">Las cláusulas suelen poder ejecutarse en ventanas concretas. Mantén algo de liquidez si temes un ataque y presta atención a los movimientos del grupo: cuando alguien acumula dinero de golpe, casi siempre es que va a por la estrella de otro.</p>
+    `
+  },
+  {
+    id: 'errores-manager-novato',
+    title: '7 errores típicos del mánager novato en el fantasy',
+    html: `
+      <p style="${P}">Todos hemos empezado cometiendo los mismos fallos. Si es tu primera temporada (o quieres dejar de ser el farolillo rojo del grupo), evita estos errores clásicos y notarás la diferencia enseguida.</p>
+
+      <h3 style="${H3}">Los fallos que más caros se pagan</h3>
+      <ul style="${UL}">
+        <li style="${LI}"><strong>Gastar todo el presupuesto en tres cracks:</strong> te quedas con un banquillo de relleno y cualquier lesión te hunde la jornada.</li>
+        <li style="${LI}"><strong>Fichar por nombre y no por momento de forma:</strong> una estrella lesionada o sin ritmo puntúa menos que un jugador en racha.</li>
+        <li style="${LI}"><strong>Olvidarte de alinear:</strong> el error más tonto y más común. Un jugador en el banquillo suma cero por muy bueno que sea.</li>
+        <li style="${LI}"><strong>Ignorar el calendario:</strong> no es lo mismo jugar en casa contra un colista que fuera contra un grande.</li>
+        <li style="${LI}"><strong>No tener portero ni defensa fiables:</strong> las porterías a cero son puntos baratos y constantes que muchos novatos desprecian.</li>
+        <li style="${LI}"><strong>Vender a lo loco tras una mala jornada:</strong> un solo partido flojo no convierte a un buen jugador en malo.</li>
+        <li style="${LI}"><strong>No usar la capitanía con cabeza:</strong> doblar puntos al jugador equivocado tira por la borda una buena jornada.</li>
+      </ul>
+
+      <p style="${P}">La clave está en la constancia: revisa alineaciones, aprovecha el calendario y no tomes decisiones en caliente. El fantasy es una carrera larga, no una jornada suelta.</p>
+    `
+  },
+  {
+    id: 'mantener-viva-la-liga',
+    title: 'Cómo mantener viva tu liga fantasy hasta la última jornada',
+    html: `
+      <p style="${P}">El mayor enemigo de una liga entre amigos no es el rival: es el abandono. Cuando alguien se descuelga en la clasificación, deja de alinear, y poco a poco la liga pierde chispa. Estas ideas mantienen a todo el grupo enganchado hasta el final.</p>
+
+      <h3 style="${H3}">Que perder también tenga premio (o castigo)</h3>
+      <p style="${P}">Si solo importa quedar primero, el que va último se rinde. Con los castigos al farolillo rojo de cada jornada, el pique se mantiene aunque no pelees por el título: nadie quiere ser el que paga el bote o cumple la prenda de la semana.</p>
+
+      <h3 style="${H3}">Premios paralelos y minirretos</h3>
+      <ul style="${UL}">
+        <li style="${LI}">Premio al mejor de cada mes, no solo al campeón final.</li>
+        <li style="${LI}">Retos semanales votados por el grupo para dar salseo a cada jornada.</li>
+        <li style="${LI}">Un "pichichi" de la liga: quien más puntúe una jornada elige el castigo del último.</li>
+      </ul>
+
+      <h3 style="${H3}">Mantén vivo el grupo de WhatsApp</h3>
+      <p style="${P}">La liga vive en las conversaciones: los piques, los memes de las derrotas y el resumen de la jornada. Herramientas como el Bufón de la Corte (votar al peor jugador) o el Muro de la Vergüenza dan temas de conversación cada semana y evitan que el grupo se apague.</p>
+
+      <h3 style="${H3}">Cierra bien la temporada</h3>
+      <p style="${P}">Un buen final anima a repetir el año siguiente: una comida pagada con el bote, un trofeo simbólico para el campeón y una última humillación reservada para el que haya quedado último de la clasificación general. Así la liga no termina, solo descansa hasta la próxima.</p>
+    `
   }
 ];
 
@@ -143,7 +237,7 @@ export function renderGuias(container, { onNavigate } = {}) {
       </a>
 
       <h1 style="font-family:var(--font-display);font-weight:900;font-size:2rem;text-transform:uppercase;line-height:1.05;margin-bottom:0.4rem;">Guías de Castigos Fantasy</h1>
-      <p style="color:var(--text-muted);font-size:0.95rem;margin-bottom:1.5rem;line-height:1.6;">Ideas de castigos, cómo detectar al farolillo rojo, cómo llevar el bote de tu liga y las diferencias entre plataformas. Todo lo que necesitas para sacarle partido a tu liga fantasy con tus amigos.</p>
+      <p style="color:var(--text-muted);font-size:0.95rem;margin-bottom:1.5rem;line-height:1.6;">Ideas de castigos, capitanías, chollos, cláusulas, errores de novato y cómo llevar el bote de tu liga. Guías prácticas para dominar tu liga fantasy de Biwenger, Comunio o LaLiga Fantasy y mantener a tus amigos enganchados hasta la última jornada.</p>
 
       <nav style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:10px;padding:1rem 1.25rem;margin-bottom:1rem;">
         <strong style="display:block;font-family:var(--font-display);text-transform:uppercase;font-size:0.8rem;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:0.5rem;">En esta página</strong>
