@@ -154,23 +154,10 @@ export function renderRoulette(container, callbacks) {
 
       if (punErr) throw punErr;
 
-      if (punList.length === 0) {
-        const insertList = DEFAULT_PUNISHMENTS.map(p => ({
-          league_id: currentLeagueId,
-          name: p.name,
-          description: p.description
-        }));
-
-        const { data: insertedData, error: insErr } = await supabase
-          .from('punishments')
-          .insert(insertList)
-          .select();
-
-        if (insErr) throw insErr;
-        punishments = insertedData;
-      } else {
-        punishments = punList;
-      }
+      // Cada liga empieza con la ruleta VACÍA y sus miembros añaden sus propios
+      // castigos. No sembramos los castigos por defecto en la nube: son de cada
+      // liga (ahí se ponen locuras) y no deben imponerse ni mezclarse.
+      punishments = punList || [];
 
       // Load history
       const { data: histList, error: histErr } = await supabase
@@ -214,6 +201,9 @@ export function renderRoulette(container, callbacks) {
     // Roster losers (pre-registered, unclaimed) have no account, so no real user can
     // "be" them — let any league member spin on their behalf instead of deadlocking.
     const isRosterLoser = !isLocalMode && pendingRecord && !pendingRecord.loser_profile_id && !!pendingRecord.loser_roster_id;
+    const isEmpty = punishments.length === 0;
+    // A wheel needs at least 2 options to be worth spinning.
+    const canSpin = punishments.length >= 2;
 
     container.innerHTML = `
       <div class="container">
@@ -264,7 +254,9 @@ export function renderRoulette(container, callbacks) {
           <div class="card glass roulette-container" style="margin-bottom: 0;">
             <h2 class="card-title gradient-text-gold">Ruleta de Castigos</h2>
             <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem; text-align: center;">
-              El azar dictará sentencia. Hay <strong>${punishments.length}</strong> castigos cargados.
+              ${isEmpty
+                ? 'Tu ruleta está vacía. Añade los castigos de tu liga abajo para empezar a girar.'
+                : `El azar dictará sentencia. Hay <strong>${punishments.length}</strong> castigos cargados.`}
             </p>
 
             <div class="wheel-wrapper">
@@ -274,15 +266,22 @@ export function renderRoulette(container, callbacks) {
               <canvas id="wheel-canvas" class="wheel-canvas" width="800" height="800" style="width: 100%; max-width: 420px; height: auto; display: block; margin: 0 auto;"></canvas>
             </div>
 
-            <!-- Gating: Only allow the pending loser to spin the wheel -->
-            ${!isLocalMode && pendingRecord && !isLoser ? `
+            <!-- Gating: need >=2 castigos, and only the pending loser may spin -->
+            ${!canSpin ? `
+              <div style="background: rgba(var(--accent-rgb), 0.08); border: 2px dashed var(--border-color-glow); border-radius: 6px; padding: 0.75rem; font-size: 0.85rem; color: var(--text-light); text-align: center; width: 100%; max-width: 320px; margin: 0.5rem auto 1.25rem auto; line-height: 1.35;">
+                ${isEmpty
+                  ? 'Aún no hay castigos. Añade los tuyos abajo para montar la ruleta de tu liga.'
+                  : 'Necesitas al menos <strong>2 castigos</strong> para poder girar. Añade otro abajo.'}
+              </div>
+              <button id="spin-btn" class="btn-primary" style="max-width: 200px; opacity: 0.5; cursor: not-allowed; margin-bottom: 0.5rem;" disabled>¡GIRAR!</button>
+            ` : (!isLocalMode && pendingRecord && !isLoser ? `
               <div style="background: rgba(239, 68, 68, 0.1); border: 2px solid #ef4444; border-radius: 6px; padding: 0.75rem; font-size: 0.85rem; color: #f87171; text-align: center; margin-bottom: 1rem; width: 100%; max-width: 320px; margin: 0.5rem auto 1.25rem auto; line-height: 1.35;">
                 Solo el jugador castigado, <strong>${escapeHTML(pendingRecord.display_name)}</strong>, puede girar la ruleta. ¡Haz que inicie sesión para tirar!
               </div>
               <button id="spin-btn" class="btn-primary" style="max-width: 200px; opacity: 0.5; cursor: not-allowed; margin-bottom: 0.5rem;" disabled>¡GIRAR!</button>
             ` : `
               <button id="spin-btn" class="btn-primary" style="max-width: 200px; margin-bottom: 0.5rem;">¡GIRAR!</button>
-            `}
+            `)}
 
             <!-- Color-coded Legend for Roulette Options (Collapsible/Optional) -->
             <div style="margin-top: 1.5rem; width: 100%; text-align: left; padding: 0.5rem; border-top: 1.5px solid var(--border-color); padding-top: 1.25rem;">
@@ -620,6 +619,25 @@ export function renderRoulette(container, callbacks) {
     const height = canvas.height;
     const center = width / 2;
     ctx.clearRect(0, 0, width, height);
+
+    // Empty wheel (league starts with no castigos): draw a placeholder ring
+    // instead of dividing by zero.
+    if (punishments.length === 0) {
+      ctx.beginPath();
+      ctx.arc(center, center, center - 15, 0, 2 * Math.PI);
+      ctx.fillStyle = '#20201f';
+      ctx.fill();
+      ctx.lineWidth = 6;
+      ctx.strokeStyle = '#3a3a3a';
+      ctx.stroke();
+      ctx.fillStyle = '#c8c8ab';
+      ctx.font = 'bold 34px Syne, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('Ruleta vacía', center, center - 10);
+      ctx.font = '24px Syne, sans-serif';
+      ctx.fillText('Añade castigos', center, center + 30);
+      return;
+    }
 
     const arcLength = (2 * Math.PI) / punishments.length;
 
