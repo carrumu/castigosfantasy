@@ -570,8 +570,8 @@ input, select, textarea, button {
 
 .btn-primary {
   width: 100%;
-  background: linear-gradient(135deg, var(--primary-green) 0%, #059669 100%);
-  color: #fff;
+  background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-dark) 100%);
+  color: #000000;
   border: none;
   padding: 0.65rem 1.25rem;
   border-radius: 8px;
@@ -584,16 +584,18 @@ input, select, textarea, button {
   align-items: center;
   gap: 0.5rem;
   transition: var(--transition-fast);
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.12);
+  box-shadow: 0 4px 12px rgba(var(--accent-rgb), 0.15);
 }
 
 .btn-primary:hover {
   filter: brightness(1.1);
   transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(var(--accent-rgb), 0.25);
 }
 
 .btn-primary:active {
   transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(var(--accent-rgb), 0.15);
 }
 
 .btn-secondary {
