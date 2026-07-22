@@ -736,6 +736,83 @@ input, select, textarea, button {
   position: relative;
 }
 
+/* ===== Roulette empty state (league starts with no castigos) ===== */
+.roulette-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1rem;
+  padding: 1rem 0.5rem 0.5rem;
+  width: 100%;
+}
+.roulette-empty-ring {
+  width: 210px;
+  height: 210px;
+  max-width: 62vw;
+  max-height: 62vw;
+  border-radius: 50%;
+  border: 5px dashed var(--border-color-glow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle, rgba(222, 237, 0, 0.07), transparent 68%);
+  box-shadow: 0 0 0 6px #12181c, 0 8px 30px rgba(0, 0, 0, 0.5);
+  animation: cf-empty-spin 16s linear infinite;
+  margin-bottom: 0.5rem;
+}
+.roulette-empty-ring-inner {
+  width: 78%;
+  height: 78%;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* keep the icon upright while the ring rotates */
+  animation: cf-empty-spin-rev 16s linear infinite;
+}
+.roulette-empty-icon {
+  font-size: 82px;
+  color: var(--accent);
+  filter: drop-shadow(0 2px 8px rgba(222, 237, 0, 0.25));
+}
+@keyframes cf-empty-spin { to { transform: rotate(360deg); } }
+@keyframes cf-empty-spin-rev { to { transform: rotate(-360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .roulette-empty-ring, .roulette-empty-ring-inner { animation: none; }
+}
+#view-container .roulette-empty-title {
+  font-family: var(--font-display) !important;
+  font-weight: 900 !important;
+  font-size: 1.5rem !important;
+  text-transform: uppercase;
+  letter-spacing: -0.5px;
+  color: var(--text-light) !important;
+  line-height: 1.05 !important;
+  margin: 0 !important;
+}
+#view-container .roulette-empty-text {
+  font-size: 0.9rem !important;
+  color: var(--text-muted) !important;
+  line-height: 1.5 !important;
+  max-width: 340px;
+  margin: 0 auto !important;
+}
+.roulette-empty-link {
+  background: transparent;
+  border: none;
+  color: var(--accent);
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  padding: 0.25rem;
+}
+.roulette-empty-link:hover { color: var(--text-light); }
+
 /* Wheel Canvas/SVG Wrapper */
 .wheel-wrapper {
   position: relative;

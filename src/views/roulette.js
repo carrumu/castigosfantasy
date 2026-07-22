@@ -253,10 +253,22 @@ export function renderRoulette(container, callbacks) {
           <!-- Columna Izquierda: Componente Ruleta -->
           <div class="card glass roulette-container" style="margin-bottom: 0;">
             <h2 class="card-title gradient-text-gold">Ruleta de Castigos</h2>
+            ${isEmpty ? `
+            <!-- Empty state: no castigos yet in this league's wheel -->
+            <div class="roulette-empty">
+              <div class="roulette-empty-ring">
+                <div class="roulette-empty-ring-inner">
+                  <span class="material-symbols-outlined roulette-empty-icon">casino</span>
+                </div>
+              </div>
+              <h3 class="roulette-empty-title">Monta la ruleta de tu liga</h3>
+              <p class="roulette-empty-text">Todavía no hay castigos. Añadid los vuestros —cuanto más locos, mejor— y dejad que el azar dicte sentencia cada jornada.</p>
+              <button id="btn-add-first-castigo" class="btn-primary" style="max-width: 280px; margin-top: 0.25rem;">Añadir mi primer castigo</button>
+              <button id="link-generador-ideas" class="roulette-empty-link">¿Sin ideas? Inspírate en el Generador →</button>
+            </div>
+            ` : `
             <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem; text-align: center;">
-              ${isEmpty
-                ? 'Tu ruleta está vacía. Añade los castigos de tu liga abajo para empezar a girar.'
-                : `El azar dictará sentencia. Hay <strong>${punishments.length}</strong> castigos cargados.`}
+              El azar dictará sentencia. Hay <strong>${punishments.length}</strong> castigos cargados.
             </p>
 
             <div class="wheel-wrapper">
@@ -269,9 +281,7 @@ export function renderRoulette(container, callbacks) {
             <!-- Gating: need >=2 castigos, and only the pending loser may spin -->
             ${!canSpin ? `
               <div style="background: rgba(var(--accent-rgb), 0.08); border: 2px dashed var(--border-color-glow); border-radius: 6px; padding: 0.75rem; font-size: 0.85rem; color: var(--text-light); text-align: center; width: 100%; max-width: 320px; margin: 0.5rem auto 1.25rem auto; line-height: 1.35;">
-                ${isEmpty
-                  ? 'Aún no hay castigos. Añade los tuyos abajo para montar la ruleta de tu liga.'
-                  : 'Necesitas al menos <strong>2 castigos</strong> para poder girar. Añade otro abajo.'}
+                Necesitas al menos <strong>2 castigos</strong> para poder girar. Añade otro abajo.
               </div>
               <button id="spin-btn" class="btn-primary" style="max-width: 200px; opacity: 0.5; cursor: not-allowed; margin-bottom: 0.5rem;" disabled>¡GIRAR!</button>
             ` : (!isLocalMode && pendingRecord && !isLoser ? `
@@ -306,7 +316,7 @@ export function renderRoulette(container, callbacks) {
                   ${showLegend ? 'Ocultar ▲' : 'Mostrar ▼'}
                 </span>
               </button>
-              
+
               <div id="roulette-legend-content" style="
                 display: ${showLegend ? 'grid' : 'none'};
                 grid-template-columns: 1fr 1fr;
@@ -329,6 +339,7 @@ export function renderRoulette(container, callbacks) {
     }).join('')}
               </div>
             </div>
+            `}
           </div>
 
           <!-- Columna Derecha: Personalizar e Historial -->
@@ -468,6 +479,24 @@ export function renderRoulette(container, callbacks) {
         }
 
         spinWheel(canvas);
+      });
+    }
+
+    // Empty-state actions
+    const addFirstBtn = container.querySelector('#btn-add-first-castigo');
+    if (addFirstBtn) {
+      addFirstBtn.addEventListener('click', () => {
+        const nameInput = container.querySelector('#new-pun-name');
+        if (nameInput) {
+          nameInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          setTimeout(() => nameInput.focus(), 350);
+        }
+      });
+    }
+    const ideasLink = container.querySelector('#link-generador-ideas');
+    if (ideasLink) {
+      ideasLink.addEventListener('click', () => {
+        if (callbacks.onNavigate) callbacks.onNavigate('generador');
       });
     }
 
