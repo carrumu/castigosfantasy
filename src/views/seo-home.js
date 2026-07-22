@@ -86,7 +86,7 @@ const FEATURES = [
     desc: 'Sortea el castigo del perdedor. Que decida el azar, sin favoritismos.'
   },
   {
-    icon: 'theater_comedy', bg: 'var(--primary-green)', color: '#000', nav: 'bufon',
+    icon: 'theater_comedy', bg: 'var(--bg-obsidian)', color: 'var(--accent)', border: '1.5px solid rgba(var(--accent-rgb), 0.55)', nav: 'bufon',
     title: 'El Bufón de la Corte',
     desc: 'Votad al peor jugador de la jornada. El que menos puntúe, paga.'
   },
@@ -119,22 +119,42 @@ export function renderSeoHome(container, { onNavigate } = {}) {
       <button class="seo-nav" data-nav="acceso" style="background:transparent;border:none;padding:0;margin-left:0.25rem;color:var(--accent);font-weight:800;text-decoration:underline;text-underline-offset:2px;cursor:pointer;font-size:inherit;font-family:inherit;">Inicia sesión →</button>
     </p>`;
 
+  // Microcopy bajo el CTA del hero: baja la fricción y remata con el chiste de marca.
+  const heroMicro = `<p class="seo-cta-micro">Gratis y sin tarjeta. Aquí el único que paga es el colista.</p>`;
+
   container.innerHTML = `
     <div class="seo-home fade-in-up" style="max-width:920px;margin:0 auto;display:flex;flex-direction:column;gap:2.5rem;">
 
       <!-- HERO -->
       <section class="brutalist-hero" style="margin-bottom:0;">
-        <h1 class="brutalist-hero-title" style="margin-bottom:0.75rem;">Castigos Fantasy: que el último de tu liga no se escape</h1>
-        <p class="brutalist-hero-subtitle" style="margin-bottom:0.5rem;font-weight:700;color:var(--accent-gold);">Cada jornada hay un último. La pregunta es qué pasa después.</p>
-        <p class="brutalist-hero-subtitle" style="margin-bottom:1.75rem;">
-          Vale para tu liga de Biwenger, Comunio, LaLiga Fantasy y más: detecta al farolillo rojo (automático con Biwenger) y organiza los castigos, el bote y los piques. Sin Excel y sin perseguir a nadie por WhatsApp.
-        </p>
-        ${heroCta}
-        ${loginNudge}
-        <div class="seo-hero-chips">
-          <span class="seo-chip">100% Gratis</span>
-          <span class="seo-chip">Sin descargas</span>
-          <span class="seo-chip">Biwenger · Comunio · LaLiga Fantasy</span>
+        <div class="seo-hero-copy">
+          <h1 class="brutalist-hero-title" style="margin-bottom:0.75rem;">Que el último de tu liga no se escape</h1>
+          <p class="brutalist-hero-subtitle" style="margin-bottom:0.5rem;font-weight:700;color:var(--accent-gold);">Cada jornada hay un último. La pregunta es qué pasa después.</p>
+          <p class="brutalist-hero-subtitle" style="margin-bottom:1.75rem;">
+            Tú sigues jugando en Biwenger o Comunio. Nosotros nos encargamos de que el último pague.
+          </p>
+          ${heroCta}
+          ${heroMicro}
+          ${loginNudge}
+          <div class="seo-hero-chips">
+            <span class="seo-chip">Sin Excel ni WhatsApp</span>
+            <span class="seo-chip">Biwenger automático</span>
+            <span class="seo-chip">Comunio y LaLiga Fantasy</span>
+          </div>
+        </div>
+
+        <!-- Mini-mockup del producto: la Lista de Morosos con el colista resaltado.
+             Datos de ejemplo, puramente ilustrativos (no son usuarios reales). -->
+        <div class="seo-hero-mockup" role="img" aria-label="Ejemplo de la Lista de Morosos: Carlos va colista de la jornada y le toca castigo">
+          <div class="seo-mock-head">
+            <span class="seo-mock-title">Lista de Morosos</span>
+            <span class="seo-mock-jornada">Jornada 24</span>
+          </div>
+          <ul class="seo-mock-list">
+            <li class="seo-mock-row"><span class="seo-mock-pos">8º</span><span class="seo-mock-name">Dani</span><span class="seo-mock-pts">41 pts</span></li>
+            <li class="seo-mock-row"><span class="seo-mock-pos">9º</span><span class="seo-mock-name">Marta</span><span class="seo-mock-pts">38 pts</span></li>
+            <li class="seo-mock-row seo-mock-colista"><span class="seo-mock-pos">10º</span><span class="seo-mock-name">Carlos</span><span class="seo-mock-tag">Colista · paga</span></li>
+          </ul>
         </div>
       </section>
 
@@ -147,8 +167,8 @@ export function renderSeoHome(container, { onNavigate } = {}) {
         <div class="seo-features">
           ${FEATURES.map(f => `
             <button class="seo-feature seo-nav" data-nav="${f.nav}">
-              <span class="seo-feature-icon" style="background:${f.bg};">
-                <span class="material-symbols-outlined" style="font-size:1.6rem;color:${f.color};">${f.icon}</span>
+              <span class="seo-feature-icon" style="background:${f.bg};${f.border ? `border:${f.border};` : ''}">
+                <span class="material-symbols-outlined" style="font-size:1.6rem;color:${f.color};" aria-hidden="true">${f.icon}</span>
               </span>
               <span class="seo-feature-text">
                 <h3 class="seo-feature-title">${f.title}</h3>
@@ -170,12 +190,12 @@ export function renderSeoHome(container, { onNavigate } = {}) {
             <div class="seo-step">
               <span class="seo-step-bignum">${s.n}</span>
               <span class="seo-step-icon-wrap" style="background:${s.bg};">
-                <span class="material-symbols-outlined" style="color:${s.color};">${s.icon}</span>
+                <span class="material-symbols-outlined" style="color:${s.color};" aria-hidden="true">${s.icon}</span>
               </span>
               <h3 class="seo-step-title">${s.title}</h3>
               <p class="seo-step-desc">${s.desc}</p>
             </div>
-            ${i < STEPS.length - 1 ? `<span class="seo-step-connector material-symbols-outlined">arrow_forward</span>` : ''}
+            ${i < STEPS.length - 1 ? `<span class="seo-step-connector material-symbols-outlined" aria-hidden="true">arrow_forward</span>` : ''}
           `).join('')}
         </div>
       </section>
@@ -196,7 +216,7 @@ export function renderSeoHome(container, { onNavigate } = {}) {
             <span class="seo-guias-card-title">Ideas de castigos para tu liga</span>
             <span class="seo-guias-card-desc">Ideas para el último de la jornada, cómo gestionar el bote y trucos para que la liga no se apague en toda la temporada.</span>
           </span>
-          <span class="seo-guias-card-arrow material-symbols-outlined">arrow_forward</span>
+          <span class="seo-guias-card-arrow material-symbols-outlined" aria-hidden="true">arrow_forward</span>
         </button>
       </section>
     </div>

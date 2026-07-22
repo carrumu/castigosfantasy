@@ -13,7 +13,7 @@ export function renderAuth(container, callbacks) {
   let isVerificationPending = false;
   let isRecoveryMode = false;
 
-  function render() {
+  async function render() {
     if (isRecoveryMode) {
       container.innerHTML = `
         <div class="container" style="display: flex; align-items: center; justify-content: center; min-height: 80vh;">
@@ -35,7 +35,7 @@ export function renderAuth(container, callbacks) {
             <form id="recovery-form">
               <div class="form-group">
                 <label for="recovery-email">Email</label>
-                <input type="email" id="recovery-email" class="input-field" placeholder="tu@email.com" required />
+                <input type="email" id="recovery-email" class="input-field" placeholder="tu@email.com" autocomplete="email" required />
               </div>
               <button type="submit" class="btn-primary" id="recovery-btn" style="margin-top: 1.5rem;">
                 <span>Enviar Enlace</span>
@@ -124,8 +124,11 @@ export function renderAuth(container, callbacks) {
     }
 
     // 1. --- Settings View for Authenticated Users ---
-    const session = isConfigured && supabase.auth.session ? supabase.auth.session() : null;
-    const user = session?.user;
+    let user = null;
+    if (isConfigured && supabase) {
+      const { data } = await supabase.auth.getSession();
+      user = data?.session?.user ?? null;
+    }
 
     if (isConfigured && user) {
       const storedGeminiKey = localStorage.getItem('CF_GEMINI_API_KEY') || '';
@@ -185,24 +188,24 @@ export function renderAuth(container, callbacks) {
             ${!isLoginMode ? `
               <div class="form-group">
                 <label for="username">Nombre Completo</label>
-                <input type="text" id="username" class="input-field" placeholder="Tu nombre completo" required />
+                <input type="text" id="username" class="input-field" placeholder="Tu nombre completo" autocomplete="name" required />
               </div>
               <div class="form-group">
                 <label for="apodo">Apodo</label>
-                <input type="text" id="apodo" class="input-field" placeholder="Tu apodo en la liga" required />
+                <input type="text" id="apodo" class="input-field" placeholder="Tu apodo en la liga" autocomplete="nickname" required />
               </div>
 
             ` : ''}
             
             <div class="form-group">
               <label for="email">Email</label>
-              <input type="email" id="email" class="input-field" placeholder="tu@email.com" required />
+              <input type="email" id="email" class="input-field" placeholder="tu@email.com" autocomplete="email" required />
             </div>
 
             <div class="form-group">
               <label for="password">Contraseña</label>
               <div class="password-wrapper">
-                <input type="password" id="password" class="input-field" placeholder="Contraseña" required style="padding-right: 2.75rem;" />
+                <input type="password" id="password" class="input-field" placeholder="Contraseña" autocomplete="${isLoginMode ? 'current-password' : 'new-password'}" required style="padding-right: 2.75rem;" />
                 <button type="button" class="btn-password-toggle" id="toggle-password" title="Mostrar/ocultar contraseña" tabindex="-1">
                   <svg id="eye-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
@@ -212,7 +215,7 @@ export function renderAuth(container, callbacks) {
               </div>
               ${isLoginMode ? `
                 <div style="text-align: right; margin-top: 0.5rem;">
-                  <button type="button" id="forgot-password-btn" style="background: transparent; border: none; color: var(--accent); font-family: var(--font-sans); font-size: 0.75rem; font-weight: 600; cursor: pointer;">
+                  <button type="button" id="forgot-password-btn" style="background: transparent; border: none; color: var(--text-muted); font-family: var(--font-sans); font-size: 0.75rem; font-weight: 600; cursor: pointer; text-decoration: underline;">
                     ¿Olvidaste tu contraseña?
                   </button>
                 </div>
@@ -241,7 +244,7 @@ export function renderAuth(container, callbacks) {
           </div>
 
           <div style="text-align: center; margin-top: 1.25rem; display: flex; flex-direction: column; gap: 0.5rem; align-items: center;">
-            <button id="toggle-mode-btn" style="background: transparent; border: none; color: var(--primary); font-family: var(--font-sans); font-weight: 600; cursor: pointer; font-size: 0.9rem;">
+            <button id="toggle-mode-btn" style="background: transparent; border: none; color: var(--text-muted); font-family: var(--font-sans); font-weight: 600; cursor: pointer; font-size: 0.9rem; text-decoration: underline;">
               ${isLoginMode ? '¿No tienes cuenta? Regístrate' : '¿Ya tienes cuenta? Inicia sesión'}
             </button>
           </div>

@@ -12,26 +12,30 @@
   
   --primary: #ffffff;
   --primary-rgb: 255, 255, 255;
-  --primary-glow: rgba(222, 237, 0, 0.15);
+  --primary-glow: rgba(var(--accent-rgb), 0.15);
   --primary-dark: #e5e2e1;
-  
+
+  /* Single source of truth for the neon-lime accent. Change these two lines
+     to re-tint every lime in the app. Everything below derives from them. */
   --accent: #deed00; /* Yellow neón */
   --accent-rgb: 222, 237, 0;
-  --accent-glow: rgba(222, 237, 0, 0.25);
-  
-  /* Legacy names for backward compatibility with inline styles */
-  --primary-green: #deed00; /* Yellow neón for primary accents */
-  --primary-green-glow: rgba(222, 237, 0, 0.2);
-  --primary-green-dark: #c3d000;
-  
-  --accent-gold: #deed00;
-  --accent-gold-glow: rgba(222, 237, 0, 0.25);
-  
+  --accent-glow: rgba(var(--accent-rgb), 0.25);
+  --accent-deep: #c3d000; /* pressed / darker shade of the accent */
+
+  /* Legacy aliases kept for backward compatibility with inline styles.
+     They all resolve to --accent; do not hardcode #deed00 again. */
+  --primary-green: var(--accent);
+  --primary-green-glow: rgba(var(--accent-rgb), 0.2);
+  --primary-green-dark: var(--accent-deep);
+
+  --accent-gold: var(--accent);
+  --accent-gold-glow: rgba(var(--accent-rgb), 0.25);
+
   --danger: #d30017; /* Coral red */
   --text-light: #e5e2e1;
   --text-muted: #c8c8ab;
   --border-color: #000000;
-  --border-color-glow: rgba(222, 237, 0, 0.35);
+  --border-color-glow: rgba(var(--accent-rgb), 0.35);
   
   /* Transitions */
   --transition-fast: 0.1s cubic-bezier(0.4, 0, 0.2, 1);
@@ -4283,13 +4287,113 @@ h1, h2, h3, h4, h5, h6, .card-title {
   margin-top: 1.25rem;
 }
 .seo-chip {
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   font-weight: 700;
   color: var(--text-light);
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--border-color);
   border-radius: 20px;
-  padding: 0.3rem 0.8rem;
+  padding: 0.28rem 0.6rem;
+  white-space: nowrap;
+}
+
+/* ===== SEO home (logged-out landing): CTA microcopy ===== */
+.seo-cta-micro {
+  margin-top: 0.7rem;
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+/* ===== SEO home (logged-out landing): hero product mock (Lista de Morosos) ===== */
+.seo-hero-mockup {
+  max-width: 340px;
+  margin: 1.75rem auto 0;
+  text-align: left;
+  background: var(--bg-card);
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: 5px 5px 0 0 var(--border-color);
+  padding: 0.85rem 0.9rem 0.95rem;
+}
+.seo-mock-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.7rem;
+}
+.seo-mock-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: -0.3px;
+  color: var(--text-light);
+}
+.seo-mock-jornada {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+.seo-mock-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.seo-mock-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 0.7rem;
+  background: var(--bg-item-light);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+}
+.seo-mock-pos {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  min-width: 1.6rem;
+}
+.seo-mock-name {
+  flex: 1;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 0.85rem;
+  color: var(--text-light);
+}
+.seo-mock-pts {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+.seo-mock-colista {
+  border: 1.5px solid rgba(211, 0, 23, 0.6);
+  background: rgba(211, 0, 23, 0.08);
+}
+.seo-mock-colista .seo-mock-pos,
+.seo-mock-colista .seo-mock-name {
+  color: #fff;
+}
+.seo-mock-tag {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--danger);
   white-space: nowrap;
 }
 
