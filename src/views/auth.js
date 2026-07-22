@@ -289,18 +289,30 @@ export function renderAuth(container, callbacks) {
              callbacks.showToast('Error de conexión con la base de datos.', 'error');
              return;
           }
-          const redirectTo = window.location.hostname === 'localhost'
+          googleBtn.disabled = true;
+          googleBtn.style.opacity = '0.7';
+          googleBtn.innerText = 'Conectando con Google...';
+
+          const redirectTo = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
             ? window.location.origin
             : 'https://castigosfantasy.com';
-          const { error } = await supabase.auth.signInWithOAuth({
+            
+          const { data, error } = await supabase.auth.signInWithOAuth({
             provider: 'google',
             options: {
-              redirectTo
+              redirectTo,
+              skipBrowserRedirect: false
             }
           });
           if (error) throw error;
+          if (data?.url) {
+            window.location.href = data.url;
+          }
         } catch (err) {
-          console.error(err);
+          console.error('Error Google OAuth:', err);
+          googleBtn.disabled = false;
+          googleBtn.style.opacity = '1';
+          googleBtn.innerText = 'Continuar con Google';
           callbacks.showToast(err.message || 'Error al conectar con Google', 'error');
         }
       });

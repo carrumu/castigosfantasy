@@ -48,6 +48,9 @@ export function renderRoulette(container, callbacks) {
   ];
 
   let activeLeagueId = localStorage.getItem('CF_ACTIVE_LEAGUE_ID');
+  let leagueMembers = [];
+  let farolilloRojo = null;
+  let selectedTargetManagerId = 'farolillo'; // 'farolillo', 'casual', or 'profile-<id>' / 'roster-<id>'
 
   async function loadData() {
     const pendingId = localStorage.getItem('CF_PENDING_RECORD_ID');
@@ -61,6 +64,7 @@ export function renderRoulette(container, callbacks) {
       }
       history = []; // No history card in local mode
       currentLeague = { name: "Ruleta Libre", invite_code: "MODO-DEMO" };
+      selectedTargetManagerId = 'casual';
       renderView();
       return;
     }
@@ -113,6 +117,81 @@ export function renderRoulette(container, callbacks) {
       if (leagueErr) throw leagueErr;
       currentLeague = leagueData;
 
+      // Load league members & unclaimed roster slots for target selector
+      const { data: membersData } = await supabase
+        .from('league_members')
+        .select(`
+          profile_id,
+          biwenger_user_name,
+          profiles:profile_id (
+            apodo,
+            display_name
+          )
+        `)
+        .eq('league_id', currentLeagueId);
+
+      const { data: rosterData } = await supabase
+        .from('league_roster')
+        .select('id, name')
+        .eq('league_id', currentLeagueId)
+        .is('claimed_by', null);
+
+      leagueMembers = [
+        ...(membersData || []).map(m => ({
+          targetId: `profile-${m.profile_id}`,
+          profile_id: m.profile_id,
+          roster_id: null,
+          name: m.profiles?.apodo || m.profiles?.display_name || 'Entrenador'
+        })),
+        ...(rosterData || []).map(r => ({
+          targetId: `roster-${r.id}`,
+          profile_id: null,
+          roster_id: r.id,
+          name: r.name
+        }))
+      ];
+
+      // Detect Farolillo Rojo (latest loser in matchday_records or standings)
+      const { data: lastRecord } = await supabase
+        .from('matchday_records')
+        .select(`
+          id,
+          matchday_number,
+          loser_profile_id,
+          loser_roster_id,
+          profiles:loser_profile_id (
+            apodo,
+            display_name
+          ),
+          roster:loser_roster_id (
+            name
+          )
+        `)
+        .eq('league_id', currentLeagueId)
+        .order('matchday_number', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (lastRecord) {
+        const loserName = lastRecord.profiles?.apodo || lastRecord.profiles?.display_name || lastRecord.roster?.name || 'Entrenador';
+        const targetId = lastRecord.loser_profile_id ? `profile-${lastRecord.loser_profile_id}` : (lastRecord.loser_roster_id ? `roster-${lastRecord.loser_roster_id}` : null);
+        farolilloRojo = {
+          name: loserName,
+          targetId,
+          profile_id: lastRecord.loser_profile_id,
+          roster_id: lastRecord.loser_roster_id,
+          matchday_number: lastRecord.matchday_number
+        };
+      } else if (leagueMembers.length > 0) {
+        farolilloRojo = {
+          name: leagueMembers[0].name,
+          targetId: leagueMembers[0].targetId,
+          profile_id: leagueMembers[0].profile_id,
+          roster_id: leagueMembers[0].roster_id,
+          matchday_number: 1
+        };
+      }
+
       // Load pending record if any
       if (pendingId) {
         const { data: recData, error: recErr } = await supabase
@@ -143,6 +222,8 @@ export function renderRoulette(container, callbacks) {
             loser_roster_id: recData.loser_roster_id,
             display_name: recData.profiles?.apodo || recData.profiles?.display_name || recData.roster?.name || 'Entrenador'
           };
+          const targetId = recData.loser_profile_id ? `profile-${recData.loser_profile_id}` : (recData.loser_roster_id ? `roster-${recData.loser_roster_id}` : null);
+          if (targetId) selectedTargetManagerId = targetId;
         }
       }
 
@@ -239,6 +320,49 @@ export function renderRoulette(container, callbacks) {
             `}
           </div>
         </div>
+
+        <!-- Tarjeta de Moroso en Capilla & Modo de Tirada -->
+        ${!isLocalMode ? `
+          <div class="card glass" style="margin-bottom: 1.25rem; background: rgba(19, 19, 19, 0.85); border: 1.5px solid var(--accent); box-shadow: 0 0 15px rgba(222, 237, 0, 0.15);">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+              <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <div style="width: 40px; height: 40px; border-radius: 50%; background: rgba(211, 0, 23, 0.2); border: 2px solid #d30017; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 900; color: #d30017; text-transform: uppercase;">
+                  PAGO
+                </div>
+                <div>
+                  <div style="font-size: 0.75rem; text-transform: uppercase; font-weight: 800; color: #deed00; letter-spacing: 0.05em;">
+                    Target de la Tirada
+                  </div>
+                  <h3 style="font-size: 1.1rem; font-weight: 900; margin: 0; color: #fff;">
+                    Moroso en Capilla
+                  </h3>
+                </div>
+              </div>
+
+              <!-- Selector de Destinatario o Tirada Casual -->
+              <div style="min-width: 260px;">
+                <label for="select-target-manager" style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 0.25rem;">
+                  ¿Para quién es el giro?
+                </label>
+                <select id="select-target-manager" class="input-field" style="padding: 0.5rem 0.75rem; font-size: 0.85rem; font-weight: 700; background: #1a1a1a; color: var(--accent); border-color: rgba(222, 237, 0, 0.4);">
+                  ${farolilloRojo ? `
+                    <option value="farolillo" ${selectedTargetManagerId === 'farolillo' ? 'selected' : ''}>
+                      Farolillo Rojo (${farolilloRojo.name})
+                    </option>
+                  ` : ''}
+                  ${leagueMembers.map(m => `
+                    <option value="${m.targetId}" ${selectedTargetManagerId === m.targetId ? 'selected' : ''}>
+                      ${escapeHTML(m.name)}
+                    </option>
+                  `).join('')}
+                  <option value="casual" ${selectedTargetManagerId === 'casual' ? 'selected' : ''}>
+                    Tirada Casual (Solo por diversión / Sin registro)
+                  </option>
+                </select>
+              </div>
+            </div>
+          </div>
+        ` : ''}
 
         <!-- Indicador de Tirada Pendiente -->
         ${pendingRecord ? `
@@ -464,16 +588,30 @@ export function renderRoulette(container, callbacks) {
       });
     }
 
+    // Target Manager / Casual mode selector change event
+    const targetSelect = container.querySelector('#select-target-manager');
+    if (targetSelect) {
+      targetSelect.addEventListener('change', (e) => {
+        selectedTargetManagerId = e.target.value;
+        const selectedOptionText = e.target.options[e.target.selectedIndex].text;
+        if (selectedTargetManagerId === 'casual') {
+          callbacks.showToast('Modo Tirada Casual activado (sin guardar en base de datos)', 'info');
+        } else {
+          callbacks.showToast(`Moroso seleccionado: ${selectedOptionText.trim()}`, 'info');
+        }
+      });
+    }
+
     // Event listeners
     const spinBtn = container.querySelector('#spin-btn');
     if (spinBtn) {
       spinBtn.addEventListener('click', () => {
         if (isSpinning) return;
 
-        // Enforce loser spin rule in database mode
-        if (!isLocalMode && pendingRecord) {
+        // Enforce loser spin rule in database mode if pendingRecord exists and casual is NOT selected
+        if (!isLocalMode && pendingRecord && selectedTargetManagerId !== 'casual') {
           if (!isLoser && !isRosterLoser) {
-            callbacks.showToast(`Solo el jugador castigado (${pendingRecord.display_name}) puede girar la ruleta`, 'error');
+            callbacks.showToast(`Solo el jugador castigado (${pendingRecord.display_name}) puede girar la ruleta para su tirada pendiente`, 'error');
             return;
           }
         }
@@ -744,26 +882,67 @@ export function renderRoulette(container, callbacks) {
       if (spinBtn) spinBtn.disabled = false;
 
       const isLocalMode = isGuest || !activeLeagueId;
-      const loserName = pendingRecord ? pendingRecord.display_name : (currentUserApodo || 'Entrenador Aleatorio');
+      let targetName = 'Tirada Casual';
+      let isCasualSpin = isLocalMode || selectedTargetManagerId === 'casual';
 
-      if (!isLocalMode && pendingRecord) {
+      if (!isCasualSpin) {
+        let loserProfileId = null;
+        let loserRosterId = null;
+
+        if (pendingRecord) {
+          targetName = pendingRecord.display_name;
+          loserProfileId = pendingRecord.loser_profile_id;
+          loserRosterId = pendingRecord.loser_roster_id;
+        } else if (selectedTargetManagerId === 'farolillo' && farolilloRojo) {
+          targetName = farolilloRojo.name;
+          loserProfileId = farolilloRojo.profile_id;
+          loserRosterId = farolilloRojo.roster_id;
+        } else if (selectedTargetManagerId.startsWith('profile-')) {
+          const profId = selectedTargetManagerId.replace('profile-', '');
+          const memberObj = leagueMembers.find(m => m.profile_id === profId);
+          targetName = memberObj?.name || 'Mánager';
+          loserProfileId = profId;
+        } else if (selectedTargetManagerId.startsWith('roster-')) {
+          const rostId = selectedTargetManagerId.replace('roster-', '');
+          const memberObj = leagueMembers.find(m => m.roster_id === rostId);
+          targetName = memberObj?.name || 'Mánager';
+          loserRosterId = rostId;
+        }
+
         try {
-          const { error } = await supabase
-            .from('matchday_records')
-            .update({ punishment_id: winningPunishment.id })
-            .eq('id', pendingRecord.id);
+          if (pendingRecord) {
+            const { error } = await supabase
+              .from('matchday_records')
+              .update({ punishment_id: winningPunishment.id })
+              .eq('id', pendingRecord.id);
 
-          if (error) throw error;
+            if (error) throw error;
+            localStorage.removeItem('CF_PENDING_RECORD_ID');
+            pendingRecord = null;
+          } else {
+            // Insert new matchday record for chosen loser
+            const matchdayNum = farolilloRojo ? farolilloRojo.matchday_number : 1;
+            const { error } = await supabase
+              .from('matchday_records')
+              .insert({
+                league_id: currentLeagueId,
+                matchday_number: matchdayNum,
+                loser_profile_id: loserProfileId,
+                loser_roster_id: loserRosterId,
+                punishment_id: winningPunishment.id,
+                amount_owed: 0
+              });
 
-          localStorage.removeItem('CF_PENDING_RECORD_ID');
-          pendingRecord = null;
-          callbacks.showToast(`¡Castigo guardado para ${loserName}!`, 'success');
+            if (error) throw error;
+          }
+
+          callbacks.showToast(`¡Castigo registrado para ${targetName}!`, 'success');
         } catch (err) {
           console.error(err);
           callbacks.showToast('Error al guardar el castigo', 'error');
         }
-      } else if (isLocalMode) {
-        callbacks.showToast(`¡Castigo local sentenciado!`, 'success');
+      } else {
+        callbacks.showToast(`¡Castigo casual sentenciado!`, 'success');
       }
 
       // Show Result Modal
@@ -771,7 +950,7 @@ export function renderRoulette(container, callbacks) {
       if (resModal) {
         resModal.querySelector('#result-title').innerText = winningPunishment.name;
         resModal.querySelector('#result-desc').innerText = winningPunishment.description || 'Cumple con el castigo en tu próxima cita.';
-        resModal.querySelector('#result-loser').innerText = loserName;
+        resModal.querySelector('#result-loser').innerText = isCasualSpin ? 'Tirada Casual (Amigos)' : targetName;
         resModal.classList.add('active');
       }
 

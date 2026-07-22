@@ -28,3 +28,7 @@ clear_history.cjs
 *.njsproj
 *.sln
 *.sw?
+.claude/
+.impeccable/
+castigosfantasy/
+
