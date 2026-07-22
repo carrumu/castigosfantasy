@@ -2,6 +2,7 @@ import { supabase } from '../supabase';
 import { openLeagueSettings } from '../utils/league-options';
 import { openBiwengerSyncModal } from '../utils/biwenger-sync-modal';
 import { openBiwengerLinkModal } from '../utils/biwenger-link-modal';
+import { openComunioLinkModal } from '../utils/comunio-link-modal';
 import { escapeHTML } from '../utils/security';
 
 export async function renderLeagueHub(container, callbacks) {
@@ -158,6 +159,21 @@ export async function renderLeagueHub(container, callbacks) {
           </button>
         ` : ''}
 
+        ${league && league.sync_source === 'comunio' ? `
+          <button class="hub-action-row" id="card-go-comunio-link" style="border: 1px solid var(--border-color); background: rgba(255,255,255,0.01);">
+            <div class="hub-action-row-left">
+              <div class="hub-action-icon" style="color: var(--accent-gold);">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+              </div>
+              <div>
+                <span class="hub-card-badge roulette" style="background: var(--accent-gold); color: #000000; margin-bottom:0.2rem;display:inline-block;">Cuenta</span>
+                <div class="hub-action-title">Vincular Comunio</div>
+              </div>
+            </div>
+            <svg class="hub-action-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+          </button>
+        ` : ''}
+
       </div>
     </div>
   `;
@@ -182,6 +198,12 @@ export async function renderLeagueHub(container, callbacks) {
   // Biwenger Link Modal
   container.querySelector('#card-go-biwenger-link')?.addEventListener('click', () => {
     openBiwengerLinkModal(leagueId, currentUserId, callbacks, () => {
+      callbacks.onNavigate('menu-liga');
+    });
+  });
+
+  container.querySelector('#card-go-comunio-link')?.addEventListener('click', () => {
+    openComunioLinkModal(leagueId, currentUserId, callbacks, () => {
       callbacks.onNavigate('menu-liga');
     });
   });

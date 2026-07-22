@@ -256,6 +256,25 @@ export async function openLeagueSettings(leagueId, callbacks) {
         </div>
       ` : ''}
 
+      <!-- Vincular Usuario Comunio (Solo si la liga es de tipo Comunio) -->
+      ${leagueData.sync_source === 'comunio' ? `
+        <div style="margin-bottom: 1.75rem; background: rgba(222, 237, 0, 0.02); padding: 1rem; border-radius: 10px; border: 1.5px solid var(--border-color-glow);">
+          <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px; display: block; margin-bottom: 0.5rem;">Vincular tu mánager de Comunio</span>
+          <p style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 0.75rem; line-height: 1.35;">
+            Selecciona tu mánager de Comunio para que las sincronizaciones te reconozcan automáticamente.
+          </p>
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <select id="user-comunio-manager-select" class="input-field" disabled style="border: 1.5px solid var(--border-color-glow); font-weight: 700; background: var(--bg-input); flex-grow: 1; padding: 0.5rem 0.75rem; font-size: 0.8rem; color: var(--text-light);">
+              <option value="">Cargando mánagers de Comunio...</option>
+            </select>
+            <button id="btn-save-user-comunio" class="btn-primary" disabled style="width: auto; font-weight: 800; padding: 0.5rem 1rem; border: 2px solid #000; box-shadow: 1.5px 1.5px 0 #000; cursor: not-allowed; font-size: 0.8rem; background: var(--accent); color: #000; opacity: 0.5;">
+              Vincular
+            </button>
+          </div>
+          <p id="comunio-link-error-msg" style="display: none; font-size: 0.7rem; color: var(--danger); margin-top: 0.5rem;"></p>
+        </div>
+      ` : ''}
+
       <!-- Acciones -->
       <div style="border-top: 1px dashed var(--border-color-glow); padding-top: 1.5rem; display: flex; flex-direction: column; gap: 0.85rem;">
         <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px; margin-bottom: 0.25rem; display: block;">Acciones de Liga</span>
@@ -569,6 +588,81 @@ export async function openLeagueSettings(leagueId, callbacks) {
       }
     }
 
+    // Load Comunio managers in the background to populate the select
+    let comunioMembersCache = [];
+    if (leagueData.sync_source === 'comunio') {
+      const selectEl = modal.querySelector('#user-comunio-manager-select');
+      const saveBtn = modal.querySelector('#btn-save-user-comunio');
+      const errorMsgEl = modal.querySelector('#comunio-link-error-msg');
+
+      if (!leagueData.comunio_community_id) {
+        if (selectEl) {
+          selectEl.innerHTML = '<option value="">-- Credenciales de Liga no configuradas --</option>';
+          selectEl.disabled = true;
+        }
+      } else {
+        (async () => {
+          try {
+            const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || localStorage.getItem('CF_SUPABASE_URL') || '';
+            const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || localStorage.getItem('CF_SUPABASE_ANON_KEY') || '';
+
+            let token = supabaseAnonKey;
+            try {
+              const sessionData = await supabase.auth.getSession();
+              if (sessionData.data?.session?.access_token) {
+                token = sessionData.data.session.access_token;
+              }
+            } catch (_) {}
+
+            const res = await fetch(`${supabaseUrl}/functions/v1/comunio-sync`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+                'apikey': supabaseAnonKey
+              },
+              body: JSON.stringify({ appLeagueId: leagueId })
+            });
+
+            const syncData = await res.json();
+            if (!syncData.ok) throw new Error(syncData.error || 'No se pudo conectar con la API de Comunio.');
+
+            const comunioMembers = syncData.members || [];
+            comunioMembersCache = comunioMembers;
+
+            if (selectEl) {
+              selectEl.innerHTML = '<option value="">-- Selecciona tu mánager --</option>';
+              comunioMembers.forEach(m => {
+                const opt = document.createElement('option');
+                opt.value = String(m.id);
+                opt.textContent = m.leader ? `${m.name} (líder)` : m.name;
+                if (memberData.comunio_manager_id === m.id) {
+                  opt.selected = true;
+                }
+                selectEl.appendChild(opt);
+              });
+              selectEl.disabled = false;
+              if (saveBtn) {
+                saveBtn.disabled = false;
+                saveBtn.style.cursor = 'pointer';
+                saveBtn.style.opacity = '1';
+              }
+            }
+          } catch (err) {
+            console.error(err);
+            if (selectEl) {
+              selectEl.innerHTML = '<option value="">-- Error al cargar mánagers --</option>';
+              selectEl.disabled = true;
+            }
+            if (errorMsgEl) {
+              errorMsgEl.style.display = 'block';
+              errorMsgEl.textContent = 'Asegúrate de que el administrador haya configurado correctamente el ID de comunidad y las credenciales de Comunio en Ajustes.';
+            }
+          }
+        })();
+      }
+    }
+
     // Hook Save User Biwenger Name
     const saveUserBiwengerBtn = modal.querySelector('#btn-save-user-biwenger');
     if (saveUserBiwengerBtn) {
@@ -596,6 +690,42 @@ export async function openLeagueSettings(leagueId, callbacks) {
         } finally {
           saveUserBiwengerBtn.disabled = false;
           saveUserBiwengerBtn.innerHTML = 'Vincular';
+        }
+      });
+    }
+
+    // Hook Save User Comunio Manager
+    const saveUserComunioBtn = modal.querySelector('#btn-save-user-comunio');
+    if (saveUserComunioBtn) {
+      saveUserComunioBtn.addEventListener('click', async () => {
+        const selectEl = modal.querySelector('#user-comunio-manager-select');
+        const selectedId = selectEl ? selectEl.value : '';
+        const chosenMember = comunioMembersCache.find(m => String(m.id) === selectedId);
+
+        saveUserComunioBtn.disabled = true;
+        saveUserComunioBtn.innerHTML = '<span class="spinner" style="width:14px;height:14px;"></span>';
+
+        try {
+          const { error } = await supabase
+            .from('league_members')
+            .update({
+              comunio_manager_id: selectedId ? Number(selectedId) : null,
+              comunio_manager_name: chosenMember?.name || null
+            })
+            .eq('league_id', leagueId)
+            .eq('profile_id', currentUserId);
+
+          if (error) throw error;
+
+          showToast('Mánager de Comunio vinculado correctamente', 'success');
+          memberData.comunio_manager_id = selectedId ? Number(selectedId) : null;
+          memberData.comunio_manager_name = chosenMember?.name || null;
+        } catch (err) {
+          console.error(err);
+          showToast('Error al vincular mánager de Comunio', 'error');
+        } finally {
+          saveUserComunioBtn.disabled = false;
+          saveUserComunioBtn.innerHTML = 'Vincular';
         }
       });
     }

@@ -1,6 +1,7 @@
 import { supabase } from '../supabase';
 import { openLeagueSettings } from '../utils/league-options';
 import { openBiwengerLinkModal } from '../utils/biwenger-link-modal';
+import { openComunioLinkModal } from '../utils/comunio-link-modal';
 
 /**
  * Renders the League Selection / Creation / Joining screen.
@@ -462,6 +463,10 @@ export function renderSelectLeague(container, callbacks) {
 
         if (targetLeague.sync_source === 'biwenger' && targetLeague.biwenger_league_id) {
           openBiwengerLinkModal(targetLeague.id, currentUser.id, callbacks, () => {
+            callbacks.onNavigate('menu-liga');
+          });
+        } else if (targetLeague.sync_source === 'comunio' && targetLeague.comunio_community_id) {
+          openComunioLinkModal(targetLeague.id, currentUser.id, callbacks, () => {
             callbacks.onNavigate('menu-liga');
           });
         } else {
