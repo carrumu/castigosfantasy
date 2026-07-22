@@ -314,7 +314,30 @@ export function renderGenerator(container, callbacks) {
         categoryLabel: "Creativo",
         intensity: 1,
         description: "Escribir a mano una carta formal de dimisión de broma, firmarla y pasar foto al grupo."
-    }
+    },
+    // --- Castigos aportados por la comunidad (documento "Castigos Liga Fantasy") ---
+    { id: "gen-39", name: "A Discreción del Campeón", category: "video", categoryLabel: "Redes y Vídeo", intensity: 3, description: "Subir un TikTok cuya temática, música y coreografía las elija en exclusiva el campeón de la liga." },
+    { id: "gen-40", name: "Filtro Animal", category: "video", categoryLabel: "Redes y Vídeo", intensity: 2, description: "Subir un TikTok hablando o actuando con un filtro de animal de lo más vergonzoso." },
+    { id: "gen-41", name: "Cambio de Look", category: "video", categoryLabel: "Redes y Vídeo", intensity: 2, description: "Grabar un vídeo cómico probándote peinados ridículos o inusuales." },
+    { id: "gen-42", name: "Historia Random", category: "video", categoryLabel: "Redes y Vídeo", intensity: 1, description: "Subir una historia a Instagram muy random y sin ningún tipo de contexto." },
+    { id: "gen-43", name: "El Himno Prohibido", category: "video", categoryLabel: "Redes y Vídeo", intensity: 2, description: "Cantar en vídeo y a pleno pulmón el himno de un equipo de fútbol que no sea el tuyo, elegido por el grupo." },
+    { id: "gen-44", name: "5 Razones Para...", category: "video", categoryLabel: "Redes y Vídeo", intensity: 2, description: "Grabar un vídeo en formato lista dando '5 razones para...' sobre un tema ridículo que imponga la liga." },
+    { id: "gen-45", name: "El Reportero Callejero", category: "video", categoryLabel: "Redes y Vídeo", intensity: 3, description: "Salir a la calle, improvisar un micrófono y entrevistar a una persona completamente random." },
+    { id: "gen-46", name: "Pidiendo Clemencia", category: "video", categoryLabel: "Redes y Vídeo", intensity: 2, description: "Grabar un vídeo de rodillas pidiendo clemencia por la desastrosa puntuación de la jornada." },
+    { id: "gen-47", name: "El Seductor del Espejo", category: "video", categoryLabel: "Redes y Vídeo", intensity: 2, description: "Grabar un vídeo frente al espejo ligando contigo mismo." },
+    { id: "gen-48", name: "El Slow Motion", category: "video", categoryLabel: "Redes y Vídeo", intensity: 1, description: "Grabar un vídeo tuyo a cámara lenta (slow motion) con la música dramática que elija el grupo." },
+    { id: "gen-49", name: "Escudo del Eterno Rival", category: "profile", categoryLabel: "Perfiles y Grupos", intensity: 2, description: "Pasar 24 horas con el escudo del eterno rival como foto de perfil." },
+    { id: "gen-50", name: "El Monstruo de Espuma", category: "profile", categoryLabel: "Perfiles y Grupos", intensity: 2, description: "Llenarte la cara por completo de espuma de afeitar y pasar una foto al grupo para demostrarlo." },
+    { id: "gen-51", name: "El Invitado Especial", category: "costume", categoryLabel: "Disfraces", intensity: 3, description: "Acudir completamente disfrazado a la próxima quedada o cena del grupo." },
+    { id: "gen-52", name: "Transformación Therian", category: "costume", categoryLabel: "Disfraces", intensity: 3, description: "Disfrazarte de therian (o incorporar elementos del disfraz) para un vídeo o evento del grupo." },
+    { id: "gen-53", name: "El Pijamas", category: "costume", categoryLabel: "Disfraces", intensity: 2, description: "Aparecer un día cualquiera, en una quedada o en público, con una camiseta de pijama puesta." },
+    { id: "gen-54", name: "La Momia", category: "costume", categoryLabel: "Disfraces", intensity: 2, description: "Embadurnarte de arriba a abajo con papel higiénico hasta parecer una momia y pasar foto." },
+    { id: "gen-55", name: "El Nadador Olímpico", category: "costume", categoryLabel: "Disfraces", intensity: 3, description: "Vestirte con indumentaria completa de nadador olímpico (bañador, gafas y gorro) para un vídeo o evento del grupo." },
+    { id: "gen-56", name: "El Cambio de Vestuario", category: "costume", categoryLabel: "Disfraces", intensity: 3, description: "Grabar un vídeo o acudir a un evento del grupo vestido del sexo contrario." },
+    { id: "gen-57", name: "El Pasillito de Collejas", category: "extreme", categoryLabel: "Físico y Extremo", intensity: 3, description: "El perdedor pasa por el pasillo del grupo mientras cada uno le da una colleja." },
+    { id: "gen-58", name: "Diana Móvil", category: "extreme", categoryLabel: "Físico y Extremo", intensity: 3, description: "La liga se junta en una calle amplia; a la de 3, el perdedor sale corriendo y el resto le lanza huevos." },
+    { id: "gen-59", name: "El Cubo Helado", category: "extreme", categoryLabel: "Físico y Extremo", intensity: 3, description: "Tirarte un cubo de agua bien fría por la cabeza y grabarlo." },
+    { id: "gen-60", name: "Depilación Sorpresa", category: "extreme", categoryLabel: "Físico y Extremo", intensity: 3, description: "Aguantar el tirón de una tira de cera en el pecho." }
 ];
 
   // 2. Active state
