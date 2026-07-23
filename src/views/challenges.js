@@ -234,19 +234,12 @@ export function renderChallenges(container, callbacks) {
       winnerId = sorted[0].id; // The one with most votes
     }
 
-    // Countdown HTML
+    // Status badge (the live ticking countdown lives only in the "Cierre de Votación" card now)
     let countdownHtml = '';
-    if (matchdayClosingTime) {
-      if (isVotingClosed) {
-        countdownHtml = `<div style="background: var(--danger); color: #fff; padding: 0.5rem 1rem; border: 2px solid #000; font-family: var(--font-display); font-weight: 800; font-size: 0.9rem; text-transform: uppercase;">
-          Votación Cerrada
-        </div>`;
-      } else {
-        countdownHtml = `<div style="background: var(--accent); color: #000; padding: 0.5rem 1rem; border: 2px solid #000; font-family: var(--font-sans); font-weight: 800; font-size: 0.85rem; display: flex; align-items: center; gap: 0.5rem;">
-          <span class="material-symbols-outlined" style="font-size: 1.2rem;">timer</span>
-          <span id="voting-countdown">Calculando...</span>
-        </div>`;
-      }
+    if (matchdayClosingTime && isVotingClosed) {
+      countdownHtml = `<div style="background: var(--danger); color: #fff; padding: 0.5rem 1rem; border: 2px solid #000; font-family: var(--font-display); font-weight: 800; font-size: 0.9rem; text-transform: uppercase;">
+        Votación Cerrada
+      </div>`;
     }
 
     container.innerHTML = `
@@ -412,15 +405,6 @@ export function renderChallenges(container, callbacks) {
         hVal.innerText = h.toString().padStart(2, '0');
         mVal.innerText = m.toString().padStart(2, '0');
         sVal.innerText = s.toString().padStart(2, '0');
-      }
-
-      const headerCountdown = container.querySelector('#voting-countdown');
-      if (headerCountdown) {
-        if (closed) {
-          headerCountdown.innerText = 'CERRADO';
-        } else {
-          headerCountdown.innerText = `${d}d ${h}h ${m}m ${s}s`;
-        }
       }
 
       if (closed && !isVotingClosed) {
