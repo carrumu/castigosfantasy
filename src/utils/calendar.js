@@ -12,6 +12,31 @@ const LALIGA_ID = 140;
  * @param {number} seasonYear (e.g. 2024 for 24/25 season)
  * @returns {Promise<Date|null>}
  */
+/**
+ * Returns the matchday number that is currently "open" right now, based on
+ * matchdays_calendar's real-calendar dates — the first matchday whose
+ * last_match_time hasn't happened yet. Falls back to the final matchday if
+ * the season has ended, or null if the table hasn't been seeded.
+ * @returns {Promise<number|null>}
+ */
+export async function getCurrentMatchdayNumber() {
+  try {
+    const { data, error } = await supabase
+      .from('matchdays_calendar')
+      .select('matchday_number, last_match_time')
+      .order('matchday_number', { ascending: true });
+
+    if (error || !data || data.length === 0) return null;
+
+    const now = Date.now();
+    const upcoming = data.find(row => new Date(row.last_match_time).getTime() > now);
+    return upcoming ? upcoming.matchday_number : data[data.length - 1].matchday_number;
+  } catch (err) {
+    console.error('Error resolving current matchday:', err);
+    return null;
+  }
+}
+
 export async function getMatchdayClosingTime(matchdayNumber, seasonYear = 2024) {
   // 1. Check if we already have it cached in Supabase
   try {
