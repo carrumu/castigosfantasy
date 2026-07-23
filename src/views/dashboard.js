@@ -898,36 +898,49 @@ export function renderDashboard(container, callbacks) {
       }
     });
 
-    // Modo Jornada Express entry point — prioritized Mon/Tue, only once a
-    // matchday is fully closed (loser + punishment already recorded), and
-    // only until the user has seen it for that record.
+    // Modo Jornada Express entry point — prioritized Mon/Tue, shown every
+    // time there's a fully closed matchday (loser + punishment already
+    // recorded). Permanent for the week, not a one-time dismissal — it
+    // should be there for every jornada, not just the first time it's seen.
     const dayOfWeek = new Date().getDay();
     const isExpressDay = dayOfWeek === 1 || dayOfWeek === 2;
     const latestCompleteRecord = [...records]
       .filter(r => r.punishment_id)
       .sort((a, b) => b.matchday_number - a.matchday_number)[0];
-    const expressSeenKey = latestCompleteRecord
-      ? `CF_EXPRESS_SEEN_${currentLeague.id}_${latestCompleteRecord.id}`
-      : null;
 
-    if (isExpressDay && latestCompleteRecord && !localStorage.getItem(expressSeenKey)) {
+    if (isExpressDay && latestCompleteRecord) {
       const expressCard = document.createElement('button');
       expressCard.id = 'jornada-express-entry';
-      expressCard.className = 'brutalist-card';
-      expressCard.style.cssText = 'width: 100%; text-align: left; cursor: pointer; margin-bottom: 1.5rem; border-color: var(--accent); background: rgba(222,237,0,0.05); display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem 1.25rem;';
+      expressCard.style.cssText = 'width: 100%; text-align: left; cursor: pointer; margin-bottom: 1.5rem; border: 3px solid #000; box-shadow: 6px 6px 0px #000; background: var(--accent); border-radius: 12px; display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1.1rem 1.35rem; transition: transform 0.15s, box-shadow 0.15s;';
+      expressCard.onmouseenter = () => { expressCard.style.transform = 'translate(-2px, -2px)'; expressCard.style.boxShadow = '8px 8px 0px #000'; };
+      expressCard.onmouseleave = () => { expressCard.style.transform = ''; expressCard.style.boxShadow = '6px 6px 0px #000'; };
       expressCard.innerHTML = `
-        <div>
-          <span class="brutalist-badge" style="background: var(--accent); color: #000; border-color: #000;">Nuevo</span>
-          <h3 style="font-family: var(--font-display); font-weight: 900; font-size: 1.05rem; margin: 0.4rem 0 0;">🎉 Resumen Exprés de la Jornada</h3>
-          <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.2rem 0 0;">Colista, castigo y frase del Bufón en un vistazo.</p>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <div style="width: 54px; height: 54px; border: 3px solid #000; border-radius: 50%; background: #000; color: var(--accent); display: flex; align-items: center; justify-content: center; flex-shrink: 0; animation: jornadaExpressPulse 1.8s ease-in-out infinite;">
+            <span class="material-symbols-outlined" style="font-size: 1.9rem;">bolt</span>
+          </div>
+          <div>
+            <span style="display: inline-block; background: #000; color: var(--accent); font-family: var(--font-display); font-weight: 900; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; padding: 0.15rem 0.5rem; border-radius: 4px; margin-bottom: 0.35rem;">Jornada ${latestCompleteRecord.matchday_number}</span>
+            <h3 style="font-family: var(--font-display); font-weight: 900; font-size: 1.25rem; margin: 0; color: #000; text-transform: uppercase; line-height: 1.1;">Resumen Exprés</h3>
+            <p style="font-size: 0.82rem; color: #000; margin: 0.2rem 0 0; font-weight: 700; opacity: 0.75;">Colista, castigo y frase del Bufón en un vistazo.</p>
+          </div>
         </div>
-        <span class="material-symbols-outlined" style="font-size: 1.8rem; color: var(--accent); flex-shrink: 0;">arrow_forward</span>
+        <span class="material-symbols-outlined" style="font-size: 2.2rem; color: #000; flex-shrink: 0;">arrow_forward</span>
       `;
+      if (!document.querySelector('#jornada-express-pulse-style')) {
+        const styleTag = document.createElement('style');
+        styleTag.id = 'jornada-express-pulse-style';
+        styleTag.textContent = `
+          @keyframes jornadaExpressPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+          }
+        `;
+        document.head.appendChild(styleTag);
+      }
       container.querySelector('.container')?.prepend(expressCard);
       expressCard.addEventListener('click', () => {
         openJornadaExpressModal(currentLeague.id, callbacks);
-        localStorage.setItem(expressSeenKey, '1');
-        expressCard.remove();
       });
     }
 
