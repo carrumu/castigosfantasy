@@ -159,31 +159,11 @@ input, select, textarea, button {
 }
 
 .gradient-text-gold {
-  background: linear-gradient(135deg, #fecdd3 0%, var(--accent-gold) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-@keyframes magmaGradient {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
+  color: var(--text-light);
 }
 
 .gradient-text-green {
-  background: linear-gradient(270deg, var(--primary-green), #c3d000, #e6f51c, var(--primary-green));
-  background-size: 400% 400%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: magmaGradient 8s ease infinite;
+  color: var(--text-light);
 }
 
 /* Layout & Navigation Structures */
@@ -4163,22 +4143,14 @@ h1, h2, h3, h4, h5, h6, .card-title {
   border-radius: 12px !important;
 }
 
-/* Ensure consistent gradients */
+/* Ensure consistent heading color/typography (see .gradient-text-* base rules) */
 .gradient-text-green {
-  background: linear-gradient(270deg, var(--primary-green), #e6f51c, var(--primary-green)) !important;
-  background-size: 400% 400% !important;
-  -webkit-background-clip: text !important;
-  background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
-  animation: magmaGradient 8s ease infinite !important;
+  color: var(--text-light) !important;
   font-family: var(--font-display) !important;
 }
 
 .gradient-text-gold {
-  background: linear-gradient(135deg, #fecdd3 0%, var(--accent-gold) 100%) !important;
-  -webkit-background-clip: text !important;
-  background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
+  color: var(--text-light) !important;
   font-family: var(--font-display) !important;
 }
 
