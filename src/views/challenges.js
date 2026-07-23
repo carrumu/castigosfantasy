@@ -1,5 +1,18 @@
 import { supabase, isConfigured } from '../supabase';
-import { getMatchdayClosingTime } from '../utils/calendar';
+import { getMatchdayClosingTime, getCurrentMatchdayNumber } from '../utils/calendar';
+import { CHALLENGES_DB } from '../utils/challenges-db';
+
+/**
+ * Picks `count` distinct random entries from CHALLENGES_DB, excluding any
+ * whose title appears in `excludeTitles` (e.g. last matchday's picks, so the
+ * same trio doesn't repeat back-to-back).
+ */
+function pickRandomChallenges(count, excludeTitles = []) {
+  const pool = CHALLENGES_DB.filter(c => !excludeTitles.includes(c.title));
+  const source = pool.length >= count ? pool : CHALLENGES_DB;
+  const shuffled = [...source].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, count);
+}
 
 /**
  * Renders the Weekly Challenges view (Reto Semanal).
@@ -23,15 +36,11 @@ export function renderChallenges(container, callbacks) {
   let countdownInterval = null;
 
   async function loadMatchday() {
-    if (activeLeagueId && isConfigured && !isGuest) {
+    if (isConfigured && !isGuest) {
       try {
-        const { data: league } = await supabase
-          .from('leagues')
-          .select('jester_current_matchday')
-          .eq('id', activeLeagueId)
-          .maybeSingle();
-        if (league && league.jester_current_matchday) {
-          currentMatchday = league.jester_current_matchday;
+        const resolved = await getCurrentMatchdayNumber();
+        if (resolved) {
+          currentMatchday = resolved;
         }
       } catch (_) {}
     }
@@ -52,11 +61,12 @@ export function renderChallenges(container, callbacks) {
 
     if (isGuest || !activeLeagueId || !isConfigured) {
       // Local Guest fallback mode
-      const defaultDares = [
-        { id: 'guest-1', title: "Outfit de Despedido", desc: "Subir foto al grupo vistiendo la ropa más hortera posible simulando despido. Plazo: 48h.", votes: 8 },
-        { id: 'guest-2', title: "Comentarista Mudo", desc: "Grabar vídeo justificando la derrota solo con mímica sin emitir sonido. Plazo: 48h.", votes: 5 },
-        { id: 'guest-3', title: "El Cantante de WhatsApp", desc: "Grabar un audio de WhatsApp de 1 minuto cantando a capela una balada a tu peor jugador.", votes: 12 }
-      ];
+      const defaultDares = pickRandomChallenges(3).map((d, idx) => ({
+        id: `guest-${idx + 1}`,
+        title: d.title,
+        desc: d.description,
+        votes: 0
+      }));
       challenges = defaultDares;
       userVotedId = localStorage.getItem('CF_USER_VOTED_CHALLENGE_ID') || null;
       isLoading = false;
@@ -76,14 +86,22 @@ export function renderChallenges(container, callbacks) {
 
       if (chalErr) throw chalErr;
 
-      // Seed default challenges if empty in Supabase database
+      // Seed random challenges from the pool if empty for this matchday,
+      // avoiding whatever this league picked last matchday so it doesn't
+      // repeat back-to-back.
       if (!remoteChallenges || remoteChallenges.length === 0) {
-        const seedDares = [
-          { title: "Outfit de Despedido", description: "Subir foto al grupo vistiendo la ropa más hortera posible simulando despido. Plazo: 48h." },
-          { title: "Comentarista Mudo", description: "Grabar vídeo justificando la derrota solo con mímica sin emitir sonido. Plazo: 48h." },
-          { title: "El Cantante de WhatsApp", description: "Grabar un audio de WhatsApp de 1 minuto cantando a capela una balada a tu peor jugador." }
-        ];
-        
+        let previousTitles = [];
+        try {
+          const { data: previous } = await supabase
+            .from('weekly_challenges')
+            .select('title')
+            .eq('league_id', activeLeagueId)
+            .eq('matchday_number', currentMatchday - 1);
+          previousTitles = (previous || []).map(p => p.title);
+        } catch (_) {}
+
+        const seedDares = pickRandomChallenges(3, previousTitles);
+
         const insertList = seedDares.map(d => ({
           league_id: activeLeagueId,
           matchday_number: currentMatchday,
