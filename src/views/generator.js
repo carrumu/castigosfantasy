@@ -591,7 +591,7 @@ export function renderGenerator(container, callbacks) {
           </div>
           <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); gap: 0.75rem;" id="saved-list-container">
             ${savedList.map((item, idx) => `
-              <div class="brutalist-card" style="padding: 0.85rem; background: rgba(0,0,0,0.25); border: 2.5px solid #000; border-left: 4px solid var(--accent); display: flex; justify-content: space-between; align-items: center; border-radius: 4px;">
+              <div class="brutalist-card" style="padding: 0.85rem; background: rgba(0,0,0,0.25); border: 2.5px solid #000; display: flex; justify-content: space-between; align-items: center; border-radius: 4px;">
                 <div style="text-align: left; padding-right: 1rem; flex-grow: 1;">
                   <h4 style="font-size: 0.9rem; font-weight: 800; margin: 0; color: var(--text-light); line-height: 1.2;">${escapeHTML(item.name)}</h4>
                   <p style="font-size: 0.75rem; color: var(--text-muted); margin: 0.35rem 0 0 0; line-height: 1.3;">${escapeHTML(item.description)}</p>
@@ -617,7 +617,7 @@ export function renderGenerator(container, callbacks) {
           </div>
           <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); gap: 0.75rem;" id="rejected-list-container">
             ${rejectedList.map((item, idx) => `
-              <div class="brutalist-card" style="padding: 0.85rem; background: rgba(0,0,0,0.25); border: 2.5px solid #000; border-left: 4px solid #962d2d; display: flex; justify-content: space-between; align-items: center; border-radius: 4px;">
+              <div class="brutalist-card" style="padding: 0.85rem; background: rgba(0,0,0,0.25); border: 2.5px solid #000; display: flex; justify-content: space-between; align-items: center; border-radius: 4px;">
                 <div style="text-align: left; padding-right: 1rem; flex-grow: 1;">
                   <h4 style="font-size: 0.9rem; font-weight: 800; margin: 0; color: var(--text-light); line-height: 1.2;">${escapeHTML(item.name)}</h4>
                   <div style="font-size: 0.65rem; font-weight: 800; color: #ff6b6b; margin-top: 0.25rem; text-transform: uppercase;">
