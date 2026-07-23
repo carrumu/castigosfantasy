@@ -2,6 +2,7 @@ import { supabase } from '../supabase';
 import { getRandomPhrase } from '../utils/phrases';
 import { openLeagueSettings } from '../utils/league-options';
 import { openBiwengerLinkModal } from '../utils/biwenger-link-modal';
+import { openJornadaExpressModal } from '../utils/jornada-express-modal';
 
 /**
  * Renders the Main Dashboard (Leaderboard, Registering matchday loser).
@@ -474,7 +475,8 @@ export function renderDashboard(container, callbacks) {
           matchday_number: matchday,
           amount_owed: amount,
           biwenger_round_id: pending.roundId,
-          trash_talk_phrase: trashPhrase
+          trash_talk_phrase: trashPhrase,
+          loser_points: pending.colistaPts ?? null
         };
         // Match the manual form: unclaimed roster slots use loser_roster_id.
         if (loserId.startsWith('roster-')) {
@@ -895,6 +897,39 @@ export function renderDashboard(container, callbacks) {
         });
       }
     });
+
+    // Modo Jornada Express entry point — prioritized Mon/Tue, only once a
+    // matchday is fully closed (loser + punishment already recorded), and
+    // only until the user has seen it for that record.
+    const dayOfWeek = new Date().getDay();
+    const isExpressDay = dayOfWeek === 1 || dayOfWeek === 2;
+    const latestCompleteRecord = [...records]
+      .filter(r => r.punishment_id)
+      .sort((a, b) => b.matchday_number - a.matchday_number)[0];
+    const expressSeenKey = latestCompleteRecord
+      ? `CF_EXPRESS_SEEN_${currentLeague.id}_${latestCompleteRecord.id}`
+      : null;
+
+    if (isExpressDay && latestCompleteRecord && !localStorage.getItem(expressSeenKey)) {
+      const expressCard = document.createElement('button');
+      expressCard.id = 'jornada-express-entry';
+      expressCard.className = 'brutalist-card';
+      expressCard.style.cssText = 'width: 100%; text-align: left; cursor: pointer; margin-bottom: 1.5rem; border-color: var(--accent); background: rgba(222,237,0,0.05); display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem 1.25rem;';
+      expressCard.innerHTML = `
+        <div>
+          <span class="brutalist-badge" style="background: var(--accent); color: #000; border-color: #000;">Nuevo</span>
+          <h3 style="font-family: var(--font-display); font-weight: 900; font-size: 1.05rem; margin: 0.4rem 0 0;">🎉 Resumen Exprés de la Jornada</h3>
+          <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.2rem 0 0;">Colista, castigo y frase del Bufón en un vistazo.</p>
+        </div>
+        <span class="material-symbols-outlined" style="font-size: 1.8rem; color: var(--accent); flex-shrink: 0;">arrow_forward</span>
+      `;
+      container.querySelector('.container')?.prepend(expressCard);
+      expressCard.addEventListener('click', () => {
+        openJornadaExpressModal(currentLeague.id, callbacks);
+        localStorage.setItem(expressSeenKey, '1');
+        expressCard.remove();
+      });
+    }
 
     // Hook Copy Invite Code
     const copyBtn = container.querySelector('#copy-invite-code');
