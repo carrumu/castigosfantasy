@@ -36,7 +36,7 @@ export function renderChallenges(container, callbacks) {
   let countdownInterval = null;
 
   async function loadMatchday() {
-    if (isConfigured && !isGuest) {
+    if (isConfigured) {
       try {
         const resolved = await getCurrentMatchdayNumber();
         if (resolved) {
