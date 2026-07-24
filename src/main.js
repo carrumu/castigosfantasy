@@ -89,119 +89,11 @@ function renderMainLayout(isGuest, currentUser = null) {
 
   app.innerHTML = `
     <div class="app-layout">
-      <!-- Sidebar de Navegación Lateral -->
-      <aside class="sidebar" id="app-sidebar">
-        <div class="sidebar-header">
-          <div class="logo gradient-text-green" style="cursor: pointer; display: flex; align-items: center; gap: 0.35rem;" id="logo-home">
-            <span class="logo-icon" style="width: 50px; height: 36px; flex-shrink: 0;"></span>
-            CastigosFantasy
-          </div>
-          <button class="sidebar-close-btn" id="sidebar-close-btn" aria-label="Cerrar menú">✕</button>
-        </div>
-
-        <nav class="sidebar-nav">
-          <button class="nav-item ${currentView === 'inicio' ? 'active' : ''}" id="nav-landing-btn">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-            <span>Inicio</span>
-          </button>
-
-          <button class="nav-item ${currentView === 'herramientas' || currentView === 'ruleta' || currentView === 'generador' ? 'active' : ''}" id="nav-wheel-btn">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;"><circle cx="12" cy="12" r="10"></circle><path d="M12 2v20"></path><path d="M2 12h20"></path></svg>
-            <span>Sala VAR</span>
-          </button>
-
-          <button class="nav-item ${currentView === 'retos' ? 'active' : ''}" id="nav-challenges-btn">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;">
-              <path d="M14.5 17.5 3 6V3h3l11.5 11.5"></path>
-              <path d="M13 19 19 13"></path>
-              <path d="m16 16 4 4"></path>
-              <path d="m19 21 2-2"></path>
-              <path d="M14.5 6.5 21 13v3h-3L6.5 14.5"></path>
-              <path d="M13 5 19 11"></path>
-              <path d="m8 16-4 4"></path>
-              <path d="m5 21 2-2"></path>
-            </svg>
-            <span>Reto Semanal</span>
-          </button>
-          <button class="nav-item ${currentView === 'bufon' ? 'active' : ''}" id="nav-bufon-btn">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;">
-              <path d="M2 10s2.5-3 5-3 5 3 5 3V14s-2.5 3-5 3-5-3-5-3z"></path>
-              <path d="M12 10s2.5-3 5-3 5 3 5 3V14s-2.5 3-5 3-5-3-5-3z"></path>
-              <path d="M5 10c.5 0 1-.5 1-1"></path>
-              <path d="M8 10c-.5 0-1-.5-1-1"></path>
-              <path d="M5 12s1.5 1.5 3 0"></path>
-              <path d="M15 10c.5 0 1-.5 1-1"></path>
-              <path d="M18 10c-.5 0-1-.5-1-1"></path>
-              <path d="M15 12s1.5 1.5 3 0"></path>
-            </svg>
-            <span>El Bufón</span>
-          </button>
-          <button class="nav-item ${currentView === 'juegos' || currentView === 'adivina-jugador' ? 'active' : ''}" id="nav-minigame-btn">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;"><line x1="6" y1="12" x2="10" y2="12"></line><line x1="8" y1="10" x2="8" y2="14"></line><line x1="15" y1="13" x2="15.01" y2="13"></line><line x1="18" y1="11" x2="18.01" y2="11"></line><rect x="2" y="6" width="20" height="12" rx="3"></rect></svg>
-            <span>Juegos</span>
-          </button>
-          <button class="nav-item ${currentView === 'generador' ? 'active' : ''}" id="nav-generator-btn">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;">
-              <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path>
-              <path d="m5 3 1 2.5L8.5 6 6 7 5 9.5 4 7 1.5 6 4 5.5z"></path>
-            </svg>
-            <span>Generador</span>
-          </button>
-          <button class="nav-item ${currentView === 'mis-ligas' ? 'active' : ''}" id="nav-select-league-btn">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-            <span>Mis Ligas</span>
-          </button>
-        </nav>
-
-        <div class="sidebar-footer" style="border-top: 1px solid var(--border-color); padding-top: 1rem;">
-          <div class="footer-widgets" style="display: flex; align-items: center; justify-content: flex-end; margin-bottom: 0.85rem;">
-            
-            <!-- Social Icons on the Right -->
-            <div class="social-icons" style="display: flex; gap: 0.75rem; align-items: center;">
-              <a href="#" class="social-link" title="Twitter / X" style="color: var(--text-muted); transition: var(--transition-fast); display: flex; align-items: center;">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"></path>
-                </svg>
-              </a>
-              <a href="#" class="social-link" title="Instagram" style="color: var(--text-muted); transition: var(--transition-fast); display: flex; align-items: center;">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
-                  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-                  <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
-                </svg>
-              </a>
-              <a href="#" class="social-link" title="TikTok" style="color: var(--text-muted); transition: var(--transition-fast); display: flex; align-items: center;">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"></path>
-                </svg>
-              </a>
-            </div>
-          </div>
-          <span style="font-weight: 700; color: var(--primary);">Ligas Fútbol Fantasy</span>
-          <span class="sidebar-version">Versión 1.1.0</span>
-          <div class="legal-links" style="display:flex;flex-wrap:wrap;gap:0.35rem 0.75rem;margin-top:0.6rem;">
-            <a class="legal-link" data-page="privacidad" style="font-size:0.68rem;color:var(--text-muted);cursor:pointer;">Privacidad</a>
-            <a class="legal-link" data-page="cookies" style="font-size:0.68rem;color:var(--text-muted);cursor:pointer;">Cookies</a>
-            <a class="legal-link" data-page="terminos" style="font-size:0.68rem;color:var(--text-muted);cursor:pointer;">Términos</a>
-          </div>
-        </div>
-      </aside>
-
-      <!-- Backdrop para Móvil -->
-      <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
-
       <!-- Contenedor de Contenido Principal -->
       <div class="main-content">
         <!-- Cabecera Superior -->
         <header class="top-header">
           <div class="header-left" style="display: flex; align-items: center; gap: 0.75rem;">
-            <button class="menu-toggle-btn" id="menu-toggle-btn" aria-label="Abrir menú">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="3" y1="12" x2="21" y2="12"></line>
-                <line x1="3" y1="6" x2="21" y2="6"></line>
-                <line x1="3" y1="18" x2="21" y2="18"></line>
-              </svg>
-            </button>
             <div class="logo text-primary" style="cursor: pointer; user-select: none; font-family: var(--font-display); font-weight: 900; font-size: 1.3rem;" id="header-logo-home">
               CASTIGOS FANTASY
             </div>
@@ -305,27 +197,6 @@ function renderMainLayout(isGuest, currentUser = null) {
   } else {
     viewContainer.className = 'container';
   }
-  const sidebar = app.querySelector('#app-sidebar');
-  const backdrop = app.querySelector('#sidebar-backdrop');
-  const menuToggle = app.querySelector('#menu-toggle-btn');
-  const sidebarClose = app.querySelector('#sidebar-close-btn');
-
-  // Funciones auxiliares para abrir/cerrar el sidebar en móvil
-  const openSidebar = () => {
-    sidebar.classList.add('open');
-    backdrop.classList.add('active');
-  };
-
-  const closeSidebar = () => {
-    sidebar.classList.remove('open');
-    backdrop.classList.remove('active');
-  };
-
-  // Eventos del menú móvil
-  if (menuToggle) menuToggle.addEventListener('click', openSidebar);
-  if (sidebarClose) sidebarClose.addEventListener('click', closeSidebar);
-  if (backdrop) backdrop.addEventListener('click', closeSidebar);
-
   // Route Views
   // The FAQ structured data only belongs on the SEO home; clear it on every
   // route change and let renderSeoHome re-inject it when appropriate.
@@ -447,78 +318,14 @@ function renderMainLayout(isGuest, currentUser = null) {
     renderGuias(viewContainer, { onNavigate: navigate });
   }
 
-  // Hook Navigation Elements (Cerrando el sidebar al hacer clic en móvil/escritorio)
-  const homeBtn = app.querySelector('#logo-home');
-  if (homeBtn) {
-    homeBtn.addEventListener('click', () => {
-      navigate('inicio');
-    });
-  }
-  
+  // Hook Navigation Elements
   const headerHomeBtn = app.querySelector('#header-logo-home');
   if (headerHomeBtn) {
     headerHomeBtn.addEventListener('click', () => {
-      closeSidebar();
       navigate('inicio');
     });
   }
 
-  const landingBtn = app.querySelector('#nav-landing-btn');
-  if (landingBtn) {
-    landingBtn.addEventListener('click', () => {
-      navigate('inicio');
-    });
-  }
-
-  const selectLeagueBtn = app.querySelector('#nav-select-league-btn');
-  if (selectLeagueBtn) {
-    selectLeagueBtn.addEventListener('click', () => {
-      navigate('mis-ligas');
-    });
-  }
-
-  const dashBtn = app.querySelector('#nav-dash-btn');
-  if (dashBtn) {
-    dashBtn.addEventListener('click', () => {
-      navigate('muro');
-    });
-  }
-  
-  const wheelBtn = app.querySelector('#nav-wheel-btn');
-  if (wheelBtn) {
-    wheelBtn.addEventListener('click', () => {
-      navigate('herramientas');
-    });
-  }
-
-  const challengesBtn = app.querySelector('#nav-challenges-btn');
-  if (challengesBtn) {
-    challengesBtn.addEventListener('click', () => {
-      navigate('retos');
-    });
-  }
-
-  const minigameBtn = app.querySelector('#nav-minigame-btn');
-  if (minigameBtn) {
-    minigameBtn.addEventListener('click', () => {
-      navigate('juegos');
-    });
-  }
-
-  const bufonBtn = app.querySelector('#nav-bufon-btn');
-  if (bufonBtn) {
-    bufonBtn.addEventListener('click', () => {
-      navigate('bufon');
-    });
-  }
-
-  const generatorBtn = app.querySelector('#nav-generator-btn');
-  if (generatorBtn) {
-    generatorBtn.addEventListener('click', () => {
-      navigate('generador');
-    });
-  }
-  
   // Bind Header Navigation Links (Desktop)
   const headerLinks = app.querySelectorAll('.header-nav-link');
   headerLinks.forEach(link => {
@@ -539,14 +346,12 @@ function renderMainLayout(isGuest, currentUser = null) {
   
   if (isGuest) {
     app.querySelector('#nav-login-btn').addEventListener('click', () => {
-      closeSidebar();
       navigate('acceso');
     });
     const bannerLink = app.querySelector('#banner-login-link');
     if (bannerLink) {
       bannerLink.addEventListener('click', (e) => {
         e.preventDefault();
-        closeSidebar();
         navigate('acceso');
       });
     }
@@ -557,17 +362,8 @@ function renderMainLayout(isGuest, currentUser = null) {
     }
   }
 
-  const settingsBtn = app.querySelector('#nav-reset-sb-btn');
-  if (settingsBtn) {
-    settingsBtn.addEventListener('click', () => {
-      closeSidebar();
-      navigate('acceso');
-    });
-  }
-
   app.querySelectorAll('.legal-link').forEach(link => {
     link.addEventListener('click', () => {
-      closeSidebar();
       navigate(link.dataset.page);
     });
   });
