@@ -1,10 +1,11 @@
 import { supabase, isConfigured } from '../supabase';
+import { openJornadaExpressModal } from '../utils/jornada-express-modal';
 
 /**
  * Renders the stunning, modern Landing/Home Page.
- * @param {HTMLElement} container 
- * @param {Object} callbacks 
- * @param {Function} callbacks.onNavigate 
+ * @param {HTMLElement} container
+ * @param {Object} callbacks
+ * @param {Function} callbacks.onNavigate
  */
 export function renderLanding(container, callbacks) {
   let currentUser = null;
@@ -12,6 +13,7 @@ export function renderLanding(container, callbacks) {
   let activeLeagueId = null;
   let activeLeagueName = '';
   let leaderboard = [];
+  let latestCompleteRecord = null;
 
   async function loadData() {
     if (!isConfigured) {
@@ -66,8 +68,12 @@ export function renderLanding(container, callbacks) {
           // Fetch records for active league
           const { data: recordsList } = await supabase
             .from('matchday_records')
-            .select('loser_profile_id, amount_owed')
+            .select('loser_profile_id, amount_owed, punishment_id, matchday_number')
             .eq('league_id', activeLeagueId);
+
+          latestCompleteRecord = (recordsList || [])
+            .filter(r => r.punishment_id)
+            .sort((a, b) => b.matchday_number - a.matchday_number)[0] || null;
 
           if (membersList) {
             const mappedList = membersList.map(m => ({
@@ -131,6 +137,26 @@ export function renderLanding(container, callbacks) {
               </button>
             </div>
           </section>
+
+          ${hasLeagues && latestCompleteRecord ? `
+            <!-- Jornada Express entry — first thing under the hero so it's
+                 actually findable, not buried inside Lista de Morosos. -->
+            <button id="landing-jornada-express-btn" style="width: 100%; text-align: left; cursor: pointer; margin-bottom: 1.5rem; border: 3px solid #000; box-shadow: 6px 6px 0px #000; background: var(--accent); border-radius: 12px; display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1.1rem 1.35rem; transition: transform 0.15s, box-shadow 0.15s;"
+              onmouseover="this.style.transform='translate(-2px,-2px)'; this.style.boxShadow='8px 8px 0px #000';"
+              onmouseout="this.style.transform=''; this.style.boxShadow='6px 6px 0px #000';">
+              <div style="display: flex; align-items: center; gap: 1rem;">
+                <div style="width: 54px; height: 54px; border: 3px solid #000; border-radius: 50%; background: #000; color: var(--accent); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                  <span class="material-symbols-outlined" style="font-size: 1.9rem;">bolt</span>
+                </div>
+                <div>
+                  <span style="display: inline-block; background: #000; color: var(--accent); font-family: var(--font-display); font-weight: 900; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; padding: 0.15rem 0.5rem; border-radius: 4px; margin-bottom: 0.35rem;">Jornada ${latestCompleteRecord.matchday_number}</span>
+                  <h3 style="font-family: var(--font-display); font-weight: 900; font-size: 1.25rem; margin: 0; color: #000; text-transform: uppercase; line-height: 1.1;">Resumen Exprés</h3>
+                  <p style="font-size: 0.82rem; color: #000; margin: 0.2rem 0 0; font-weight: 700; opacity: 0.75;">Colista, castigo y frase del Bufón en un vistazo.</p>
+                </div>
+              </div>
+              <span class="material-symbols-outlined" style="font-size: 2.2rem; color: #000; flex-shrink: 0;">arrow_forward</span>
+            </button>
+          ` : ''}
 
           <!-- ===== NIVEL 2: Esta jornada ===== -->
           <section class="landing-tier">
@@ -402,6 +428,13 @@ export function renderLanding(container, callbacks) {
             callbacks.onNavigate('mis-ligas');
           }
         }
+      });
+    }
+
+    const jornadaExpressBtn = container.querySelector('#landing-jornada-express-btn');
+    if (jornadaExpressBtn) {
+      jornadaExpressBtn.addEventListener('click', () => {
+        openJornadaExpressModal(activeLeagueId, callbacks);
       });
     }
   }

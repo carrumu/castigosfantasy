@@ -2721,6 +2721,11 @@ input, select, textarea, button {
   color: #000000;
 }
 
+.hub-card-badge.express {
+  background-color: var(--accent);
+  color: #000000;
+}
+
 @media (max-width: 580px) {
   .hub-card {
     padding: 1.5rem 1.25rem;

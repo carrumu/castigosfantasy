@@ -3,6 +3,7 @@ import { openLeagueSettings } from '../utils/league-options';
 import { openBiwengerSyncModal } from '../utils/biwenger-sync-modal';
 import { openBiwengerLinkModal } from '../utils/biwenger-link-modal';
 import { openComunioLinkModal } from '../utils/comunio-link-modal';
+import { openJornadaExpressModal } from '../utils/jornada-express-modal';
 import { escapeHTML } from '../utils/security';
 
 export async function renderLeagueHub(container, callbacks) {
@@ -76,6 +77,19 @@ export async function renderLeagueHub(container, callbacks) {
         <span class="hub-dot"></span>Accesos
       </div>
       <div class="hub-actions-list">
+
+        <button class="hub-action-row" id="card-go-jornada-express">
+          <div class="hub-action-row-left">
+            <div class="hub-action-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
+            </div>
+            <div>
+              <span class="hub-card-badge express" style="margin-bottom:0.2rem;display:inline-block;">Resumen</span>
+              <div class="hub-action-title">Jornada Exprés</div>
+            </div>
+          </div>
+          <svg class="hub-action-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+        </button>
 
         <button class="hub-action-row" id="card-go-dashboard">
           <div class="hub-action-row-left">
@@ -179,6 +193,7 @@ export async function renderLeagueHub(container, callbacks) {
   `;
 
   // Navigation
+  container.querySelector('#card-go-jornada-express')?.addEventListener('click', () => openJornadaExpressModal(leagueId, callbacks));
   container.querySelector('#card-go-dashboard')?.addEventListener('click', () => callbacks.onNavigate('muro'));
   container.querySelector('#card-go-roulette')?.addEventListener('click', () => callbacks.onNavigate('ruleta'));
   container.querySelector('#card-go-bufon')?.addEventListener('click', () => callbacks.onNavigate('bufon'));
