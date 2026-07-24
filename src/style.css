@@ -1962,7 +1962,7 @@ input, select, textarea, button {
 
 .header-nav {
   display: none;
-  gap: 1.5rem;
+  gap: 1.1rem;
   justify-content: center;
   align-items: center;
 }
@@ -1976,7 +1976,7 @@ input, select, textarea, button {
   white-space: nowrap;
   color: var(--text-muted);
   cursor: pointer;
-  padding: 0.5rem 1rem;
+  padding: 0.5rem 0.85rem;
   text-transform: uppercase;
   letter-spacing: 1px;
   transition: var(--transition-fast);
@@ -1996,7 +1996,7 @@ input, select, textarea, button {
   box-shadow: 2px 2px 0px 0px #000000;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   .top-header {
     display: grid;
     grid-template-columns: 1fr auto 1fr;
@@ -2216,7 +2216,7 @@ input, select, textarea, button {
   display: none;
 }
 
-@media (max-width: 767px) {
+@media (max-width: 1023px) {
   .mobile-bottom-nav {
     display: flex;
     position: fixed;
