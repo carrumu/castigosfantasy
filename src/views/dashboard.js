@@ -898,17 +898,18 @@ export function renderDashboard(container, callbacks) {
       }
     });
 
-    // Modo Jornada Express entry point — prioritized Mon/Tue, shown every
-    // time there's a fully closed matchday (loser + punishment already
-    // recorded). Permanent for the week, not a one-time dismissal — it
-    // should be there for every jornada, not just the first time it's seen.
-    const dayOfWeek = new Date().getDay();
-    const isExpressDay = dayOfWeek === 1 || dayOfWeek === 2;
+    // Modo Jornada Express entry point — shown every time there's a fully
+    // closed matchday (loser + punishment already recorded), all week long,
+    // not just Mon/Tue. Always reflects the most recently closed jornada:
+    // `records` is refetched on every dashboard load, and picking the
+    // highest matchday_number here means the moment a new jornada is closed
+    // (new loser/punishment recorded), this card automatically points at
+    // that one instead of the previous week's.
     const latestCompleteRecord = [...records]
       .filter(r => r.punishment_id)
       .sort((a, b) => b.matchday_number - a.matchday_number)[0];
 
-    if (isExpressDay && latestCompleteRecord) {
+    if (latestCompleteRecord) {
       const expressCard = document.createElement('button');
       expressCard.id = 'jornada-express-entry';
       expressCard.style.cssText = 'width: 100%; text-align: left; cursor: pointer; margin-bottom: 1.5rem; border: 3px solid #000; box-shadow: 6px 6px 0px #000; background: var(--accent); border-radius: 12px; display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1.1rem 1.35rem; transition: transform 0.15s, box-shadow 0.15s;';
