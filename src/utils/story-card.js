@@ -132,15 +132,15 @@ export async function generateStoryCardBlob({ loserName, points, punishmentName,
   let y = 130;
 
   // --- Logo + wordmark
-  // logo.png is a wide 1376x768 mark, not square — force-fitting it into a
-  // 128x128 box squashed the "CF" glyph. Scale by width and derive height
-  // from the image's own aspect ratio instead.
+  // logo.png is a wide 1376x768 wordmark lockup, not the icon mark — using
+  // it here always meant squashing or awkwardly cropping it. favicon-192 is
+  // already the tightly-cropped square "CF" glyph used as the app/tab icon
+  // everywhere else, so it's the right asset for a square logo slot.
   try {
-    const logo = await loadImage('/logo.png');
-    const logoWidth = 300;
-    const logoHeight = logoWidth * (logo.height / logo.width);
-    ctx.drawImage(logo, WIDTH / 2 - logoWidth / 2, y, logoWidth, logoHeight);
-    y += logoHeight + 30;
+    const logo = await loadImage('/favicon-192.png');
+    const logoSize = 150;
+    ctx.drawImage(logo, WIDTH / 2 - logoSize / 2, y, logoSize, logoSize);
+    y += logoSize + 30;
   } catch (_) {
     y += 20;
   }
