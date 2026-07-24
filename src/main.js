@@ -85,8 +85,6 @@ async function checkAuthAndRender() {
 }
 
 function renderMainLayout(isGuest, currentUser = null) {
-  const notificationsCount = parseInt(localStorage.getItem('CF_COMMUNITY_NOTIFICATIONS_COUNT') || '0', 10);
-
   app.innerHTML = `
     <div class="app-layout">
       <!-- Contenedor de Contenido Principal -->
@@ -577,11 +575,6 @@ function showUpdatePasswordModal() {
     }
   });
 }
-
-// Listen for notifications updates
-window.addEventListener('cf-notification-update', () => {
-  checkAuthAndRender();
-});
 
 // Route parsing on load/change
 function handleRouting() {
