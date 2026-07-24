@@ -112,28 +112,7 @@ export function renderLanding(container, callbacks) {
               Sigue la jornada, vota al bufón y descubre quién debe pasar por caja esta semana.
             </p>
             <div style="margin-top: 1.5rem;">
-              <button id="hero-create-league-btn" style="
-                font-family: var(--font-display);
-                font-weight: 900;
-                font-size: 1rem;
-                text-transform: uppercase;
-                letter-spacing: -0.5px;
-                background: var(--accent);
-                color: #000000;
-                border: 3px solid #000000;
-                padding: 0.75rem 2rem;
-                cursor: pointer;
-                box-shadow: 5px 5px 0px 0px #000000;
-                transition: transform 0.1s ease, box-shadow 0.1s ease;
-                display: inline-flex;
-                align-items: center;
-                gap: 0.5rem;
-              "
-              onmouseover="this.style.transform='translate(-2px,-2px)'; this.style.boxShadow='7px 7px 0px 0px #000000';"
-              onmouseout="this.style.transform=''; this.style.boxShadow='5px 5px 0px 0px #000000';"
-              onmousedown="this.style.transform='translate(3px,3px)'; this.style.boxShadow='0px 0px 0px #000000';"
-              onmouseup="this.style.transform='translate(-2px,-2px)'; this.style.boxShadow='7px 7px 0px 0px #000000';"
-              >
+              <button id="hero-create-league-btn" class="brutalist-btn" style="width: auto; padding: 0.75rem 2rem; display: inline-flex; align-items: center; gap: 0.5rem;">
                 ${hasLeagues ? `
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="9 18 15 12 9 6"></polyline>
@@ -245,9 +224,6 @@ export function renderLanding(container, callbacks) {
 
           <!-- Grid Content: Row 2 (Full Width) -->
           <article class="brutalist-card" style="display: flex; flex-direction: column; gap: 1.5rem; position: relative; overflow: visible;">
-            <div style="position: absolute; top: -12px; right: -12px; z-index: 10;">
-              <span class="brutalist-badge" style="transform: rotate(4deg);">NUEVO</span>
-            </div>
             <div style="max-width: 85%;">
               <h2 style="font-family: var(--font-display); font-size: 2rem; font-weight: 900; text-transform: uppercase; margin-bottom: 0.75rem; line-height: 1;">El Reto de la Semana</h2>
               <p style="font-size: 1.05rem; color: var(--text-light); line-height: 1.5; border-left: 6px solid var(--primary-green); padding-left: 1rem; margin-bottom: 1.5rem;">
@@ -255,7 +231,6 @@ export function renderLanding(container, callbacks) {
               </p>
               <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
                 <button class="brutalist-btn" style="width: auto; padding: 0.65rem 1.75rem;" id="landing-retos-btn-accept">Votar</button>
-                <button class="brutalist-btn brutalist-btn-secondary" style="width: auto; padding: 0.65rem 1.75rem;" id="landing-retos-btn-details">Leer el Acta</button>
               </div>
             </div>
           </article>
@@ -404,14 +379,6 @@ export function renderLanding(container, callbacks) {
     const retosAcceptBtn = container.querySelector('#landing-retos-btn-accept');
     if (retosAcceptBtn) {
       retosAcceptBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (callbacks.onNavigate) callbacks.onNavigate('retos');
-      });
-    }
-
-    const retosDetailsBtn = container.querySelector('#landing-retos-btn-details');
-    if (retosDetailsBtn) {
-      retosDetailsBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         if (callbacks.onNavigate) callbacks.onNavigate('retos');
       });

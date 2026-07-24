@@ -3854,14 +3854,6 @@ input, select, textarea, button {
 }
 
 /* 5. Special inline elements overrides on Home Page */
-#hero-create-league-btn {
-  border: none !important;
-  box-shadow: 0 4px 12px rgba(222, 237, 0, 0.15) !important;
-  border-radius: 8px !important;
-  background: linear-gradient(135deg, var(--accent) 0%, #c3d000 100%) !important;
-  color: #000000 !important;
-}
-
 #morosos-card ul li {
   border: 1px solid var(--border-color) !important;
   border-radius: 6px !important;
