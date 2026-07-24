@@ -1,6 +1,7 @@
 import { supabase, isConfigured } from '../supabase';
 import { setupAutocomplete } from '../utils/autocomplete';
 import { LALIGA_PLAYERS_DB } from '../utils/players-db';
+import { getCurrentMatchdayNumber } from '../utils/calendar';
 
 /**
  * Renders the "El Bufón" (Matchday's Worst Player) screen.
@@ -116,7 +117,7 @@ export function renderBufon(container, callbacks) {
         // 1. Resolve a single global league container in the database (ordered by created_at)
         const { data: leagues, error: leagueErr } = await supabase
           .from('leagues')
-          .select('id, name, jester_current_matchday, jester_voting_start')
+          .select('id, name, jester_voting_start')
           .order('created_at', { ascending: true })
           .limit(1);
 
@@ -130,27 +131,24 @@ export function renderBufon(container, callbacks) {
 
         activeLeagueId = leagues[0].id;
         currentLeagueName = leagues[0].name;
-        currentMatchday = leagues[0].jester_current_matchday || 5;
         votingStartTime = leagues[0].jester_voting_start;
       } else {
         const { data: histData } = await supabase
           .from('jester_history')
-          .select('league_id, matchday_number')
+          .select('league_id')
           .order('matchday_number', { ascending: false })
           .limit(1);
-        
+
         const { data: nomData } = await supabase
           .from('jester_nominees')
-          .select('league_id, matchday_number, created_at')
+          .select('league_id, created_at')
           .order('created_at', { ascending: true });
 
         if (nomData && nomData.length > 0) {
           activeLeagueId = nomData[0].league_id;
-          currentMatchday = nomData[0].matchday_number;
-          votingStartTime = nomData[0].created_at; 
+          votingStartTime = nomData[0].created_at;
         } else if (histData && histData.length > 0) {
           activeLeagueId = histData[0].league_id;
-          currentMatchday = histData[0].matchday_number + 1;
           votingStartTime = null;
         } else {
           forceDemoMode = true;
@@ -159,6 +157,17 @@ export function renderBufon(container, callbacks) {
         }
         currentLeagueName = 'Global';
       }
+
+      // Resolve the real current LaLiga matchday from the shared calendar
+      // (the same source Retos/challenges use) instead of Bufón's own
+      // jester_current_matchday counter — that column was just an internal
+      // tally that only advanced when a round closed, disconnected from the
+      // actual football calendar (it defaults to 5 and stays there for any
+      // league that's never manually closed a round).
+      try {
+        const resolved = await getCurrentMatchdayNumber();
+        if (resolved) currentMatchday = resolved;
+      } catch (_) { /* keep the current in-memory value on failure */ }
 
       // 2. Load nominees, votes, history for this global league container
       await loadLeagueData();
@@ -444,13 +453,12 @@ export function renderBufon(container, callbacks) {
 
       if (delErr) throw delErr;
 
-      // 3. Reset voting start time and increment matchday in leagues table
+      // 3. Reset voting start time — the next matchday number resolves on
+      // its own from the shared calendar on the next load, nothing to
+      // increment here anymore.
       const { error: leagueErr } = await supabase
         .from('leagues')
-        .update({
-          jester_current_matchday: currentMatchday + 1,
-          jester_voting_start: null
-        })
+        .update({ jester_voting_start: null })
         .eq('id', activeLeagueId);
 
       if (leagueErr) throw leagueErr;
