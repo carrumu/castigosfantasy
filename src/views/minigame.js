@@ -1,5 +1,6 @@
 import { supabase } from '../supabase';
 import { resolveDailyChallenge } from '../utils/daily-challenge';
+import { SITE_URL } from '../utils/site';
 
 /**
  * Helper to remove accents and special characters
@@ -309,7 +310,7 @@ export async function renderMinigame(container, callbacks) {
       }).join('');
       text += rowEmojis + '\n';
     });
-    text += `\nJuega aquí: ${window.location.origin}`;
+    text += `\n¿Adivinas tú al jugador secreto de hoy?\nJuega gratis en ${SITE_URL}/adivina-jugador`;
     return text;
   }
 

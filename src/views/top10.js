@@ -4,6 +4,7 @@ import { LALIGA_PLAYERS_DB } from '../utils/players-db';
 import { escapeHTML } from '../utils/security';
 import { resolveDailyChallenge } from '../utils/daily-challenge';
 import { buildMarketValueTopics } from '../utils/dynamic-value-topics';
+import { SITE_URL } from '../utils/site';
 
 function normalizeStr(str) {
   if (!str) return '';
@@ -366,7 +367,9 @@ export async function renderTop10(container, callbacks) {
     const text = `LaLiga Top 10 #${dailyNumber} (${todayStr})
 🏆 Adivinados: ${guessedIndices.size}/10
 ${emojiBlock}
-Juega en Castigos Fantasy`;
+
+¿Superas mi resultado?
+Juega gratis en ${SITE_URL}/top-10`;
 
     if (navigator.share) {
       // Opens the device's native share sheet. Ignore rejections here: they
