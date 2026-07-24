@@ -140,7 +140,9 @@ export async function generateStoryCardBlob({ loserName, points, punishmentName,
     const logo = await loadImage('/favicon-192.png');
     const logoSize = 150;
     ctx.drawImage(logo, WIDTH / 2 - logoSize / 2, y, logoSize, logoSize);
-    y += logoSize + 30;
+    // fillText below is positioned by baseline, not top — its ascenders eat
+    // most of a small gap here, which is why 30px read as "touching" it.
+    y += logoSize + 60;
   } catch (_) {
     y += 20;
   }
