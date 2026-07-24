@@ -324,7 +324,13 @@ export async function renderMinigame(container, callbacks) {
         shakeActiveRow();
         return;
       }
-      
+
+      if (!LALIGA_PLAYERS.includes(currentGuess)) {
+        callbacks.showToast('Ese nombre no está en la lista', 'info');
+        shakeActiveRow();
+        return;
+      }
+
       // Submit guess
       guesses.push(currentGuess);
       const latestIndex = guesses.length - 1;

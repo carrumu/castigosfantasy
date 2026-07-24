@@ -2,6 +2,7 @@ import { setupAutocomplete } from '../utils/autocomplete';
 import { LALIGA_TOPICS_DB } from '../utils/topics-db';
 import { LALIGA_PLAYERS_DB } from '../utils/players-db';
 import { supabase } from '../supabase';
+import { escapeHTML } from '../utils/security';
 
 function parseMarketValue(valStr) {
   if (!valStr || valStr === '-') return 0;
@@ -349,13 +350,15 @@ export async function renderTop10(container, callbacks) {
         isMatch = ans.matches.some(m => cleanString(m) === normalizedGuess);
       }
 
-      // 3. Substring matching (handles "RC Celta de Vigo" matching "Celta de Vigo")
-      if (!isMatch) {
+      // 3. Substring matching (handles "RC Celta de Vigo" matching "Celta de Vigo").
+      // Guarded by a minimum length so a short/partial guess (e.g. "a") can't
+      // accidentally substring-match almost any name and steal a free correct.
+      if (!isMatch && normalizedGuess.length >= 3) {
         isMatch = normalizedGuess.includes(cleanAnsName) || cleanAnsName.includes(normalizedGuess);
       }
 
       // 4. Substring matching with synonyms
-      if (!isMatch && ans.matches) {
+      if (!isMatch && ans.matches && normalizedGuess.length >= 3) {
         isMatch = ans.matches.some(m => {
           const cleanM = cleanString(m);
           return normalizedGuess.includes(cleanM) || cleanM.includes(normalizedGuess);
@@ -516,11 +519,11 @@ Juega en Castigos Fantasy`;
       let textHtml = '';
       if (isGuessed) {
         textHtml = `
-              <span style="font-weight: 800; color: var(--text-light); font-size: 0.95rem;">${ans.name}</span>
+              <span style="font-weight: 800; color: var(--text-light); font-size: 0.95rem;">${escapeHTML(ans.name)}</span>
             `;
       } else if (revealRed) {
         textHtml = `
-              <span style="font-weight: 800; color: #f87171; font-size: 0.95rem; text-decoration: line-through;">${ans.name}</span>
+              <span style="font-weight: 800; color: #f87171; font-size: 0.95rem; text-decoration: line-through;">${escapeHTML(ans.name)}</span>
             `;
       } else {
         textHtml = `
@@ -530,7 +533,7 @@ Juega en Castigos Fantasy`;
 
       let extraInfoHtml = '';
       if (isGuessed || revealRed) {
-        extraInfoHtml = ans.info ? `<div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem; font-weight: 600;">${ans.info}</div>` : '';
+        extraInfoHtml = ans.info ? `<div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem; font-weight: 600;">${escapeHTML(ans.info)}</div>` : '';
       }
 
       return `
