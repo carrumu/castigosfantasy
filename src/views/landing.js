@@ -13,10 +13,8 @@ export function renderLanding(container, callbacks) {
   let activeLeagueName = '';
   let leaderboard = [];
 
-  const isGuest = localStorage.getItem('CF_GUEST_MODE') === 'true';
-
   async function loadData() {
-    if (isGuest || !isConfigured) {
+    if (!isConfigured) {
       renderView();
       return;
     }
@@ -202,7 +200,7 @@ export function renderLanding(container, callbacks) {
                         ${leagues.map(l => {
                           if (l.id === activeLeagueId) return '';
                           return `
-                            <button class="btn-switch-league-landing" data-id="${l.id}" data-name="${l.name}" style="
+                            <button class="btn-switch-league-landing" data-id="${l.id}" data-name="${escapeHTML(l.name)}" style="
                               background: rgba(255,255,255,0.03);
                               color: var(--text-light);
                               border: 1px solid var(--border-color);
