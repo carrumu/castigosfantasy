@@ -55,26 +55,48 @@ export function renderBufon(container, callbacks) {
     renderLeagueView();
   }
 
-  // Helper to compute countdown remaining time text
-  function getRemainingTimeText() {
-    if (!votingStartTime) return "24 horas (pendiente de inicio)";
-    const start = new Date(votingStartTime).getTime();
-    const end = start + (24 * 3600 * 1000);
-    const diff = end - Date.now();
-    if (diff <= 0) {
-      return "Votación finalizada (cierre pendiente)";
+  // Shifts a real Date into "Madrid wall-clock time, expressed via the
+  // browser's own local getters" — same trick top10.js's getGameDateString
+  // uses for its daily reset. As long as both sides of a comparison go
+  // through this same shift, the resulting duration is correct real time.
+  function toMadridWallClock(date) {
+    return new Date(date.toLocaleString('en-US', { timeZone: 'Europe/Madrid' }));
+  }
+
+  // Voting for the currently open matchday always closes automatically at
+  // the next Monday 23:00 (Europe/Madrid) on or after it started — never a
+  // manual action. A round that opens on e.g. a Wednesday just gets a
+  // shorter window than one opening right after the previous Monday close.
+  function getVotingDeadline(startTimeStr) {
+    const start = startTimeStr ? new Date(startTimeStr) : new Date();
+    const madridStart = toMadridWallClock(start);
+    const daysUntilMonday = (1 - madridStart.getDay() + 7) % 7;
+    const deadline = new Date(madridStart);
+    deadline.setDate(madridStart.getDate() + daysUntilMonday);
+    deadline.setHours(23, 0, 0, 0);
+    if (deadline.getTime() <= madridStart.getTime()) {
+      deadline.setDate(deadline.getDate() + 7);
     }
-    const hrs = Math.floor(diff / 3600000);
-    const mins = Math.floor((diff % 3600000) / 60000);
-    return `Tiempo restante: ${hrs}h ${mins}m`;
+    return deadline;
   }
 
   // Helper to get time value
   function getRemainingTime() {
-    if (!votingStartTime) return 24 * 3600 * 1000;
-    const start = new Date(votingStartTime).getTime();
-    const end = start + (24 * 3600 * 1000);
-    return end - Date.now();
+    if (!votingStartTime) return 7 * 24 * 3600 * 1000; // no nominations yet — nothing to close
+    return getVotingDeadline(votingStartTime).getTime() - toMadridWallClock(new Date()).getTime();
+  }
+
+  // Helper to compute countdown remaining time text
+  function getRemainingTimeText() {
+    if (!votingStartTime) return "Esperando la primera nominación";
+    const diff = getRemainingTime();
+    if (diff <= 0) return "Votación finalizada (cierre pendiente)";
+    const days = Math.floor(diff / 86400000);
+    const hrs = Math.floor((diff % 86400000) / 3600000);
+    const mins = Math.floor((diff % 3600000) / 60000);
+    return days > 0
+      ? `Cierra en ${days}d ${hrs}h ${mins}m (lunes 23:00)`
+      : `Cierra en ${hrs}h ${mins}m (lunes 23:00)`;
   }
 
   async function loadData() {
@@ -230,6 +252,14 @@ export function renderBufon(container, callbacks) {
         }
       }
 
+      if (!isGuest && getRemainingTime() <= 0) {
+        const closed = await maybeAutoCloseMatchday();
+        if (closed) {
+          await loadData();
+          return;
+        }
+      }
+
       renderLeagueView();
     } catch (err) {
       console.error("Error loading league data, falling back to Demo Mode:", err);
@@ -363,44 +393,21 @@ export function renderBufon(container, callbacks) {
     }
   }
 
-  async function closeMatchday() {
-    if (!isConfigured || forceDemoMode) {
-      if (nominees.length === 0) {
-        callbacks.showToast("No hay nominados en esta jornada para cerrar", "error");
-        return;
-      }
-      let winner = nominees[0];
-      nominees.forEach(n => {
-        if (n.votes > winner.votes) {
-          winner = n;
-        }
-      });
-      const newHistory = {
-        matchday: currentMatchday,
-        name: winner.name,
-        team: winner.team,
-        reason: winner.reason,
-        raffleWinner: "Invitado (Liga Demo)",
-        rafflePlayer: winner.name
-      };
-      history.unshift(newHistory);
-      localStorage.setItem('CF_DEMO_JESTER_HISTORY', JSON.stringify(history));
-      nominees = [];
-      localStorage.setItem('CF_DEMO_JESTER_NOMINEES', JSON.stringify(nominees));
-      userVotedId = null;
-      localStorage.removeItem('CF_DEMO_JESTER_USER_VOTE');
-      callbacks.showToast(`¡Jornada demo cerrada! El bufón de la jornada es ${winner.name}`, "success");
-      loadDemoData();
-      return;
-    }
-
-    if (nominees.length === 0) {
-      callbacks.showToast("No hay nominados en esta jornada para cerrar", "error");
-      return;
-    }
-
+  // Closes the currently open matchday once its deadline (next Monday
+  // 23:00) has passed. Never triggered by a button — whichever logged-in
+  // visitor's browser happens to load the page first after the deadline
+  // performs it. Returns true if the matchday transitioned (either a
+  // winner was crowned, or an empty round was just cleared) so the caller
+  // knows to reload.
+  async function maybeAutoCloseMatchday() {
     try {
-      // Find nominee with the highest votes
+      if (nominees.length === 0) {
+        // Nothing to crown — just clear the stale window so the next
+        // nomination opens a fresh one anchored to the following Monday.
+        await supabase.from('leagues').update({ jester_voting_start: null }).eq('id', activeLeagueId);
+        return true;
+      }
+
       let winner = nominees[0];
       nominees.forEach(n => {
         if (n.votes > winner.votes) {
@@ -408,7 +415,9 @@ export function renderBufon(container, callbacks) {
         }
       });
 
-      // 1. Add winner to history
+      // 1. Add winner to history. Unique (league_id, matchday_number) means
+      // that if another visitor's browser already closed this matchday,
+      // this insert fails and we back off instead of double-closing.
       const { error: histErr } = await supabase
         .from('jester_history')
         .insert({
@@ -421,7 +430,10 @@ export function renderBufon(container, callbacks) {
           raffle_player: null
         });
 
-      if (histErr) throw histErr;
+      if (histErr) {
+        if (histErr.code === '23505') return true;
+        throw histErr;
+      }
 
       // 2. Delete nominees for this matchday (which cascades to votes)
       const { error: delErr } = await supabase
@@ -429,27 +441,24 @@ export function renderBufon(container, callbacks) {
         .delete()
         .eq('league_id', activeLeagueId)
         .eq('matchday_number', currentMatchday);
-      
+
       if (delErr) throw delErr;
 
       // 3. Reset voting start time and increment matchday in leagues table
-      const nextMatchday = currentMatchday + 1;
       const { error: leagueErr } = await supabase
         .from('leagues')
         .update({
-          jester_current_matchday: nextMatchday,
+          jester_current_matchday: currentMatchday + 1,
           jester_voting_start: null
         })
         .eq('id', activeLeagueId);
 
       if (leagueErr) throw leagueErr;
 
-      callbacks.showToast(`Jornada cerrada. ¡El bufón de la jornada es ${winner.name}!`, "success");
-
-      await loadData();
+      return true;
     } catch (err) {
-      console.error("Error closing matchday:", err);
-      callbacks.showToast("Error al cerrar la jornada", "error");
+      console.error("Error auto-closing Bufón matchday:", err);
+      return false;
     }
   }
 
@@ -467,22 +476,13 @@ export function renderBufon(container, callbacks) {
         ` : ''}
         <div class="container" style="${isGuest ? 'filter: blur(8px); opacity: 0.55; pointer-events: none; user-select: none;' : ''}">
         <!-- Header -->
-        <div style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: start; flex-wrap: wrap; gap: 1rem;">
-          <div>
-            <h1 class="gradient-text-gold" style="font-size: 1.65rem; font-weight: 900; display: flex; align-items: center; gap: 0.5rem;">
-              El Bufón de la Corte
-            </h1>
-            <p style="font-size: 0.85rem; color: var(--text-muted);">
-              Votación global al futbolista de LaLiga con la actuación más cómica o desastrosa en la <strong>Jornada ${currentMatchday}</strong>.
-            </p>
-          </div>
-          ${!isGuest ? `
-            <div>
-              <button id="close-matchday-btn" class="btn-primary btn-danger" style="font-size: 0.8rem; padding: 0.55rem 1.1rem; font-weight: 700; border: 2.5px solid #000; box-shadow: 2px 2px 0px #000; border-radius: 6px;">
-                Cerrar Votación Global
-              </button>
-            </div>
-          ` : ''}
+        <div style="margin-bottom: 1.5rem;">
+          <h1 class="gradient-text-gold" style="font-size: 1.65rem; font-weight: 900; display: flex; align-items: center; gap: 0.5rem;">
+            El Bufón de la Corte
+          </h1>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">
+            Votación global al futbolista de LaLiga con la actuación más cómica o desastrosa en la <strong>Jornada ${currentMatchday}</strong>.
+          </p>
         </div>
 
         <div class="dashboard-grid">
@@ -723,21 +723,6 @@ export function renderBufon(container, callbacks) {
         if (!name) return;
         
         handleNominate(name, team, reason);
-      });
-    }
-
-    // Hook Close Matchday button
-    const closeBtn = container.querySelector('#close-matchday-btn');
-    if (closeBtn) {
-      closeBtn.addEventListener('click', () => {
-        if (isGuest) {
-          callbacks.showToast('Inicia sesión para cerrar la jornada', 'warning');
-          callbacks.onNavigate('acceso');
-          return;
-        }
-        if (confirm(`¿Estás seguro de que quieres cerrar la Jornada ${currentMatchday}? Esto registrará al bufón ganador en el histórico global y limpiará las nominaciones para la Jornada ${currentMatchday + 1}.`)) {
-          closeMatchday();
-        }
       });
     }
 
