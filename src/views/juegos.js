@@ -136,13 +136,11 @@ export function renderJuegos(container, callbacks) {
           <!-- Mini duel preview -->
           <div style="width: 100%; height: 160px; border-bottom: 3px solid #000000; background: var(--bg-obsidian); display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 1rem; box-sizing: border-box;">
             <div style="flex: 1; background: var(--bg-card); border: 1.5px solid var(--border-color); border-radius: 6px; padding: 0.5rem 0.25rem; text-align: center; box-shadow: 2px 2px 0px #000;">
-              <div style="font-size: 1rem; line-height: 1;">🇦🇷</div>
               <div style="font-size: 0.6rem; font-weight: 800; color: var(--text-light); margin: 0.2rem 0; line-height: 1.1;">Messi</div>
               <div style="font-size: 0.85rem; font-weight: 900; color: var(--accent); line-height: 1;">474</div>
             </div>
             <div style="font-family: var(--font-display); font-weight: 900; font-size: 0.75rem; color: var(--text-muted); letter-spacing: 1px; flex-shrink: 0;">VS</div>
             <div style="flex: 1; background: var(--bg-card); border: 1.5px solid var(--accent); border-radius: 6px; padding: 0.5rem 0.25rem; text-align: center; box-shadow: 2px 2px 0px #000;">
-              <div style="font-size: 1rem; line-height: 1;">🇵🇹</div>
               <div style="font-size: 0.6rem; font-weight: 800; color: var(--text-light); margin: 0.2rem 0; line-height: 1.1;">Cristiano</div>
               <div style="font-size: 0.85rem; font-weight: 900; color: var(--text-muted); line-height: 1;">???</div>
             </div>

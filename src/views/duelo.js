@@ -1,5 +1,6 @@
 import { LALIGA_TOPICS_DB } from '../utils/topics-db.js';
 import { escapeHTML } from '../utils/security.js';
+import { buildMarketValueTopics } from '../utils/dynamic-value-topics.js';
 
 const STATS_KEY = 'CF_DUELO_STATS';
 const REVEAL_MS = 1600;
@@ -26,31 +27,61 @@ function unitOf(info) {
  * Only topics that are genuine descending numeric rankings can produce a fair duel.
  * Requiring the parsed numbers to descend with the rank also proves we parsed the
  * metric the list is actually ordered by, so lists ("Ganadores del Balón de Oro")
- * and compound stats ("2 ligas / 3 copas") are dropped.
+ * and compound stats ("2 ligas / 3 copas") are dropped. Returns null if `t` doesn't
+ * qualify.
  */
-function buildTopics() {
+function toRankingTopic(t) {
+  const answers = t.answers || [];
+  if (answers.length < 4) return null;
+
+  // Dynamic topics (e.g. market-value rankings) carry a precomputed numeric
+  // `value` per answer, which is more reliable than re-parsing `info` text.
+  const values = answers.map(a => (typeof a.value === 'number' ? a.value : parseNum(a.info)));
+  if (values.some(v => v === null || v === undefined)) return null;
+  if (!values.every((v, i) => i === 0 || values[i - 1] >= v)) return null;
+  if (new Set(values).size < 4) return null;
+
+  return {
+    title: t.title,
+    badge: t.badgeTitle || 'RANKING',
+    unit: t.unit || unitOf(answers[0].info),
+    entries: answers.map((a, i) => ({
+      name: a.name,
+      info: a.info,
+      value: values[i]
+    }))
+  };
+}
+
+/**
+ * Combines the static topic set with live market-value rankings (same source
+ * "LaLiga Top 10" uses), filtered down to genuine numeric rankings.
+ * Deduplicates by the actual set of names in each topic — not just by
+ * title — since the bundled dataset has some topics repeated under
+ * slightly different titles/badges with identical content.
+ */
+async function buildTopics() {
   const out = [];
-  for (const t of LALIGA_TOPICS_DB) {
-    const answers = t.answers || [];
-    if (answers.length < 4) continue;
+  const seenSignatures = new Set();
 
-    const values = answers.map(a => parseNum(a.info));
-    if (values.some(v => v === null)) continue;
-    if (!values.every((v, i) => i === 0 || values[i - 1] >= v)) continue;
-    if (new Set(values).size < 4) continue;
+  const addIfNew = (t) => {
+    const ranking = toRankingTopic(t);
+    if (!ranking) return;
+    const signature = ranking.entries.map(e => e.name).sort().join('|');
+    if (seenSignatures.has(signature)) return;
+    seenSignatures.add(signature);
+    out.push(ranking);
+  };
 
-    out.push({
-      title: t.title,
-      badge: t.badgeTitle || 'RANKING',
-      unit: unitOf(answers[0].info),
-      entries: answers.map((a, i) => ({
-        name: a.name,
-        flag: a.flag || '',
-        info: a.info,
-        value: values[i]
-      }))
-    });
+  LALIGA_TOPICS_DB.forEach(addIfNew);
+
+  try {
+    const { topics: dynamicTopics } = await buildMarketValueTopics();
+    dynamicTopics.forEach(addIfNew);
+  } catch (_) {
+    // Live data unavailable — the static topics are still enough to play.
   }
+
   return out;
 }
 
@@ -87,8 +118,15 @@ function shuffle(arr) {
  * @param {Object} callbacks
  * @param {Function} callbacks.onNavigate
  */
-export function renderDuelo(container, callbacks) {
-  const topics = buildTopics();
+export async function renderDuelo(container, callbacks) {
+  container.innerHTML = `
+    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 300px; width: 100%;">
+      <div class="loader" style="border: 4px solid rgba(255,255,255,0.1); border-left-color: var(--primary-green); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite;"></div>
+      <p style="margin-top: 1rem; color: var(--text-muted); font-size: 0.9rem; font-weight: 600;">Cargando categorías...</p>
+    </div>
+  `;
+
+  const topics = await buildTopics();
   let stats = loadStats();
 
   let streak = 0;
@@ -231,7 +269,6 @@ export function renderDuelo(container, callbacks) {
         box-shadow: ${glow};
         transition: border-color 0.25s ease, box-shadow 0.25s ease;
       ">
-        <div style="font-size: 1.6rem; line-height: 1; margin-bottom: 0.4rem;">${escapeHTML(entry.flag)}</div>
         <div style="font-family: var(--font-display); font-weight: 900; font-size: 1.05rem; color: var(--text-light); line-height: 1.15; margin-bottom: 0.5rem;">
           ${escapeHTML(entry.name)}
         </div>
@@ -308,7 +345,6 @@ export function renderDuelo(container, callbacks) {
     const isRecord = newRecord;
     return `
       <div style="text-align: center; padding: 0.5rem 0 0;">
-        <div style="font-size: 3rem; line-height: 1; margin-bottom: 0.5rem;">${isRecord ? '🏆' : '💀'}</div>
         <h2 style="font-family: var(--font-display); font-weight: 900; font-size: 1.4rem; color: var(--text-light); text-transform: uppercase; margin-bottom: 0.35rem;">
           ${isRecord ? '¡Nuevo récord!' : 'Fin del duelo'}
         </h2>

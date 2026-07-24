@@ -400,7 +400,7 @@ export const LALIGA_TOPICS_DB = [
   },
   {
     "title": "Jugadores con Más Partidos en la Selección Española",
-    "badgeTitle": "PARTIDOS SELECCIÓN",
+    "badgeTitle": "MÁS PARTIDOS SELECCIÓN",
     "answers": [
       {
         "name": "Sergio Ramos",
