@@ -1965,7 +1965,6 @@ input, select, textarea, button {
   gap: 1.5rem;
   justify-content: center;
   align-items: center;
-  margin: 0 auto; /* Center navigation on desktop */
 }
 
 .header-nav-link {
@@ -1974,6 +1973,7 @@ input, select, textarea, button {
   font-family: var(--font-sans);
   font-size: 0.85rem;
   font-weight: 800;
+  white-space: nowrap;
   color: var(--text-muted);
   cursor: pointer;
   padding: 0.5rem 1rem;
@@ -1997,8 +1997,23 @@ input, select, textarea, button {
 }
 
 @media (min-width: 768px) {
+  .top-header {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+  }
+
+  .header-left {
+    justify-self: start;
+  }
+
   .header-nav {
     display: flex;
+  }
+
+  .header-right {
+    justify-self: end;
+    margin-left: 0;
   }
 }
 
