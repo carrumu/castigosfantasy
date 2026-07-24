@@ -119,6 +119,7 @@ export function renderDuelo(container, callbacks) {
   let newCategory = false;
   let newRecord = false;
   let locked = false;
+  let revealTimeout = null;
 
   if (topics.length === 0) {
     container.innerHTML = `
@@ -178,7 +179,8 @@ export function renderDuelo(container, callbacks) {
     phase = 'reveal';
     render();
 
-    setTimeout(() => {
+    revealTimeout = setTimeout(() => {
+      revealTimeout = null;
       if (lastCorrect) {
         streak += 1;
         // Persist the record as soon as it grows, so leaving mid-run never loses it.
@@ -384,4 +386,17 @@ export function renderDuelo(container, callbacks) {
 
   startTopic();
   render();
+
+  // Custom cleanup when view gets destroyed/unmounted (prevent the reveal
+  // timeout from firing render() on a detached container after navigating away)
+  const observer = new MutationObserver(() => {
+    if (!document.body.contains(container)) {
+      if (revealTimeout) {
+        clearTimeout(revealTimeout);
+        revealTimeout = null;
+      }
+      observer.disconnect();
+    }
+  });
+  observer.observe(document.body, { childList: true, subtree: true });
 }

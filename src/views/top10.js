@@ -3,6 +3,7 @@ import { LALIGA_TOPICS_DB } from '../utils/topics-db';
 import { LALIGA_PLAYERS_DB } from '../utils/players-db';
 import { supabase } from '../supabase';
 import { escapeHTML } from '../utils/security';
+import { resolveDailyChallenge } from '../utils/daily-challenge';
 
 function parseMarketValue(valStr) {
   if (!valStr || valStr === '-') return 0;
@@ -135,7 +136,6 @@ export async function renderTop10(container, callbacks) {
   }
 
   let activeTopic = null; // Topic object from LALIGA_TOPICS_DB or dynamic
-  let topicIndex = -1;
   let guessedIndices = new Set();
   let surrendered = false;
   let dailyNumber = 0;
@@ -154,33 +154,23 @@ export async function renderTop10(container, callbacks) {
     return `${yyyy}-${mm}-${dd}`;
   };
 
-  // Helper: Get Daily Topic from date seed
-  const getDailyTopic = () => {
-    const gameDateStr = getGameDateString();
-    const gameDate = new Date(gameDateStr + "T00:00:00Z"); // Use UTC midnight of the game date
-    const epoch = new Date(Date.UTC(2026, 0, 1)); // Reference point: Jan 1, 2026 UTC
-    
-    const diffDays = Math.floor((gameDate.getTime() - epoch.getTime()) / (1000 * 60 * 60 * 24));
-    
-    // Support wrap-around for index if dates exceed DB length
-    const index = Math.abs(diffDays) % combinedTopics.length;
-    return {
-      topic: combinedTopics[index],
-      index: index,
-      number: diffDays + 1
-    };
-  };
-
-  // Initialize Daily Game State
-  function initGame() {
+  // Initialize Daily Game State. The topic is pinned in Supabase the first
+  // time anyone loads it that day (see resolveDailyChallenge), so every
+  // player gets the same Top 10 even if their own combinedTopics list
+  // (partly built from live market-value data) ends up slightly different.
+  async function initGame() {
     const gameDateStr = getGameDateString();
     const savedState = JSON.parse(localStorage.getItem('CF_TOP10_DAILY_STATE') || 'null');
-    const dailyInfo = getDailyTopic();
-    activeTopic = dailyInfo.topic;
-    topicIndex = dailyInfo.index;
-    dailyNumber = dailyInfo.number;
 
-    if (savedState && savedState.date === gameDateStr && savedState.topicIndex === topicIndex) {
+    const gameDate = new Date(gameDateStr + "T00:00:00Z"); // Use UTC midnight of the game date
+    const epoch = new Date(Date.UTC(2026, 0, 1)); // Reference point: Jan 1, 2026 UTC
+    const diffDays = Math.floor((gameDate.getTime() - epoch.getTime()) / (1000 * 60 * 60 * 24));
+    dailyNumber = diffDays + 1;
+
+    const localIndex = Math.abs(diffDays) % combinedTopics.length;
+    activeTopic = await resolveDailyChallenge('top10', gameDateStr, dailyNumber, () => combinedTopics[localIndex]);
+
+    if (savedState && savedState.date === gameDateStr) {
       guessedIndices = new Set(savedState.guessedIndices || []);
       surrendered = savedState.surrendered || false;
     } else {
@@ -195,7 +185,6 @@ export async function renderTop10(container, callbacks) {
     const gameDateStr = getGameDateString();
     localStorage.setItem('CF_TOP10_DAILY_STATE', JSON.stringify({
       date: gameDateStr,
-      topicIndex: topicIndex,
       guessedIndices: Array.from(guessedIndices),
       surrendered: surrendered
     }));
@@ -433,11 +422,20 @@ export async function renderTop10(container, callbacks) {
 ${emojiBlock}
 Juega en Castigos Fantasy`;
 
-    navigator.clipboard.writeText(text).then(() => {
-      callbacks.showToast('¡Resultados copiados al portapapeles!', 'success');
-    }).catch(err => {
-      callbacks.showToast('No se pudo copiar al portapapeles', 'error');
-    });
+    if (navigator.share) {
+      // Opens the device's native share sheet. Ignore rejections here: they
+      // just mean the user closed the sheet without picking anything.
+      navigator.share({ text }).catch(() => {});
+      return;
+    }
+
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text).then(() => {
+        callbacks.showToast('¡Resultados copiados al portapapeles!', 'success');
+      }).catch(() => {
+        callbacks.showToast('No se pudo copiar al portapapeles', 'error');
+      });
+    }
   }
 
   function showVictoryEffects() {
@@ -711,7 +709,7 @@ Juega en Castigos Fantasy`;
   }
 
   // Initialize and run
-  initGame();
+  await initGame();
   renderGameBoard();
 
   // Custom cleanup when view gets destroyed/unmounted (prevent autocomplete memory leaks)

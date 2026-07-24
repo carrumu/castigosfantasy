@@ -1,4 +1,5 @@
 import { supabase } from '../supabase';
+import { resolveDailyChallenge } from '../utils/daily-challenge';
 
 /**
  * Helper to remove accents and special characters
@@ -132,19 +133,6 @@ export async function renderMinigame(container, callbacks) {
     return Math.floor(diffTime / (1000 * 60 * 60 * 24));
   };
 
-  // Helper: Get Daily Player from date seed
-  const getDailyPlayer = () => {
-    const epoch = new Date(2026, 0, 1).getTime(); // Reference point: Jan 1, 2026
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const diffDays = Math.floor((today.getTime() - epoch) / (1000 * 60 * 60 * 24));
-    const index = Math.abs(diffDays) % LALIGA_PLAYERS.length;
-    return {
-      name: LALIGA_PLAYERS[index],
-      number: diffDays + 1
-    };
-  };
-
   // State
   let secretPlayer = "";
   let guesses = [];
@@ -153,13 +141,25 @@ export async function renderMinigame(container, callbacks) {
   let dailyNumber = 0;
   let activeModal = null;
 
-  // Initialize Daily Game State
-  function initGame() {
+  // Initialize Daily Game State. The secret word is pinned in Supabase the
+  // first time anyone loads it that day (see resolveDailyChallenge), so
+  // every player gets the same word even if their own LALIGA_PLAYERS list
+  // (recomputed live from market values) ends up slightly different.
+  async function initGame() {
     const todayStr = getDateString();
     const savedState = JSON.parse(localStorage.getItem('CF_WORDLE_DAILY_STATE') || 'null');
-    const dailyInfo = getDailyPlayer();
-    secretPlayer = dailyInfo.name;
-    dailyNumber = dailyInfo.number;
+
+    const epoch = new Date(2026, 0, 1).getTime(); // Reference point: Jan 1, 2026
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const diffDays = Math.floor((today.getTime() - epoch) / (1000 * 60 * 60 * 24));
+    dailyNumber = diffDays + 1;
+
+    const localIndex = Math.abs(diffDays) % LALIGA_PLAYERS.length;
+    const payload = await resolveDailyChallenge('wordle', todayStr, dailyNumber, () => ({
+      secretPlayer: LALIGA_PLAYERS[localIndex]
+    }));
+    secretPlayer = payload.secretPlayer;
 
     // Calculate and verify streak cooldown (must be strictly consecutive, max 1 day difference)
     const lastWonStr = localStorage.getItem('CF_WORDLE_LAST_WON_DATE');
@@ -325,7 +325,7 @@ export async function renderMinigame(container, callbacks) {
         return;
       }
 
-      if (!LALIGA_PLAYERS.includes(currentGuess)) {
+      if (currentGuess !== secretPlayer && !LALIGA_PLAYERS.includes(currentGuess)) {
         callbacks.showToast('Ese nombre no está en la lista', 'info');
         shakeActiveRow();
         return;
@@ -428,6 +428,14 @@ export async function renderMinigame(container, callbacks) {
 
   function handleShareClick() {
     const shareText = getShareText();
+
+    if (navigator.share) {
+      // Opens the device's native share sheet. Ignore rejections here: they
+      // just mean the user closed the sheet without picking anything.
+      navigator.share({ text: shareText }).catch(() => {});
+      return;
+    }
+
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(shareText)
         .then(() => {
@@ -854,7 +862,7 @@ export async function renderMinigame(container, callbacks) {
   }
 
   // Initialize daily game
-  initGame();
+  await initGame();
   renderView();
 
   // Attach and detach keydown listener correctly
