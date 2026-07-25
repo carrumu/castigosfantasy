@@ -6,7 +6,7 @@
 const seoMap = {
   'inicio': {
     title: 'Gestor de Castigos y Ligas Fantasy | CastigosFantasy',
-    description: 'Organiza tu liga Biwenger o Fantasy, gestiona botes de dinero y aplica castigos aleatorios con la ruleta de morosos. Disfruta con tus amigos.',
+    description: 'Organiza tu liga de Biwenger, Comunio o LaLiga Fantasy, gestiona el bote y aplica castigos aleatorios con la ruleta de morosos. Disfruta con tus amigos.',
     schemaType: 'WebApplication'
   },
   'acceso': {
@@ -111,8 +111,11 @@ const seoMap = {
   }
 };
 
-export function setSEO(view) {
-  const seoData = seoMap[view] || seoMap['inicio'];
+export function setSEO(view, overrides = null) {
+  // `overrides` permite SEO por página dentro de una misma vista (p.ej. cada
+  // artículo de /guias/<slug>): { title, description, path, schemaType }.
+  const base = seoMap[view] || seoMap['inicio'];
+  const seoData = overrides ? { ...base, ...overrides } : base;
 
   // Update Title
   document.title = seoData.title;
@@ -142,7 +145,7 @@ export function setSEO(view) {
     canonicalTag.setAttribute('rel', 'canonical');
     document.head.appendChild(canonicalTag);
   }
-  const cleanPath = view === 'inicio' ? '' : view;
+  const cleanPath = seoData.path !== undefined ? seoData.path : (view === 'inicio' ? '' : view);
   canonicalTag.setAttribute('href', `https://castigosfantasy.com/${cleanPath}`);
 
   // Dynamic JSON-LD (SEO/AEO)

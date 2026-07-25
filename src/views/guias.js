@@ -1,22 +1,30 @@
 /**
- * "Guías" — a long-form, text-first resource page.
+ * "Guías" — recurso de contenido, orientado a texto y SEO.
  *
- * Its job is to give Google (and AdSense) substantial, original content that is
- * genuinely useful to someone arriving from search about fantasy punishments,
- * Biwenger, the common pot, etc. One rich URL with several full articles and a
- * table of contents.
+ * Antes era UNA sola URL (/guias) con todas las guías apiladas. Ahora es un
+ * hub: /guias lista las guías y cada una vive en su propia URL
+ * (/guias/<slug>). Esto multiplica el contenido rastreable (una página por
+ * tema, cada una enfocada a su keyword) en vez de tener un único documento
+ * gigante, que es justo lo que buscan Google y AdSense.
+ *
+ * El enrutado (src/main.js) pasa `slug`:
+ *   - sin slug  -> render del índice (hub)
+ *   - con slug  -> render del artículo individual
+ * El SEO por artículo (título + meta) lo aplica setSEO() en main.js leyendo
+ * getGuideBySlug().
  */
 
-const H2 = 'font-family:var(--font-display);font-weight:900;font-size:1.5rem;text-transform:uppercase;line-height:1.1;margin:2.75rem 0 0.5rem;color:var(--text-light);scroll-margin-top:90px;';
+const H2 = 'font-family:var(--font-display);font-weight:900;font-size:1.5rem;text-transform:uppercase;line-height:1.1;margin:2.25rem 0 0.5rem;color:var(--text-light);scroll-margin-top:90px;';
 const H3 = 'font-family:var(--font-display);font-weight:800;font-size:1.05rem;text-transform:uppercase;margin:1.5rem 0 0.5rem;color:var(--accent-gold,#deed00);';
 const P = 'margin:0 0 1rem;';
 const UL = 'margin:0 0 1rem;padding-left:1.25rem;';
 const LI = 'margin-bottom:0.45rem;';
 
-const GUIDES = [
+export const GUIDES = [
   {
     id: 'ideas-de-castigos',
     title: 'Ideas de castigos para el último de tu liga fantasy',
+    description: 'Más de 20 ideas de castigos para el farolillo rojo de tu liga fantasy: dentro del juego, en redes, prendas y para el bote común. De lo más suave a lo más cruel.',
     html: `
       <p style="${P}">Aportar al bote y poco más se queda corto enseguida. El buen castigo pica sin hacer daño, da para meme en el grupo y, a ser posible, duele dentro del propio fantasy. Aquí tienes ideas concretas, ordenadas de más suave a más cruel. Puedes sortearlas con la <a href="/ruleta" class="cf-link" data-nav="ruleta" style="color:var(--accent);">Ruleta de Sentencias</a> o dejar que el <a href="/generador" class="cf-link" data-nav="generador" style="color:var(--accent);">Generador de Castigos</a> te proponga una al momento.</p>
 
@@ -68,6 +76,7 @@ const GUIDES = [
   {
     id: 'farolillo-rojo-biwenger',
     title: 'El farolillo rojo: quién queda último cada jornada (y cómo detectarlo)',
+    description: 'Qué es el farolillo rojo en el fantasy, por qué gestionarlo a mano es un lío y cómo detectar automáticamente al colista de cada jornada en Biwenger.',
     html: `
       <p style="${P}">En el argot del fantasy, el "farolillo rojo" es el que va colista, el que menos puntos ha hecho en la jornada. Es el protagonista involuntario de los castigos: sobre él recae la penitencia o la aportación al bote.</p>
 
@@ -84,6 +93,7 @@ const GUIDES = [
   {
     id: 'gestionar-el-bote',
     title: 'Cómo gestionar el bote de tu liga fantasy sin discusiones',
+    description: 'Cómo llevar el bote común de tu liga fantasy con reglas claras, control automático de deudas y transparencia para que nadie discuta y el dinero llegue entero a final de temporada.',
     html: `
       <p style="${P}">El bote común es una de las mejores tradiciones del fantasy entre amigos: cada jornada, el que pierde aporta, y al final de la temporada se hace algo con el dinero (una comida, un premio para el campeón, etc.). El problema es llevar las cuentas de forma clara para que nadie discuta.</p>
 
@@ -104,6 +114,7 @@ const GUIDES = [
   {
     id: 'biwenger-comunio-laliga-fantasy',
     title: 'Castigos en Biwenger, Comunio o LaLiga Fantasy: ¿es lo mismo?',
+    description: '¿Funcionan igual los castigos en Biwenger, Comunio y LaLiga Fantasy? Qué comparten todas las plataformas y en qué se diferencian a la hora de sincronizar tu liga.',
     html: `
       <p style="${P}">Una duda habitual al empezar: ¿los castigos funcionan igual en todas las plataformas de fantasy? La respuesta corta es sí. El concepto de "el último paga" existe igual en Biwenger, Comunio, LaLiga Fantasy, Mister o cualquier otra. Lo único que cambia es de dónde se importa la clasificación.</p>
 
@@ -124,6 +135,7 @@ const GUIDES = [
   {
     id: 'como-elegir-capitan',
     title: 'Cómo elegir capitán en tu liga fantasy (y no fallar cada jornada)',
+    description: 'La capitanía dobla puntos y decide tu jornada. Cómo elegir capitán mirando el rival, la titularidad y el calendario, y cuándo arriesgar con un diferencial.',
     html: `
       <p style="${P}">La capitanía dobla los puntos de un jugador, así que es la decisión que más pesa cada jornada. Acertar con el capitán es, muchas veces, la diferencia entre ser el líder o acabar de farolillo rojo pagando el bote.</p>
 
@@ -140,6 +152,7 @@ const GUIDES = [
   {
     id: 'encontrar-chollos',
     title: 'Chollos en el fantasy: cómo encontrar jugadores baratos que puntúan',
+    description: 'Cómo encontrar chollos en el fantasy: recién ascendidos, titularidad por encima del nombre, defensas de equipos sólidos y por qué hay que reaccionar rápido.',
     html: `
       <p style="${P}">Un chollo es ese jugador barato que rinde muy por encima de su precio y te libera dinero para reforzar el resto del equipo. Encontrarlos a tiempo es lo que separa a los mánagers que pelean arriba de los que se quedan enganchados a fichajes caros que no rinden.</p>
 
@@ -159,6 +172,7 @@ const GUIDES = [
   {
     id: 'clausulas-de-rescision',
     title: 'Cláusulas de rescisión: cómo usarlas (y cómo protegerte)',
+    description: 'Cómo usar las cláusulas de rescisión en el fantasy: cuándo lanzar una, cómo proteger a tus mejores jugadores y por qué vigilar el saldo del resto del grupo.',
     html: `
       <p style="${P}">En muchas ligas fantasy puedes fichar a un jugador de otro mánager pagando su cláusula de rescisión, aunque no esté en venta. Es una de las mecánicas más divertidas y polémicas, y saber manejarla te da ventaja tanto para atacar como para defender tu plantilla.</p>
 
@@ -175,6 +189,7 @@ const GUIDES = [
   {
     id: 'errores-manager-novato',
     title: '7 errores típicos del mánager novato en el fantasy',
+    description: 'Los 7 errores más comunes del mánager novato en el fantasy: gastar en tres cracks, fichar por nombre, olvidar alinear, ignorar el calendario y más.',
     html: `
       <p style="${P}">Todos hemos empezado cometiendo los mismos fallos. Si es tu primera temporada (o quieres dejar de ser el farolillo rojo del grupo), evita estos errores clásicos y notarás la diferencia enseguida.</p>
 
@@ -195,6 +210,7 @@ const GUIDES = [
   {
     id: 'mantener-viva-la-liga',
     title: 'Cómo mantener viva tu liga fantasy hasta la última jornada',
+    description: 'Ideas para que tu liga fantasy no se apague: castigos al último, premios paralelos, minirretos y mantener vivo el grupo de WhatsApp hasta la última jornada.',
     html: `
       <p style="${P}">El mayor enemigo de una liga entre amigos no es el rival: es el abandono. Cuando alguien se descuelga en la clasificación, deja de alinear, y poco a poco la liga pierde chispa. Estas ideas mantienen a todo el grupo enganchado hasta el final.</p>
 
@@ -217,60 +233,93 @@ const GUIDES = [
   }
 ];
 
-export function renderGuias(container, { onNavigate } = {}) {
-  const toc = GUIDES.map(g => `
-    <li style="${LI}"><a href="#${g.id}" class="cf-toc" data-id="${g.id}" style="color:var(--accent);">${g.title}</a></li>
-  `).join('');
+export function getGuideBySlug(slug) {
+  return GUIDES.find(g => g.id === slug) || null;
+}
 
-  const articles = GUIDES.map(g => `
-    <article style="border-top:1px solid var(--border-color);padding-top:0.5rem;">
-      <h2 id="${g.id}" style="${H2}">${g.title}</h2>
-      ${g.html}
-    </article>
+const BACK_ARROW = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>';
+
+const CTA_BLOCK = `
+  <div style="border-top:1px solid var(--border-color);margin-top:2.5rem;padding-top:1.5rem;text-align:center;">
+    <p style="${P}color:var(--text-muted);">¿Listo para empezar? Crea tu liga gratis y deja de perseguir a tus amigos por WhatsApp.</p>
+    <button class="cf-link" data-nav="acceso" style="font-family:var(--font-display);font-weight:900;text-transform:uppercase;background:var(--accent);color:#000;border:3px solid #000;padding:0.75rem 1.75rem;cursor:pointer;box-shadow:4px 4px 0 #000;">Crea tu liga gratis</button>
+  </div>
+`;
+
+function renderHub(container) {
+  const cards = GUIDES.map(g => `
+    <a href="/guias/${g.id}" class="cf-guide-card cf-link" data-nav="guias/${g.id}" style="display:block;text-decoration:none;background:var(--bg-card);border:1px solid var(--border-color);border-radius:12px;padding:1.25rem 1.35rem;transition:transform 0.15s ease,border-color 0.15s ease;">
+      <h2 style="font-family:var(--font-display);font-weight:800;font-size:1.15rem;text-transform:uppercase;line-height:1.15;margin:0 0 0.4rem;color:var(--text-light);">${g.title}</h2>
+      <p style="margin:0 0 0.6rem;font-size:0.9rem;line-height:1.55;color:var(--text-muted);">${g.description}</p>
+      <span style="font-family:var(--font-display);font-weight:800;font-size:0.85rem;text-transform:uppercase;color:var(--accent);">Leer guía →</span>
+    </a>
   `).join('');
 
   container.innerHTML = `
     <div class="content-page" style="max-width: 820px; margin: 0 auto; padding: 1rem 0 3rem;">
-      <a id="content-back" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--text-muted);font-size:0.85rem;font-weight:700;cursor:pointer;margin-bottom:1.25rem;">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
-        Volver
+      <a id="content-back" data-nav="inicio" class="cf-link" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--text-muted);font-size:0.85rem;font-weight:700;cursor:pointer;margin-bottom:1.25rem;">
+        ${BACK_ARROW} Volver al inicio
       </a>
 
       <h1 style="font-family:var(--font-display);font-weight:900;font-size:2rem;text-transform:uppercase;line-height:1.05;margin-bottom:0.4rem;">Guías de Castigos Fantasy</h1>
-      <p style="color:var(--text-muted);font-size:0.95rem;margin-bottom:1.5rem;line-height:1.6;">Ideas de castigos, capitanías, chollos, cláusulas, errores de novato y cómo llevar el bote de tu liga. Guías prácticas para dominar tu liga fantasy de Biwenger, Comunio o LaLiga Fantasy y mantener a tus amigos enganchados hasta la última jornada.</p>
+      <p style="color:var(--text-muted);font-size:0.95rem;margin-bottom:1.75rem;line-height:1.6;">Ideas de castigos, capitanías, chollos, cláusulas, errores de novato y cómo llevar el bote de tu liga. Guías prácticas para dominar tu liga fantasy de Biwenger, Comunio o LaLiga Fantasy y mantener a tus amigos enganchados hasta la última jornada.</p>
 
-      <nav style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:10px;padding:1rem 1.25rem;margin-bottom:1rem;">
-        <strong style="display:block;font-family:var(--font-display);text-transform:uppercase;font-size:0.8rem;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:0.5rem;">En esta página</strong>
-        <ul style="margin:0;padding-left:1.1rem;font-size:0.9rem;line-height:1.7;">${toc}</ul>
-      </nav>
-
-      <div class="content-body" style="font-size:0.95rem;line-height:1.7;color:var(--text-light);">
-        ${articles}
+      <div class="cf-guides-grid" style="display:grid;grid-template-columns:1fr;gap:1rem;">
+        ${cards}
       </div>
 
-      <div style="border-top:1px solid var(--border-color);margin-top:2.5rem;padding-top:1.5rem;text-align:center;">
-        <p style="${P}color:var(--text-muted);">¿Listo para empezar? Crea tu liga gratis y deja de perseguir a tus amigos por WhatsApp.</p>
-        <button class="cf-link" data-nav="acceso" style="font-family:var(--font-display);font-weight:900;text-transform:uppercase;background:var(--accent);color:#000;border:3px solid #000;padding:0.75rem 1.75rem;cursor:pointer;box-shadow:4px 4px 0 #000;">Crea tu liga gratis</button>
-      </div>
+      ${CTA_BLOCK}
     </div>
   `;
+}
 
-  container.querySelector('#content-back')?.addEventListener('click', () => {
-    if (window.history.length > 1) window.history.back();
-    else onNavigate?.('inicio');
-  });
+function renderArticle(container, guide) {
+  // Otras guías (para enlazado interno): todas menos la actual.
+  const related = GUIDES.filter(g => g.id !== guide.id).slice(0, 4).map(g => `
+    <li style="${LI}"><a href="/guias/${g.id}" class="cf-link" data-nav="guias/${g.id}" style="color:var(--accent);">${g.title}</a></li>
+  `).join('');
 
-  // Smooth-scroll for the table of contents.
-  container.querySelectorAll('.cf-toc').forEach(a => {
-    a.addEventListener('click', (e) => {
+  container.innerHTML = `
+    <div class="content-page" style="max-width: 820px; margin: 0 auto; padding: 1rem 0 3rem;">
+      <a id="content-back" data-nav="guias" class="cf-link" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--text-muted);font-size:0.85rem;font-weight:700;cursor:pointer;margin-bottom:1.25rem;">
+        ${BACK_ARROW} Todas las guías
+      </a>
+
+      <article>
+        <h1 style="font-family:var(--font-display);font-weight:900;font-size:2rem;text-transform:uppercase;line-height:1.08;margin-bottom:1rem;">${guide.title}</h1>
+        <div class="content-body" style="font-size:0.98rem;line-height:1.75;color:var(--text-light);">
+          ${guide.html}
+        </div>
+      </article>
+
+      <div style="border-top:1px solid var(--border-color);margin-top:2.5rem;padding-top:1.5rem;">
+        <h2 style="${H2}margin-top:0;">Sigue leyendo</h2>
+        <ul style="${UL}font-size:0.95rem;line-height:1.7;">${related}</ul>
+      </div>
+
+      ${CTA_BLOCK}
+    </div>
+  `;
+}
+
+export function renderGuias(container, { onNavigate, slug } = {}) {
+  const guide = slug ? getGuideBySlug(slug) : null;
+
+  if (guide) {
+    renderArticle(container, guide);
+  } else {
+    renderHub(container);
+  }
+
+  // Todos los enlaces/CTAs internos usan .cf-link con data-nav (incluye
+  // "guias/<slug>" para navegar entre artículos).
+  container.querySelectorAll('.cf-link').forEach(el => {
+    el.addEventListener('click', (e) => {
       e.preventDefault();
-      const el = container.querySelector('#' + a.dataset.id);
-      el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      onNavigate?.(el.dataset.nav);
     });
   });
 
-  // In-content CTAs that route into the app.
-  container.querySelectorAll('.cf-link').forEach(el => {
-    el.addEventListener('click', () => onNavigate?.(el.dataset.nav));
-  });
+  // Al entrar en un artículo o cambiar de guía, subir arriba del todo.
+  window.scrollTo({ top: 0, behavior: 'auto' });
 }

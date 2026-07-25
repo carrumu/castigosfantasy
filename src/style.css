@@ -240,6 +240,26 @@ input, select, textarea, button {
   transform: translate(4px, 4px);
 }
 
+/* Secondary ghost button in the guest header ("Entrar"): quiet, so the accent
+   "Crea tu liga" stays the single visual priority. */
+.nav-btn-ghost {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-family: var(--font-sans);
+  font-weight: 800;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 0.55rem 0.5rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: var(--transition-fast);
+}
+.nav-btn-ghost:hover {
+  color: var(--primary);
+}
+
 .header-action-btn {
   background: var(--bg-item-light);
   border: 3px solid #000000;
@@ -4519,4 +4539,25 @@ h1, h2, h3, h4, h5, h6, .card-title {
   line-height: 1.55;
   color: var(--text-light);
   margin-bottom: 0.4rem;
+}
+
+/* ===== Footer: enlaces a redes sociales (Instagram / TikTok) ===== */
+.footer-social-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border-color);
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: var(--transition-fast);
+}
+.footer-social-link:hover {
+  color: #000;
+  background: var(--accent);
+  border-color: #000;
+  transform: translateY(-2px);
+  box-shadow: 2px 2px 0 0 #000;
 }

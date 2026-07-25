@@ -23,7 +23,7 @@ import { renderPlayersHub } from './views/players_hub';
 import { renderLegal } from './views/legal';
 import { renderSeoHome, removeFaqSchema } from './views/seo-home';
 import { renderAbout, renderContacto } from './views/about';
-import { renderGuias } from './views/guias';
+import { renderGuias, getGuideBySlug } from './views/guias';
 
 // Initialize Theme (Force Dark Mode)
 document.body.classList.remove('light-theme');
@@ -34,6 +34,7 @@ const app = document.querySelector('#app');
 
 // State
 let currentView = 'inicio'; // 'inicio', 'muro', 'ruleta', 'retos', or 'acceso'
+let currentGuideSlug = null; // slug del artículo cuando la ruta es /guias/<slug>
 let preAuthView = 'mis-ligas'; // view to return to once login/signup from 'acceso' succeeds
 let supportBubblePos = null; // { left, top }
 
@@ -97,25 +98,32 @@ function renderMainLayout(isGuest, currentUser = null) {
             </div>
           </div>
           
-          <!-- Enlaces de navegación en cabecera (Escritorio) -->
+          <!-- Enlaces de navegación en cabecera (Escritorio).
+               El <nav> se mantiene siempre (aunque vacío) para conservar las 3
+               columnas del grid del header. Al visitante sin registrar no le
+               mostramos los destinos de la app: compiten con "Crea tu liga". -->
           <nav class="header-nav">
+            ${isGuest ? '' : `
             <button class="header-nav-link ${currentView === 'inicio' ? 'active' : ''}" data-nav="inicio">INICIO</button>
             <button class="header-nav-link ${currentView === 'herramientas' || currentView === 'ruleta' || currentView === 'generador' ? 'active' : ''}" data-nav="herramientas">SALA VAR</button>
             <button class="header-nav-link ${currentView === 'retos' ? 'active' : ''}" data-nav="retos">RETOS</button>
             <button class="header-nav-link ${currentView === 'comunidad' || currentView === 'bufon' || currentView === 'foro' ? 'active' : ''}" data-nav="comunidad">COMUNIDAD</button>
             <button class="header-nav-link ${currentView === 'juegos' || currentView === 'adivina-jugador' || currentView === 'top-10' || currentView === 'duelo' ? 'active' : ''}" data-nav="juegos">JUEGOS</button>
             <button class="header-nav-link ${currentView === 'mis-ligas' ? 'active' : ''}" data-nav="mis-ligas">MIS LIGAS</button>
+            `}
           </nav>
-          
+
           <div class="header-right">
             ${isGuest ? `
-              <button class="nav-btn-guest" id="nav-login-btn" title="Iniciar Sesión">
+              <button class="nav-btn-guest" id="nav-create-btn" title="Crea tu liga gratis">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
-                  <polyline points="10 17 15 12 10 7"></polyline>
-                  <line x1="15" y1="12" x2="3" y2="12"></line>
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
                 </svg>
-                <span class="nav-btn-text">INICIAR SESIÓN</span>
+                <span class="nav-btn-text">CREA TU LIGA</span>
+              </button>
+              <button class="nav-btn-ghost" id="nav-login-btn" title="Iniciar Sesión">
+                <span class="nav-btn-ghost-text">Entrar</span>
               </button>
             ` : `
               <button class="btn-profile-header" id="nav-profile-btn" title="Mi Perfil">
@@ -133,7 +141,22 @@ function renderMainLayout(isGuest, currentUser = null) {
         <main id="view-container" class="container"></main>
 
         <!-- Pie de página con enlaces legales (visible en todas las vistas) -->
-        <footer class="site-footer" style="border-top: 1px solid var(--border-color); margin-top: 2rem; padding: 1.5rem 1rem calc(1.5rem + 70px); text-align: center; color: var(--text-muted); font-size: 0.78rem; line-height: 1.6;">
+        <footer class="site-footer" style="border-top: 1px solid var(--border-color); margin-top: 2rem; padding: 1.5rem 1rem ${isGuest ? '1.5rem' : 'calc(1.5rem + 70px)'}; text-align: center; color: var(--text-muted); font-size: 0.78rem; line-height: 1.6;">
+          <!-- Redes sociales: enlaces externos a Instagram y TikTok (nueva pestaña). -->
+          <div class="footer-social" style="display: flex; justify-content: center; gap: 0.85rem; margin-bottom: 1rem;">
+            <a class="footer-social-link" href="https://www.instagram.com/castigosfantasyy.__/" target="_blank" rel="noopener noreferrer" aria-label="Síguenos en Instagram" title="Instagram">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+              </svg>
+            </a>
+            <a class="footer-social-link" href="https://www.tiktok.com/@castigosfantasy255" target="_blank" rel="noopener noreferrer" aria-label="Síguenos en TikTok" title="TikTok">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M16.6 5.82a4.28 4.28 0 0 1-1.05-2.82h-3.11v12.63a2.59 2.59 0 0 1-2.59 2.5 2.59 2.59 0 0 1-2.59-2.59 2.59 2.59 0 0 1 3.36-2.47V9.4a5.7 5.7 0 0 0-.77-.05A5.72 5.72 0 0 0 4.14 15.07a5.72 5.72 0 0 0 11.44 0V8.9a7.33 7.33 0 0 0 4.29 1.37V7.16a4.28 4.28 0 0 1-3.27-1.34z"></path>
+              </svg>
+            </a>
+          </div>
           <div style="margin-bottom: 0.5rem;">© 2026 CastigosFantasy · Ligas de fútbol fantasy entre amigos</div>
           <div style="display: flex; gap: 0.4rem 1rem; flex-wrap: wrap; justify-content: center; margin-bottom: 0.4rem;">
             <a class="legal-link" data-page="sobre-nosotros" style="color: var(--text-muted); cursor: pointer; font-weight: 600;">Sobre nosotros</a>
@@ -152,7 +175,10 @@ function renderMainLayout(isGuest, currentUser = null) {
         </footer>
       </div>
 
-      <!-- Navegación Inferior para Móvil -->
+      <!-- Navegación Inferior para Móvil.
+           Solo para usuarios logueados: el visitante sin registrar no la ve,
+           así la home no compite con el único objetivo (crear liga). -->
+      ${isGuest ? '' : `
       <nav class="mobile-bottom-nav">
         <!-- 1. Panel -->
         <button class="mobile-nav-item mobile-nav-main mobile-nav-panel ${currentView === 'inicio' ? 'active' : ''}" data-nav="inicio" title="Panel principal">
@@ -185,6 +211,7 @@ function renderMainLayout(isGuest, currentUser = null) {
           <span class="mobile-nav-label">RETOS</span>
         </button>
       </nav>
+      `}
 
     </div>
   `;
@@ -313,7 +340,7 @@ function renderMainLayout(isGuest, currentUser = null) {
   } else if (currentView === 'contacto') {
     renderContacto(viewContainer, { onNavigate: navigate });
   } else if (currentView === 'guias') {
-    renderGuias(viewContainer, { onNavigate: navigate });
+    renderGuias(viewContainer, { onNavigate: navigate, slug: currentGuideSlug });
   }
 
   // Hook Navigation Elements
@@ -344,6 +371,9 @@ function renderMainLayout(isGuest, currentUser = null) {
   
   if (isGuest) {
     app.querySelector('#nav-login-btn').addEventListener('click', () => {
+      navigate('acceso');
+    });
+    app.querySelector('#nav-create-btn')?.addEventListener('click', () => {
       navigate('acceso');
     });
     const bannerLink = app.querySelector('#banner-login-link');
@@ -598,6 +628,14 @@ function handleRouting() {
     view = 'inicio';
   }
 
+  // Segundo segmento de la ruta: solo lo usamos para las guías (/guias/<slug>).
+  // Si el slug no corresponde a ninguna guía, caemos al índice del hub.
+  let guide = null;
+  if (view === 'guias' && parts[1]) {
+    guide = getGuideBySlug(parts[1]);
+  }
+  currentGuideSlug = guide ? guide.id : null;
+
   // Remember where the user was before landing on the login/signup screen,
   // so a successful login returns them there instead of always to 'mis-ligas'.
   if (view === 'acceso' && currentView !== 'acceso') {
@@ -605,7 +643,16 @@ function handleRouting() {
   }
 
   currentView = view;
-  setSEO(currentView);
+  // SEO por artículo: cada guía tiene su propio título, meta y canonical.
+  if (guide) {
+    setSEO('guias', {
+      title: `${guide.title} | CastigosFantasy`,
+      description: guide.description,
+      path: `guias/${guide.id}`
+    });
+  } else {
+    setSEO(currentView);
+  }
   checkAuthAndRender();
 }
 

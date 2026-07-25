@@ -8,7 +8,7 @@
 
 const LAST_UPDATED = '11 de julio de 2026';
 const OWNER = 'Carlos Rubio Muriel';
-const EMAIL = 'carrumu05@gmail.com';
+const EMAIL = 'castigosfantasy2005@gmail.com';
 const SITE = 'castigosfantasy.com';
 
 export function renderLegal(container, { page = 'privacidad', onNavigate } = {}) {

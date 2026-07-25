@@ -3,4 +3,17 @@ Disallow: /mis-ligas
 Disallow: /menu-liga
 Disallow: /muro
 
+# Herramientas interactivas y menús sin contenido sustancial: no aportan
+# valor de indexación y diluyen la señal de "contenido de calidad" del
+# resto del sitio (ver public/sitemap.xml para las páginas de contenido real).
+Disallow: /ruleta
+Disallow: /juegos
+Disallow: /comunidad
+Disallow: /herramientas
+Disallow: /top-10
+Disallow: /generador
+Disallow: /bufon
+Disallow: /foro
+Disallow: /retos
+
 Sitemap: https://castigosfantasy.com/sitemap.xml

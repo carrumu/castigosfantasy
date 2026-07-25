@@ -129,9 +129,8 @@ export function renderSeoHome(container, { onNavigate } = {}) {
       <section class="brutalist-hero" style="margin-bottom:0;">
         <div class="seo-hero-copy">
           <h1 class="brutalist-hero-title" style="margin-bottom:0.75rem;">Que el último de tu liga no se escape</h1>
-          <p class="brutalist-hero-subtitle" style="margin-bottom:0.5rem;font-weight:700;color:var(--accent-gold);">Cada jornada hay un último. La pregunta es qué pasa después.</p>
           <p class="brutalist-hero-subtitle" style="margin-bottom:1.75rem;">
-            Tú sigues jugando en Biwenger o Comunio. Nosotros nos encargamos de que el último pague.
+            Tú sigues jugando en Biwenger, Comunio o LaLiga Fantasy. Nosotros nos encargamos de que <strong style="color:var(--accent-gold);font-weight:800;">el último pague</strong>.
           </p>
           ${heroCta}
           ${heroMicro}
