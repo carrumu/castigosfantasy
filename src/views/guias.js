@@ -88,6 +88,15 @@ export const GUIDES = [
 
       <h3 style="${H3}">¿Y si juego en Comunio o LaLiga Fantasy?</h3>
       <p style="${P}">El concepto de "el último paga" es idéntico en cualquier plataforma. Hoy la sincronización automática está activa con Biwenger; si tu liga juega en Comunio, LaLiga Fantasy o Mister, puedes seguir usando la app para gestionar el bote, sortear castigos y llevar el muro de la vergüenza, confirmando tú manualmente quién ha quedado último en un par de toques.</p>
+
+      <h3 style="${H3}">Por qué conviene darle bombo al farolillo rojo</h3>
+      <p style="${P}">Un farolillo rojo sin consecuencias es un farolillo rojo que pasa desapercibido, y ahí empieza el desinterés. Cuando quedar último tiene premio (un castigo, una prenda o una aportación al bote), el colista deja de ser una fila más de la tabla y se convierte en el protagonista de la semana. Ese pique es, muchas veces, lo que engancha más que la propia pelea por el título.</p>
+
+      <h3 style="${H3}">Farolillo rojo de la jornada vs. de la temporada</h3>
+      <p style="${P}">Conviene distinguir dos cosas. El farolillo rojo de la jornada es el que menos puntúa esa semana concreta: sobre él caen los castigos semanales. El farolillo rojo de la temporada es el que acaba último en la clasificación general, y suele reservarse para la humillación final del año. Muchas ligas premian (o castigan) los dos por separado para que nadie se relaje ni al principio ni al final.</p>
+
+      <h3 style="${H3}">Que no se pierda la cuenta</h3>
+      <p style="${P}">El clásico problema es que, tres jornadas después, ya nadie recuerda quién quedó último ni si cumplió. Llevar un registro (automático con Biwenger, o confirmado a mano en el resto) evita que el castigo quede en nada. Un farolillo rojo que sabe que va a quedar por escrito en el Muro de la Vergüenza se lo piensa dos veces antes de escaquearse.</p>
     `
   },
   {
@@ -109,6 +118,15 @@ export const GUIDES = [
 
       <h3 style="${H3}">Transparencia = menos discusiones</h3>
       <p style="${P}">Cuando el saldo del bote y las deudas de cada uno son visibles para toda la liga, se acaban las discusiones de "yo ya pagué" o "¿cuánto debía?". La transparencia es la mejor forma de que un bote entre amigos llegue entero al final de la temporada.</p>
+
+      <h3 style="${H3}">Decide qué hacer con el bote antes de discutirlo</h3>
+      <p style="${P}">La mayoría de las broncas por el bote no son por el dinero, sino por no haber acordado antes qué se hacía con él. Comida de fin de temporada, premio para el campeón, o repartir entre los tres primeros: da igual la fórmula, pero pactadla en la primera jornada y dejadla por escrito. Así, cuando llegue mayo, no hay debate.</p>
+
+      <h3 style="${H3}">El moroso: el gran enemigo del bote</h3>
+      <p style="${P}">En toda liga hay uno que siempre "ya te lo paso" y nunca lo pasa. La mejor defensa contra el moroso es la transparencia: si todo el grupo ve quién debe qué y desde cuándo, la presión social hace el trabajo sola. Nadie quiere ser el que aparece en rojo jornada tras jornada delante de sus amigos.</p>
+
+      <h3 style="${H3}">Aportaciones pequeñas y constantes</h3>
+      <p style="${P}">Un bote funciona mejor con cantidades pequeñas cada jornada que con multas grandes de vez en cuando. Un euro o dos por quedar último es asumible, mantiene el pique semanal y, sumado a lo largo de la temporada, da para un buen cierre. Las multas enormes solo consiguen que la gente se enfade y deje de pagar.</p>
     `
   },
   {
@@ -130,6 +148,15 @@ export const GUIDES = [
 
       <h3 style="${H3}">Marcas y afiliación</h3>
       <p style="${P}">Castigos Fantasy no está asociado ni patrocinado por Biwenger, Comunio, Mister ni LaLiga. Son marcas de sus respectivos titulares; nosotros solo añadimos la capa social de castigos por encima de tu liga.</p>
+
+      <h3 style="${H3}">Elige la plataforma por tu grupo, no al revés</h3>
+      <p style="${P}">Si todavía estás decidiendo dónde montar la liga, la mejor plataforma es aquella en la que ya juegan la mayoría de tus amigos. La comodidad de que todos entren sin aprender una app nueva vale más que cualquier función concreta. Los castigos funcionan igual de bien en todas, así que ese no debe ser el factor decisivo.</p>
+
+      <h3 style="${H3}">Qué gana la liga con la capa de castigos</h3>
+      <p style="${P}">Biwenger, Comunio y LaLiga Fantasy gestionan de maravilla la parte deportiva: fichajes, puntos, clasificación. Lo que ninguna hace bien es la parte social: el bote, quién paga, quién se raja y el pique de cada jornada. Esa es justo la capa que se añade por encima, sin tocar tu liga de siempre.</p>
+
+      <h3 style="${H3}">No hace falta que todos migren de golpe</h3>
+      <p style="${P}">El flujo natural es que una persona monte el grupo de castigos y comparta el enlace por WhatsApp, igual que se comparte cualquier otra cosa. No tienes que convencer a nadie de cambiar de plataforma ni de aprender nada nuevo: seguís jugando donde jugáis, solo que ahora el último de la jornada tiene consecuencias.</p>
     `
   },
   {
@@ -147,6 +174,15 @@ export const GUIDES = [
 
       <h3 style="${H3}">Diferénciate del grupo</h3>
       <p style="${P}">Si todos capitanean al mismo, acertar solo te mantiene a la par. Cuando vas por detrás en la clasificación, una capitanía diferencial (un jugador menos evidente con buen partido) es la forma de recuperar terreno. Si vas líder, cubrirte con la opción segura suele ser lo más sensato.</p>
+
+      <h3 style="${H3}">Aprovecha las jornadas dobles</h3>
+      <p style="${P}">En las semanas en las que un equipo juega dos partidos, su jugador puede puntuar el doble de veces. Si además tu liga dobla los puntos del capitán, capitanear a alguien con jornada doble y buenos rivales es de las jugadas más rentables que existen. Míralo siempre antes de cerrar: una jornada doble bien capitaneada te puede sacar del pozo de un plumazo.</p>
+
+      <h3 style="${H3}">No te comas la cabeza a última hora</h3>
+      <p style="${P}">Uno de los errores más caros es cambiar el capitán treinta segundos antes del cierre por una corazonada. Casi siempre, la primera elección razonada es la buena. Decide con criterio a principio de semana, ajusta solo si hay una lesión o una novedad real, y no te dejes llevar por el último tuit que hayas leído.</p>
+
+      <h3 style="${H3}">Un método rápido para decidir</h3>
+      <p style="${P}">Si no quieres complicarte, responde a tres preguntas y capitanea al que más veces diga que sí: ¿juega seguro los 90 minutos?, ¿su rival es asequible y juega en casa?, ¿está en buena racha? Un jugador que cumple los tres es tu capitán; si ninguno lo cumple del todo, tira por el más fiable antes que por el más vistoso.</p>
     `
   },
   {
@@ -167,6 +203,15 @@ export const GUIDES = [
 
       <h3 style="${H3}">Reacciona rápido</h3>
       <p style="${P}">El valor de un chollo dura poco: en cuanto rinde, su precio sube y todos lo quieren. Revisa el mercado cada jornada y no esperes a estar seguro del todo, porque para entonces ya no será un chollo.</p>
+
+      <h3 style="${H3}">Vigila las rachas de partidos asequibles</h3>
+      <p style="${P}">Un chollo se multiplica si además tiene un calendario amable por delante. Un jugador barato de un equipo que encadena tres o cuatro rivales flojos puede darte puntos constantes durante varias jornadas seguidas. Cruzar precio bajo con buen calendario es la fórmula que de verdad marca la diferencia.</p>
+
+      <h3 style="${H3}">Cuidado con los chollos de una sola jornada</h3>
+      <p style="${P}">No todo lo que puntúa mucho una semana es un chollo. Un jugador que hace un partidazo aislado y vuelve a desaparecer no te sirve: te habrás gastado el dinero justo cuando su precio estaba más alto. Busca regularidad, no fuegos artificiales.</p>
+
+      <h3 style="${H3}">El banquillo también cuenta</h3>
+      <p style="${P}">Los mejores gestores no solo fichan chollos para el once: llenan el banquillo de jugadores baratos con minutos, para que una lesión o una rotación no les deje la jornada a medias. Un banquillo de chollos titulares es un seguro barato contra los imprevistos.</p>
     `
   },
   {
@@ -184,6 +229,15 @@ export const GUIDES = [
 
       <h3 style="${H3}">Vigila tu saldo y el mercado</h3>
       <p style="${P}">Las cláusulas suelen poder ejecutarse en ventanas concretas. Mantén algo de liquidez si temes un ataque y presta atención a los movimientos del grupo: cuando alguien acumula dinero de golpe, casi siempre es que va a por la estrella de otro.</p>
+
+      <h3 style="${H3}">El farol de la cláusula</h3>
+      <p style="${P}">A veces, la amenaza vale más que el fichaje. Dejar caer en el grupo que "igual pago la cláusula de fulano" puede hacer que su dueño se ponga nervioso y suba cláusulas a lo loco, gastando dinero que luego le falta en el mercado. En una liga entre amigos, la guerra psicológica es medio juego.</p>
+
+      <h3 style="${H3}">Cuidado con quedarte sin fondo de armario</h3>
+      <p style="${P}">Pagar una cláusula alta puede dejarte con un equipo de dos estrellas y nueve rellenos. Antes de lanzarte, piensa si el fichaje te compensa o si te deja vendido ante la primera lesión. A veces es más rentable reforzar tres posiciones flojas que gastarlo todo en un solo nombre.</p>
+
+      <h3 style="${H3}">Revisa las reglas de tu liga</h3>
+      <p style="${P}">No todas las ligas manejan las cláusulas igual: algunas las bloquean las primeras jornadas, otras limitan cuántas puedes lanzar por temporada, y otras las desactivan del todo. Antes de montar una estrategia alrededor de las cláusulas, asegúrate de saber exactamente cómo funcionan en tu competición.</p>
     `
   },
   {
@@ -205,6 +259,15 @@ export const GUIDES = [
       </ul>
 
       <p style="${P}">La clave está en la constancia: revisa alineaciones, aprovecha el calendario y no tomes decisiones en caliente. El fantasy es una carrera larga, no una jornada suelta.</p>
+
+      <h3 style="${H3}">El error de mirar solo tu equipo</h3>
+      <p style="${P}">Muchos novatos juegan como si estuvieran solos: fichan a su gusto sin mirar qué hace el resto. En una liga, ir a rebufo del líder o cubrir sus jugadores clave a veces importa más que tu propia alineación. Vigila el mercado del grupo tanto como el tuyo.</p>
+
+      <h3 style="${H3}">No te obsesiones con una sola jornada</h3>
+      <p style="${P}">Una mala jornada no hunde una temporada, y una buena no la gana. El error emocional más común es reconstruir el equipo entero tras un domingo flojo. Los que pelean arriba son casi siempre los que mantienen la calma y confían en un plan a largo plazo.</p>
+
+      <h3 style="${H3}">Aprende de tu farolillo rojo</h3>
+      <p style="${P}">Si te toca pagar el bote una semana, aprovecha para mirar por qué: ¿fallaste el capitán?, ¿tenías medio equipo en el banquillo?, ¿ignoraste el calendario? El farolillo rojo de hoy, si aprende del castigo, es el que pelea por el título el mes que viene.</p>
     `
   },
   {
@@ -229,6 +292,197 @@ export const GUIDES = [
 
       <h3 style="${H3}">Cierra bien la temporada</h3>
       <p style="${P}">Un buen final anima a repetir el año siguiente: una comida pagada con el bote, un trofeo simbólico para el campeón y una última humillación reservada para el que haya quedado último de la clasificación general. Así la liga no termina, solo descansa hasta la próxima.</p>
+
+      <h3 style="${H3}">Da voz a los que van últimos</h3>
+      <p style="${P}">La liga se apaga cuando los de abajo se rinden. Por eso los castigos, los minirretos y los premios paralelos están pensados sobre todo para ellos: si el que va decimoquinto tiene algo por lo que pelear cada jornada, sigue alineando y sigue picándose. Una liga viva es una liga donde también importa no ser el último.</p>
+
+      <h3 style="${H3}">Rituales que enganchan</h3>
+      <p style="${P}">Las ligas que duran tienen sus rituales: el resumen de la jornada, el meme del que ha quedado último, la votación al peor jugador. No hace falta que sea nada elaborado; basta con que sea fijo. Cuando el grupo espera cada semana su dosis de salseo, nadie se descuelga.</p>
+
+      <h3 style="${H3}">Renueva las apuestas a mitad de temporada</h3>
+      <p style="${P}">Si a la vuelta de Navidad la liga pierde fuelle, mete algo nuevo: un premio al mejor de la segunda vuelta, un castigo especial para el colista del mes o un minitorneo paralelo. Un pequeño reinicio de objetivos vuelve a enganchar a los que ya daban la temporada por perdida.</p>
+    `
+  },
+  {
+    id: 'reglas-para-liga-de-castigos',
+    title: 'Cómo montar las reglas de tu liga de castigos (sin líos)',
+    description: 'Guía para montar las reglas de una liga de castigos: qué se castiga, cuánto se aporta, qué pasa con los morosos y cómo cerrar la temporada. Con una plantilla base para copiar.',
+    html: `
+      <p style="${P}">Una liga de castigos que no acuerda las reglas al principio acaba en discusiones a mitad de temporada. La clave es dejarlas claras y por escrito antes de la primera jornada, cuando todavía nadie va último y todos las aceptan de buen rollo. Aquí tienes cómo montarlas paso a paso.</p>
+
+      <h3 style="${H3}">Define qué se castiga</h3>
+      <p style="${P}">Lo más habitual es castigar al farolillo rojo de cada jornada, el que menos puntúa. Pero puedes añadir supuestos: al que se olvide de alinear, al que no pague a tiempo o al que quede último de un mes entero. Cuantos más frentes, más salseo, pero no te pases el primer año: empieza con el castigo al colista de la jornada y ve ampliando.</p>
+
+      <h3 style="${H3}">Pon cifras claras al bote</h3>
+      <p style="${P}">Si vais a jugar con dinero, decidid una cantidad fija y pequeña por quedar último (uno o dos euros suele bastar). Acordad también si hay recargos, por ejemplo doblar la aportación si eres último dos jornadas seguidas. Lo importante es que la cifra sea asumible para todos: una multa demasiado alta solo consigue que la gente deje de pagar.</p>
+
+      <h3 style="${H3}">Decide quién elige el castigo</h3>
+      <p style="${P}">Hay tres fórmulas y todas valen: que lo elija el ganador de la jornada, que lo vote el grupo, o que lo decida el azar con una ruleta. La ruleta es la que menos discusiones genera, porque nadie puede acusar a nadie de tenerle manía. Sea cual sea, pactad el catálogo de castigos posibles al principio para que no haya sorpresas.</p>
+
+      <h3 style="${H3}">Reglas para el moroso y el que se raja</h3>
+      <p style="${P}">Todo grupo tiene un moroso y alguien que se raja del castigo. Deja claro qué pasa con ellos: normalmente basta con dejar constancia pública en un muro de la vergüenza para que la presión social haga el resto. Si quieres apretar más, el que no cumpla puede acumular el castigo para la jornada siguiente.</p>
+
+      <h3 style="${H3}">Una plantilla base para empezar</h3>
+      <p style="${P}">Si no quieres complicarte, copia estas reglas y ajústalas a tu grupo:</p>
+      <ul style="${UL}">
+        <li style="${LI}">El último de cada jornada aporta 2 euros al bote y cumple el castigo que salga en la ruleta.</li>
+        <li style="${LI}">Quien quede último dos jornadas seguidas, dobla la aportación.</li>
+        <li style="${LI}">Quien no alinee, cuenta como último automáticamente.</li>
+        <li style="${LI}">El que se raje del castigo queda en el muro de la vergüenza hasta cumplirlo.</li>
+        <li style="${LI}">El bote se gasta en una comida de fin de temporada; el campeón no paga su parte.</li>
+        <li style="${LI}">El último de la clasificación general cumple una humillación final pactada.</li>
+      </ul>
+
+      <p style="${P}">Con esto tienes una liga de castigos montada en cinco minutos. A partir de ahí, cada temporada podéis ir afinando lo que funcione y quitando lo que no.</p>
+    `
+  },
+  {
+    id: 'glosario-fantasy',
+    title: 'Glosario del fantasy: los términos que tienes que conocer',
+    description: 'Diccionario del fantasy de fútbol: farolillo rojo, chollo, cláusula, portería a cero, diferencial, mister y más términos que se usan en Biwenger, Comunio y LaLiga Fantasy.',
+    html: `
+      <p style="${P}">El fantasy tiene su propia jerga, y si acabas de empezar es fácil perderse entre chollos, cláusulas y farolillos rojos. Aquí tienes los términos más usados en Biwenger, Comunio y LaLiga Fantasy explicados en una línea, para que no te pierdas en el grupo.</p>
+
+      <h3 style="${H3}">Clasificación y castigos</h3>
+      <ul style="${UL}">
+        <li style="${LI}"><strong>Farolillo rojo:</strong> el que va último, el que menos puntúa. El candidato al castigo de la jornada.</li>
+        <li style="${LI}"><strong>Colista:</strong> lo mismo que farolillo rojo, el último de la tabla.</li>
+        <li style="${LI}"><strong>Bote:</strong> el dinero común que se junta con las aportaciones de los que pierden.</li>
+        <li style="${LI}"><strong>Moroso:</strong> el que debe dinero al bote y no lo paga.</li>
+        <li style="${LI}"><strong>Rajarse:</strong> no cumplir el castigo que te ha tocado.</li>
+      </ul>
+
+      <h3 style="${H3}">Fichajes y mercado</h3>
+      <ul style="${UL}">
+        <li style="${LI}"><strong>Chollo:</strong> jugador barato que puntúa mucho más de lo que cuesta.</li>
+        <li style="${LI}"><strong>Cláusula de rescisión:</strong> lo que pagas para fichar a un jugador de otro mánager aunque no esté en venta.</li>
+        <li style="${LI}"><strong>Clausulazo:</strong> pagar una cláusula alta para robarle la estrella a un rival.</li>
+        <li style="${LI}"><strong>Puja:</strong> la cantidad que ofreces por un jugador del mercado; se lo lleva la más alta.</li>
+        <li style="${LI}"><strong>Subida/bajada de valor:</strong> cómo cambia el precio de un jugador según su rendimiento y la demanda.</li>
+      </ul>
+
+      <h3 style="${H3}">Puntos y alineación</h3>
+      <ul style="${UL}">
+        <li style="${LI}"><strong>Portería a cero:</strong> cuando tu equipo no encaja gol; suma puntos extra a porteros y defensas.</li>
+        <li style="${LI}"><strong>Capitán:</strong> el jugador cuyos puntos se doblan esa jornada.</li>
+        <li style="${LI}"><strong>Diferencial:</strong> un jugador que casi nadie tiene; si puntúa, te separa del grupo.</li>
+        <li style="${LI}"><strong>Once tipo:</strong> tu alineación habitual, la que pones si no hay novedades.</li>
+        <li style="${LI}"><strong>Rotación:</strong> cuando un entrenador da descanso a un titular; ojo, porque puede dejarte sin puntos.</li>
+      </ul>
+
+      <h3 style="${H3}">Otros términos habituales</h3>
+      <ul style="${UL}">
+        <li style="${LI}"><strong>Mánager:</strong> cada participante de la liga; tú eres el mánager de tu equipo.</li>
+        <li style="${LI}"><strong>Mister:</strong> otra forma de llamar al mánager o entrenador; también es el nombre de una app de fantasy.</li>
+        <li style="${LI}"><strong>Jornada doble:</strong> semana en la que un equipo juega dos partidos y sus jugadores pueden puntuar el doble.</li>
+      </ul>
+
+      <p style="${P}">Con estos términos ya puedes seguir cualquier conversación de tu liga sin quedarte fuera. Y si te toca ser el farolillo rojo, al menos sabrás exactamente cómo se llama tu desgracia.</p>
+    `
+  },
+  {
+    id: 'repartir-el-bote-final-temporada',
+    title: 'Cómo repartir el bote al final de la temporada',
+    description: 'Ideas para repartir el bote de tu liga fantasy a final de temporada: comida de grupo, premios al podio, sorteos y fórmulas para que nadie acabe enfadado.',
+    html: `
+      <p style="${P}">Llega el final de temporada, el bote está lleno y toca decidir qué hacer con él. Este es justo el momento en el que más ligas discuten, porque muchas no acordaron nada al principio. Aquí tienes las fórmulas más habituales para repartirlo sin que nadie acabe mosqueado.</p>
+
+      <h3 style="${H3}">La comida de grupo (la clásica)</h3>
+      <p style="${P}">La opción más socorrida y la que mejor sienta: el bote se gasta en una comida o cena de todos al terminar la liga. Es la que más une al grupo, porque el dinero vuelve a todos por igual y se cierra la temporada con buen rollo. Muchas ligas hacen que el campeón no pague su parte como premio simbólico.</p>
+
+      <h3 style="${H3}">Premios al podio</h3>
+      <p style="${P}">Si preferís que ganar tenga recompensa económica, repartid el bote entre los primeros: por ejemplo, 60% para el campeón, 30% para el segundo y 10% para el tercero. Funciona bien en ligas competitivas, pero tiene un riesgo: los que van por abajo pueden desengancharse si ven que no van a oler el dinero.</p>
+
+      <h3 style="${H3}">Fórmula mixta</h3>
+      <p style="${P}">La solución intermedia que contenta a casi todos: una parte del bote va a una comida de grupo y otra parte, más pequeña, se la lleva el campeón. Así se premia ganar sin dejar fuera a los que han pagado todo el año sin opciones de podio.</p>
+
+      <h3 style="${H3}">El sorteo sorpresa</h3>
+      <p style="${P}">Para grupos que se lo toman con humor: una parte del bote se sortea entre todos los que hayan cumplido sus castigos durante la temporada. Es una forma de premiar que la gente no se raje y de que hasta el último tenga un motivo para seguir participando.</p>
+
+      <h3 style="${H3}">Deja el reparto por escrito desde el principio</h3>
+      <p style="${P}">Sea cual sea la fórmula, el consejo es siempre el mismo: pactadla en la primera jornada, no en la última. Cuando el reparto está claro desde el inicio, nadie puede sentirse engañado al final, y el bote cumple su función: dar emoción a la temporada, no romper amistades.</p>
+    `
+  },
+  {
+    id: 'mercado-de-fichajes-fantasy',
+    title: 'Cómo dominar el mercado de fichajes en el fantasy',
+    description: 'Trucos para el mercado del fantasy: cuándo comprar y vender, aprovechar las subidas y bajadas de valor, ganar pujas y no quedarte pillado con jugadores caros.',
+    html: `
+      <p style="${P}">En el fantasy no solo se gana en el campo: buena parte de la ventaja se construye en el mercado. Saber cuándo comprar, cuándo vender y cómo aprovechar los cambios de precio es lo que separa a los que suben en la tabla de los que se quedan estancados. Estas son las claves.</p>
+
+      <h3 style="${H3}">Compra antes de que suba, vende antes de que baje</h3>
+      <p style="${P}">El precio de un jugador sube cuando rinde y todos lo quieren, y baja cuando falla o se lesiona. El truco está en adelantarte: ficha al jugador en forma antes de que su precio se dispare, y suéltalo cuando notes que su rendimiento va a caer. Comprar caro y vender barato es la forma más rápida de arruinarte.</p>
+
+      <h3 style="${H3}">Aprovecha las subidas de valor para hacer caja</h3>
+      <p style="${P}">Un jugador que compraste barato y ahora vale mucho más es dinero en el banco. No tengas miedo de venderlo si su precio está inflado: con ese beneficio puedes fichar a dos jugadores que te den más puntos totales. Muchos gestores buenos van rotando la plantilla para exprimir cada subida de valor.</p>
+
+      <h3 style="${H3}">Gana las pujas sin pasarte</h3>
+      <p style="${P}">Cuando varios vais a por el mismo jugador, gana la puja más alta. La tentación es ofrecer de más para asegurar, pero eso te deja sin dinero para el resto. Calcula cuánto vale de verdad ese jugador para ti y no te dejes llevar por la guerra de pujas: casi siempre hay una alternativa parecida más barata.</p>
+
+      <h3 style="${H3}">No te quedes pillado con jugadores caros que no rinden</h3>
+      <p style="${P}">El error más caro es enamorarte de un fichaje. Si esa estrella por la que pagaste un dineral lleva jornadas sin puntuar, cada semana que la mantienes pierdes puntos y valor. Asume la pérdida, véndelo y reinvierte: en el fantasy, como en la bolsa, aguantar una mala inversión solo la hace peor.</p>
+
+      <h3 style="${H3}">Ten siempre algo de liquidez</h3>
+      <p style="${P}">Guardar un poco de dinero sin gastar te permite reaccionar: fichar un chollo que aparece de repente, lanzar una cláusula o cubrir una lesión de última hora. Los que van con todo el presupuesto gastado siempre llegan tarde a las oportunidades.</p>
+    `
+  },
+  {
+    id: 'castigos-sin-dinero',
+    title: 'Castigos sin dinero: prendas y retos para ligas sin bote',
+    description: 'Ideas de castigos sin dinero para tu liga fantasy: prendas, retos, vídeos y humillaciones para grupos que prefieren jugarse el orgullo en vez del bolsillo.',
+    html: `
+      <p style="${P}">No todas las ligas quieren jugar con dinero, y está bien: a veces el orgullo pica más que la cartera. Si tu grupo prefiere castigos sin bote, aquí tienes ideas que funcionan igual de bien (o mejor), ordenadas por lo mucho que escuecen.</p>
+
+      <h3 style="${H3}">Prendas y retos rápidos</h3>
+      <ul style="${UL}">
+        <li style="${LI}">Foto de perfil de WhatsApp durante una semana con un montaje que le prepare el ganador.</li>
+        <li style="${LI}">Estado de WhatsApp reconociendo por escrito que ha sido el peor de la jornada.</li>
+        <li style="${LI}">Nota de voz al grupo "dando explicaciones" por el fracaso, con tono de entrenador cesado.</li>
+        <li style="${LI}">Vídeo imitando una celebración de gol ridícula en el salón de su casa.</li>
+      </ul>
+
+      <h3 style="${H3}">Castigos dentro del propio fantasy</h3>
+      <p style="${P}">Los que más duelen son los que afectan a la jornada siguiente, y no cuestan un euro:</p>
+      <ul style="${UL}">
+        <li style="${LI}">La próxima alineación la decide el grupo por votación, capitán incluido.</li>
+        <li style="${LI}">Cede tu capitán de la siguiente jornada al jugador que elija el ganador.</li>
+        <li style="${LI}">Una semana sin poder fichar ni vender: te aguantas con lo que tienes.</li>
+        <li style="${LI}">Tu equipo se llama lo que decida el grupo hasta que otro quede último.</li>
+      </ul>
+
+      <h3 style="${H3}">Castigos de exposición pública</h3>
+      <p style="${P}">Cuando el grupo se lo toma con humor, la vergüenza es el mejor castigo:</p>
+      <ul style="${UL}">
+        <li style="${LI}">Story de Instagram enseñando el once de esa jornada con la leyenda "así se pierde una liga".</li>
+        <li style="${LI}">Cantar (mal) el himno del rival más odiado del grupo en un vídeo.</li>
+        <li style="${LI}">Quedar registrado en el muro de la vergüenza hasta que otro lo releve.</li>
+      </ul>
+
+      <h3 style="${H3}">La clave: que decida el azar</h3>
+      <p style="${P}">Igual que con los castigos de dinero, lo mejor es acordar un catálogo al empezar la temporada y sortear el castigo con una ruleta. Así nadie se queja de que le tienen manía, y el que pierde no puede discutir: le ha tocado, y punto.</p>
+    `
+  },
+  {
+    id: 'como-remontar-clasificacion',
+    title: 'Cómo remontar cuando vas último en el fantasy',
+    description: 'Vas colista de la liga fantasy y quieres remontar: estrategia de fichajes, capitanías diferenciales, calendario y paciencia para escalar puestos antes de fin de temporada.',
+    html: `
+      <p style="${P}">Vas último, pagas el bote cada jornada y empiezas a plantearte tirar la toalla. Antes de rendirte: remontar en el fantasy es más habitual de lo que parece, porque la temporada es larga y casi todos cometen errores. Estas son las palancas para escalar puestos.</p>
+
+      <h3 style="${H3}">Arriesga con capitanías diferenciales</h3>
+      <p style="${P}">Si vas por detrás, jugar seguro solo te mantiene donde estás. Necesitas puntos que los de arriba no tengan: capitanea a jugadores menos evidentes con buen partido, en vez de al mismo crack que lleva medio grupo. Cuando aciertas un diferencial, recuperas terreno de golpe; cuando fallas, tampoco perdías nada estando ya último.</p>
+
+      <h3 style="${H3}">Mira el calendario más que los nombres</h3>
+      <p style="${P}">Una de las mejores formas de remontar es fichar jugadores con un calendario amable por delante. Un jugador correcto con tres rivales flojos seguidos te dará más puntos que una estrella con un calendario duro. Adelántate a esas rachas antes de que suban de precio.</p>
+
+      <h3 style="${H3}">Reconstruye con cabeza, no en caliente</h3>
+      <p style="${P}">La tentación cuando vas último es vender medio equipo tras una mala jornada. Error: eso suele hacerte comprar caro y vender barato. Cambia una o dos piezas por jornada, prioriza titularidad y minutos, y da tiempo a que los fichajes cuajen. Remontar es una carrera, no un pelotazo.</p>
+
+      <h3 style="${H3}">Aprovecha que los de arriba se relajan</h3>
+      <p style="${P}">El líder que va cómodo empieza a descuidar alineaciones, a no vigilar el mercado y a jugar seguro. Ahí es donde el que va último, con hambre y sin nada que perder, puede recortar semana a semana. La constancia del de abajo suele comerse la relajación del de arriba.</p>
+
+      <h3 style="${H3}">Y si no remontas, que no te pillen de farolillo rojo final</h3>
+      <p style="${P}">A veces no da para el título, pero sí para no acabar último del todo y librarte de la humillación final. Pelea cada puesto: en una liga de castigos, subir del último al penúltimo ya es una pequeña victoria (y un castigo menos).</p>
     `
   }
 ];
