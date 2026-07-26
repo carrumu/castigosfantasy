@@ -14,11 +14,32 @@
  * getGuideBySlug().
  */
 
+import { PUNISHMENT_IDEAS } from '../utils/punishments-catalog.js';
+
 const H2 = 'font-family:var(--font-display);font-weight:900;font-size:1.5rem;text-transform:uppercase;line-height:1.1;margin:2.25rem 0 0.5rem;color:var(--text-light);scroll-margin-top:90px;';
 const H3 = 'font-family:var(--font-display);font-weight:800;font-size:1.05rem;text-transform:uppercase;margin:1.5rem 0 0.5rem;color:var(--accent-gold,#deed00);';
 const P = 'margin:0 0 1rem;';
 const UL = 'margin:0 0 1rem;padding-left:1.25rem;';
 const LI = 'margin-bottom:0.45rem;';
+
+// Construye el HTML del catálogo de castigos a partir de los datos del
+// Generador (agrupados por tipo). Así esta guía indexable muestra exactamente
+// los mismos castigos que ofrece la herramienta (sin cloaking).
+function buildPunishmentCatalogHtml() {
+  const order = [];
+  const byCat = {};
+  for (const p of PUNISHMENT_IDEAS) {
+    if (!byCat[p.categoryLabel]) { byCat[p.categoryLabel] = []; order.push(p.categoryLabel); }
+    byCat[p.categoryLabel].push(p);
+  }
+  const intro = `<p style="${P}">Estos son los ${PUNISHMENT_IDEAS.length} castigos del <a href="/generador" class="cf-link" data-nav="generador" style="color:var(--accent);">Generador de Castigos</a>, ordenados por tipo. Puedes sortear cualquiera con la <a href="/ruleta" class="cf-link" data-nav="ruleta" style="color:var(--accent);">Ruleta de Sentencias</a> o dejar que el generador te proponga uno al azar. De lo más suave a lo más bestia.</p>`;
+  const sections = order.map(cat => `
+      <h3 style="${H3}">${cat}</h3>
+      <ul style="${UL}">
+        ${byCat[cat].map(i => `<li style="${LI}"><strong>${i.name}:</strong> ${i.description}</li>`).join('')}
+      </ul>`).join('');
+  return intro + sections;
+}
 
 export const GUIDES = [
   {
@@ -72,6 +93,12 @@ export const GUIDES = [
 
       <p style="${P}">Una regla de oro: el mejor castigo hace reír a todo el grupo, también al que lo cumple, y nunca cruza lo personal. Acordad un catálogo al empezar la temporada, metedlo en la ruleta y que decida el azar; así nadie puede quejarse de favoritismos.</p>
     `
+  },
+  {
+    id: 'catalogo-de-castigos',
+    title: 'Catálogo de 60 castigos para tu liga fantasy',
+    description: 'Catálogo completo de castigos para el último de tu liga fantasy: vergonzosos, creativos, deportivos y físicos. 60 ideas listas para sortear con la ruleta o generar al azar.',
+    html: buildPunishmentCatalogHtml()
   },
   {
     id: 'farolillo-rojo-biwenger',

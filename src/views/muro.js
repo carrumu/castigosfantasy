@@ -1,4 +1,5 @@
 import { supabase } from '../supabase';
+import { howItWorks } from '../utils/how-it-works.js';
 
 /**
  * Renders the "Muro de la Vergüenza" (Wall of Shame) audit log view.
@@ -98,6 +99,16 @@ export function renderMuro(container, callbacks) {
             </h1>
           </div>
         </div>
+
+        ${howItWorks({
+          title: '¿Cómo funciona el Muro de la Vergüenza?',
+          intro: 'Es el registro público de quién cumple sus castigos y quién se raja. Deja constancia para que la presión del grupo haga el resto.',
+          steps: [
+            'Cada vez que alguien rechaza o no cumple un castigo, queda anotado aquí.',
+            'El ranking ordena a los entrenadores por las veces que se han escaqueado.',
+            'Nadie quiere liderar esta lista: esa es justo la gracia.'
+          ]
+        })}
 
         <div style="display: grid; grid-template-columns: 1fr; gap: 1.5rem; align-items: start;">
           

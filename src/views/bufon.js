@@ -2,6 +2,7 @@ import { supabase, isConfigured } from '../supabase';
 import { setupAutocomplete } from '../utils/autocomplete';
 import { LALIGA_PLAYERS_DB } from '../utils/players-db';
 import { getCurrentMatchdayNumber } from '../utils/calendar';
+import { howItWorks } from '../utils/how-it-works.js';
 
 /**
  * Renders the "El Bufón" (Matchday's Worst Player) screen.
@@ -492,6 +493,16 @@ export function renderBufon(container, callbacks) {
             Votación global al futbolista de LaLiga con la actuación más cómica o desastrosa en la <strong>Jornada ${currentMatchday}</strong>.
           </p>
         </div>
+
+        ${howItWorks({
+          title: '¿Cómo funciona el Bufón de la Corte?',
+          intro: 'Cada jornada, la comunidad vota al jugador de LaLiga con la actuación más cómica o desastrosa. Es una votación paralela para dar salseo, además de la clasificación de tu liga.',
+          steps: [
+            'Se abre la votación de la jornada con los jugadores candidatos.',
+            'Cada uno vota a quien crea que ha sido el más desastroso.',
+            'El más votado se corona Bufón de la jornada y queda para la posteridad.'
+          ]
+        })}
 
         <div class="dashboard-grid">
           <!-- Columna Izquierda: Votación Activa & Formulario -->

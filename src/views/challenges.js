@@ -1,6 +1,7 @@
 import { supabase, isConfigured } from '../supabase';
 import { getMatchdayClosingTime, getCurrentMatchdayNumber } from '../utils/calendar';
 import { CHALLENGES_DB } from '../utils/challenges-db';
+import { howItWorks } from '../utils/how-it-works.js';
 
 /**
  * Picks `count` distinct random entries from CHALLENGES_DB, excluding any
@@ -255,6 +256,16 @@ export function renderChallenges(container, callbacks) {
           </div>
           ${countdownHtml}
         </div>
+
+        ${howItWorks({
+          title: '¿Cómo funcionan los Retos de la Semana?',
+          intro: 'La liga decide democráticamente qué castigo tendrá que cumplir el último de la jornada, votando entre varias opciones.',
+          steps: [
+            'Se proponen varias penitencias para el farolillo rojo de la jornada.',
+            'Cada miembro vota la que más le apetezca ver cumplida.',
+            'Al cerrarse el plazo, la más votada es la sentencia definitiva.'
+          ]
+        })}
 
         <div class="dashboard-grid">
           <!-- Columna Izquierda: Votaciones -->
