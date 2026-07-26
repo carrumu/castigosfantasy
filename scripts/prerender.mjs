@@ -21,7 +21,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import * as cheerio from 'cheerio';
-import { GUIDES } from '../src/views/guias.js';
+import { GUIDES, CATEGORIES, GUIDE_CATEGORY } from '../src/views/guias.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DIST_DIR = path.join(__dirname, '..', 'dist');
@@ -69,17 +69,27 @@ function main() {
       description: 'Guías prácticas para tu liga fantasy: ideas de castigos, cómo elegir capitán, encontrar chollos, usar cláusulas, errores de novato y cómo gestionar el bote en Biwenger, Comunio y LaLiga Fantasy.',
       canonicalPath: 'guias'
     });
-    const cards = GUIDES.map(g => `
-      <a href="/guias/${g.id}" style="display:block;text-decoration:none;background:#1c1b1b;border:1px solid #2a2a2a;border-radius:12px;padding:1.25rem 1.35rem;margin-bottom:1rem;">
-        <h2 style="font-weight:800;font-size:1.15rem;text-transform:uppercase;margin:0 0 0.4rem;color:#efefef;">${g.title}</h2>
-        <p style="margin:0 0 0.6rem;font-size:0.9rem;line-height:1.55;color:#a9a9a0;">${g.description}</p>
-        <span style="font-weight:800;font-size:0.85rem;text-transform:uppercase;color:#deed00;">Leer guía →</span>
-      </a>`).join('');
+    const card = g => `
+        <a href="/guias/${g.id}" style="display:block;text-decoration:none;background:#1c1b1b;border:1px solid #2a2a2a;border-radius:12px;padding:1.25rem 1.35rem;margin-bottom:1rem;">
+          <h3 style="font-weight:800;font-size:1.15rem;text-transform:uppercase;margin:0 0 0.4rem;color:#efefef;">${g.title}</h3>
+          <p style="margin:0 0 0.6rem;font-size:0.9rem;line-height:1.55;color:#a9a9a0;">${g.description}</p>
+          <span style="font-weight:800;font-size:0.85rem;text-transform:uppercase;color:#deed00;">Leer guía →</span>
+        </a>`;
+    const groups = CATEGORIES.map(cat => {
+      const items = GUIDES.filter(g => GUIDE_CATEGORY[g.id] === cat.id);
+      if (!items.length) return '';
+      return `
+      <section style="margin-bottom:2rem;">
+        <h2 style="font-weight:900;font-size:1rem;text-transform:uppercase;letter-spacing:1px;color:#deed00;border-bottom:1px solid #2a2a2a;padding-bottom:0.4rem;margin:0 0 1rem;">${cat.label}</h2>
+        ${items.map(card).join('')}
+      </section>`;
+    }).join('');
     $('#app').html(`
       <main style="max-width:820px;margin:0 auto;padding:1rem 1.25rem 3rem;color:#efefef;font-family:system-ui,sans-serif;">
         <h1 style="font-weight:900;font-size:2rem;text-transform:uppercase;line-height:1.05;margin-bottom:0.4rem;">Guías de Castigos Fantasy</h1>
         <p style="color:#a9a9a0;font-size:0.95rem;margin-bottom:1.5rem;line-height:1.6;">Ideas de castigos, capitanías, chollos, cláusulas, errores de novato y cómo llevar el bote de tu liga. Guías prácticas para tu liga fantasy de Biwenger, Comunio o LaLiga Fantasy.</p>
-        ${cards}
+        <input type="search" placeholder="Busca tu duda: capitán, bote, chollos, cláusula..." aria-label="Buscar en las guías" style="width:100%;box-sizing:border-box;background:#1c1b1b;border:1.5px solid #2a2a2a;border-radius:10px;padding:0.8rem 1rem;color:#efefef;font-size:0.95rem;margin-bottom:1.75rem;" />
+        ${groups}
       </main>`);
     writePage('guias', $.html());
     ok++;

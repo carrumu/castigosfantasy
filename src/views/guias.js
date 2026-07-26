@@ -527,14 +527,61 @@ const CTA_BLOCK = `
   </div>
 `;
 
-function renderHub(container) {
-  const cards = GUIDES.map(g => `
-    <a href="/guias/${g.id}" class="cf-guide-card cf-link" data-nav="guias/${g.id}" style="display:block;text-decoration:none;background:var(--bg-card);border:1px solid var(--border-color);border-radius:12px;padding:1.25rem 1.35rem;transition:transform 0.15s ease,border-color 0.15s ease;">
+// Categorías del hub de guías (orden en el que se muestran).
+export const CATEGORIES = [
+  { id: 'castigos', label: 'Castigos y tu liga' },
+  { id: 'bote', label: 'El bote común' },
+  { id: 'estrategia', label: 'Estrategia fantasy' },
+  { id: 'basicos', label: 'Primeros pasos' }
+];
+
+// A qué categoría pertenece cada guía.
+export const GUIDE_CATEGORY = {
+  'ideas-de-castigos': 'castigos',
+  'catalogo-de-castigos': 'castigos',
+  'castigos-sin-dinero': 'castigos',
+  'reglas-para-liga-de-castigos': 'castigos',
+  'farolillo-rojo-biwenger': 'castigos',
+  'mantener-viva-la-liga': 'castigos',
+  'gestionar-el-bote': 'bote',
+  'repartir-el-bote-final-temporada': 'bote',
+  'como-elegir-capitan': 'estrategia',
+  'encontrar-chollos': 'estrategia',
+  'clausulas-de-rescision': 'estrategia',
+  'mercado-de-fichajes-fantasy': 'estrategia',
+  'errores-manager-novato': 'estrategia',
+  'como-remontar-clasificacion': 'estrategia',
+  'biwenger-comunio-laliga-fantasy': 'basicos',
+  'glosario-fantasy': 'basicos'
+};
+
+// Texto normalizado (minúsculas, sin acentos ni comillas) para el buscador.
+function normalizeSearch(s) {
+  return String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/"/g, '');
+}
+
+export function guideCardHtml(g) {
+  const search = normalizeSearch(`${g.title} ${g.description}`);
+  return `
+    <a href="/guias/${g.id}" class="cf-guide-card cf-link" data-nav="guias/${g.id}" data-search="${search}" style="display:block;text-decoration:none;background:var(--bg-card);border:1px solid var(--border-color);border-radius:12px;padding:1.25rem 1.35rem;transition:transform 0.15s ease,border-color 0.15s ease;">
       <h2 style="font-family:var(--font-display);font-weight:800;font-size:1.15rem;text-transform:uppercase;line-height:1.15;margin:0 0 0.4rem;color:var(--text-light);">${g.title}</h2>
       <p style="margin:0 0 0.6rem;font-size:0.9rem;line-height:1.55;color:var(--text-muted);">${g.description}</p>
       <span style="font-family:var(--font-display);font-weight:800;font-size:0.85rem;text-transform:uppercase;color:var(--accent);">Leer guía →</span>
-    </a>
-  `).join('');
+    </a>`;
+}
+
+function renderHub(container) {
+  const groups = CATEGORIES.map(cat => {
+    const items = GUIDES.filter(g => GUIDE_CATEGORY[g.id] === cat.id);
+    if (!items.length) return '';
+    return `
+      <section class="cf-guide-group" data-cat="${cat.id}" style="margin-bottom:2rem;">
+        <h2 class="cf-guide-cat" style="font-family:var(--font-display);font-weight:900;font-size:1rem;text-transform:uppercase;letter-spacing:1px;color:var(--accent);border-bottom:1px solid var(--border-color);padding-bottom:0.4rem;margin:0 0 1rem;">${cat.label}</h2>
+        <div class="cf-guides-grid" style="display:grid;grid-template-columns:1fr;gap:1rem;">
+          ${items.map(guideCardHtml).join('')}
+        </div>
+      </section>`;
+  }).join('');
 
   container.innerHTML = `
     <div class="content-page" style="max-width: 820px; margin: 0 auto; padding: 1rem 0 3rem;">
@@ -543,15 +590,40 @@ function renderHub(container) {
       </a>
 
       <h1 style="font-family:var(--font-display);font-weight:900;font-size:2rem;text-transform:uppercase;line-height:1.05;margin-bottom:0.4rem;">Guías de Castigos Fantasy</h1>
-      <p style="color:var(--text-muted);font-size:0.95rem;margin-bottom:1.75rem;line-height:1.6;">Ideas de castigos, capitanías, chollos, cláusulas, errores de novato y cómo llevar el bote de tu liga. Guías prácticas para dominar tu liga fantasy de Biwenger, Comunio o LaLiga Fantasy y mantener a tus amigos enganchados hasta la última jornada.</p>
+      <p style="color:var(--text-muted);font-size:0.95rem;margin-bottom:1.5rem;line-height:1.6;">Ideas de castigos, capitanías, chollos, cláusulas, errores de novato y cómo llevar el bote de tu liga. Guías prácticas para dominar tu liga fantasy de Biwenger, Comunio o LaLiga Fantasy y mantener a tus amigos enganchados hasta la última jornada.</p>
 
-      <div class="cf-guides-grid" style="display:grid;grid-template-columns:1fr;gap:1rem;">
-        ${cards}
+      <input id="cf-guide-search" type="search" placeholder="Busca tu duda: capitán, bote, chollos, cláusula..." autocomplete="off" aria-label="Buscar en las guías" style="width:100%;box-sizing:border-box;background:var(--bg-card);border:1.5px solid var(--border-color);border-radius:10px;padding:0.8rem 1rem;color:var(--text-light);font-family:var(--font-sans);font-size:0.95rem;margin-bottom:1.75rem;" />
+
+      <div id="cf-guides-groups">
+        ${groups}
       </div>
+
+      <p id="cf-no-results" style="display:none;color:var(--text-muted);text-align:center;padding:1.5rem 0;line-height:1.6;">No hemos encontrado ninguna guía con eso. Prueba con otra palabra o <a href="/contacto" class="cf-link" data-nav="contacto" style="color:var(--accent);">escríbenos tu duda</a>.</p>
 
       ${CTA_BLOCK}
     </div>
   `;
+
+  // Buscador: filtro en cliente, insensible a acentos y mayúsculas. Oculta las
+  // tarjetas que no coinciden y las categorías que se quedan vacías.
+  const input = container.querySelector('#cf-guide-search');
+  const noRes = container.querySelector('#cf-no-results');
+  const cards = Array.from(container.querySelectorAll('.cf-guide-card'));
+  const groupEls = Array.from(container.querySelectorAll('.cf-guide-group'));
+  input?.addEventListener('input', () => {
+    const q = normalizeSearch(input.value.trim());
+    let visible = 0;
+    cards.forEach(c => {
+      const match = !q || (c.dataset.search || '').includes(q);
+      c.style.display = match ? '' : 'none';
+      if (match) visible++;
+    });
+    groupEls.forEach(g => {
+      const anyVisible = Array.from(g.querySelectorAll('.cf-guide-card')).some(c => c.style.display !== 'none');
+      g.style.display = anyVisible ? '' : 'none';
+    });
+    if (noRes) noRes.style.display = visible ? 'none' : 'block';
+  });
 }
 
 function renderArticle(container, guide) {
