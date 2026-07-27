@@ -2,19 +2,28 @@ import { escapeHTML } from '../utils/security';
 import { SITE_URL } from '../utils/site';
 import { HISTORIC_ELEVENS, FORMATIONS } from '../utils/historic-elevens';
 import { setupAutocomplete } from '../utils/autocomplete';
+import { LALIGA_PLAYERS_DB } from '../utils/players-db';
 
-// Pool para el autocompletado: unión de todos los jugadores de todos los onces.
-// Son cientos de nombres de distintas épocas, así que sugerir uno no desvela el
-// 11 de hoy; solo ayuda a escribir sin fallar la ortografía.
+// Pool para el autocompletado: TODOS los jugadores que tenemos, para poder
+// intentar cualquiera. Une los jugadores de los onces históricos con toda la
+// base de jugadores actuales. Como son cientos de nombres de todas las épocas,
+// sugerir uno no desvela el 11 de hoy; solo ayuda a escribir sin fallar.
 const AUTOCOMPLETE_POOL = (() => {
   const seen = new Set();
   const arr = [];
+  // 1) Jugadores de los onces históricos (incluye a los "correctos").
   for (const e of HISTORIC_ELEVENS) {
     for (const pl of e.players) {
       if (seen.has(pl.name)) continue;
       seen.add(pl.name);
       arr.push({ name: pl.name, searchKeys: pl.keys, team: '' });
     }
+  }
+  // 2) Toda la base de jugadores actuales, para poder intentar cualquiera.
+  for (const pl of LALIGA_PLAYERS_DB) {
+    if (!pl || !pl.name || seen.has(pl.name)) continue;
+    seen.add(pl.name);
+    arr.push({ name: pl.name, searchKeys: pl.searchKeys || [], team: '' });
   }
   return arr;
 })();
