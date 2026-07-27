@@ -30,6 +30,14 @@ export const FORMATIONS = {
     { pos: 'RB', x: 86, y: 71 }, { pos: 'CB', x: 62, y: 75 }, { pos: 'CB', x: 38, y: 75 }, { pos: 'LB', x: 14, y: 71 },
     { pos: 'MD', x: 86, y: 47 }, { pos: 'MC', x: 62, y: 50 }, { pos: 'MC', x: 38, y: 50 }, { pos: 'MI', x: 14, y: 47 },
     { pos: 'DC', x: 62, y: 15 }, { pos: 'DC', x: 38, y: 15 }
+  ],
+  // Orden de slots: GK, CB, CB, CB, carrilero der., MC, MC, carrilero izq., MP, DC, DC
+  '3-5-2': [
+    { pos: 'GK', x: 50, y: 91 },
+    { pos: 'CB', x: 68, y: 76 }, { pos: 'CB', x: 50, y: 79 }, { pos: 'CB', x: 32, y: 76 },
+    { pos: 'CAR', x: 88, y: 55 }, { pos: 'MC', x: 62, y: 52 }, { pos: 'MC', x: 38, y: 52 }, { pos: 'CAR', x: 12, y: 55 },
+    { pos: 'MP', x: 50, y: 33 },
+    { pos: 'DC', x: 62, y: 14 }, { pos: 'DC', x: 38, y: 14 }
   ]
 };
 
@@ -266,6 +274,216 @@ export const HISTORIC_ELEVENS = [
       p('Gareth Bale', 'Bale'),
       p('Karim Benzema', 'Benzema'),
       p('Cristiano Ronaldo', 'Cristiano', 'ronaldo', 'cr7')
+    ]
+  },
+  {
+    id: 'real-madrid-novena-2002',
+    team: 'Real Madrid',
+    season: '2001-02',
+    milestone: 'La Novena (Glasgow, volea de Zidane)',
+    formation: '4-4-2',
+    source: 'Final Champions 2002 (Glasgow), once inicial',
+    players: [
+      p('César Sánchez', 'César', 'cesar sanchez', 'cesar'),
+      p('Míchel Salgado', 'Salgado'),
+      p('Fernando Hierro', 'Hierro'),
+      p('Iván Helguera', 'Helguera'),
+      p('Roberto Carlos', 'R. Carlos', 'roberto carlos'),
+      p('Luís Figo', 'Figo'),
+      p('Claude Makélélé', 'Makélélé', 'makelele'),
+      p('Zinedine Zidane', 'Zidane', 'zizou'),
+      p('Steve McManaman', 'McManaman', 'macca'),
+      p('Raúl', 'Raúl', 'raul'),
+      p('Fernando Morientes', 'Morientes', 'moro')
+    ]
+  },
+  {
+    id: 'liverpool-champions-2019',
+    team: 'Liverpool',
+    season: '2018-19',
+    milestone: 'La Champions de Madrid',
+    formation: '4-3-3',
+    source: 'Final Champions 2019 (Madrid), once inicial',
+    players: [
+      p('Alisson', 'Alisson', 'alisson becker'),
+      p('Trent Alexander-Arnold', 'Alexander-Arnold', 'trent', 'taa'),
+      p('Joël Matip', 'Matip'),
+      p('Virgil van Dijk', 'Van Dijk', 'vvd', 'virgil'),
+      p('Andrew Robertson', 'Robertson', 'robbo'),
+      p('Jordan Henderson', 'Henderson', 'hendo'),
+      p('Fabinho', 'Fabinho'),
+      p('Georginio Wijnaldum', 'Wijnaldum', 'gini'),
+      p('Mohamed Salah', 'Salah', 'mo salah'),
+      p('Roberto Firmino', 'Firmino', 'bobby'),
+      p('Sadio Mané', 'Mané', 'mane')
+    ]
+  },
+  {
+    id: 'bayern-triplete-2020',
+    team: 'Bayern de Múnich',
+    season: '2019-20',
+    milestone: 'El triplete de Flick',
+    formation: '4-2-3-1',
+    source: 'Final Champions 2020 (Lisboa), once inicial',
+    players: [
+      p('Manuel Neuer', 'Neuer'),
+      p('Joshua Kimmich', 'Kimmich'),
+      p('Jérôme Boateng', 'Boateng'),
+      p('David Alaba', 'Alaba'),
+      p('Alphonso Davies', 'Davies'),
+      p('Thiago Alcántara', 'Thiago', 'thiago alcantara'),
+      p('Leon Goretzka', 'Goretzka'),
+      p('Serge Gnabry', 'Gnabry'),
+      p('Thomas Müller', 'Müller', 'muller'),
+      p('Kingsley Coman', 'Coman'),
+      p('Robert Lewandowski', 'Lewandowski', 'lewy')
+    ]
+  },
+  {
+    id: 'inter-triplete-2010',
+    team: 'Inter de Milán',
+    season: '2009-10',
+    milestone: 'El triplete de Mourinho',
+    formation: '4-2-3-1',
+    source: 'Final Champions 2010 (Madrid), once inicial',
+    players: [
+      p('Júlio César', 'Júlio César', 'julio cesar'),
+      p('Maicon', 'Maicon'),
+      p('Lúcio', 'Lúcio', 'lucio'),
+      p('Walter Samuel', 'Samuel', 'walter samuel'),
+      p('Cristian Chivu', 'Chivu'),
+      p('Esteban Cambiasso', 'Cambiasso', 'cuchu'),
+      p('Javier Zanetti', 'Zanetti', 'pupi'),
+      p("Samuel Eto'o", "Eto'o", 'etoo'),
+      p('Wesley Sneijder', 'Sneijder'),
+      p('Goran Pandev', 'Pandev'),
+      p('Diego Milito', 'Milito', 'el principe')
+    ]
+  },
+  {
+    id: 'manchester-united-champions-2008',
+    team: 'Manchester United',
+    season: '2007-08',
+    milestone: 'La Champions de Moscú',
+    formation: '4-2-3-1',
+    source: 'Final Champions 2008 (Moscú), once inicial',
+    players: [
+      p('Edwin van der Sar', 'Van der Sar', 'vandersar'),
+      p('Wes Brown', 'Brown'),
+      p('Rio Ferdinand', 'Ferdinand', 'rio'),
+      p('Nemanja Vidić', 'Vidić', 'vidic'),
+      p('Patrice Evra', 'Evra'),
+      p('Owen Hargreaves', 'Hargreaves'),
+      p('Michael Carrick', 'Carrick'),
+      p('Cristiano Ronaldo', 'Cristiano', 'ronaldo', 'cr7'),
+      p('Paul Scholes', 'Scholes'),
+      p('Wayne Rooney', 'Rooney'),
+      p('Carlos Tévez', 'Tévez', 'tevez')
+    ]
+  },
+  {
+    id: 'espana-eurocopa-2012',
+    team: 'España',
+    season: '2012',
+    milestone: 'Bicampeona de Europa',
+    formation: '4-2-3-1',
+    source: 'Final de la Eurocopa 2012 (Kiev), once inicial',
+    players: [
+      p('Iker Casillas', 'Casillas', 'iker'),
+      p('Álvaro Arbeloa', 'Arbeloa'),
+      p('Gerard Piqué', 'Piqué', 'pique'),
+      p('Sergio Ramos', 'Ramos', 'sergio ramos'),
+      p('Jordi Alba', 'Alba', 'jordi alba'),
+      p('Xabi Alonso', 'X. Alonso', 'xabi'),
+      p('Sergio Busquets', 'Busquets', 'busi'),
+      p('David Silva', 'Silva', 'david silva'),
+      p('Xavi Hernández', 'Xavi'),
+      p('Andrés Iniesta', 'Iniesta'),
+      p('Cesc Fàbregas', 'Cesc', 'fabregas', 'cesc fabregas')
+    ]
+  },
+  {
+    id: 'argentina-mundial-2022',
+    team: 'Argentina',
+    season: '2022',
+    milestone: 'Campeona del Mundo (Messi)',
+    formation: '4-3-3',
+    source: 'Final del Mundial 2022 (Lusail), once inicial',
+    players: [
+      p('Emiliano Martínez', 'E. Martínez', 'dibu', 'martinez'),
+      p('Nahuel Molina', 'Molina'),
+      p('Cristian Romero', 'Romero', 'cuti'),
+      p('Nicolás Otamendi', 'Otamendi'),
+      p('Nicolás Tagliafico', 'Tagliafico'),
+      p('Rodrigo De Paul', 'De Paul', 'depaul'),
+      p('Enzo Fernández', 'Enzo', 'enzo fernandez'),
+      p('Alexis Mac Allister', 'Mac Allister', 'macallister'),
+      p('Lionel Messi', 'Messi', 'leo messi'),
+      p('Julián Álvarez', 'J. Álvarez', 'julian alvarez', 'araña'),
+      p('Ángel Di María', 'Di María', 'di maria', 'fideo')
+    ]
+  },
+  {
+    id: 'brasil-mundial-2002',
+    team: 'Brasil',
+    season: '2002',
+    milestone: 'Pentacampeona (los tres R)',
+    formation: '3-5-2',
+    source: 'Final del Mundial 2002 (Yokohama), once inicial',
+    players: [
+      p('Marcos', 'Marcos'),
+      p('Lúcio', 'Lúcio', 'lucio'),
+      p('Edmílson', 'Edmílson', 'edmilson'),
+      p('Roque Júnior', 'Roque Júnior', 'roque junior'),
+      p('Cafú', 'Cafú', 'cafu'),
+      p('Gilberto Silva', 'Gilberto', 'gilberto silva'),
+      p('Kléberson', 'Kléberson', 'kleberson'),
+      p('Roberto Carlos', 'R. Carlos', 'roberto carlos'),
+      p('Ronaldinho', 'Ronaldinho', 'dinho'),
+      p('Ronaldo', 'Ronaldo', 'r9', 'ronaldo nazario'),
+      p('Rivaldo', 'Rivaldo')
+    ]
+  },
+  {
+    id: 'francia-mundial-1998',
+    team: 'Francia',
+    season: '1998',
+    milestone: 'Campeona del Mundo en casa',
+    formation: '4-2-3-1',
+    source: 'Final del Mundial 1998 (Saint-Denis); Blanc sancionado, jugó Leboeuf',
+    players: [
+      p('Fabien Barthez', 'Barthez'),
+      p('Lilian Thuram', 'Thuram'),
+      p('Frank Leboeuf', 'Leboeuf'),
+      p('Marcel Desailly', 'Desailly'),
+      p('Bixente Lizarazu', 'Lizarazu'),
+      p('Didier Deschamps', 'Deschamps', 'dd'),
+      p('Emmanuel Petit', 'Petit'),
+      p('Christian Karembeu', 'Karembeu'),
+      p('Zinedine Zidane', 'Zidane', 'zizou'),
+      p('Youri Djorkaeff', 'Djorkaeff'),
+      p('Stéphane Guivarch', 'Guivarch', 'guivarc')
+    ]
+  },
+  {
+    id: 'manchester-city-triplete-2023',
+    team: 'Manchester City',
+    season: '2022-23',
+    milestone: 'El triplete de Guardiola',
+    formation: '4-3-3',
+    source: 'Temporada 2022-23, once tipo — VERIFICAR (formación variable)',
+    players: [
+      p('Ederson', 'Ederson'),
+      p('Kyle Walker', 'Walker'),
+      p('John Stones', 'Stones'),
+      p('Rúben Dias', 'Dias', 'ruben dias'),
+      p('Nathan Aké', 'Aké', 'ake'),
+      p('Kevin De Bruyne', 'De Bruyne', 'kdb', 'debruyne'),
+      p('Rodri', 'Rodri'),
+      p('İlkay Gündoğan', 'Gündoğan', 'gundogan'),
+      p('Bernardo Silva', 'Bernardo', 'bernardo silva'),
+      p('Erling Haaland', 'Haaland'),
+      p('Jack Grealish', 'Grealish')
     ]
   }
 ];
