@@ -18,6 +18,7 @@ import { renderForo } from './views/foro';
 import { renderHerramientas } from './views/herramientas';
 import { renderTop10 } from './views/top10';
 import { renderDuelo } from './views/duelo';
+import { renderOnce11 } from './views/once11';
 import { renderMuro } from './views/muro';
 import { renderPlayersHub } from './views/players_hub';
 import { renderLegal } from './views/legal';
@@ -108,7 +109,7 @@ function renderMainLayout(isGuest, currentUser = null) {
             <button class="header-nav-link ${currentView === 'herramientas' || currentView === 'ruleta' || currentView === 'generador' ? 'active' : ''}" data-nav="herramientas">SALA VAR</button>
             <button class="header-nav-link ${currentView === 'retos' ? 'active' : ''}" data-nav="retos">RETOS</button>
             <button class="header-nav-link ${currentView === 'comunidad' || currentView === 'bufon' || currentView === 'foro' ? 'active' : ''}" data-nav="comunidad">COMUNIDAD</button>
-            <button class="header-nav-link ${currentView === 'juegos' || currentView === 'adivina-jugador' || currentView === 'top-10' || currentView === 'duelo' ? 'active' : ''}" data-nav="juegos">JUEGOS</button>
+            <button class="header-nav-link ${currentView === 'juegos' || currentView === 'adivina-jugador' || currentView === 'top-10' || currentView === 'duelo' || currentView === 'once-del-dia' ? 'active' : ''}" data-nav="juegos">JUEGOS</button>
             <button class="header-nav-link ${currentView === 'mis-ligas' ? 'active' : ''}" data-nav="mis-ligas">MIS LIGAS</button>
             `}
           </nav>
@@ -201,7 +202,7 @@ function renderMainLayout(isGuest, currentUser = null) {
           <span class="mobile-nav-label">VAR</span>
         </button>
         <!-- 5. Juegos -->
-        <button class="mobile-nav-item ${currentView === 'juegos' || currentView === 'adivina-jugador' || currentView === 'top-10' || currentView === 'duelo' ? 'active' : ''}" data-nav="juegos" title="Juegos interactivos">
+        <button class="mobile-nav-item ${currentView === 'juegos' || currentView === 'adivina-jugador' || currentView === 'top-10' || currentView === 'duelo' || currentView === 'once-del-dia' ? 'active' : ''}" data-nav="juegos" title="Juegos interactivos">
           <span class="material-symbols-outlined">sports_esports</span>
           <span class="mobile-nav-label">JUEGOS</span>
         </button>
@@ -293,6 +294,11 @@ function renderMainLayout(isGuest, currentUser = null) {
     });
   } else if (currentView === 'duelo') {
     renderDuelo(viewContainer, {
+      onNavigate: navigate,
+      showToast
+    });
+  } else if (currentView === 'once-del-dia') {
+    renderOnce11(viewContainer, {
       onNavigate: navigate,
       showToast
     });
@@ -620,7 +626,7 @@ function handleRouting() {
   const KNOWN_VIEWS = [
     'inicio', 'acceso', 'mis-ligas', 'menu-liga', 'muro', 'muro-verguenza',
     'herramientas', 'ruleta', 'retos', 'juegos', 'adivina-jugador', 'top-10',
-    'duelo', 'jugadores', 'bufon', 'generador', 'comunidad', 'foro',
+    'duelo', 'once-del-dia', 'jugadores', 'bufon', 'generador', 'comunidad', 'foro',
     'privacidad', 'cookies', 'terminos',
     'sobre-nosotros', 'contacto', 'guias'
   ];

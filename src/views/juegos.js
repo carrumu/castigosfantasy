@@ -160,6 +160,31 @@ export function renderJuegos(container, callbacks) {
           </div>
         </button>
 
+        <button id="game-once-btn" class="tool-card-btn" style="overflow: hidden; display: flex; flex-direction: column;">
+
+          <!-- Mini squad preview -->
+          <div style="width: 100%; height: 160px; border-bottom: 3px solid #000000; background: var(--bg-obsidian); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.5rem; padding: 1rem; box-sizing: border-box;">
+            <div style="font-family: var(--font-display); font-weight: 900; font-size: 0.65rem; letter-spacing: 1px; color: var(--text-muted); text-transform: uppercase;">Equipo del día</div>
+            <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.25rem; width: 100%; max-width: 190px;">
+              ${Array.from({ length: 12 }).map((_, i) => `<div style="height: 12px; border-radius: 3px; border: 1.5px solid #000; background: ${i < 7 ? 'var(--accent)' : 'var(--bg-card)'};"></div>`).join('')}
+            </div>
+            <div style="font-family: var(--font-display); font-weight: 900; font-size: 0.9rem; color: var(--accent); line-height: 1;">7 <span style="color: var(--text-muted); font-size: 0.7rem;">/ 11</span></div>
+          </div>
+
+          <div class="tool-card-inner" style="padding: 1.25rem 1.25rem; display: flex; flex-direction: column; gap: 0.75rem; flex: 1; justify-content: space-between;">
+            <div class="tool-card-text">
+              <h2 class="tool-card-title" style="margin-bottom: 0.35rem;">El Once del Día</h2>
+              <p class="tool-card-desc">Cada día, un equipo. Nombra a los jugadores de su plantilla y comparte tu marca con el grupo.</p>
+            </div>
+            <div class="tool-card-arrow" style="align-self: flex-end;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 12h14"></path>
+                <path d="m12 5 7 7-7 7"></path>
+              </svg>
+            </div>
+          </div>
+        </button>
+
       </div>
     </div>
   `;
@@ -174,5 +199,9 @@ export function renderJuegos(container, callbacks) {
 
   container.querySelector('#game-duelo-btn').addEventListener('click', () => {
     if (callbacks.onNavigate) callbacks.onNavigate('duelo');
+  });
+
+  container.querySelector('#game-once-btn').addEventListener('click', () => {
+    if (callbacks.onNavigate) callbacks.onNavigate('once-del-dia');
   });
 }
