@@ -13,7 +13,7 @@ const AUTOCOMPLETE_POOL = (() => {
     for (const pl of e.players) {
       if (seen.has(pl.name)) continue;
       seen.add(pl.name);
-      arr.push({ name: pl.name, searchKeys: pl.keys });
+      arr.push({ name: pl.name, searchKeys: pl.keys, team: '' });
     }
   }
   return arr;
@@ -96,14 +96,15 @@ export function renderOnce11(container, callbacks = {}) {
 
       <div id="once-progress" style="margin-bottom:0.75rem;"></div>
 
+      <div id="once-input-area" style="position:relative;z-index:30;margin-bottom:0.5rem;"></div>
+      <div id="once-feedback" style="min-height:1.2rem;text-align:center;font-size:0.85rem;font-weight:700;margin:0 0 0.6rem;"></div>
+
       <div id="once-pitch" style="position:relative;width:100%;padding-bottom:132%;background:linear-gradient(180deg,#0c2a1a 0%,#0a1f14 100%);border:3px solid #000;box-shadow:6px 6px 0 #000;border-radius:10px;overflow:hidden;">
         <div style="position:absolute;top:50%;left:0;right:0;height:1px;background:rgba(255,255,255,0.12);"></div>
         <div style="position:absolute;top:50%;left:50%;width:96px;height:96px;border:1px solid rgba(255,255,255,0.12);border-radius:50%;transform:translate(-50%,-50%);"></div>
         <div id="once-slots"></div>
       </div>
 
-      <div id="once-input-area" style="margin-top:1rem;"></div>
-      <div id="once-feedback" style="min-height:1.3rem;text-align:center;font-size:0.85rem;font-weight:700;margin:0.5rem 0 0.25rem;"></div>
       <div id="once-actions" style="margin-top:1rem;"></div>
     </div>
   `;
