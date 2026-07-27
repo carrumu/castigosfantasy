@@ -485,5 +485,194 @@ export const HISTORIC_ELEVENS = [
       p('Erling Haaland', 'Haaland'),
       p('Jack Grealish', 'Grealish')
     ]
+  },
+  {
+    id: 'real-madrid-decimocuarta-2022',
+    team: 'Real Madrid',
+    season: '2021-22',
+    milestone: 'La Decimocuarta',
+    formation: '4-3-3',
+    source: 'Final Champions 2022 (París), once inicial',
+    players: [
+      p('Thibaut Courtois', 'Courtois'),
+      p('Dani Carvajal', 'Carvajal'),
+      p('Éder Militão', 'Militão', 'militao'),
+      p('David Alaba', 'Alaba'),
+      p('Ferland Mendy', 'Mendy'),
+      p('Luka Modrić', 'Modrić', 'modric'),
+      p('Casemiro', 'Casemiro', 'case'),
+      p('Toni Kroos', 'Kroos'),
+      p('Federico Valverde', 'Valverde', 'fede', 'pajarito'),
+      p('Karim Benzema', 'Benzema'),
+      p('Vinícius Júnior', 'Vinícius', 'vinicius', 'vini')
+    ]
+  },
+  {
+    id: 'bayern-wembley-2013',
+    team: 'Bayern de Múnich',
+    season: '2012-13',
+    milestone: 'El triplete de Heynckes (Wembley)',
+    formation: '4-2-3-1',
+    source: 'Final Champions 2013 (Wembley), once inicial',
+    players: [
+      p('Manuel Neuer', 'Neuer'),
+      p('Philipp Lahm', 'Lahm'),
+      p('Jérôme Boateng', 'Boateng'),
+      p('Dante', 'Dante'),
+      p('David Alaba', 'Alaba'),
+      p('Javi Martínez', 'J. Martínez', 'javi martinez'),
+      p('Bastian Schweinsteiger', 'Schweinsteiger', 'schweini'),
+      p('Arjen Robben', 'Robben'),
+      p('Thomas Müller', 'Müller', 'muller'),
+      p('Franck Ribéry', 'Ribéry', 'ribery'),
+      p('Mario Mandžukić', 'Mandžukić', 'mandzukic')
+    ]
+  },
+  {
+    id: 'alemania-mundial-2014',
+    team: 'Alemania',
+    season: '2014',
+    milestone: 'Campeona del Mundo (Maracanazo inverso)',
+    formation: '4-2-3-1',
+    source: 'Final del Mundial 2014 (Maracaná), once inicial',
+    players: [
+      p('Manuel Neuer', 'Neuer'),
+      p('Philipp Lahm', 'Lahm'),
+      p('Jérôme Boateng', 'Boateng'),
+      p('Mats Hummels', 'Hummels'),
+      p('Benedikt Höwedes', 'Höwedes', 'howedes'),
+      p('Sami Khedira', 'Khedira'),
+      p('Bastian Schweinsteiger', 'Schweinsteiger', 'schweini'),
+      p('Thomas Müller', 'Müller', 'muller'),
+      p('Toni Kroos', 'Kroos'),
+      p('Mesut Özil', 'Özil', 'ozil'),
+      p('Miroslav Klose', 'Klose')
+    ]
+  },
+  {
+    id: 'italia-eurocopa-2021',
+    team: 'Italia',
+    season: '2020',
+    milestone: 'Campeona de Europa (Wembley)',
+    formation: '4-3-3',
+    source: 'Final de la Eurocopa 2020 (Wembley), once inicial',
+    players: [
+      p('Gianluigi Donnarumma', 'Donnarumma', 'gigio'),
+      p('Giovanni Di Lorenzo', 'Di Lorenzo'),
+      p('Leonardo Bonucci', 'Bonucci'),
+      p('Giorgio Chiellini', 'Chiellini'),
+      p('Emerson Palmieri', 'Emerson'),
+      p('Nicolò Barella', 'Barella'),
+      p('Jorginho', 'Jorginho'),
+      p('Marco Verratti', 'Verratti'),
+      p('Federico Chiesa', 'Chiesa'),
+      p('Ciro Immobile', 'Immobile'),
+      p('Lorenzo Insigne', 'Insigne')
+    ]
+  },
+  {
+    id: 'manchester-united-treble-1999',
+    team: 'Manchester United',
+    season: '1998-99',
+    milestone: 'El triplete de Ferguson',
+    formation: '4-4-2',
+    source: 'Temporada 1998-99, once tipo (en la final de Champions faltaron Keane y Scholes por sanción)',
+    players: [
+      p('Peter Schmeichel', 'Schmeichel'),
+      p('Gary Neville', 'G. Neville', 'gary neville'),
+      p('Ronny Johnsen', 'Johnsen'),
+      p('Jaap Stam', 'Stam'),
+      p('Denis Irwin', 'Irwin'),
+      p('David Beckham', 'Beckham', 'becks'),
+      p('Roy Keane', 'Keane'),
+      p('Paul Scholes', 'Scholes'),
+      p('Ryan Giggs', 'Giggs'),
+      p('Dwight Yorke', 'Yorke'),
+      p('Andy Cole', 'Cole', 'andy cole')
+    ]
+  },
+  {
+    id: 'valencia-benitez-2004',
+    team: 'Valencia CF',
+    season: '2003-04',
+    milestone: 'Liga y UEFA de Rafa Benítez',
+    formation: '4-4-2',
+    source: 'Temporada 2003-04, once tipo — VERIFICAR',
+    players: [
+      p('Santiago Cañizares', 'Cañizares', 'canizares'),
+      p('Curro Torres', 'Curro Torres', 'curro'),
+      p('Roberto Ayala', 'Ayala'),
+      p('Carlos Marchena', 'Marchena'),
+      p('Amedeo Carboni', 'Carboni'),
+      p('Vicente', 'Vicente', 'vicente rodriguez'),
+      p('David Albelda', 'Albelda'),
+      p('Rubén Baraja', 'Baraja', 'pipo'),
+      p('Francisco Rufete', 'Rufete'),
+      p('Mista', 'Mista'),
+      p('Pablo Aimar', 'Aimar', 'el payaso')
+    ]
+  },
+  {
+    id: 'sevilla-uefa-2006',
+    team: 'Sevilla FC',
+    season: '2005-06',
+    milestone: 'La UEFA de Palop y Puerta',
+    formation: '4-4-2',
+    source: 'Final UEFA 2006 (Eindhoven) — VERIFICAR',
+    players: [
+      p('Andrés Palop', 'Palop'),
+      p('Dani Alves', 'Alves', 'dani alves'),
+      p('Javi Navarro', 'J. Navarro', 'javi navarro'),
+      p('Aitor Ocio', 'Ocio', 'aitor ocio'),
+      p('David Castedo', 'Castedo'),
+      p('Jesús Navas', 'J. Navas', 'jesus navas'),
+      p('Adriano', 'Adriano'),
+      p('Renato', 'Renato'),
+      p('Christian Poulsen', 'Poulsen'),
+      p('Luís Fabiano', 'L. Fabiano', 'luis fabiano', 'fabiano'),
+      p('Frédéric Kanouté', 'Kanouté', 'kanoute')
+    ]
+  },
+  {
+    id: 'deportivo-superdepor-2000',
+    team: 'Deportivo',
+    season: '1999-2000',
+    milestone: 'El Superdépor campeón de Liga',
+    formation: '4-4-2',
+    source: 'Temporada 1999-2000, once tipo — VERIFICAR',
+    players: [
+      p("Jacques Songo'o", "Songo'o", 'songo', 'songoo'),
+      p('Manuel Pablo', 'M. Pablo', 'manuel pablo'),
+      p('Noureddine Naybet', 'Naybet'),
+      p('Donato', 'Donato'),
+      p('Enrique Romero', 'Romero', 'enrique romero'),
+      p('Sergio', 'Sergio', 'sergio gonzalez'),
+      p('Mauro Silva', 'Mauro Silva', 'mauro'),
+      p('Fran', 'Fran', 'fran gonzalez'),
+      p('Djalminha', 'Djalminha', 'djalma'),
+      p('Roy Makaay', 'Makaay'),
+      p('Pauleta', 'Pauleta')
+    ]
+  },
+  {
+    id: 'chelsea-champions-2012',
+    team: 'Chelsea',
+    season: '2011-12',
+    milestone: 'La Champions de Múnich (Drogba)',
+    formation: '4-2-3-1',
+    source: 'Final Champions 2012 (Múnich) — VERIFICAR',
+    players: [
+      p('Petr Čech', 'Čech', 'cech'),
+      p('José Bosingwa', 'Bosingwa'),
+      p('Gary Cahill', 'Cahill'),
+      p('David Luiz', 'David Luiz', 'luiz'),
+      p('Ashley Cole', 'A. Cole', 'ashley cole'),
+      p('John Obi Mikel', 'Mikel', 'obi mikel'),
+      p('Frank Lampard', 'Lampard', 'lamps'),
+      p('Salomon Kalou', 'Kalou'),
+      p('Juan Mata', 'Mata', 'juan mata'),
+      p('Ryan Bertrand', 'Bertrand'),
+      p('Didier Drogba', 'Drogba')
+    ]
   }
 ];
