@@ -174,7 +174,7 @@ export function renderJuegos(container, callbacks) {
           <div class="tool-card-inner" style="padding: 1.25rem 1.25rem; display: flex; flex-direction: column; gap: 0.75rem; flex: 1; justify-content: space-between;">
             <div class="tool-card-text">
               <h2 class="tool-card-title" style="margin-bottom: 0.35rem;">El Once del Día</h2>
-              <p class="tool-card-desc">Cada día, un equipo. Nombra a los jugadores de su plantilla y comparte tu marca con el grupo.</p>
+              <p class="tool-card-desc">Cada día, un once mítico de la historia (el Madrid de los 100 puntos, el Leicester...). ¿Adivinas los 11 titulares?</p>
             </div>
             <div class="tool-card-arrow" style="align-self: flex-end;">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
