@@ -1,6 +1,23 @@
 import { escapeHTML } from '../utils/security';
 import { SITE_URL } from '../utils/site';
 import { HISTORIC_ELEVENS, FORMATIONS } from '../utils/historic-elevens';
+import { setupAutocomplete } from '../utils/autocomplete';
+
+// Pool para el autocompletado: unión de todos los jugadores de todos los onces.
+// Son cientos de nombres de distintas épocas, así que sugerir uno no desvela el
+// 11 de hoy; solo ayuda a escribir sin fallar la ortografía.
+const AUTOCOMPLETE_POOL = (() => {
+  const seen = new Set();
+  const arr = [];
+  for (const e of HISTORIC_ELEVENS) {
+    for (const pl of e.players) {
+      if (seen.has(pl.name)) continue;
+      seen.add(pl.name);
+      arr.push({ name: pl.name, searchKeys: pl.keys });
+    }
+  }
+  return arr;
+})();
 
 /**
  * "El Once del Día" — adivina el 11 titular de un equipo-hito histórico
@@ -59,6 +76,8 @@ export function renderOnce11(container, callbacks = {}) {
   };
 
   const matches = (pl, q) => pl.keys.some(k => normalizeStr(k) === q) || normalizeStr(pl.name) === q || normalizeStr(pl.short) === q;
+
+  let acCleanup = null;
 
   // Shell.
   container.innerHTML = `
@@ -135,6 +154,7 @@ export function renderOnce11(container, callbacks = {}) {
   }
 
   function renderInput() {
+    if (acCleanup) { try { acCleanup(); } catch (_) {} acCleanup = null; }
     if (finished) {
       els.inputArea.innerHTML = `
         <div style="text-align:center;background:var(--bg-card);border:3px solid #000;box-shadow:4px 4px 0 #000;border-radius:8px;padding:0.9rem;">
@@ -144,19 +164,21 @@ export function renderOnce11(container, callbacks = {}) {
       return;
     }
     els.inputArea.innerHTML = `
-      <form id="once-form" style="display:flex;gap:0.5rem;">
-        <input id="once-input" type="text" autocomplete="off" placeholder="Escribe un apellido y pulsa Enter..."
-          style="flex:1;min-width:0;box-sizing:border-box;background:var(--bg-input,#1c1b1b);border:3px solid #000;box-shadow:3px 3px 0 #000;border-radius:6px;padding:0.7rem 0.85rem;color:var(--text-light);font-family:var(--font-sans);font-weight:700;font-size:0.95rem;" />
-        <button type="submit" style="flex-shrink:0;padding:0 1.1rem;font-family:var(--font-display);font-weight:900;text-transform:uppercase;background:var(--accent);color:#000;border:3px solid #000;box-shadow:3px 3px 0 #000;border-radius:6px;cursor:pointer;">OK</button>
-      </form>`;
-    const form = els.inputArea.querySelector('#once-form');
+      <div style="display:flex;gap:0.5rem;">
+        <div class="once-input-wrap" style="position:relative;flex:1;min-width:0;">
+          <input id="once-input" type="text" autocomplete="off" placeholder="Escribe un jugador..."
+            style="width:100%;box-sizing:border-box;background:var(--bg-input,#1c1b1b);border:3px solid #000;box-shadow:3px 3px 0 #000;border-radius:6px;padding:0.7rem 0.85rem;color:var(--text-light);font-family:var(--font-sans);font-weight:700;font-size:0.95rem;" />
+        </div>
+        <button id="once-ok" type="button" style="flex-shrink:0;padding:0 1.1rem;font-family:var(--font-display);font-weight:900;text-transform:uppercase;background:var(--accent);color:#000;border:3px solid #000;box-shadow:3px 3px 0 #000;border-radius:6px;cursor:pointer;">OK</button>
+      </div>`;
     const input = els.inputArea.querySelector('#once-input');
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      handleGuess(input.value);
-      input.value = '';
-      input.focus();
+    const okBtn = els.inputArea.querySelector('#once-ok');
+    // Autocompletado sobre el pool de jugadores de todos los onces.
+    acCleanup = setupAutocomplete(input, (selected) => { input.value = ''; handleGuess(selected.name); }, AUTOCOMPLETE_POOL);
+    input.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); const v = input.value; input.value = ''; handleGuess(v); }
     });
+    okBtn.addEventListener('click', () => { const v = input.value; input.value = ''; handleGuess(v); input.focus(); });
     input.focus();
   }
 
@@ -189,10 +211,16 @@ export function renderOnce11(container, callbacks = {}) {
         setFeedback(`Ya tenías a ${hit.short}.`, 'warn');
       } else {
         guessed.add(hit.name);
-        if (guessed.size >= total) finished = true;
-        save();
         setFeedback(`¡Bien! ${hit.name}.`, 'ok');
-        updateUI();
+        if (guessed.size >= total) {
+          finished = true;
+          save();
+          updateUI();
+        } else {
+          save();
+          renderProgress();
+          renderSlots();
+        }
       }
     } else {
       setFeedback(`"${rawText.trim()}" no está en este once.`, 'error');
