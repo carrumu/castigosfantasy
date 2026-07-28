@@ -6,10 +6,10 @@ export default defineConfig({
     host: true,
     proxy: {
       '/api-biwenger': {
-        target: 'https://api.biwenger.com',
+        target: 'https://biwenger.as.com',
         changeOrigin: true,
         secure: false,
-        rewrite: (path) => path.replace(/^\/api-biwenger/, ''),
+        rewrite: (path) => path.replace(/^\/api-biwenger/, '/api'),
         configure: (proxy, options) => {
           proxy.on('error', (err, req, res) => {
             console.error('Vite Proxy Error for Biwenger:', err.message);

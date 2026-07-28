@@ -291,7 +291,7 @@ export async function openBiwengerTestModal() {
 
       } else {
         // Métodos HTTP directos tradicionales
-        const apiBase = method === 'direct' ? 'https://api.biwenger.com' : '/api-biwenger';
+        const apiBase = method === 'direct' ? 'https://biwenger.as.com/api' : '/api-biwenger';
         statusEl.innerHTML = '<span class="spinner" style="width:20px;height:20px;display:inline-block;vertical-align:middle;margin-right:10px;"></span>Autenticando en Biwenger...';
 
         const loginRes = await fetch(`${apiBase}/v2/auth/login`, {
