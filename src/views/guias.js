@@ -528,6 +528,9 @@ export const GUIDES = [
       <h3 style="${H3}">3. Pega el código y tus credenciales en Ajustes</h3>
       <p style="${P}">Entra en <strong>Opciones de la liga</strong> en Castigos Fantasy. Con Biwenger seleccionado como tipo de sincronización, pega el código de liga y añade el <strong>correo y la contraseña</strong> con los que entras a Biwenger. La app los necesita para poder leer la clasificación de tu liga; se guardan de forma privada y la contraseña no se vuelve a mostrar.</p>
 
+      <h3 style="${H3}">¿Entras a Biwenger con Google, Facebook o Apple?</h3>
+      <p style="${P}">Este es el fallo más habitual. Si entras a Biwenger con Google, Facebook o Apple, <strong>no tienes una contraseña propia de Biwenger</strong>, así que el correo y la contraseña de Google no funcionan aquí (verás un error de "credenciales no válidas"). La solución es rápida y solo se hace una vez: abre Biwenger, pulsa <span class="hl">"¿Olvidaste tu contraseña?"</span> con tu correo, créate una contraseña, y usa <strong>ese mismo correo y esa contraseña nueva</strong> en Castigos Fantasy.</p>
+
       <h3 style="${H3}">4. Guarda y deja que sincronice</h3>
       <p style="${P}">Guarda los ajustes. A partir de ahí, Castigos Fantasy importa sola la clasificación de cada jornada y detecta automáticamente al <strong>farolillo rojo</strong> (el que queda último), actualizando el bote y las deudas. Ya no tienes que revisarlo ni apuntarlo en el grupo.</p>
 
