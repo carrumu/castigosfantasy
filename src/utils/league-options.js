@@ -178,6 +178,9 @@ export async function openLeagueSettings(leagueId, callbacks) {
               <label for="edit-biwenger-password" style="color: var(--text-light); font-weight: 700; font-size: 0.75rem; display: block; margin-bottom: 0.25rem;">Contraseña de Biwenger</label>
               <input type="password" id="edit-biwenger-password" class="input-field" placeholder="Dejar en blanco para no cambiar" style="border: 1.5px solid var(--border-color-glow); font-weight: 700; background: var(--bg-input); width: 100%; padding: 0.55rem 0.75rem;" />
             </div>
+            <p style="font-size: 0.7rem; color: var(--text-muted); line-height: 1.45; margin: 0.2rem 0 0; background: rgba(222,237,0,0.06); border: 1px solid rgba(222,237,0,0.25); border-radius: 6px; padding: 0.5rem 0.65rem;">
+              ¿Entras a Biwenger con <strong style="color: var(--text-light);">Google, Facebook o Apple</strong>? Entonces no tienes contraseña propia de Biwenger. Créate una en Biwenger con <strong style="color: var(--text-light);">"¿Olvidaste tu contraseña?"</strong> usando tu correo, y pon aquí ese correo y esa contraseña.
+            </p>
           </div>
 
           <!-- Fields to configure Comunio credentials -->

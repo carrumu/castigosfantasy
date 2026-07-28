@@ -458,11 +458,21 @@ export async function openBiwengerSyncModal(leagueId, leagueData, isAdmin, callb
 
   } catch (err) {
     console.error(err);
+    const msg = (err && err.message) ? String(err.message) : 'Error desconocido';
+    // ¿Es un fallo de credenciales? Biwenger devuelve "Email or password not valid".
+    const isCredError = /password not valid|invalid|credenciales|not valid|401/i.test(msg);
+    const credHelp = `
+      <strong style="color:var(--text-light);">Correo o contraseña de Biwenger incorrectos.</strong><br/>
+      Revísalos en las opciones de la liga.<br/><br/>
+      <strong style="color:var(--accent-gold,#deed00);">¿Entras a Biwenger con Google, Facebook o Apple?</strong>
+      Entonces no tienes una contraseña propia de Biwenger. Créate una:
+      abre Biwenger, pulsa <strong>"¿Olvidaste tu contraseña?"</strong> con tu correo,
+      y usa ese <strong>correo y esa contraseña</strong> aquí.`;
     statusEl.innerHTML = `
       <strong style="color:var(--danger);">Error de Sincronización</strong><br/>
-      <span style="font-size:0.75rem; color:var(--text-muted); display:block; margin-top:0.4rem; line-height:1.45; text-align: left;">
-        Detalle del error: <strong style="color: #ff8888;">${err.message}</strong><br/><br/>
-        <em>Comprueba que las credenciales de Biwenger de la liga sean correctas en las opciones de configuración de la liga.</em>
+      <span style="font-size:0.75rem; color:var(--text-muted); display:block; margin-top:0.4rem; line-height:1.5; text-align: left;">
+        Detalle del error: <strong style="color: #ff8888;">${msg}</strong><br/><br/>
+        ${isCredError ? credHelp : `<em>Comprueba que las credenciales de Biwenger de la liga sean correctas en las opciones de configuración de la liga.</em>`}
       </span>
     `;
   }
