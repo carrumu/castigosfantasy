@@ -511,6 +511,32 @@ export const GUIDES = [
       <h3 style="${H3}">Y si no remontas, que no te pillen de farolillo rojo final</h3>
       <p style="${P}">A veces no da para el título, pero sí para no acabar último del todo y librarte de la humillación final. Pelea cada puesto: en una liga de castigos, subir del último al penúltimo ya es una pequeña victoria (y un castigo menos).</p>
     `
+  },
+  {
+    id: 'conectar-biwenger',
+    title: 'Cómo conectar tu liga de Biwenger a Castigos Fantasy',
+    description: 'Guía paso a paso para sincronizar tu liga de Biwenger con Castigos Fantasy: crear la liga, meter el código y tus credenciales, y que detecte al farolillo rojo solo cada jornada.',
+    html: `
+      <p style="${P}">Si tu liga juega en Biwenger, puedes conectarla a Castigos Fantasy para que detecte solo quién queda último cada jornada y lleve el bote y los castigos sin que apuntes nada a mano. Sigues jugando tu liga en Biwenger exactamente igual: esto se conecta por encima, no lo sustituye. Así se hace, paso a paso.</p>
+
+      <h3 style="${H3}">1. Crea tu liga y elige el tipo Biwenger</h3>
+      <p style="${P}">Entra en <strong>Mis Ligas</strong> y crea una liga nueva. Al crearla, en el tipo de liga elige <strong>Biwenger</strong> (en lugar de Fantasy manual o Comunio). Con esto le dices a la app que tu clasificación viene de Biwenger.</p>
+
+      <h3 style="${H3}">2. Copia el código de tu liga de Biwenger</h3>
+      <p style="${P}">Abre tu liga en Biwenger y copia el <strong>código que la identifica</strong>, el que aparece en el enlace de tu liga (tiene una pinta parecida a <span class="hl">cwRzHsqCc6nx</span>). Ese código es el que usa Castigos Fantasy para saber de qué liga tiene que leer la clasificación.</p>
+
+      <h3 style="${H3}">3. Pega el código y tus credenciales en Ajustes</h3>
+      <p style="${P}">Entra en <strong>Opciones de la liga</strong> en Castigos Fantasy. Con Biwenger seleccionado como tipo de sincronización, pega el código de liga y añade el <strong>correo y la contraseña</strong> con los que entras a Biwenger. La app los necesita para poder leer la clasificación de tu liga; se guardan de forma privada y la contraseña no se vuelve a mostrar.</p>
+
+      <h3 style="${H3}">4. Guarda y deja que sincronice</h3>
+      <p style="${P}">Guarda los ajustes. A partir de ahí, Castigos Fantasy importa sola la clasificación de cada jornada y detecta automáticamente al <strong>farolillo rojo</strong> (el que queda último), actualizando el bote y las deudas. Ya no tienes que revisarlo ni apuntarlo en el grupo.</p>
+
+      <h3 style="${H3}">Que cada miembro vincule su participante</h3>
+      <p style="${P}">Para que las estadísticas de cada uno cuadren, cada miembro de la liga debería entrar en Opciones de la liga y vincular su <strong>participante de Biwenger</strong>, eligiendo su nombre de la lista. Así el sistema sabe quién es quién y reparte los castigos a la persona correcta.</p>
+
+      <h3 style="${H3}">¿Y si mi liga no es de Biwenger?</h3>
+      <p style="${P}">La sincronización automática está disponible con Biwenger. Si juegas en Comunio, LaLiga Fantasy, Mister u otra, puedes usar Castigos Fantasy igual: la ruleta, el bote y el muro de la vergüenza funcionan lo mismo, solo que confirmas tú quién ha quedado último en un par de toques. Tienes más detalle en la guía de <a href="/guias/biwenger-comunio-laliga-fantasy" class="cf-link" data-nav="guias/biwenger-comunio-laliga-fantasy" style="color:var(--accent);">castigos en Biwenger, Comunio o LaLiga Fantasy</a>.</p>
+    `
   }
 ];
 
@@ -552,6 +578,7 @@ export const GUIDE_CATEGORY = {
   'errores-manager-novato': 'estrategia',
   'como-remontar-clasificacion': 'estrategia',
   'biwenger-comunio-laliga-fantasy': 'basicos',
+  'conectar-biwenger': 'basicos',
   'glosario-fantasy': 'basicos'
 };
 
