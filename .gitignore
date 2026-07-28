@@ -32,3 +32,6 @@ clear_history.cjs
 .impeccable/
 castigosfantasy/
 
+
+# Archivos internos del IDE (pueden contener credenciales de pruebas)
+.gemini/

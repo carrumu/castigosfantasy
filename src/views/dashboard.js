@@ -1,4 +1,5 @@
 import { supabase } from '../supabase';
+import { escapeHTML } from '../utils/security';
 import { getRandomPhrase } from '../utils/phrases';
 import { openLeagueSettings } from '../utils/league-options';
 import { openBiwengerLinkModal } from '../utils/biwenger-link-modal';
@@ -392,7 +393,7 @@ export function renderDashboard(container, callbacks) {
     const memberOptions = members.map(m => {
       const bwMatch = m.biwenger_user_name &&
         pending.tieNames.some(n => n.toLowerCase().trim() === m.biwenger_user_name.toLowerCase().trim());
-      return `<option value="${m.profile_id}" ${defaultMember?.profile_id === m.profile_id || (pending.isTie && bwMatch) ? 'selected' : ''}>${m.display_name}</option>`;
+      return `<option value="${m.profile_id}" ${defaultMember?.profile_id === m.profile_id || (pending.isTie && bwMatch) ? 'selected' : ''}>${escapeHTML(m.display_name)}</option>`;
     }).join('');
 
     const modal = document.createElement('div');
@@ -550,7 +551,7 @@ export function renderDashboard(container, callbacks) {
             <div class="leaderboard-rank">${idx + 1}</div>
             <div class="leaderboard-info">
               <div class="leaderboard-name" style="display: flex; align-items: center; flex-wrap: wrap;">
-                ${item.name} ${biwengerPart}
+                ${escapeHTML(item.name)} ${biwengerPart}
               </div>
               <div class="leaderboard-stats">Último puesto: <strong>${item.countLast}</strong> veces</div>
             </div>
@@ -693,7 +694,7 @@ export function renderDashboard(container, callbacks) {
             <div class="leaderboard-rank" style="background: rgba(255,255,255,0.03); color: var(--text-muted);">--</div>
             <div class="leaderboard-info">
               <div class="leaderboard-name" style="display: flex; align-items: center; flex-wrap: wrap;">
-                ${m.display_name}
+                ${escapeHTML(m.display_name)}
                 <span style="font-size: 0.72rem; color: var(--accent-gold); font-weight: 500; margin-left: 0.35rem;">Sin vincular ${linkActionHtml}</span>
               </div>
               <div class="leaderboard-stats">Mánager de CastigosFantasy no asociado a Biwenger</div>
@@ -740,7 +741,7 @@ export function renderDashboard(container, callbacks) {
         <!-- Banner de Liga -->
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
           <div>
-            <h1 class="gradient-text-green" style="font-size: 1.6rem; font-weight: 900;">${currentLeague.name}</h1>
+            <h1 class="gradient-text-green" style="font-size: 1.6rem; font-weight: 900;">${escapeHTML(currentLeague.name)}</h1>
             <p style="font-size: 0.85rem; color: var(--text-muted);">
               Código de Invitación: <strong style="color: var(--accent-gold); cursor: pointer;" id="copy-invite-code" title="Copiar código">${currentLeague.invite_code} (Copiar)</strong>
             </p>
@@ -820,7 +821,7 @@ export function renderDashboard(container, callbacks) {
                 <select id="loser-select" class="input-field" required>
                   <option value="">-- Selecciona el Perdedor --</option>
                   ${members.map(m => `
-                    <option value="${m.profile_id}">${m.display_name}</option>
+                    <option value="${m.profile_id}">${escapeHTML(m.display_name)}</option>
                   `).join('')}
                 </select>
               </div>
