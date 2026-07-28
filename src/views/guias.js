@@ -540,6 +540,29 @@ export const GUIDES = [
       <h3 style="${H3}">¿Y si mi liga no es de Biwenger?</h3>
       <p style="${P}">La sincronización automática está disponible con Biwenger. Si juegas en Comunio, LaLiga Fantasy, Mister u otra, puedes usar Castigos Fantasy igual: la ruleta, el bote y el muro de la vergüenza funcionan lo mismo, solo que confirmas tú quién ha quedado último en un par de toques. Tienes más detalle en la guía de <a href="/guias/biwenger-comunio-laliga-fantasy" class="cf-link" data-nav="guias/biwenger-comunio-laliga-fantasy" style="color:var(--accent);">castigos en Biwenger, Comunio o LaLiga Fantasy</a>.</p>
     `
+  },
+  {
+    id: 'conectar-comunio',
+    title: 'Cómo conectar tu liga de Comunio a Castigos Fantasy',
+    description: 'Guía paso a paso para sincronizar tu liga de Comunio con Castigos Fantasy: solo tu usuario y contraseña, y la comunidad se detecta sola para llevar el bote y los castigos al farolillo rojo.',
+    html: `
+      <p style="${P}">Si tu liga juega en Comunio, puedes conectarla a Castigos Fantasy para que lleve el bote y los castigos sin que apuntes nada a mano. Sigues jugando en Comunio exactamente igual: esto se conecta por encima, no lo sustituye. Y lo mejor: tu comunidad <strong>se detecta sola</strong>, no necesitas buscar ningún código.</p>
+
+      <h3 style="${H3}">1. Crea tu liga y elige el tipo Comunio</h3>
+      <p style="${P}">Entra en <strong>Mis Ligas</strong> y crea una liga nueva. Al crearla, elige el tipo <strong>Comunio</strong> (en lugar de Fantasy manual o Biwenger).</p>
+
+      <h3 style="${H3}">2. Pon tu usuario y contraseña de Comunio</h3>
+      <p style="${P}">Entra en <strong>Opciones de la liga</strong> y, con Comunio seleccionado, escribe el <strong>usuario</strong> con el que entras a Comunio (ojo: <span class="hl">el usuario, no el correo</span>) y tu contraseña. Se guardan de forma privada y la contraseña no se vuelve a mostrar.</p>
+
+      <h3 style="${H3}">3. Guarda y listo</h3>
+      <p style="${P}">Al sincronizar, Castigos Fantasy <strong>detecta tu comunidad automáticamente</strong> e importa la clasificación de la jornada, detectando al <strong>farolillo rojo</strong> y llevando el bote. No tienes que meter ningún ID de comunidad (solo hace falta si juegas en varias comunidades a la vez y quieres elegir una).</p>
+
+      <h3 style="${H3}">¿Entras a Comunio con Google, Facebook o Apple?</h3>
+      <p style="${P}">Es el fallo más habitual. Si entras a Comunio con Google, Facebook o Apple, <strong>no tienes una contraseña propia de Comunio</strong>, así que fallará al conectar. Se arregla rápido y una sola vez: en Comunio, pulsa <span class="hl">"¿Olvidaste tu contraseña?"</span> con tu correo, créate una contraseña, y usa aquí tu <strong>usuario y esa contraseña nueva</strong>.</p>
+
+      <h3 style="${H3}">Nota sobre las puntuaciones</h3>
+      <p style="${P}">La clasificación solo tiene puntos una vez ha empezado la temporada. En pretemporada, la comunidad y los miembros se detectan igual, pero el ranking estará vacío hasta que se jueguen jornadas.</p>
+    `
   }
 ];
 
@@ -582,6 +605,7 @@ export const GUIDE_CATEGORY = {
   'como-remontar-clasificacion': 'estrategia',
   'biwenger-comunio-laliga-fantasy': 'basicos',
   'conectar-biwenger': 'basicos',
+  'conectar-comunio': 'basicos',
   'glosario-fantasy': 'basicos'
 };
 
