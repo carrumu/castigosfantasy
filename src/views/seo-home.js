@@ -105,13 +105,11 @@ const STEPS = [
 
 export function renderSeoHome(container, { onNavigate } = {}) {
   const heroCta = `
-    <button class="seo-nav" data-nav="acceso" style="
+    <button class="seo-nav cf-lift" data-nav="acceso" style="
       font-family:var(--font-display);font-weight:900;font-size:1.05rem;text-transform:uppercase;
       letter-spacing:-0.5px;background:var(--accent);color:#000;border:3px solid #000;
       padding:0.85rem 2rem;cursor:pointer;box-shadow:5px 5px 0 #000;
-      transition:transform 0.1s ease, box-shadow 0.1s ease;"
-      onmouseover="this.style.transform='translate(-2px,-2px)';this.style.boxShadow='7px 7px 0 #000';"
-      onmouseout="this.style.transform='';this.style.boxShadow='5px 5px 0 #000';">Crea tu liga gratis →</button>`;
+      transition:transform 0.1s ease, box-shadow 0.1s ease;">Crea tu liga gratis →</button>`;
 
   const loginNudge = `
     <p class="seo-login-nudge">

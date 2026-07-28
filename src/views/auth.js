@@ -232,7 +232,7 @@ export function renderAuth(container, callbacks) {
           <div class="social-divider">o continuar con</div>
 
           <div style="display: flex; justify-content: center; width: 100%;">
-            <button type="button" id="google-login-btn" style="display: flex; align-items: center; justify-content: center; gap: 0.6rem; width: 100%; padding: 0.75rem 1.25rem; background: #fff; color: #3c4043; border: 1px solid #dadce0; border-radius: 8px; font-family: var(--font-sans); font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: box-shadow 0.2s, background 0.2s;" onmouseover="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.18)'; this.style.background='#f8f8f8'" onmouseout="this.style.boxShadow='none'; this.style.background='#fff'">
+            <button type="button" id="google-login-btn" class="cf-google-btn" style="display: flex; align-items: center; justify-content: center; gap: 0.6rem; width: 100%; padding: 0.75rem 1.25rem; background: #fff; color: #3c4043; border: 1px solid #dadce0; border-radius: 8px; font-family: var(--font-sans); font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: box-shadow 0.2s, background 0.2s;">
               <svg width="20" height="20" viewBox="0 0 18 18">
                 <path fill="#4285F4" d="M17.64 9.2c0-.63-.06-1.25-.16-1.84H9v3.47h4.84c-.21 1.12-.84 2.07-1.8 2.7v2.24h2.9c1.7-1.57 2.7-3.88 2.7-6.57z"/>
                 <path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.23l-2.9-2.24c-.8.54-1.84.87-3.06.87-2.35 0-4.35-1.59-5.06-3.73H.95v2.3C2.43 15.89 5.5 18 9 18z"/>

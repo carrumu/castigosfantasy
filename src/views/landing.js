@@ -141,9 +141,7 @@ export function renderLanding(container, callbacks) {
           ${hasLeagues && latestCompleteRecord ? `
             <!-- Jornada Express entry — first thing under the hero so it's
                  actually findable, not buried inside Lista de Morosos. -->
-            <button id="landing-jornada-express-btn" style="width: 100%; text-align: left; cursor: pointer; margin-bottom: 1.5rem; border: 3px solid #000; box-shadow: 6px 6px 0px #000; background: var(--accent); border-radius: 12px; display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1.1rem 1.35rem; transition: transform 0.15s, box-shadow 0.15s;"
-              onmouseover="this.style.transform='translate(-2px,-2px)'; this.style.boxShadow='8px 8px 0px #000';"
-              onmouseout="this.style.transform=''; this.style.boxShadow='6px 6px 0px #000';">
+            <button id="landing-jornada-express-btn" class="cf-lift-lg" style="width: 100%; text-align: left; cursor: pointer; margin-bottom: 1.5rem; border: 3px solid #000; box-shadow: 6px 6px 0px #000; background: var(--accent); border-radius: 12px; display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1.1rem 1.35rem; transition: transform 0.15s, box-shadow 0.15s;">
               <div style="display: flex; align-items: center; gap: 1rem;">
                 <div style="width: 54px; height: 54px; border: 3px solid #000; border-radius: 50%; background: #000; color: var(--accent); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                   <span class="material-symbols-outlined" style="font-size: 1.9rem;">bolt</span>

@@ -646,7 +646,7 @@ Firmado y jurado por todos los miembros del grupo de WhatsApp.`;
                 <!-- Display Wrap -->
                 <div id="calc-destination-display-wrap" style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.02); padding: 0.55rem 0.75rem; border: 2px dashed var(--border-color); border-radius: 6px;">
                   <span id="calc-destination-text-val" style="font-weight: 700; color: var(--text-light); font-size: 0.78rem;">Una buena cena de campeones</span>
-                  <button id="btn-edit-destination" style="background: transparent; border: none; color: var(--accent); display: flex; align-items: center; justify-content: center; padding: 0.2rem; cursor: pointer; transition: transform 0.15s ease;" onmouseover="this.style.transform='scale(1.18)'" onmouseout="this.style.transform='scale(1)'" title="Editar destino">
+                  <button id="btn-edit-destination" class="cf-zoom" style="background: transparent; border: none; color: var(--accent); display: flex; align-items: center; justify-content: center; padding: 0.2rem; cursor: pointer; transition: transform 0.15s ease;" title="Editar destino">
                     <span class="material-symbols-outlined" style="font-size: 16px;">edit</span>
                   </button>
                 </div>

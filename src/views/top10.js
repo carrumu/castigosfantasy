@@ -185,10 +185,26 @@ export async function renderTop10(container, callbacks) {
 
   // Render colorful flag img using flagcdn.com (works on all OS including Windows)
   // If the image fails to load (e.g. adblocker on mobile), fallback to the native emoji
+  // Sustituye la imagen de la bandera por el emoji si la carga falla (p. ej.
+  // un bloqueador de anuncios tumba flagcdn.com). Antes esto era un onerror
+  // inline; ahora va por addEventListener para poder aplicar una CSP estricta.
+  const bindFlagFallbacks = (root) => {
+    root.querySelectorAll('img.cf-flag').forEach((img) => {
+      img.addEventListener('error', () => {
+        const span = document.createElement('span');
+        span.style.cssText = 'font-size: 1.25rem; display: inline-block; vertical-align: middle;';
+        span.textContent = img.dataset.fallback || '';
+        img.replaceWith(span);
+      }, { once: true });
+    });
+  };
+
   const getFlagHtml = (flag) => {
     const code = getCountryCode(flag);
     const safeFlag = flag ? flag.replace(/'/g, '&#39;').replace(/"/g, '&quot;') : '';
-    return `<img src="https://flagcdn.com/w40/${code}.png" style="width: 24px; height: auto; border-radius: 2px; box-shadow: 0 1px 3px rgba(0,0,0,0.3); display: inline-block; vertical-align: middle;" alt="${code.toUpperCase()}" onerror="this.outerHTML='<span style=\\'font-size: 1.25rem; display: inline-block; vertical-align: middle;\\'>${safeFlag}</span>'" />`;
+    // El fallback a emoji se engancha con addEventListener tras renderizar
+    // (ver bindFlagFallbacks), para no depender de un onerror inline.
+    return `<img src="https://flagcdn.com/w40/${code}.png" class="cf-flag" data-fallback="${safeFlag}" style="width: 24px; height: auto; border-radius: 2px; box-shadow: 0 1px 3px rgba(0,0,0,0.3); display: inline-block; vertical-align: middle;" alt="${code.toUpperCase()}" />`;
   };
 
   // Dynamically resolve autocomplete search database based on topic
@@ -538,11 +554,7 @@ Juega gratis en ${SITE_URL}/top-10`;
               transition: transform 0.05s ease, box-shadow 0.05s ease;
               flex-shrink: 0;
             "
-            title="Rendirse y revelar respuestas"
-            onmouseover="this.style.transform='translate(-1px,-1px)'; this.style.boxShadow='4px 4px 0px #000000';"
-            onmouseout="this.style.transform=''; this.style.boxShadow='3px 3px 0px #000000';"
-            onmousedown="this.style.transform='translate(2px,2px)'; this.style.boxShadow='0px 0px 0px #000000';"
-            onmouseup="this.style.transform='translate(-1px,-1px)'; this.style.boxShadow='4px 4px 0px #000000';"
+            title="Rendirse y revelar respuestas" class="cf-btn-press"
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
@@ -607,6 +619,9 @@ Juega gratis en ${SITE_URL}/top-10`;
         ${inputControlsHtml}
       </div>
     `;
+
+    // Fallback a emoji para las banderas que no carguen (sustituye al onerror inline)
+    bindFlagFallbacks(container);
 
     // Setup autocomplete dropdown list if game is active
     if (!isFinished) {

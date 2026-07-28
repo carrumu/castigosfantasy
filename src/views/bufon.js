@@ -773,7 +773,8 @@ export function renderBufon(container, callbacks) {
         }, 50);
       }).catch(err => {
         console.error('Error loading auth view:', err);
-        authContainer.innerHTML = '<div class="card glass" style="text-align:center; padding:1.5rem;">Error al cargar acceso. <button class="btn-primary" onclick="window.location.reload()">Recargar</button></div>';
+        authContainer.innerHTML = '<div class="card glass" style="text-align:center; padding:1.5rem;">Error al cargar acceso. <button class="btn-primary" id="bufon-reload-btn">Recargar</button></div>';
+        authContainer.querySelector('#bufon-reload-btn')?.addEventListener('click', () => window.location.reload());
       });
     }
   }

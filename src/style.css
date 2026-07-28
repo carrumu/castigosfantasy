@@ -4561,3 +4561,35 @@ h1, h2, h3, h4, h5, h6, .card-title {
   transform: translateY(-2px);
   box-shadow: 2px 2px 0 0 #000;
 }
+
+/* ===== Efectos hover sin JavaScript embebido =====
+   Sustituyen a los antiguos atributos onmouseover/onmouseout inline, que una
+   Content-Security-Policy estricta bloquea. El !important es necesario porque
+   el estado base de estos elementos vive en su atributo style. */
+.cf-lift:hover {
+  transform: translate(-2px, -2px) !important;
+  box-shadow: 7px 7px 0 #000 !important;
+}
+.cf-lift-lg:hover {
+  transform: translate(-2px, -2px) !important;
+  box-shadow: 8px 8px 0 #000 !important;
+}
+.cf-lift-sm:hover {
+  transform: translate(-1px, -1px) !important;
+  box-shadow: 4px 4px 0 #000 !important;
+}
+.cf-zoom:hover {
+  transform: scale(1.18) !important;
+}
+.cf-google-btn:hover {
+  background: #f8f8f8 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18) !important;
+}
+.cf-btn-press:hover {
+  transform: translate(-1px, -1px) !important;
+  box-shadow: 4px 4px 0 #000 !important;
+}
+.cf-btn-press:active {
+  transform: translate(2px, 2px) !important;
+  box-shadow: 0 0 0 #000 !important;
+}
