@@ -79,23 +79,14 @@ serve(async (req: Request) => {
     }
     const authHeaders = { ...jsonHeaders, "Authorization": `Bearer ${token}` };
 
-    // --- 2. Resolve community id if not configured ---
+    // --- 2. Se necesita el ID de comunidad ---
+    // La API moderna de Comunio no expone la comunidad solo con el token de
+    // forma fiable (no hay un /users/me utilizable sin el userid, que el login
+    // no devuelve). Por eso el ID de comunidad debe estar configurado en la
+    // liga. El usuario lo encuentra en la URL de su comunidad en Comunio
+    // (p. ej. .../communities/5241339 -> el ID es 5241339).
     if (!communityId) {
-      const meRes = await fetch(`${COMUNIO_API}/users/me`, { headers: authHeaders });
-      const meText = await meRes.text();
-      let me: any = {};
-      try { me = JSON.parse(meText); } catch (_) {}
-      console.log(`[comunio] users/me status=${meRes.status} body=${meText.slice(0, 500)}`);
-      // Try common shapes for the community list
-      const communities = me?.communities || me?.data?.communities || me?.user?.communities || [];
-      if (Array.isArray(communities) && communities.length > 0) {
-        communityId = String(communities[0].id ?? communities[0].communityId ?? communities[0]);
-      } else if (me?.community?.id) {
-        communityId = String(me.community.id);
-      }
-      if (!communityId) {
-        return json({ error: "No se pudo resolver la comunidad de Comunio. Revisa el ID en Ajustes.", _debug: me }, 502);
-      }
+      return json({ error: "Falta el ID de comunidad de Comunio. Añádelo en Ajustes de la liga (lo tienes en la URL de tu comunidad en comunio.es)." }, 400);
     }
 
     // --- 3. Community info (name) + members + standings ---
@@ -111,11 +102,14 @@ serve(async (req: Request) => {
     let standingsRaw: any = null;
     try { standingsRaw = stText ? JSON.parse(stText) : null; } catch (_) { standingsRaw = null; }
 
-    const members = (memJson?.members || []).map((m: any) => ({
+    // Forma real de /communities/{id}/members: { members:[{ id, loginName,
+    // firstName, isLeader }] }. Con ?online la clave es "users"; soportamos ambas.
+    const memberList = memJson?.members || memJson?.users || [];
+    const members = memberList.map((m: any) => ({
       id: m.id,
-      login: m.login,
-      name: m.firstName || m.login || "Mánager",
-      leader: !!m.leader,
+      login: m.loginName || m.login,
+      name: m.firstName || m.loginName || m.login || "Mánager",
+      leader: !!(m.isLeader ?? m.leader),
     }));
 
     // Standings hold the points once the season has started; empty in preseason.
