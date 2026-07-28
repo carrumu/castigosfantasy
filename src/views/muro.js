@@ -1,4 +1,5 @@
 import { supabase } from '../supabase';
+import { escapeHTML } from '../utils/security';
 import { howItWorks } from '../utils/how-it-works.js';
 
 /**
@@ -141,7 +142,7 @@ export function renderMuro(container, callbacks) {
                     <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.15); padding: 0.75rem 1rem; border-radius: 6px; border: 1.5px solid var(--border-color);">
                       <div style="display: flex; align-items: center; gap: 0.75rem;">
                         <span style="font-weight: 900; color: var(--text-muted); width: 20px;">#${idx + 1}</span>
-                        <span style="font-weight: 700; color: var(--text-light);">${c.name}</span>
+                        <span style="font-weight: 700; color: var(--text-light);">${escapeHTML(c.name)}</span>
                       </div>
                       <span style="font-size: 0.7rem; font-weight: 800; background: ${badgeBg}; color: ${badgeColor}; padding: 0.25rem 0.6rem; border-radius: 4px; border: 1px solid #000; text-transform: uppercase;">
                         ${c.count} rechazo${c.count > 1 ? 's' : ''}
@@ -187,7 +188,7 @@ export function renderMuro(container, callbacks) {
                         </span>
                       </div>
                       <p style="font-size: 0.8rem; color: var(--text-light); line-height: 1.4; margin: 0;">
-                        Castigo: <span style="font-weight: 700;">${ev.punishment_name}</span>
+                        Castigo: <span style="font-weight: 700;">${escapeHTML(ev.punishment_name)}</span>
                       </p>
                       <span style="font-size: 0.68rem; color: var(--text-muted); font-weight: 500;">
                         Fecha: ${dateStr}

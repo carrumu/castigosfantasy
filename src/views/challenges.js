@@ -1,6 +1,7 @@
 import { supabase, isConfigured } from '../supabase';
 import { getMatchdayClosingTime, getCurrentMatchdayNumber } from '../utils/calendar';
 import { CHALLENGES_DB } from '../utils/challenges-db';
+import { escapeHTML } from '../utils/security';
 import { howItWorks } from '../utils/how-it-works.js';
 
 /**
@@ -292,9 +293,9 @@ export function renderChallenges(container, callbacks) {
                     <div style="position: relative; z-index: 2; display: flex; justify-content: space-between; align-items: start; gap: 1rem;">
                       <div style="flex-grow: 1;">
                         <h4 style="font-size: 1.05rem; font-weight: 700; color: ${isWinner ? 'var(--accent)' : (isThisVoted ? 'var(--primary)' : 'var(--text-light)')}; margin-bottom: 0.25rem;">
-                          ${item.title}
+                          ${escapeHTML(item.title)}
                         </h4>
-                        <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.4;">${item.desc}</p>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.4;">${escapeHTML(item.desc)}</p>
                       </div>
                       <div style="text-align: right; min-width: 80px;">
                         <span style="font-weight: 800; font-size: 1.15rem; color: ${isWinner ? 'var(--accent)' : 'var(--primary)'};">${percent}%</span>

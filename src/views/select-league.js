@@ -1,4 +1,5 @@
 import { supabase } from '../supabase';
+import { escapeHTML } from '../utils/security';
 import { openLeagueSettings } from '../utils/league-options';
 import { openBiwengerLinkModal } from '../utils/biwenger-link-modal';
 import { openComunioLinkModal } from '../utils/comunio-link-modal';
@@ -133,7 +134,7 @@ export function renderSelectLeague(container, callbacks) {
                   return `
                     <div class="league-item ${isActive ? 'is-active' : ''}">
                       <div class="league-item-top-row">
-                        <h4 class="league-item-name">${l.name}</h4>
+                        <h4 class="league-item-name">${escapeHTML(l.name)}</h4>
                         ${isActive ? `
                           <span class="league-active-badge">Activa</span>
                         ` : ''}
@@ -148,7 +149,7 @@ export function renderSelectLeague(container, callbacks) {
                         
                         <div class="league-item-actions">
                           <button class="btn-dots btn-league-opts" data-id="${l.id}" title="Opciones de la Liga">⋮</button>
-                          <button class="btn-select-league ${isActive ? 'is-active' : ''}" data-id="${l.id}" data-name="${l.name}">
+                          <button class="btn-select-league ${isActive ? 'is-active' : ''}" data-id="${l.id}" data-name="${escapeHTML(l.name)}">
                             ${isActive ? 'Entrar ✓' : 'Seleccionar'}
                           </button>
                         </div>
@@ -413,7 +414,7 @@ export function renderSelectLeague(container, callbacks) {
             let optionsHtml = '<option value="">-- Selecciona tu identidad --</option>';
             roster.forEach(r => {
               if (!r.is_claimed) {
-                optionsHtml += `<option value="${r.id}">${r.name}</option>`;
+                optionsHtml += `<option value="${r.id}">${escapeHTML(r.name)}</option>`;
               }
             });
             optionsHtml += '<option value="new">Nuevo Jugador (No estoy en la lista)</option>';
