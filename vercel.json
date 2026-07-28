@@ -1,5 +1,12 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "comment": "Al existir vercel.json se pierde el fallback SPA automatico del preset de Vite, asi que hay que declararlo explicitamente. Los rewrites se aplican DESPUES de buscar el fichero estatico, por lo que las paginas prerenderizadas (/guias/...) se siguen sirviendo tal cual.",
+  "rewrites": [
+    {
+      "source": "/((?!assets/|.*\\.[a-zA-Z0-9]+$).*)",
+      "destination": "/index.html"
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",
