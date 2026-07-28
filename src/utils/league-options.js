@@ -187,9 +187,9 @@ export async function openLeagueSettings(leagueId, callbacks) {
           <div id="edit-comunio-fields" style="display: ${leagueData.sync_source === 'comunio' ? 'flex' : 'none'}; flex-direction: column; gap: 0.75rem; border-top: 1.5px dashed var(--border-color-glow); padding-top: 0.75rem; margin-top: 0.15rem;">
             <span style="font-size: 0.72rem; color: var(--accent-gold); font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Automatización Comunio</span>
             <div class="form-group" style="margin-bottom: 0;">
-              <label for="edit-comunio-community-id" style="color: var(--text-light); font-weight: 700; font-size: 0.75rem; display: block; margin-bottom: 0.25rem;">ID de Comunidad Comunio</label>
-              <input type="text" id="edit-comunio-community-id" class="input-field" value="${leagueData.comunio_community_id || ''}" placeholder="Ej: 5241339" style="border: 1.5px solid var(--border-color-glow); font-weight: 700; background: var(--bg-input); width: 100%; padding: 0.55rem 0.75rem;" />
-              <p style="font-size: 0.68rem; color: var(--text-muted); line-height: 1.4; margin: 0.3rem 0 0;">Entra en tu comunidad en <strong style="color: var(--text-light);">comunio.es</strong>: el ID son los números que salen en la dirección (<em>.../communities/<strong style="color: var(--text-light);">5241339</strong>/...</em>).</p>
+              <label for="edit-comunio-community-id" style="color: var(--text-light); font-weight: 700; font-size: 0.75rem; display: block; margin-bottom: 0.25rem;">ID de Comunidad Comunio <span style="color: var(--text-muted); font-weight: 500;">(opcional)</span></label>
+              <input type="text" id="edit-comunio-community-id" class="input-field" value="${leagueData.comunio_community_id || ''}" placeholder="Se detecta sola" style="border: 1.5px solid var(--border-color-glow); font-weight: 700; background: var(--bg-input); width: 100%; padding: 0.55rem 0.75rem;" />
+              <p style="font-size: 0.68rem; color: var(--text-muted); line-height: 1.4; margin: 0.3rem 0 0;">Se detecta automáticamente al sincronizar. Solo rellénalo si juegas en <strong style="color: var(--text-light);">varias comunidades</strong> de Comunio y quieres una concreta.</p>
             </div>
             <div class="form-group" style="margin-bottom: 0;">
               <label for="edit-comunio-email" style="color: var(--text-light); font-weight: 700; font-size: 0.75rem; display: block; margin-bottom: 0.25rem;">Usuario / ID de Comunio</label>

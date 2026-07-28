@@ -79,14 +79,19 @@ serve(async (req: Request) => {
     }
     const authHeaders = { ...jsonHeaders, "Authorization": `Bearer ${token}` };
 
-    // --- 2. Se necesita el ID de comunidad ---
-    // La API moderna de Comunio no expone la comunidad solo con el token de
-    // forma fiable (no hay un /users/me utilizable sin el userid, que el login
-    // no devuelve). Por eso el ID de comunidad debe estar configurado en la
-    // liga. El usuario lo encuentra en la URL de su comunidad en Comunio
-    // (p. ej. .../communities/5241339 -> el ID es 5241339).
+    // --- 2. Autodetectar la comunidad ---
+    // GET / (raíz) con el token devuelve { user:{id}, community:{id,name}, _links }.
+    // Ese es el "bootstrap" real de la API moderna (el antiguo /users/me no vale:
+    // pide un userid que el login no entrega). Si el usuario configuró un ID de
+    // comunidad a mano (varias comunidades), ese tiene prioridad.
     if (!communityId) {
-      return json({ error: "Falta el ID de comunidad de Comunio. Añádelo en Ajustes de la liga (lo tienes en la URL de tu comunidad en comunio.es)." }, 400);
+      const rootRes = await fetch(`${COMUNIO_API}/`, { headers: authHeaders });
+      const rootJson = await rootRes.json().catch(() => ({}));
+      communityId = rootJson?.community?.id ? String(rootJson.community.id) : null;
+      console.log(`[comunio] bootstrap GET / status=${rootRes.status} community=${communityId}`);
+      if (!communityId) {
+        return json({ error: "No hemos podido detectar tu comunidad de Comunio. Asegúrate de estar dentro de una comunidad en Comunio, o añade el ID de comunidad en Ajustes.", _debug: rootJson }, 502);
+      }
     }
 
     // --- 3. Community info (name) + members + standings ---
