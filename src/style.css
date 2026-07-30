@@ -4593,3 +4593,67 @@ h1, h2, h3, h4, h5, h6, .card-title {
   transform: translate(2px, 2px) !important;
   box-shadow: 0 0 0 #000 !important;
 }
+
+/* ===== "¿Cómo funciona?" plegable =====
+   Va cerrado por defecto: solo se ve un botón discreto de información. Usa
+   <details>/<summary> nativo, sin JavaScript (compatible con CSP estricta). */
+.how-it-works {
+  max-width: 640px;
+  margin: 1rem auto 1.25rem;
+  text-align: left;
+}
+.how-it-works-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  list-style: none;
+  padding: 0.4rem 0.85rem 0.4rem 0.5rem;
+  border: 1.5px solid var(--border-color, #2a2a2a);
+  border-radius: 999px;
+  background: var(--bg-card, #1c1b1b);
+  color: var(--text-muted, #a9a9a0);
+  font-family: var(--font-display, inherit);
+  font-weight: 800;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: color 0.15s ease, border-color 0.15s ease;
+  user-select: none;
+}
+/* Oculta el triangulito nativo (Chrome/Safari y Firefox) */
+.how-it-works-toggle::-webkit-details-marker { display: none; }
+.how-it-works-toggle::marker { content: ''; }
+.how-it-works-toggle:hover {
+  color: var(--text-light, #efefef);
+  border-color: var(--accent, #deed00);
+}
+.how-it-works-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--accent, #deed00);
+  color: #000;
+  font-family: var(--font-mono, monospace);
+  font-weight: 700;
+  font-size: 0.72rem;
+  line-height: 1;
+}
+.how-it-works[open] .how-it-works-toggle {
+  color: var(--text-light, #efefef);
+  border-color: var(--accent, #deed00);
+  margin-bottom: 0.6rem;
+}
+.how-it-works-body {
+  background: var(--bg-card, #1c1b1b);
+  border: 1px solid var(--border-color, #2a2a2a);
+  border-left: 4px solid var(--accent, #deed00);
+  border-radius: 10px;
+  padding: 1rem 1.15rem;
+  color: var(--text-light, #efefef);
+  font-size: 0.9rem;
+}
