@@ -105,6 +105,8 @@ const seoMap = {
     schemaType: 'ContactPage'
   },
   'guias': {
+    // Barra final: es la URL que sirve el HTML prerenderizado (ver prerender.mjs).
+    path: 'guias/',
     title: 'Guías Fantasy: castigos, capitanías, chollos y cláusulas | CastigosFantasy',
     description: 'Guías prácticas para tu liga fantasy: ideas de castigos, cómo elegir capitán, encontrar chollos, usar cláusulas, errores de novato y cómo gestionar el bote en Biwenger, Comunio y LaLiga Fantasy.',
     schemaType: 'Article'

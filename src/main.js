@@ -406,7 +406,11 @@ function renderMainLayout(isGuest, currentUser = null) {
 }
 
 function navigate(view) {
-  const newPath = view === 'inicio' ? '/' : '/' + view;
+  // Las rutas de guías llevan barra final: son las que sirven el HTML
+  // prerenderizado en Render (sin ella se devuelve el cascarón del SPA), así
+  // que la barra de direcciones debe coincidir con la canónica y el sitemap.
+  const needsSlash = view === 'guias' || view.startsWith('guias/');
+  const newPath = view === 'inicio' ? '/' : '/' + view + (needsSlash ? '/' : '');
   if (window.location.pathname !== newPath) {
     history.pushState({}, '', newPath);
   }
@@ -654,7 +658,10 @@ function handleRouting() {
     setSEO('guias', {
       title: `${guide.title} | CastigosFantasy`,
       description: guide.description,
-      path: `guias/${guide.id}`
+      // Barra final: es la URL que sirve el HTML prerenderizado en Render
+      // (sin ella devuelve el cascarón del SPA). Debe coincidir con la
+      // canónica del prerender y con el sitemap.
+      path: `guias/${guide.id}/`
     });
   } else {
     setSEO(currentView);

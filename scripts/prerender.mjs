@@ -44,7 +44,12 @@ function main() {
     $('#twitter-title').attr('content', title);
     $('#twitter-description').attr('content', description);
 
-    const href = `${SITE}/${canonicalPath}`;
+    // OJO: la canonica lleva barra final a proposito. Estas paginas se
+    // publican como <ruta>/index.html y el hosting (Render) solo sirve el
+    // fichero si la URL termina en barra; sin ella devuelve el cascaron del
+    // SPA. Si la canonica apuntara a la version sin barra, Google indexaria
+    // el cascaron y todas las guias le pareceria la misma pagina.
+    const href = canonicalPath ? `${SITE}/${canonicalPath}/` : `${SITE}/`;
     let canonical = $('link[rel="canonical"]');
     if (canonical.length === 0) {
       $('head').append(`\n    <link rel="canonical" href="${href}" />`);

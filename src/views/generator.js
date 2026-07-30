@@ -161,7 +161,7 @@ export function renderGenerator(container, callbacks) {
             'Si no os convence, generad otra hasta dar con la que más pique.',
             'Cuando acordéis el castigo, el perdedor lo cumple; si se raja, queda registrado.'
           ],
-          note: 'Puedes ver el catálogo completo en la guía <a href="/guias/catalogo-de-castigos" data-nav="guias/catalogo-de-castigos" class="cf-hiw-link" style="color:var(--accent);">catálogo de castigos para el fantasy</a>.'
+          note: 'Puedes ver el catálogo completo en la guía <a href="/guias/catalogo-de-castigos/" data-nav="guias/catalogo-de-castigos" class="cf-hiw-link" style="color:var(--accent);">catálogo de castigos para el fantasy</a>.'
         })}
 
         <!-- Main Generation Card -->

@@ -538,7 +538,7 @@ export const GUIDES = [
       <p style="${P}">Para que las estadísticas de cada uno cuadren, cada miembro de la liga debería entrar en Opciones de la liga y vincular su <strong>participante de Biwenger</strong>, eligiendo su nombre de la lista. Así el sistema sabe quién es quién y reparte los castigos a la persona correcta.</p>
 
       <h3 style="${H3}">¿Y si mi liga no es de Biwenger?</h3>
-      <p style="${P}">La sincronización automática está disponible con Biwenger. Si juegas en Comunio, LaLiga Fantasy, Mister u otra, puedes usar Castigos Fantasy igual: la ruleta, el bote y el muro de la vergüenza funcionan lo mismo, solo que confirmas tú quién ha quedado último en un par de toques. Tienes más detalle en la guía de <a href="/guias/biwenger-comunio-laliga-fantasy" class="cf-link" data-nav="guias/biwenger-comunio-laliga-fantasy" style="color:var(--accent);">castigos en Biwenger, Comunio o LaLiga Fantasy</a>.</p>
+      <p style="${P}">La sincronización automática está disponible con Biwenger. Si juegas en Comunio, LaLiga Fantasy, Mister u otra, puedes usar Castigos Fantasy igual: la ruleta, el bote y el muro de la vergüenza funcionan lo mismo, solo que confirmas tú quién ha quedado último en un par de toques. Tienes más detalle en la guía de <a href="/guias/biwenger-comunio-laliga-fantasy/" class="cf-link" data-nav="guias/biwenger-comunio-laliga-fantasy" style="color:var(--accent);">castigos en Biwenger, Comunio o LaLiga Fantasy</a>.</p>
     `
   },
   {
@@ -617,7 +617,7 @@ function normalizeSearch(s) {
 export function guideCardHtml(g) {
   const search = normalizeSearch(`${g.title} ${g.description}`);
   return `
-    <a href="/guias/${g.id}" class="cf-guide-card cf-link" data-nav="guias/${g.id}" data-search="${search}" style="display:block;text-decoration:none;background:var(--bg-card);border:1px solid var(--border-color);border-radius:12px;padding:1.25rem 1.35rem;transition:transform 0.15s ease,border-color 0.15s ease;">
+    <a href="/guias/${g.id}/" class="cf-guide-card cf-link" data-nav="guias/${g.id}" data-search="${search}" style="display:block;text-decoration:none;background:var(--bg-card);border:1px solid var(--border-color);border-radius:12px;padding:1.25rem 1.35rem;transition:transform 0.15s ease,border-color 0.15s ease;">
       <h2 style="font-family:var(--font-display);font-weight:800;font-size:1.15rem;text-transform:uppercase;line-height:1.15;margin:0 0 0.4rem;color:var(--text-light);">${g.title}</h2>
       <p style="margin:0 0 0.6rem;font-size:0.9rem;line-height:1.55;color:var(--text-muted);">${g.description}</p>
       <span style="font-family:var(--font-display);font-weight:800;font-size:0.85rem;text-transform:uppercase;color:var(--accent);">Leer guía →</span>
@@ -683,7 +683,7 @@ function renderHub(container) {
 function renderArticle(container, guide) {
   // Otras guías (para enlazado interno): todas menos la actual.
   const related = GUIDES.filter(g => g.id !== guide.id).slice(0, 4).map(g => `
-    <li style="${LI}"><a href="/guias/${g.id}" class="cf-link" data-nav="guias/${g.id}" style="color:var(--accent);">${g.title}</a></li>
+    <li style="${LI}"><a href="/guias/${g.id}/" class="cf-link" data-nav="guias/${g.id}" style="color:var(--accent);">${g.title}</a></li>
   `).join('');
 
   container.innerHTML = `
