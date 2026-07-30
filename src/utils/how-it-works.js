@@ -21,8 +21,15 @@ export function howItWorks({ title = '¿Cómo funciona?', intro = '', steps = []
   return `
     <details class="how-it-works">
       <summary class="how-it-works-toggle">
-        <span class="how-it-works-icon" aria-hidden="true">i</span>
+        <svg class="how-it-works-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="9.5"></circle>
+          <line x1="12" y1="16.5" x2="12" y2="11"></line>
+          <line x1="12" y1="7.5" x2="12.01" y2="7.5"></line>
+        </svg>
         <span>${title}</span>
+        <svg class="how-it-works-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
       </summary>
       <div class="how-it-works-body">
         ${intro ? `<p style="margin:0;line-height:1.55;color:var(--text-muted,#a9a9a0);">${intro}</p>` : ''}

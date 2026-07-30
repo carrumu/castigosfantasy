@@ -4608,7 +4608,7 @@ h1, h2, h3, h4, h5, h6, .card-title {
   gap: 0.5rem;
   cursor: pointer;
   list-style: none;
-  padding: 0.4rem 0.85rem 0.4rem 0.5rem;
+  padding: 0.45rem 0.9rem;
   border: 1.5px solid var(--border-color, #2a2a2a);
   border-radius: 999px;
   background: var(--bg-card, #1c1b1b);
@@ -4629,19 +4629,22 @@ h1, h2, h3, h4, h5, h6, .card-title {
   border-color: var(--accent, #deed00);
 }
 .how-it-works-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 20px;
-  height: 20px;
+  width: 17px;
+  height: 17px;
   flex-shrink: 0;
-  border-radius: 50%;
-  background: var(--accent, #deed00);
-  color: #000;
-  font-family: var(--font-mono, monospace);
-  font-weight: 700;
-  font-size: 0.72rem;
-  line-height: 1;
+  color: var(--accent, #deed00);
+}
+.how-it-works-chevron {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  margin-left: 0.1rem;
+  opacity: 0.65;
+  transition: transform 0.2s ease, opacity 0.15s ease;
+}
+.how-it-works[open] .how-it-works-chevron {
+  transform: rotate(180deg);
+  opacity: 1;
 }
 .how-it-works[open] .how-it-works-toggle {
   color: var(--text-light, #efefef);
