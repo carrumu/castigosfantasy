@@ -1,5 +1,6 @@
 import { supabase } from '../supabase';
 import { getRandomPhrase } from './phrases';
+import { getSuggestedMatchdayNumber } from './calendar';
 
 /**
  * Opens the Biwenger Synchronization Modal.
@@ -290,8 +291,8 @@ export async function openBiwengerSyncModal(leagueId, leagueData, isAdmin, callb
 
       if (recErr) throw recErr;
 
-      const maxMatchday = (records || []).reduce((max, r) => r.matchday_number > max ? r.matchday_number : max, 0);
-      modal.querySelector('#biwenger-matchday').value = maxMatchday + 1;
+      // Sugerida a partir del calendario real, sin repetir una ya registrada.
+      modal.querySelector('#biwenger-matchday').value = await getSuggestedMatchdayNumber(records || []);
 
       // Populate select dropdown: app members, then unclaimed roster slots,
       // then an option to register the detected Biwenger loser as a brand-new

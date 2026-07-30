@@ -37,6 +37,28 @@ export async function getCurrentMatchdayNumber() {
   }
 }
 
+/**
+ * Número de jornada que se propone al cerrar una jornada.
+ *
+ * Parte del calendario real (matchdays_calendar) en vez de ir sumando 1 a la
+ * última registrada, que se desviaba en cuanto había un registro de prueba o
+ * un salto. Aun así nunca propone una jornada ya registrada, para no repetir.
+ *
+ * @param {Array<{matchday_number:number}>} records registros de la liga
+ * @returns {Promise<number>}
+ */
+export async function getSuggestedMatchdayNumber(records = []) {
+  const maxRecorded = (records || []).reduce(
+    (max, r) => (r.matchday_number > max ? r.matchday_number : max),
+    0
+  );
+  let current = null;
+  try {
+    current = await getCurrentMatchdayNumber();
+  } catch (_) {}
+  return Math.max(current || 1, maxRecorded + 1);
+}
+
 export async function getMatchdayClosingTime(matchdayNumber, seasonYear = 2024) {
   // 1. Check if we already have it cached in Supabase
   try {

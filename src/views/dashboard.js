@@ -4,6 +4,7 @@ import { getRandomPhrase } from '../utils/phrases';
 import { openLeagueSettings } from '../utils/league-options';
 import { openBiwengerLinkModal } from '../utils/biwenger-link-modal';
 import { openJornadaExpressModal } from '../utils/jornada-express-modal';
+import { getSuggestedMatchdayNumber } from '../utils/calendar';
 
 /**
  * Renders the Main Dashboard (Leaderboard, Registering matchday loser).
@@ -19,6 +20,7 @@ export function renderDashboard(container, callbacks) {
   let currentLeague = null;
   let members = [];
   let records = [];
+  let suggestedMatchday = 1;
   let isAdmin = false;
   let currentUserId = null;
 
@@ -158,6 +160,10 @@ export function renderDashboard(container, callbacks) {
         ...r,
         loser_profile_id: r.loser_profile_id || (r.loser_roster_id ? `roster-${r.loser_roster_id}` : null)
       }));
+
+      // Jornada que se propondrá al cerrar. Se resuelve aquí (contexto async)
+      // a partir del calendario real, no sumando 1 a la última registrada.
+      suggestedMatchday = await getSuggestedMatchdayNumber(records);
 
       // Start fetching Biwenger standings asynchronously
       fetchBiwengerStandings();
@@ -386,8 +392,8 @@ export function renderDashboard(container, callbacks) {
     const old = document.querySelector('#jornada-confirm-modal');
     if (old) old.remove();
 
-    const maxMatchday = records.reduce((max, r) => r.matchday_number > max ? r.matchday_number : max, 0);
-    const nextMatchday = maxMatchday + 1;
+    // Sugerida desde el calendario real (ver getSuggestedMatchdayNumber)
+    const nextMatchday = suggestedMatchday;
 
     // Build member options for select
     const memberOptions = members.map(m => {
@@ -733,8 +739,8 @@ export function renderDashboard(container, callbacks) {
     const botePot = records.reduce((sum, r) => sum + Number(r.amount_owed), 0);
 
     // Get default next matchday number
-    const maxMatchday = records.reduce((max, r) => r.matchday_number > max ? r.matchday_number : max, 0);
-    const nextMatchday = maxMatchday + 1;
+    // Sugerida desde el calendario real (ver getSuggestedMatchdayNumber)
+    const nextMatchday = suggestedMatchday;
 
     container.innerHTML = `
       <div class="container">
