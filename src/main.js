@@ -25,6 +25,7 @@ import { renderLegal } from './views/legal';
 import { renderSeoHome, removeFaqSchema } from './views/seo-home';
 import { renderAbout, renderContacto } from './views/about';
 import { renderGuias, getGuideBySlug } from './views/guias';
+import { getAuthIntent, setAuthIntent, clearAuthIntent, INTENT_CREATE_LEAGUE } from './utils/auth-intent';
 
 // Initialize Theme (Force Dark Mode)
 document.body.classList.remove('light-theme');
@@ -74,6 +75,16 @@ async function checkAuthAndRender() {
   }
 
   const isGuest = !user;
+
+  // El correo de verificación y el redirect de Google aterrizan siempre en la
+  // portada, así que sin esto la intención de crear liga moría justo ahí: el
+  // usuario acababa de registrarse para montar su liga y se encontraba la
+  // landing de la app, sin liga y sin saber por dónde seguir.
+  if (!isGuest && currentView === 'inicio' && getAuthIntent() === INTENT_CREATE_LEAGUE) {
+    history.replaceState({}, '', '/mis-ligas');
+    handleRouting();
+    return;
+  }
 
   // Route Guard: restrict private views to authenticated users
   const privateViews = ['muro', 'mis-ligas', 'menu-liga'];
@@ -241,8 +252,15 @@ function renderMainLayout(isGuest, currentUser = null) {
       });
     }
   } else if (currentView === 'acceso') {
+    // Quien llegó pulsando "Crea tu liga gratis" no tiene cuenta: se le abre el
+    // registro y, al terminar, se le lleva a crear la liga que vino a crear.
+    const wantsLeague = getAuthIntent() === INTENT_CREATE_LEAGUE;
     renderAuth(viewContainer, {
-      onAuthSuccess: () => navigate(preAuthView),
+      initialMode: wantsLeague ? 'signup' : 'login',
+      intentNote: wantsLeague
+        ? 'Paso 1 de 2: crea tu cuenta y al entrar montas tu liga.'
+        : '',
+      onAuthSuccess: () => navigate(wantsLeague ? 'mis-ligas' : preAuthView),
       showToast
     });
   } else if (currentView === 'mis-ligas') {
@@ -376,16 +394,22 @@ function renderMainLayout(isGuest, currentUser = null) {
   });
   
   if (isGuest) {
+    // La cabecera repite la misma pareja que la home: un botón para crear liga
+    // y otro para entrar. Comparten destino, así que la intención es lo único
+    // que le dice a la pantalla de acceso cuál de los dos se pulsó.
     app.querySelector('#nav-login-btn').addEventListener('click', () => {
+      clearAuthIntent();
       navigate('acceso');
     });
     app.querySelector('#nav-create-btn')?.addEventListener('click', () => {
+      setAuthIntent(INTENT_CREATE_LEAGUE);
       navigate('acceso');
     });
     const bannerLink = app.querySelector('#banner-login-link');
     if (bannerLink) {
       bannerLink.addEventListener('click', (e) => {
         e.preventDefault();
+        clearAuthIntent();
         navigate('acceso');
       });
     }

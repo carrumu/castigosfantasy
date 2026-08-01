@@ -3,13 +3,18 @@ import { sendAdminNotification } from '../utils/email';
 
 /**
  * Renders the Authentication screen or Settings panel.
- * @param {HTMLElement} container 
- * @param {Object} callbacks 
- * @param {Function} callbacks.onAuthSuccess 
- * @param {Function} callbacks.showToast 
+ * @param {HTMLElement} container
+ * @param {Object} callbacks
+ * @param {Function} callbacks.onAuthSuccess
+ * @param {Function} callbacks.showToast
+ * @param {'login'|'signup'} [callbacks.initialMode] Con qué formulario abrir.
+ *   Quien llega desde "Crea tu liga gratis" no tiene cuenta todavía: enseñarle
+ *   un login le obliga a encontrar el enlace de registro del final.
+ * @param {string} [callbacks.intentNote] Aviso opcional bajo el título, para
+ *   dejar claro que registrarse es el paso previo, no el destino.
  */
 export function renderAuth(container, callbacks) {
-  let isLoginMode = true;
+  let isLoginMode = callbacks.initialMode !== 'signup';
   let isVerificationPending = false;
   let isRecoveryMode = false;
 
@@ -180,9 +185,15 @@ export function renderAuth(container, callbacks) {
               </h1>
             </div>
             
-            <h2 style="font-family: var(--font-display); font-size: 1.25rem; font-weight: 800; text-transform: uppercase; margin-bottom: 1.25rem; text-align: center; color: var(--text-light);">
+            <h2 style="font-family: var(--font-display); font-size: 1.25rem; font-weight: 800; text-transform: uppercase; margin-bottom: ${!isLoginMode && callbacks.intentNote ? '0.5rem' : '1.25rem'}; text-align: center; color: var(--text-light);">
               ${isLoginMode ? 'Inicio de Sesión' : 'Crear Cuenta'}
             </h2>
+
+            ${!isLoginMode && callbacks.intentNote ? `
+              <p style="font-size: 0.8rem; line-height: 1.45; color: var(--text-muted); text-align: center; margin-bottom: 1.25rem;">
+                ${callbacks.intentNote}
+              </p>
+            ` : ''}
 
           <form id="auth-form">
             ${!isLoginMode ? `

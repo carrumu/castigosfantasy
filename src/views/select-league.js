@@ -3,6 +3,7 @@ import { escapeHTML } from '../utils/security';
 import { openLeagueSettings } from '../utils/league-options';
 import { openBiwengerLinkModal } from '../utils/biwenger-link-modal';
 import { openComunioLinkModal } from '../utils/comunio-link-modal';
+import { consumeAuthIntent, INTENT_CREATE_LEAGUE } from '../utils/auth-intent';
 
 /**
  * Renders the League Selection / Creation / Joining screen.
@@ -311,6 +312,13 @@ export function renderSelectLeague(container, callbacks) {
         }
         modalCreateForm.classList.add('active');
       });
+
+      // Cierre del recorrido que empezó en "Crea tu liga gratis": el usuario ya
+      // pidió crear liga antes de registrarse, así que no se le vuelve a pedir
+      // que la busque en un menú. Se consume una sola vez.
+      if (consumeAuthIntent() === INTENT_CREATE_LEAGUE && !atLeagueLimit()) {
+        modalCreateForm.classList.add('active');
+      }
     }
 
     const closeJoin = () => {

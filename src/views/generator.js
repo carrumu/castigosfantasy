@@ -2,6 +2,7 @@ import { supabase } from '../supabase';
 import { escapeHTML } from '../utils/security.js';
 import { PUNISHMENT_IDEAS } from '../utils/punishments-catalog.js';
 import { howItWorks } from '../utils/how-it-works.js';
+import { logPunishmentGeneration } from '../utils/punishment-counter.js';
 
 /**
  * Renders the interactive public Punishment Generator.
@@ -348,6 +349,10 @@ export function renderGenerator(container, callbacks) {
         const randomIndex = Math.floor(Math.random() * available.length);
         currentPunishment = available[randomIndex];
         hasGenerated = true;
+        // Cuenta para la cifra de la portada. A diferencia de
+        // savePunishmentEvent, esto también registra a los invitados, que son
+        // la mayoría de quien toca el generador.
+        logPunishmentGeneration('generador', currentPunishment.id);
         isRejecting = false; // reset rejection state on new spin
 
         renderView();

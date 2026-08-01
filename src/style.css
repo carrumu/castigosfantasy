@@ -2796,7 +2796,13 @@ input, select, textarea, button {
   padding: 0;
   text-align: left;
   transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.15s ease;
-  display: block;
+  /* Un <button> centra su contenido en vertical por defecto. Con tarjetas de
+     la misma altura pero distinto texto, eso descolocaba iconos y flechas en
+     diagonal. En columna y a altura completa, todas arrancan arriba. */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  height: 100%;
 }
 
 .tool-card-btn:hover {
@@ -2813,8 +2819,10 @@ input, select, textarea, button {
 .tool-card-inner {
   display: flex;
   flex-direction: column;
+  justify-content: flex-start;
   gap: 1rem;
   padding: 1.75rem 1.5rem;
+  flex: 1; /* Ocupa la tarjeta entera: así la flecha cae siempre abajo del todo. */
 }
 
 .tool-card-icon-wrap {
@@ -3548,6 +3556,14 @@ input, select, textarea, button {
     display: none !important;
   }
 
+  /* Excepción: en la home de invitados la descripción ES el contenido. Quien
+     ya usa la app sabe qué es la "Ruleta de Sentencias"; quien acaba de llegar,
+     no, y sin esta línea solo ve cuatro nombres sueltos. */
+  #probar-gratis .tool-card-desc {
+    display: block !important;
+    font-size: 0.76rem !important;
+  }
+
   .tool-card-arrow svg {
     width: 16px !important;
     height: 16px !important;
@@ -4135,6 +4151,54 @@ h1, h2, h3, h4, h5, h6, .card-title {
   white-space: nowrap;
 }
 
+/* ===== SEO home (logged-out landing): salida sin registro =====
+   Acción secundaria bajo el CTA. Deliberadamente discreta (sin caja ni sombra)
+   para que no compita con "Crea tu liga gratis", pero visible desde el primer
+   pantallazo: es la que recoge a quien todavía no quiere dar su email. */
+.seo-try-free {
+  display: inline-block;
+  margin-top: 0.85rem;
+  background: transparent;
+  border: none;
+  padding: 0.2rem 0;
+  font-family: var(--font-sans);
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-light);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+.seo-try-free:hover {
+  color: var(--accent);
+}
+
+/* La cabecera es sticky (65px + borde): sin esto el salto desde el hero deja
+   el título de la sección escondido detrás de ella. */
+#probar-gratis {
+  scroll-margin-top: 85px;
+}
+
+/* Los cuatro títulos ocupan 2 o 3 líneas según el nombre. Reservando la altura
+   de 3 (line-height 1.1 × 3), las descripciones de las cuatro tarjetas empiezan
+   a la misma altura y la fila se lee como una rejilla y no como una escalera.
+   Solo en multicolumna: en móvil cada título cabe en una línea y sobraría aire. */
+@media (min-width: 560px) {
+  #probar-gratis .tool-card-title {
+    min-height: 3.3em;
+  }
+}
+
+.seo-free-intro {
+  margin: 0.9rem 0 1.25rem;
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
 /* ===== SEO home (logged-out landing): CTA microcopy ===== */
 .seo-cta-micro {
   margin-top: 0.7rem;
@@ -4660,3 +4724,664 @@ h1, h2, h3, h4, h5, h6, .card-title {
   color: var(--text-light, #efefef);
   font-size: 0.9rem;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   HOME DE INVITADOS: bloques interactivos
+   Todo lo de aquí abajo solo se pinta en la portada sin sesión. Comparte los
+   tokens de la marca (--accent, borde negro grueso, sombra dura desplazada) en
+   vez de inventar una paleta nueva.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Ruleta demo ─────────────────────────────────────────────────────────── */
+.rd-box {
+  border: 3px solid #000;
+  border-radius: 14px;
+  background: var(--bg-card);
+  box-shadow: 7px 7px 0 0 #000;
+  padding: 1.5rem 1.25rem 1.35rem;
+  text-align: center;
+}
+
+/* Altura fija: sin esto la página pega un salto cada vez que cambia el
+   contenido durante el sorteo, que es justo cuando el usuario está mirando. */
+.rd-stage {
+  min-height: 168px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+}
+
+.rd-idle {
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--text-muted);
+  max-width: 22rem;
+}
+
+.rd-rolling {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.5px;
+  color: var(--accent);
+  opacity: 0.85;
+}
+
+.rd-card {
+  width: 100%;
+  border: 2px solid var(--border-color-glow);
+  border-radius: 10px;
+  background: var(--bg-obsidian);
+  padding: 1rem 1.1rem 1.15rem;
+  text-align: left;
+  animation: rd-pop 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes rd-pop {
+  from { transform: scale(0.93); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+.rd-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.6rem;
+}
+
+.rd-cat {
+  font-family: var(--font-display);
+  font-size: 0.65rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #000;
+  background: var(--accent);
+  border-radius: 4px;
+  padding: 0.18rem 0.5rem;
+}
+
+.rd-intensity {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  white-space: nowrap;
+}
+
+.rd-flame { font-size: 0.75rem; opacity: 0.35; }
+.rd-flame.is-on { opacity: 1; }
+
+.rd-intensity-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+}
+
+.rd-name {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.5px;
+  line-height: 1.05;
+  color: var(--text-light);
+  margin: 0 0 0.4rem;
+}
+
+.rd-desc {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.rd-spin {
+  width: 100%;
+  max-width: 22rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.5px;
+  color: #000;
+  background: var(--accent);
+  border: 3px solid #000;
+  border-radius: 10px;
+  box-shadow: 5px 5px 0 0 #000;
+  padding: 0.9rem 1.5rem;
+  cursor: pointer;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.rd-spin:hover:not(:disabled) {
+  transform: translate(2px, 2px);
+  box-shadow: 3px 3px 0 0 #000;
+}
+
+.rd-spin:active:not(:disabled) {
+  transform: translate(5px, 5px);
+  box-shadow: 0 0 0 0 #000;
+}
+
+.rd-spin:disabled { cursor: wait; }
+
+.rd-spin.is-spinning .rd-spin-icon {
+  animation: rd-shake 0.4s linear infinite;
+}
+
+@keyframes rd-shake {
+  0%, 100% { transform: rotate(-14deg); }
+  50%      { transform: rotate(14deg); }
+}
+
+.rd-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+
+.rd-actions[hidden] { display: none; }
+
+.rd-again {
+  background: transparent;
+  border: 2px solid var(--border-color-glow);
+  border-radius: 8px;
+  color: var(--text-light);
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 0.6rem 1.1rem;
+  cursor: pointer;
+  transition: border-color var(--transition-fast), color var(--transition-fast);
+}
+
+.rd-again:hover { border-color: var(--accent); color: var(--accent); }
+
+.rd-count {
+  margin: 0.9rem 0 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.rd-count[hidden] { display: none; }
+
+/* ── Botón de WhatsApp (compartido por varios bloques) ───────────────────── */
+.wa-share-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: #25d366;
+  color: #05340f;
+  border: 2px solid #000;
+  border-radius: 8px;
+  box-shadow: 3px 3px 0 0 #000;
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  font-weight: 800;
+  padding: 0.6rem 1.1rem;
+  cursor: pointer;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.wa-share-btn:hover {
+  transform: translate(1px, 1px);
+  box-shadow: 2px 2px 0 0 #000;
+}
+
+.wa-share-btn:active {
+  transform: translate(3px, 3px);
+  box-shadow: 0 0 0 0 #000;
+}
+
+.wa-share-btn-lg {
+  font-size: 0.95rem;
+  padding: 0.8rem 1.5rem;
+}
+
+/* ── Cifras reales ───────────────────────────────────────────────────────── */
+/* auto-fit, no un número fijo de columnas: la tira puede traer 2, 3 o 4 cifras
+   según cuáles superen el mínimo, y con columnas fijas quedaban celdas vacías. */
+.stats-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1px;
+  background: #000;
+  border: 3px solid #000;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.stat-item {
+  background: var(--bg-card);
+  padding: 1.1rem 0.75rem;
+  text-align: center;
+}
+
+.stat-num {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 1.9rem;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -1px;
+  color: var(--accent);
+}
+
+.stat-label {
+  display: block;
+  margin-top: 0.3rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  line-height: 1.3;
+}
+
+/* ── Simulador de bote ───────────────────────────────────────────────────── */
+.bs-box {
+  border: 3px solid #000;
+  border-radius: 14px;
+  background: var(--bg-card);
+  box-shadow: 7px 7px 0 0 #000;
+  padding: 1.4rem 1.25rem;
+}
+
+.bs-controls {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+  margin-bottom: 1.4rem;
+}
+
+@media (min-width: 620px) {
+  .bs-controls { grid-template-columns: 1fr 1fr; gap: 1.75rem; }
+}
+
+.bs-field { display: block; }
+
+.bs-label {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+}
+
+.bs-value {
+  display: block;
+  margin: 0.2rem 0 0.6rem;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: var(--text-light);
+}
+
+.bs-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 8px;
+  border: 2px solid #000;
+  border-radius: 6px;
+  background: var(--bg-obsidian);
+  cursor: pointer;
+}
+
+.bs-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 26px;
+  height: 26px;
+  border: 3px solid #000;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 2px 2px 0 0 #000;
+  cursor: grab;
+}
+
+.bs-range::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border: 3px solid #000;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: grab;
+}
+
+.bs-range:active::-webkit-slider-thumb { cursor: grabbing; }
+
+.bs-result {
+  border-top: 3px solid #000;
+  padding-top: 1.2rem;
+  text-align: center;
+}
+
+.bs-result-eyebrow {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text-muted);
+}
+
+.bs-total {
+  display: block;
+  font-family: var(--font-display);
+  font-size: clamp(2.8rem, 12vw, 4.2rem);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -2px;
+  color: var(--accent);
+  margin: 0.3rem 0 0.5rem;
+  text-shadow: 3px 3px 0 #000;
+}
+
+.bs-premio {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-light);
+}
+
+.bs-formula {
+  margin: 0.4rem 0 0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.bs-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 1.2rem;
+}
+
+/* ── Antes vs Después ────────────────────────────────────────────────────── */
+.vs-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 700px) {
+  .vs-grid { grid-template-columns: 1fr 1fr; }
+}
+
+.vs-col {
+  border: 3px solid #000;
+  border-radius: 12px;
+  background: var(--bg-card);
+  padding: 1.15rem 1.2rem 1.25rem;
+}
+
+/* La columna buena lleva el acento y la sombra: a igualdad de contenido, el ojo
+   tiene que caer en el lado del producto. */
+.vs-despues {
+  border-color: var(--accent);
+  box-shadow: 6px 6px 0 0 #000;
+}
+
+.vs-antes { opacity: 0.82; }
+
+.vs-col-title {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.3px;
+  color: var(--text-light);
+  margin: 0 0 0.9rem;
+}
+
+.vs-tag {
+  font-size: 0.62rem;
+  font-weight: 900;
+  letter-spacing: 1px;
+  border-radius: 4px;
+  padding: 0.18rem 0.45rem;
+}
+
+.vs-tag-bad  { background: var(--danger); color: #fff; }
+.vs-tag-good { background: var(--accent); color: #000; }
+
+.vs-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.vs-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+
+.vs-icon {
+  flex-shrink: 0;
+  width: 1.1rem;
+  font-weight: 900;
+  text-align: center;
+}
+
+.vs-antes .vs-icon   { color: var(--danger); }
+.vs-despues .vs-icon { color: var(--accent); }
+.vs-despues .vs-list li { color: var(--text-light); }
+
+/* ── Encuesta ────────────────────────────────────────────────────────────── */
+.poll-box {
+  border: 3px solid #000;
+  border-radius: 14px;
+  background: var(--bg-card);
+  box-shadow: 7px 7px 0 0 #000;
+  padding: 1.35rem 1.25rem;
+}
+
+.poll-question {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 900;
+  line-height: 1.2;
+  color: var(--text-light);
+  margin: 0 0 1.1rem;
+}
+
+.poll-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.poll-option {
+  position: relative;
+  overflow: hidden;
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: 2px solid var(--border-color-glow);
+  border-radius: 8px;
+  background: var(--bg-obsidian);
+  padding: 0.75rem 0.9rem;
+  cursor: pointer;
+  transition: border-color var(--transition-fast), transform var(--transition-fast);
+}
+
+.poll-option:not(:disabled):hover {
+  border-color: var(--accent);
+  transform: translateX(3px);
+}
+
+.poll-option:disabled { cursor: default; }
+
+/* La barra de resultado va por debajo del texto y crece al revelarse. */
+.poll-bar {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: rgba(var(--accent-rgb), 0.16);
+  transition: width 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.poll-option.is-mine .poll-bar { background: rgba(var(--accent-rgb), 0.32); }
+.poll-option.is-mine { border-color: var(--accent); }
+
+.poll-option-text {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.poll-option-label {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-light);
+}
+
+.poll-option-num {
+  flex-shrink: 0;
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 900;
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+.poll-total {
+  margin: 0.9rem 0 0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+/* ── Cierre de WhatsApp ──────────────────────────────────────────────────── */
+.seo-nudge-wa {
+  text-align: center;
+  border: 3px dashed var(--border-color-glow);
+  border-radius: 14px;
+  padding: 1.5rem 1.25rem;
+}
+
+.seo-nudge-wa-text {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 900;
+  line-height: 1.25;
+  color: var(--text-light);
+  margin: 0 0 1rem;
+}
+
+/* ── Barra sticky ────────────────────────────────────────────────────────── */
+.seo-sticky-cta {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 95;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  background: var(--bg-obsidian);
+  border-top: 3px solid var(--accent);
+  box-shadow: 0 -6px 24px rgba(0, 0, 0, 0.55);
+  padding: 0.75rem 1rem;
+  animation: sticky-up 0.25s ease-out;
+}
+
+.seo-sticky-cta[hidden] { display: none; }
+
+@keyframes sticky-up {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+.seo-sticky-text {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-light);
+  text-align: center;
+}
+
+.seo-sticky-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.seo-sticky-btn {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.3px;
+  color: #000;
+  background: var(--accent);
+  border: 2px solid #000;
+  border-radius: 8px;
+  box-shadow: 3px 3px 0 0 #000;
+  padding: 0.55rem 1.1rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.seo-sticky-btn:hover {
+  transform: translate(1px, 1px);
+  box-shadow: 2px 2px 0 0 #000;
+}
+
+.seo-sticky-close {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1rem;
+  line-height: 1;
+  padding: 0.4rem;
+  cursor: pointer;
+}
+
+.seo-sticky-close:hover { color: var(--text-light); }
+
+/* Deja aire al final para que la barra fija no tape el último bloque. */
+.seo-home { padding-bottom: 4.5rem; }
+
+/* La encuesta y las cifras arrancan ocultas y se muestran solas si hay datos. */
+#encuesta-home[hidden],
+#cifras-home[hidden] { display: none; }
+
+/* Respeta a quien pidió menos movimiento: se queda todo, pero quieto. */
+@media (prefers-reduced-motion: reduce) {
+  .rd-card,
+  .seo-sticky-cta { animation: none; }
+  .rd-spin.is-spinning .rd-spin-icon { animation: none; }
+  .poll-bar { transition: none; }
+}
+
