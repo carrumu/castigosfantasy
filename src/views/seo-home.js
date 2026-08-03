@@ -180,7 +180,13 @@ export function renderSeoHome(container, { onNavigate } = {}) {
     </p>`;
 
   // Microcopy bajo el CTA del hero: baja la fricción y remata con el chiste de marca.
-  const heroMicro = `<p class="seo-cta-micro">Gratis y sin tarjeta. Aquí el único que paga es el colista.</p>`;
+  // La bandera va en SVG y no como emoji: Chrome en Windows no tiene glifos de
+  // banderas y pintaba un "ᴱˢ" suelto delante del texto.
+  const banderaES = `
+    <svg class="seo-chip-flag" viewBox="0 0 9 6" aria-hidden="true">
+      <rect width="9" height="6" fill="#c60b1e"/>
+      <rect y="1.5" width="9" height="3" fill="#ffc400"/>
+    </svg>`;
 
   // Salida para quien todavía no quiere dar su email. Apunta al demo, que está
   // justo debajo: la primera acción posible en esta web es jugar, no registrarse.
@@ -201,13 +207,15 @@ export function renderSeoHome(container, { onNavigate } = {}) {
           </p>
           ${heroCta}
           ${heroSecondary}
-          ${heroMicro}
-          ${loginNudge}
+          <!-- Aligerado a propósito. Aquí había además una microcopia
+               ("Gratis y sin tarjeta...") que repetía el GRATIS del botón, y un
+               "¿ya estás? inicia sesión" que duplica el ENTRAR de la cabecera y
+               vuelve a salir en la banda de cierre. Siete bloques apilados antes
+               del mockup era demasiado para una primera pantalla. -->
           <div class="seo-hero-chips">
-            <span class="seo-chip seo-chip-es">🇪🇸 Hecho en España</span>
             <span class="seo-chip">Sin Excel ni WhatsApp</span>
-            <span class="seo-chip">Biwenger automático</span>
-            <span class="seo-chip">Comunio y LaLiga Fantasy</span>
+            <span class="seo-chip">Biwenger en automático</span>
+            <span class="seo-chip seo-chip-es">${banderaES} Hecho en España</span>
           </div>
         </div>
 
