@@ -3261,6 +3261,9 @@ input, select, textarea, button {
   align-items: center;
   justify-content: center;
   gap: 0.35rem;
+  /* Las etiquetas son cortas y deben ir en una linea. Sin esto, "Respuestas
+     (0)" se partia en dos dentro del boton al quedarse sin ancho en movil. */
+  white-space: nowrap;
   transition: transform var(--transition-fast), box-shadow var(--transition-fast), background-color var(--transition-fast);
 }
 
@@ -5385,3 +5388,80 @@ h1, h2, h3, h4, h5, h6, .card-title {
   .poll-bar { transition: none; }
 }
 
+
+/* ── Foro: fila de acciones de cada post ─────────────────────────────────────
+   Antes eran dos grupos flex anidados con space-between. En movil el grupo de
+   la derecha no cabia entero, asi que en vez de envolver boton a boton se
+   quedaba comprimido y partia el texto por dentro. Ahora es una sola fila y
+   los botones envuelven de uno en uno. */
+.post-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  border-top: 2px dashed #000;
+  padding-top: 0.75rem;
+}
+
+/* El menu de tres puntos se va al extremo derecho de la fila. */
+.post-actions .post-menu {
+  position: relative;
+  margin-left: auto;
+}
+
+.post-menu-panel {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  z-index: 30;
+  min-width: 185px;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-card);
+  border: 2.5px solid #000;
+  box-shadow: 4px 4px 0 #000;
+}
+
+.post-menu-panel[hidden] { display: none; }
+
+.post-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1.5px dashed var(--border-color-glow);
+  color: var(--text-light);
+  font-family: var(--font-sans);
+  font-weight: 800;
+  font-size: 0.78rem;
+  text-align: left;
+  white-space: nowrap;
+  padding: 0.65rem 0.8rem;
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.post-menu-item:last-child { border-bottom: none; }
+.post-menu-item:hover { background: var(--bg-card-hover); }
+.post-menu-item.is-danger { color: var(--danger); }
+.post-menu-item.is-danger:hover { background: rgba(211, 0, 23, 0.12); }
+
+/* Los botones NUNCA encogen: conservan el ancho de su texto y, cuando no
+   caben, saltan de linea. Dejarles encoger (flex-shrink) los aplastaba por
+   debajo de su contenido y, como el texto ya no puede partirse, se salia del
+   boton y se solapaba con el de al lado. */
+.post-actions .brutalist-btn-small {
+  flex: 0 0 auto;
+}
+
+/* En movil se quedan icono + contador y desaparecen las palabras. Con ellas
+   puestas, "Me Gusta" y "Respuestas" suman 346px y ya no caben en la fila de
+   un movil, que ronda los 328px utiles: la fila se partia en tres. Es ademas
+   el patron que usa cualquier red social, asi que se entiende sin leerlo. */
+@media (max-width: 560px) {
+  .post-actions .btn-label {
+    display: none;
+  }
+}

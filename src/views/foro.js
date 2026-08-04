@@ -471,30 +471,45 @@ function renderFeed(container, newPosts) {
       <!-- Safe Content: We inject text via textContent on a helper element to block XSS -->
       <div class="post-text-container" style="font-size: 0.95rem; line-height: 1.5; margin-bottom: 1.25rem; font-weight: 700; word-break: break-word; white-space: pre-wrap; color: var(--text-light);"></div>
       
-      <!-- Actions Footer -->
-      <div style="display: flex; align-items: center; justify-content: space-between; border-top: 2px dashed #000; padding-top: 0.75rem; gap: 0.5rem; flex-wrap: wrap;">
-        
-        <!-- Likes Button -->
-        <div style="display: flex; gap: 0.3rem;" class="likes-wrapper">
-          <button class="like-btn brutalist-btn-small ${userLiked ? 'is-active' : ''}">
-            Me Gusta <span class="count">${likeCount}</span>
+      <!-- Actions Footer.
+           Una sola fila flexible en vez de dos grupos anidados: anidados, en
+           movil el grupo de la derecha no cabia entero y rompia el texto de
+           los botones por dentro. Ahora envuelven de uno en uno. -->
+      <div class="post-actions">
+        <!-- El texto de los botones se oculta en móvil (ver .btn-label en el
+             CSS) y queda icono + contador: con las etiquetas puestas, los dos
+             botones suman más ancho del que tiene un móvil y partían la fila. -->
+        <button class="like-btn brutalist-btn-small ${userLiked ? 'is-active' : ''}">
+          <span class="material-symbols-outlined" style="font-size: 1.1rem; vertical-align: middle;">favorite</span>
+          <span class="btn-label">Me Gusta</span>
+          <span class="count">${likeCount}</span>
+        </button>
+
+        <button class="toggle-comments-btn brutalist-btn-small">
+          <span class="material-symbols-outlined" style="font-size: 1.1rem; vertical-align: middle;">chat_bubble</span>
+          <span class="btn-label">Respuestas</span>
+          <span class="comment-label">${commentsCount}</span>
+        </button>
+
+        <!-- Compartir y eliminar se van a un menu de tres puntos: son acciones
+             secundarias y, sueltas en la fila, no cabian en movil. Ademas
+             esconder "eliminar" detras de un toque evita borrados sin querer. -->
+        <div class="post-menu">
+          <button class="post-menu-btn brutalist-btn-small" title="Más opciones" aria-label="Más opciones" aria-haspopup="true" aria-expanded="false">
+            <span class="material-symbols-outlined" style="font-size: 1.1rem; vertical-align: middle;">more_horiz</span>
           </button>
-        </div>
-        
-        <!-- Comments & Utility buttons -->
-        <div style="display: flex; gap: 0.4rem; align-items: center;">
-          <button class="toggle-comments-btn brutalist-btn-small">
-            <span class="material-symbols-outlined" style="font-size: 1.1rem; vertical-align: middle;">chat_bubble</span>
-            <span class="comment-label">Respuestas (${commentsCount})</span>
-          </button>
-          <button class="share-post-btn brutalist-btn-small" title="Copiar enlace al post">
-            <span class="material-symbols-outlined" style="font-size: 1.1rem; vertical-align: middle;">share</span>
-          </button>
-          ${canDelete ? `
-            <button class="delete-post-btn brutalist-btn-small btn-danger" title="Eliminar publicación" style="font-weight: bold; font-family: var(--font-sans);">
-              Eliminar post ✕
+          <div class="post-menu-panel" hidden>
+            <button class="share-post-btn post-menu-item" title="Copiar enlace al post">
+              <span class="material-symbols-outlined" style="font-size: 1rem;">share</span>
+              Copiar enlace
             </button>
-          ` : ''}
+            ${canDelete ? `
+              <button class="delete-post-btn post-menu-item is-danger" title="Eliminar publicación">
+                <span class="material-symbols-outlined" style="font-size: 1rem;">delete</span>
+                Eliminar post
+              </button>
+            ` : ''}
+          </div>
         </div>
       </div>
       
@@ -542,6 +557,48 @@ function setupCardListeners(card, post, container) {
   const deleteBtn = card.querySelector('.delete-post-btn');
   const commentsList = card.querySelector('.comments-list');
   const commentForm = card.querySelector('.comment-form');
+
+  // --- Menú de tres puntos ---
+  const menuBtn = card.querySelector('.post-menu-btn');
+  const menuPanel = card.querySelector('.post-menu-panel');
+  if (menuBtn && menuPanel) {
+    // .brutalist-card lleva overflow:hidden, y como la fila de acciones está al
+    // final de la tarjeta, el panel quedaba recortado por completo: se abría
+    // pero no se veía nada. Se levanta el recorte solo mientras está abierto.
+    const cerrar = () => {
+      menuPanel.hidden = true;
+      menuBtn.setAttribute('aria-expanded', 'false');
+      card.style.overflow = '';
+    };
+
+    menuBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const abierto = !menuPanel.hidden;
+      // Solo puede haber un menú abierto: si no, quedan varios flotando por el
+      // muro y el siguiente clic cierra el que no toca.
+      document.querySelectorAll('.post-menu-panel').forEach(p => { p.hidden = true; });
+      document.querySelectorAll('.post-menu-btn').forEach(b => b.setAttribute('aria-expanded', 'false'));
+      document.querySelectorAll('.brutalist-card').forEach(c => { c.style.overflow = ''; });
+      if (!abierto) {
+        menuPanel.hidden = false;
+        menuBtn.setAttribute('aria-expanded', 'true');
+        card.style.overflow = 'visible';
+      }
+    });
+
+    // Clic fuera y Escape lo cierran.
+    document.addEventListener('click', (e) => {
+      if (!menuPanel.hidden && !menuPanel.contains(e.target)) cerrar();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') cerrar();
+    });
+
+    // Elegir una opción cierra el menú (el borrado se lleva la tarjeta entera).
+    menuPanel.querySelectorAll('.post-menu-item').forEach(item => {
+      item.addEventListener('click', cerrar);
+    });
+  }
 
   // Comments accordion toggle
   let commentsLoaded = false;
@@ -594,7 +651,7 @@ function setupCardListeners(card, post, container) {
           .eq('post_id', post.id);
         
         if (!countErr) {
-          card.querySelector('.comment-label').textContent = `Respuestas (${count})`;
+          card.querySelector('.comment-label').textContent = `${count}`;
         }
       } catch (err) {
         console.error('Error al guardar comentario:', err);
@@ -747,7 +804,7 @@ async function fetchCommentsAndRender(postId, listContainer) {
       if (card) {
         const commentLabel = card.querySelector('.comment-label');
         if (commentLabel) {
-          commentLabel.textContent = `Respuestas (0)`;
+          commentLabel.textContent = `0`;
         }
       }
       return;
@@ -1020,7 +1077,7 @@ async function fetchCommentsAndRender(postId, listContainer) {
     if (card) {
       const commentLabel = card.querySelector('.comment-label');
       if (commentLabel) {
-        commentLabel.textContent = `Respuestas (${comments.length})`;
+        commentLabel.textContent = `${comments.length}`;
       }
     }
 
