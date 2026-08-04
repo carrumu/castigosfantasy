@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portada Reel Oficial - CastigosFantasy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-obsidian: #131313;
+      --bg-card: #20201f;
+      --accent: #deed00;
+      --danger: #d30017;
+      --text-light: #e5e2e1;
+      --text-muted: #c8c8ab;
+      --font-display: 'Syne', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #050505;
+      font-family: var(--font-display);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      color: var(--text-light);
+    }
+
+    /* 9:16 Aspect Ratio Canvas for Instagram Reel Cover */
+    .reel-cover-canvas {
+      width: 540px;
+      height: 960px;
+      background: var(--bg-obsidian);
+      border: 4px solid var(--accent);
+      border-radius: 20px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      padding: 2.5rem 1.8rem;
+      box-shadow: 0 0 50px rgba(222, 237, 0, 0.25), 8px 8px 0px #000;
+      background-image: 
+        radial-gradient(circle at 50% 30%, rgba(222, 237, 0, 0.12) 0%, transparent 60%),
+        radial-gradient(circle at 50% 80%, rgba(211, 0, 23, 0.1) 0%, transparent 50%);
+    }
+
+    /* Decorative grid background overlay */
+    .reel-cover-canvas::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 30px 30px;
+      pointer-events: none;
+    }
+
+    /* Header Badge */
+    .header-badge {
+      background: rgba(222, 237, 0, 0.15);
+      border: 2px solid var(--accent);
+      color: var(--accent);
+      padding: 0.5rem 1.2rem;
+      border-radius: 30px;
+      font-size: 0.85rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      box-shadow: 3px 3px 0px #000;
+      z-index: 2;
+    }
+
+    /* Main Title */
+    .cover-title-container {
+      text-align: center;
+      z-index: 2;
+      margin-top: 0.5rem;
+    }
+
+    .cover-title-small {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 0.4rem;
+    }
+
+    .cover-title-main {
+      font-size: 2.3rem;
+      font-weight: 900;
+      line-height: 1.05;
+      text-transform: uppercase;
+      letter-spacing: -1px;
+      color: #ffffff;
+      text-shadow: 3px 3px 0px #000;
+    }
+
+    .cover-title-highlight {
+      color: var(--accent);
+      background: #000000;
+      padding: 0.2rem 0.6rem;
+      border-radius: 8px;
+      border: 2px solid var(--accent);
+      display: inline-block;
+      margin-top: 0.4rem;
+      box-shadow: 4px 4px 0px #000;
+    }
+
+    /* Center Graphic Container: Real Assets */
+    .center-visual-hub {
+      position: relative;
+      width: 100%;
+      height: 380px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 2;
+    }
+
+    /* Real Roulette Wheel Rotation */
+    .roulette-img {
+      width: 320px;
+      height: 320px;
+      object-fit: contain;
+      filter: drop-shadow(0 0 20px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 15px rgba(222, 237, 0, 0.3));
+      animation: slowRotate 25s linear infinite;
+    }
+
+    @keyframes slowRotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    /* Overlay Real Logo Shield in center */
+    .logo-overlay-badge {
+      position: absolute;
+      width: 120px;
+      height: 120px;
+      background: var(--bg-card);
+      border: 3.5px solid var(--accent);
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 0 25px rgba(0, 0, 0, 0.9), 4px 4px 0px #000;
+      z-index: 3;
+      padding: 8px;
+    }
+
+    .logo-img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    /* Floating Badges */
+    .floating-tag {
+      position: absolute;
+      background: var(--danger);
+      color: #ffffff;
+      font-size: 0.75rem;
+      font-weight: 800;
+      padding: 0.4rem 0.8rem;
+      border-radius: 8px;
+      border: 2px solid #000000;
+      box-shadow: 3px 3px 0px #000;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      z-index: 4;
+    }
+
+    .tag-top-left {
+      top: 15px;
+      left: 15px;
+      transform: rotate(-6deg);
+    }
+
+    .tag-bottom-right {
+      bottom: 15px;
+      right: 15px;
+      transform: rotate(5deg);
+      background: var(--accent);
+      color: #000000;
+    }
+
+    /* Bottom Outro Brand Section */
+    .cover-outro-footer {
+      width: 100%;
+      background: #000000;
+      border: 3px solid var(--accent);
+      border-radius: 16px;
+      padding: 1.1rem;
+      text-align: center;
+      box-shadow: 5px 5px 0px var(--accent), 8px 8px 0px #000;
+      z-index: 2;
+    }
+
+    .footer-subtitle {
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 0.3rem;
+    }
+
+    .footer-domain {
+      font-size: 1.7rem;
+      font-weight: 900;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      line-height: 1;
+    }
+
+    .footer-cta-tag {
+      margin-top: 0.5rem;
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 0.25rem 0.6rem;
+      border-radius: 12px;
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 9:16 Canvas -->
+  <div class="reel-cover-canvas">
+
+    <!-- Header Tag -->
+    <div class="header-badge">
+      ⚡ NUEVA TEMPORADA 2026/27
+    </div>
+
+    <!-- Main Text Hook -->
+    <div class="cover-title-container">
+      <div class="cover-title-small">¿Estáis preparados para</div>
+      <div class="cover-title-main">
+        LO QUE SE VIENE<br>
+        <span class="cover-title-highlight">EN TU LIGA? ⚽🔥</span>
+      </div>
+    </div>
+
+    <!-- Center Graphic: Real Assets (Roulette + Real Logo) -->
+    <div class="center-visual-hub">
+      <div class="floating-tag tag-top-left">🔥 RETOS VIRALES</div>
+      
+      <!-- Real Roulette Asset -->
+      <img class="roulette-img" src="./penalty_roulette_wheel.png" alt="Ruleta CastigosFantasy" />
+      
+      <!-- Real Logo Asset overlay -->
+      <div class="logo-overlay-badge">
+        <img class="logo-img" src="./logo.png" alt="Logo CastigosFantasy" />
+      </div>
+
+      <div class="floating-tag tag-bottom-right">🎰 RULETA 3D</div>
+    </div>
+
+    <!-- Footer Outro Brand Call-to-Action -->
+    <div class="cover-outro-footer">
+      <div class="footer-subtitle">TODOS LOS CASTIGOS Y MINIJUEGOS EN</div>
+      <div class="footer-domain">CASTIGOSFANTASY.COM</div>
+      <div class="footer-cta-tag">🔗 ENLACE EN LA BIO</div>
+    </div>
+
+  </div>
+
+</body>
+</html>
