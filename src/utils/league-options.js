@@ -1,4 +1,5 @@
 import { supabase } from '../supabase';
+import { escapeHTML } from './security.js';
 
 /**
  * Dynamically loads and displays the league settings/options modal.
@@ -87,14 +88,16 @@ export async function openLeagueSettings(leagueId, callbacks) {
     // never read back to the client.
     let biwengerEmail = '';
     let comunioEmail = '';
+    let misterEmail = '';
     if (isAdmin) {
       const { data: secretRow } = await supabase
         .from('league_secrets')
-        .select('biwenger_email, comunio_email')
+        .select('biwenger_email, comunio_email, mister_email')
         .eq('league_id', leagueId)
         .maybeSingle();
       biwengerEmail = secretRow?.biwenger_email || '';
       comunioEmail = secretRow?.comunio_email || '';
+      misterEmail = secretRow?.mister_email || '';
     }
 
     // Load all members of the league to check for successors
@@ -160,7 +163,33 @@ export async function openLeagueSettings(leagueId, callbacks) {
                 <input type="radio" name="edit-league-type" value="comunio" ${leagueData.sync_source === 'comunio' ? 'checked' : ''} style="accent-color: var(--accent);" />
                 Comunio
               </label>
+              <label style="display: flex; align-items: center; gap: 0.35rem; color: var(--text-light); font-size: 0.78rem; cursor: pointer; font-weight: 600;">
+                <input type="radio" name="edit-league-type" value="mister" ${leagueData.sync_source === 'mister' ? 'checked' : ''} style="accent-color: var(--accent);" />
+                Mister
+              </label>
             </div>
+          </div>
+
+          <!-- Credenciales de Mister -->
+          <div id="edit-mister-fields" style="display: ${leagueData.sync_source === 'mister' ? 'flex' : 'none'}; flex-direction: column; gap: 0.75rem; border-top: 1.5px dashed var(--border-color-glow); padding-top: 0.75rem; margin-top: 0.15rem;">
+            <span style="font-size: 0.72rem; color: var(--accent-gold); font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Automatización Mister</span>
+            ${leagueData.mister_league_name ? `
+              <p style="font-size: 0.7rem; color: var(--text-muted); margin: 0;">Última liga leída: <strong style="color: var(--accent);">${escapeHTML(leagueData.mister_league_name)}</strong></p>
+            ` : ''}
+            <div class="form-group" style="margin-bottom: 0;">
+              <label for="edit-mister-email" style="color: var(--text-light); font-weight: 700; font-size: 0.75rem; display: block; margin-bottom: 0.25rem;">Correo de Mister</label>
+              <input type="email" id="edit-mister-email" class="input-field" value="${misterEmail || ''}" placeholder="ejemplo@correo.com" autocomplete="off" style="border: 1.5px solid var(--border-color-glow); font-weight: 700; background: var(--bg-input); width: 100%; padding: 0.55rem 0.75rem;" />
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label for="edit-mister-password" style="color: var(--text-light); font-weight: 700; font-size: 0.75rem; display: block; margin-bottom: 0.25rem;">Contraseña de Mister</label>
+              <input type="password" id="edit-mister-password" class="input-field" placeholder="Dejar en blanco para no cambiar" style="border: 1.5px solid var(--border-color-glow); font-weight: 700; background: var(--bg-input); width: 100%; padding: 0.55rem 0.75rem;" />
+            </div>
+            <p style="font-size: 0.7rem; color: var(--text-muted); line-height: 1.45; margin: 0.2rem 0 0; background: rgba(222,237,0,0.06); border: 1px solid rgba(222,237,0,0.25); border-radius: 6px; padding: 0.5rem 0.65rem;">
+              ¿Entras a Mister con <strong style="color: var(--text-light);">Google o Apple</strong>? Esa cuenta no tiene contraseña propia, así que no se puede sincronizar. Créate una contraseña en Mister con <strong style="color: var(--text-light);">"¿Olvidaste tu contraseña?"</strong> y usa aquí ese correo.
+            </p>
+            <p style="font-size: 0.7rem; color: var(--text-muted); line-height: 1.45; margin: 0; background: rgba(211,0,23,0.06); border: 1px solid rgba(211,0,23,0.3); border-radius: 6px; padding: 0.5rem 0.65rem;">
+              <strong style="color: var(--text-light);">Ojo:</strong> Mister no permite elegir liga. Se leerá la que esa cuenta tenga activa en la app. Si juegas varias en Mister, comprueba que la de arriba es la correcta.
+            </p>
           </div>
 
           <!-- Fields to configure Biwenger credentials -->
@@ -358,14 +387,16 @@ export async function openLeagueSettings(leagueId, callbacks) {
       });
     });
 
-    // Toggle the Biwenger / Comunio credential blocks with the type selector.
+    // Toggle the Biwenger / Comunio / Mister credential blocks with the type selector.
     const biwengerFields = modal.querySelector('#edit-biwenger-fields');
     const comunioFields = modal.querySelector('#edit-comunio-fields');
+    const misterFields = modal.querySelector('#edit-mister-fields');
     modal.querySelectorAll('input[name="edit-league-type"]').forEach(radio => {
       radio.addEventListener('change', () => {
         const val = modal.querySelector('input[name="edit-league-type"]:checked')?.value;
         if (biwengerFields) biwengerFields.style.display = val === 'biwenger' ? 'flex' : 'none';
         if (comunioFields) comunioFields.style.display = val === 'comunio' ? 'flex' : 'none';
+        if (misterFields) misterFields.style.display = val === 'mister' ? 'flex' : 'none';
       });
     });
 
@@ -472,7 +503,7 @@ export async function openLeagueSettings(leagueId, callbacks) {
             updatePayload.comunio_community_id = null;
             const emailVal = settingsForm.querySelector('#edit-biwenger-email').value.trim();
             const newPasswordVal = settingsForm.querySelector('#edit-biwenger-password').value.trim();
-            const secretPayload = { league_id: leagueId, biwenger_email: emailVal, comunio_email: null, comunio_password: null, updated_at: new Date().toISOString() };
+            const secretPayload = { league_id: leagueId, biwenger_email: emailVal, comunio_email: null, comunio_password: null, mister_email: null, mister_password: null, updated_at: new Date().toISOString() };
             if (newPasswordVal) secretPayload.biwenger_password = newPasswordVal;
             const { error: secretErr } = await supabase.from('league_secrets').upsert(secretPayload, { onConflict: 'league_id' });
             if (secretErr) throw secretErr;
@@ -481,13 +512,26 @@ export async function openLeagueSettings(leagueId, callbacks) {
             updatePayload.biwenger_league_id = null;
             const emailVal = settingsForm.querySelector('#edit-comunio-email').value.trim();
             const newPasswordVal = settingsForm.querySelector('#edit-comunio-password').value.trim();
-            const secretPayload = { league_id: leagueId, comunio_email: emailVal, biwenger_email: null, biwenger_password: null, updated_at: new Date().toISOString() };
+            const secretPayload = { league_id: leagueId, comunio_email: emailVal, biwenger_email: null, biwenger_password: null, mister_email: null, mister_password: null, updated_at: new Date().toISOString() };
             if (newPasswordVal) secretPayload.comunio_password = newPasswordVal;
+            const { error: secretErr } = await supabase.from('league_secrets').upsert(secretPayload, { onConflict: 'league_id' });
+            if (secretErr) throw secretErr;
+          } else if (newType === 'mister') {
+            // Mister no tiene id de liga que guardar: la liga la decide la
+            // sesión de esa cuenta. El nombre detectado lo escribe la propia
+            // edge function al sincronizar.
+            updatePayload.biwenger_league_id = null;
+            updatePayload.comunio_community_id = null;
+            const emailVal = settingsForm.querySelector('#edit-mister-email').value.trim();
+            const newPasswordVal = settingsForm.querySelector('#edit-mister-password').value.trim();
+            const secretPayload = { league_id: leagueId, mister_email: emailVal, biwenger_email: null, biwenger_password: null, comunio_email: null, comunio_password: null, updated_at: new Date().toISOString() };
+            if (newPasswordVal) secretPayload.mister_password = newPasswordVal;
             const { error: secretErr } = await supabase.from('league_secrets').upsert(secretPayload, { onConflict: 'league_id' });
             if (secretErr) throw secretErr;
           } else {
             updatePayload.biwenger_league_id = null;
             updatePayload.comunio_community_id = null;
+            updatePayload.mister_league_name = null;
             // Drop any stored credentials when leaving automatic sync.
             const { error: delErr } = await supabase.from('league_secrets').delete().eq('league_id', leagueId);
             if (delErr) throw delErr;

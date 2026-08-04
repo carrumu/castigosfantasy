@@ -3,6 +3,7 @@ import { escapeHTML } from '../utils/security';
 import { openLeagueSettings } from '../utils/league-options';
 import { openBiwengerLinkModal } from '../utils/biwenger-link-modal';
 import { openComunioLinkModal } from '../utils/comunio-link-modal';
+import { openMisterLinkModal } from '../utils/mister-link-modal';
 import { consumeAuthIntent, INTENT_CREATE_LEAGUE } from '../utils/auth-intent';
 
 /**
@@ -252,8 +253,12 @@ export function renderSelectLeague(container, callbacks) {
                         <input type="radio" name="league-type" value="comunio" style="accent-color: var(--accent);" />
                         Comunio
                       </label>
+                      <label style="display: flex; align-items: center; gap: 0.4rem; color: var(--text-light); font-size: 0.8rem; cursor: pointer; font-weight: 600;">
+                        <input type="radio" name="league-type" value="mister" style="accent-color: var(--accent);" />
+                        Mister
+                      </label>
                     </div>
-                    <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.4rem;">Si eliges Biwenger o Comunio, configura tus credenciales después en Ajustes de la liga.</p>
+                    <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.4rem;">Si eliges Biwenger, Comunio o Mister, configura tus credenciales después en Ajustes de la liga.</p>
                   </div>
 
                   <button type="submit" class="btn-primary" id="btn-create" style="font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Crear Liga</button>
@@ -476,6 +481,12 @@ export function renderSelectLeague(container, callbacks) {
           });
         } else if (targetLeague.sync_source === 'comunio' && targetLeague.comunio_community_id) {
           openComunioLinkModal(targetLeague.id, currentUser.id, callbacks, () => {
+            callbacks.onNavigate('menu-liga');
+          });
+        } else if (targetLeague.sync_source === 'mister') {
+          // Mister no tiene id de liga que comprobar aquí: si al admin le falta
+          // configurar las credenciales, el propio modal lo dice al fallar.
+          openMisterLinkModal(targetLeague.id, currentUser.id, callbacks, () => {
             callbacks.onNavigate('menu-liga');
           });
         } else {
