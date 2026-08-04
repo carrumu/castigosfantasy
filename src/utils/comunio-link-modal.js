@@ -91,12 +91,27 @@ export async function openComunioLinkModal(leagueId, currentUserId, callbacks, o
     // 2. Fetch active membership to check current link
     const { data: memberData } = await supabase
       .from('league_members')
-      .select('comunio_manager_id, comunio_manager_name')
+      .select('comunio_manager_id, comunio_manager_name, is_admin')
       .eq('league_id', leagueId)
       .eq('profile_id', currentUserId)
       .maybeSingle();
 
     const currentLinkedId = memberData?.comunio_manager_id ?? null;
+    const esAdmin = !!memberData?.is_admin;
+
+    // Mánagers ya reclamados por otro miembro: si se ofrecen, dos personas
+    // pueden acabar apuntando al mismo y las estadísticas se cruzan.
+    const ocupados = new Map();
+    try {
+      const { data: otros } = await supabase
+        .from('league_members')
+        .select('profile_id, comunio_manager_id, comunio_manager_name')
+        .eq('league_id', leagueId)
+        .not('comunio_manager_id', 'is', null);
+      (otros || [])
+        .filter(m => m.profile_id !== currentUserId)
+        .forEach(m => ocupados.set(String(m.comunio_manager_id), m.comunio_manager_name));
+    } catch (_) { /* si no se pueden leer, se ofrecen todos */ }
 
     // 3. Call Edge Function to get members
     const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || localStorage.getItem('CF_SUPABASE_URL') || '';
@@ -132,15 +147,52 @@ export async function openComunioLinkModal(leagueId, currentUserId, callbacks, o
       throw new Error('No se encontraron mánagers en esta comunidad de Comunio.');
     }
 
+    /** Guarda la vinculación. Devuelve true si fue bien. */
+    async function vincular(manager) {
+      const { error } = await supabase
+        .from('league_members')
+        .update({ comunio_manager_id: Number(manager.id), comunio_manager_name: manager.name || null })
+        .eq('league_id', leagueId)
+        .eq('profile_id', currentUserId);
+      if (error) { console.error(error); return false; }
+      return true;
+    }
+
+    // ---- Vinculación automática ----
+    // `isMe` marca al dueño de las credenciales guardadas, que es el admin que
+    // las configuró. Solo a él se le puede vincular solo: para el resto de
+    // miembros ese mánager es el del admin, no el suyo.
+    const yo = comunioMembers.find(m => m.isMe);
+    const libre = yo && !ocupados.has(String(yo.id));
+    if (esAdmin && yo && libre && currentLinkedId === null) {
+      confirmBtn.disabled = true;
+      confirmBtn.innerHTML = '<span class="spinner" style="width:16px;height:16px;"></span> Vinculando...';
+      if (await vincular(yo)) {
+        callbacks.showToast(`Vinculado automáticamente a "${yo.name}"`, 'success');
+        close();
+        return;
+      }
+      confirmBtn.innerHTML = 'Vincular Cuenta';
+    }
+
     // Populate Select
     selectEl.innerHTML = '<option value="">-- Selecciona tu mánager --</option>';
     comunioMembers.forEach(m => {
       const opt = document.createElement('option');
       opt.value = String(m.id);
-      opt.textContent = m.leader ? `${m.name} (líder)` : m.name;
+      if (ocupados.has(String(m.id))) {
+        opt.textContent = `${m.name} — ya vinculado`;
+        opt.disabled = true;
+      } else {
+        opt.textContent = m.isMe ? `${m.name} (esta cuenta)` : (m.leader ? `${m.name} (líder)` : m.name);
+      }
       if (currentLinkedId !== null && m.id === currentLinkedId) opt.selected = true;
       selectEl.appendChild(opt);
     });
+
+    // Al dueño de las credenciales se le deja preseleccionado aunque no se
+    // haya podido vincular solo: es casi seguro el suyo.
+    if (yo && libre && currentLinkedId === null) selectEl.value = String(yo.id);
 
     selectEl.disabled = false;
     confirmBtn.disabled = false;
@@ -160,19 +212,10 @@ export async function openComunioLinkModal(leagueId, currentUserId, callbacks, o
       confirmBtn.disabled = true;
       confirmBtn.innerHTML = '<span class="spinner" style="width:16px;height:16px;"></span> Vinculando...';
 
-      try {
-        const { error } = await supabase
-          .from('league_members')
-          .update({ comunio_manager_id: Number(selectedId), comunio_manager_name: chosenMember?.name || null })
-          .eq('league_id', leagueId)
-          .eq('profile_id', currentUserId);
-
-        if (error) throw error;
-
+      if (await vincular(chosenMember || { id: selectedId, name: null })) {
         callbacks.showToast(`¡Perfil vinculado a "${chosenMember?.name || selectedId}"!`, 'success');
         close();
-      } catch (saveErr) {
-        console.error(saveErr);
+      } else {
         callbacks.showToast('Error al guardar la vinculación', 'error');
         confirmBtn.disabled = false;
         confirmBtn.innerHTML = 'Vincular Cuenta';

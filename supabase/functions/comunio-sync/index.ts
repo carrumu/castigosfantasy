@@ -84,11 +84,18 @@ serve(async (req: Request) => {
     // Ese es el "bootstrap" real de la API moderna (el antiguo /users/me no vale:
     // pide un userid que el login no entrega). Si el usuario configuró un ID de
     // comunidad a mano (varias comunidades), ese tiene prioridad.
-    if (!communityId) {
+    // El bootstrap se pide SIEMPRE, aunque ya tengamos la comunidad: es la
+    // única forma de saber qué mánager es el dueño de las credenciales, y con
+    // eso la UI puede vincular sola al admin sin preguntarle nada.
+    let meId: string | null = null;
+    {
       const rootRes = await fetch(`${COMUNIO_API}/`, { headers: authHeaders });
       const rootJson = await rootRes.json().catch(() => ({}));
-      communityId = rootJson?.community?.id ? String(rootJson.community.id) : null;
-      console.log(`[comunio] bootstrap GET / status=${rootRes.status} community=${communityId}`);
+      meId = rootJson?.user?.id != null ? String(rootJson.user.id) : null;
+      if (!communityId) {
+        communityId = rootJson?.community?.id ? String(rootJson.community.id) : null;
+      }
+      console.log(`[comunio] bootstrap GET / status=${rootRes.status} community=${communityId} me=${meId}`);
       if (!communityId) {
         return json({ error: "No hemos podido detectar tu comunidad de Comunio. Asegúrate de estar dentro de una comunidad en Comunio, o añade el ID de comunidad en Ajustes.", _debug: rootJson }, 502);
       }
@@ -115,6 +122,8 @@ serve(async (req: Request) => {
       login: m.loginName || m.login,
       name: m.firstName || m.loginName || m.login || "Mánager",
       leader: !!(m.isLeader ?? m.leader),
+      // Dueño de las credenciales guardadas para esta liga.
+      isMe: meId != null && String(m.id) === meId,
     }));
 
     // Standings hold the points once the season has started; empty in preseason.

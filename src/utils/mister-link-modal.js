@@ -80,14 +80,29 @@ export async function openMisterLinkModal(leagueId, currentUserId, callbacks, on
   modal.addEventListener('click', e => { if (e.target === modal) close(); });
 
   try {
-    // Vinculación actual, si ya la había.
+    // Vinculación actual y rol del usuario.
     const { data: memberData } = await supabase
       .from('league_members')
-      .select('mister_manager_id')
+      .select('mister_manager_id, is_admin')
       .eq('league_id', leagueId)
       .eq('profile_id', currentUserId)
       .maybeSingle();
     const yaVinculado = memberData?.mister_manager_id ?? null;
+    const esAdmin = !!memberData?.is_admin;
+
+    // Managers que ya ha reclamado otro miembro: no deben ofrecerse, o dos
+    // personas acabarían apuntando al mismo y las estadísticas se cruzarían.
+    let ocupados = new Map();
+    try {
+      const { data: otros } = await supabase
+        .from('league_members')
+        .select('profile_id, mister_manager_id, mister_manager_name')
+        .eq('league_id', leagueId)
+        .not('mister_manager_id', 'is', null);
+      (otros || [])
+        .filter(m => m.profile_id !== currentUserId)
+        .forEach(m => ocupados.set(String(m.mister_manager_id), m.mister_manager_name));
+    } catch (_) { /* si no se pueden leer, se ofrecen todos */ }
 
     const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || localStorage.getItem('CF_SUPABASE_URL') || '';
     const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || localStorage.getItem('CF_SUPABASE_ANON_KEY') || '';
@@ -119,16 +134,56 @@ export async function openMisterLinkModal(leagueId, currentUserId, callbacks, on
       banner.style.display = 'block';
     }
 
+    /** Guarda la vinculación. Devuelve true si fue bien. */
+    async function vincular(manager) {
+      const { error } = await supabase
+        .from('league_members')
+        // El id de Mister se guarda como texto: viene así de la URL y no hay
+        // ninguna razón para convertirlo a número.
+        .update({ mister_manager_id: String(manager.id), mister_manager_name: manager.name || null })
+        .eq('league_id', leagueId)
+        .eq('profile_id', currentUserId);
+      if (error) { console.error(error); return false; }
+      return true;
+    }
+
+    // ---- Vinculación automática ----
+    // Mister marca con `isMe` al dueño de las credenciales guardadas, que es
+    // el admin que las configuró. Para él se puede vincular solo, sin
+    // preguntarle nada. Para el resto de miembros NO: verían el mánager del
+    // admin marcado como "esta cuenta" y acabarían vinculados a él.
+    const yo = managers.find(m => m.isMe);
+    const libre = yo && !ocupados.has(String(yo.id));
+    if (esAdmin && yo && libre && !yaVinculado) {
+      confirmBtn.disabled = true;
+      confirmBtn.innerHTML = '<span class="spinner" style="width:16px;height:16px;"></span> Vinculando...';
+      if (await vincular(yo)) {
+        callbacks.showToast(`Vinculado automáticamente a "${yo.name}"`, 'success');
+        close();
+        return;
+      }
+      // Si falla, se sigue con el desplegable de siempre.
+      confirmBtn.innerHTML = 'Vincular Cuenta';
+    }
+
     selectEl.innerHTML = '<option value="">-- Selecciona tu mánager --</option>';
     managers.forEach(m => {
       const opt = document.createElement('option');
       opt.value = String(m.id);
-      // Mister marca con `isMe` al dueño de las credenciales: es una pista
-      // útil, aunque quien vincula puede ser otro miembro de la liga.
-      opt.textContent = m.isMe ? `${m.name} (esta cuenta)` : m.name;
+      const tomadoPor = ocupados.get(String(m.id));
+      if (tomadoPor !== undefined) {
+        opt.textContent = `${m.name} — ya vinculado`;
+        opt.disabled = true;
+      } else {
+        opt.textContent = m.isMe ? `${m.name} (esta cuenta)` : m.name;
+      }
       if (yaVinculado !== null && String(m.id) === String(yaVinculado)) opt.selected = true;
       selectEl.appendChild(opt);
     });
+
+    // Si es el dueño de las credenciales, se le deja preseleccionado aunque no
+    // se haya podido vincular solo: es casi seguro el suyo.
+    if (yo && libre && !yaVinculado) selectEl.value = String(yo.id);
 
     selectEl.disabled = false;
     confirmBtn.disabled = false;
@@ -146,20 +201,10 @@ export async function openMisterLinkModal(leagueId, currentUserId, callbacks, on
       confirmBtn.disabled = true;
       confirmBtn.innerHTML = '<span class="spinner" style="width:16px;height:16px;"></span> Vinculando...';
 
-      try {
-        const { error } = await supabase
-          .from('league_members')
-          // El id de Mister se guarda como texto: viene así de la URL y no hay
-          // ninguna razón para convertirlo a número.
-          .update({ mister_manager_id: elegido, mister_manager_name: manager?.name || null })
-          .eq('league_id', leagueId)
-          .eq('profile_id', currentUserId);
-        if (error) throw error;
-
+      if (await vincular(manager || { id: elegido, name: null })) {
         callbacks.showToast(`¡Perfil vinculado a "${manager?.name || elegido}"!`, 'success');
         close();
-      } catch (saveErr) {
-        console.error(saveErr);
+      } else {
         callbacks.showToast('Error al guardar la vinculación', 'error');
         confirmBtn.disabled = false;
         confirmBtn.innerHTML = 'Vincular Cuenta';
