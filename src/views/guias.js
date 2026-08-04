@@ -114,7 +114,7 @@ export const GUIDES = [
       <p style="${P}">Cuando sincronizas tu liga de Biwenger, la clasificación de la jornada se importa sola y se detecta automáticamente quién ha sido el farolillo rojo, sin que tengas que revisar nada a mano. En cuanto se cierra la jornada, la app ya sabe quién es el candidato al castigo y actualiza el bote y las deudas.</p>
 
       <h3 style="${H3}">¿Y si juego en Comunio o LaLiga Fantasy?</h3>
-      <p style="${P}">El concepto de "el último paga" es idéntico en cualquier plataforma. Hoy la sincronización automática está activa con Biwenger; si tu liga juega en Comunio, LaLiga Fantasy o Mister, puedes seguir usando la app para gestionar el bote, sortear castigos y llevar el muro de la vergüenza, confirmando tú manualmente quién ha quedado último en un par de toques.</p>
+      <p style="${P}">El concepto de "el último paga" es idéntico en cualquier plataforma. La sincronización automática está activa con <strong>Biwenger y Comunio</strong>: la clasificación se importa sola y la app sabe quién ha quedado último. Si tu liga juega en LaLiga Fantasy, Mister u otra, puedes seguir usando la app para gestionar el bote, sortear castigos y llevar el muro de la vergüenza, confirmando tú manualmente quién ha quedado último en un par de toques.</p>
 
       <h3 style="${H3}">Por qué conviene darle bombo al farolillo rojo</h3>
       <p style="${P}">Un farolillo rojo sin consecuencias es un farolillo rojo que pasa desapercibido, y ahí empieza el desinterés. Cuando quedar último tiene premio (un castigo, una prenda o una aportación al bote), el colista deja de ser una fila más de la tabla y se convierte en el protagonista de la semana. Ese pique es, muchas veces, lo que engancha más que la propia pelea por el título.</p>
@@ -171,7 +171,7 @@ export const GUIDES = [
       </ul>
 
       <h3 style="${H3}">En qué se diferencian a la hora de sincronizar</h3>
-      <p style="${P}">Hoy la sincronización automática está disponible con Biwenger: la clasificación se importa sola. En Comunio, LaLiga Fantasy y otras, la gestión del bote, la ruleta y el muro funcionan igual, pero confirmas tú quién ha quedado último. En todos los casos, Castigos Fantasy es un complemento: sigues jugando tu liga exactamente donde ya lo haces.</p>
+      <p style="${P}">La sincronización automática está disponible con <strong>Biwenger y Comunio</strong>: vinculas la liga una vez y la clasificación se importa sola, jornada tras jornada. En LaLiga Fantasy, Mister y otras, la gestión del bote, la ruleta y el muro funcionan igual, pero confirmas tú quién ha quedado último. En todos los casos, Castigos Fantasy es un complemento: sigues jugando tu liga exactamente donde ya lo haces.</p>
 
       <h3 style="${H3}">Marcas y afiliación</h3>
       <p style="${P}">Castigos Fantasy no está asociado ni patrocinado por Biwenger, Comunio, Mister ni LaLiga. Son marcas de sus respectivos titulares; nosotros solo añadimos la capa social de castigos por encima de tu liga.</p>
@@ -538,7 +538,7 @@ export const GUIDES = [
       <p style="${P}">Para que las estadísticas de cada uno cuadren, cada miembro de la liga debería entrar en Opciones de la liga y vincular su <strong>participante de Biwenger</strong>, eligiendo su nombre de la lista. Así el sistema sabe quién es quién y reparte los castigos a la persona correcta.</p>
 
       <h3 style="${H3}">¿Y si mi liga no es de Biwenger?</h3>
-      <p style="${P}">La sincronización automática está disponible con Biwenger. Si juegas en Comunio, LaLiga Fantasy, Mister u otra, puedes usar Castigos Fantasy igual: la ruleta, el bote y el muro de la vergüenza funcionan lo mismo, solo que confirmas tú quién ha quedado último en un par de toques. Tienes más detalle en la guía de <a href="/guias/biwenger-comunio-laliga-fantasy/" class="cf-link" data-nav="guias/biwenger-comunio-laliga-fantasy" style="color:var(--accent);">castigos en Biwenger, Comunio o LaLiga Fantasy</a>.</p>
+      <p style="${P}">La sincronización automática está disponible con Biwenger y con Comunio. Si juegas en LaLiga Fantasy, Mister u otra, puedes usar Castigos Fantasy igual: la ruleta, el bote y el muro de la vergüenza funcionan lo mismo, solo que confirmas tú quién ha quedado último en un par de toques. Tienes más detalle en la guía de <a href="/guias/biwenger-comunio-laliga-fantasy/" class="cf-link" data-nav="guias/biwenger-comunio-laliga-fantasy" style="color:var(--accent);">castigos en Biwenger, Comunio o LaLiga Fantasy</a>.</p>
     `
   },
   {

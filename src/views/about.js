@@ -49,7 +49,7 @@ export function renderAbout(container, { onNavigate } = {}) {
 
     <h2 style="${H}">Qué ofrecemos</h2>
     <ul style="${UL}">
-      <li style="${LI}"><strong>Detección automática del último</strong> de cada jornada (sincronización con Biwenger) para llevar el bote y las deudas sin llevar cuentas a mano.</li>
+      <li style="${LI}"><strong>Detección automática del último</strong> de cada jornada (sincronización con Biwenger y Comunio) para llevar el bote y las deudas sin llevar cuentas a mano.</li>
       <li style="${LI}"><strong>Ruleta de Sentencias</strong> para sortear el castigo del perdedor cuando el grupo no se pone de acuerdo.</li>
       <li style="${LI}"><strong>Generador de Castigos</strong> con ideas al instante, del bote a las prendas más ridículas.</li>
       <li style="${LI}"><strong>Bufón de la Corte</strong> para votar al peor jugador de la jornada.</li>
