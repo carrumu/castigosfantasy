@@ -56,7 +56,14 @@ export function adSlotHtml() {
  * partir de la segunda guía el hueco se quedaría vacío.
  */
 export function mountAd(root) {
-  if (!hasAdConsent()) return;
+  const slot = root.querySelector('.ad-slot');
+
+  if (!hasAdConsent()) {
+    // Sin permiso no hay anuncio, así que tampoco debe quedarse el rótulo
+    // "Publicidad" presidiendo un hueco vacío.
+    if (slot) slot.hidden = true;
+    return;
+  }
 
   const hueco = root.querySelector(`#${AD_CONTAINER_ID}`);
   if (!hueco) return;
@@ -71,4 +78,16 @@ export function mountAd(root) {
   s.setAttribute('data-cfasync', 'false');
   s.setAttribute('data-adsterra', 'true');
   document.body.appendChild(s);
+
+  // Adsterra puede no devolver anuncio: unidad recién creada, sin demanda para
+  // ese país, o un bloqueador de por medio. En ese caso el contenedor se queda
+  // vacío y, sin esto, el lector ve un "PUBLICIDAD" encabezando la nada. Se
+  // comprueba pasado un margen y, si no ha llegado nada, el bloque desaparece.
+  if (slot) {
+    slot.hidden = false;
+    setTimeout(() => {
+      const vacio = hueco.children.length === 0 && hueco.getBoundingClientRect().height < 5;
+      if (vacio) slot.hidden = true;
+    }, 4000);
+  }
 }
