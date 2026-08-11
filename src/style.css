@@ -5465,3 +5465,25 @@ h1, h2, h3, h4, h5, h6, .card-title {
     display: none;
   }
 }
+
+/* ── Hueco de publicidad (solo en los artículos de guías) ─────────────────── */
+.ad-slot {
+  margin: 2.5rem 0 0;
+  padding-top: 1.25rem;
+  border-top: 1px dashed var(--border-color-glow);
+  min-height: 120px;
+}
+
+/* Etiquetarlo es obligatorio para no confundir anuncio con contenido, y
+   ademas evita que el lector sienta que le han colado algo. */
+.ad-slot-label {
+  display: block;
+  margin-bottom: 0.6rem;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  opacity: 0.65;
+}

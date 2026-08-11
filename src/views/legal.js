@@ -85,7 +85,7 @@ function privacyBody() {
     <h2 style="${H}">3. Finalidades y base jurídica</h2>
     <ul style="${UL}">
       <li style="${LI}"><strong>Prestar el servicio y gestionar tu cuenta:</strong> ejecución de la relación contractual que aceptas al registrarte.</li>
-      <li style="${LI}"><strong>Publicidad y fuentes de terceros (Google):</strong> tu consentimiento, que puedes retirar en cualquier momento.</li>
+      <li style="${LI}"><strong>Publicidad (Adsterra) y fuentes de terceros (Google Fonts):</strong> tu consentimiento, que puedes retirar en cualquier momento.</li>
       <li style="${LI}"><strong>Atender tus consultas de soporte:</strong> tu consentimiento al contactarnos.</li>
     </ul>
 
@@ -95,11 +95,12 @@ function privacyBody() {
       <li style="${LI}"><strong>Supabase, Inc.</strong> — autenticación y base de datos.</li>
       <li style="${LI}"><strong>Nominalia</strong> — proveedor de dominio y alojamiento.</li>
       <li style="${LI}"><strong>Biwenger</strong> — únicamente si activas la sincronización de una liga.</li>
-      <li style="${LI}"><strong>Google</strong> — tipografías (Google Fonts) y publicidad (Google AdSense).</li>
+      <li style="${LI}"><strong>Adsterra</strong> — red publicitaria que muestra los anuncios de las guías, junto con sus anunciantes y socios de medición.</li>
+      <li style="${LI}"><strong>Google</strong> — tipografías (Google Fonts).</li>
     </ul>
 
     <h2 style="${H}">5. Transferencias internacionales</h2>
-    <p style="${P}">Algunos proveedores (por ejemplo, Google) pueden tratar datos fuera del Espacio Económico Europeo. En esos casos, dichas transferencias se amparan en las garantías adecuadas previstas por el RGPD, como las Cláusulas Contractuales Tipo de la Comisión Europea.</p>
+    <p style="${P}">Algunos proveedores (por ejemplo, Adsterra o Google) pueden tratar datos fuera del Espacio Económico Europeo. En esos casos, dichas transferencias se amparan en las garantías adecuadas previstas por el RGPD, como las Cláusulas Contractuales Tipo de la Comisión Europea.</p>
 
     <h2 style="${H}">6. Conservación</h2>
     <p style="${P}">Conservamos tus datos mientras mantengas tu cuenta y sean necesarios para prestar el servicio. Puedes solicitar su supresión en cualquier momento.</p>
@@ -125,7 +126,7 @@ function cookiesBody() {
     <h2 style="${H}">2. Cookies que utilizamos</h2>
     <ul style="${UL}">
       <li style="${LI}"><strong>Técnicas o necesarias</strong> (no requieren consentimiento): mantienen tu sesión iniciada, recuerdan tu liga activa, el modo invitado y tus preferencias básicas. Sin ellas la aplicación no funciona correctamente.</li>
-      <li style="${LI}"><strong>De terceros / publicidad</strong> (requieren tu consentimiento): <strong>Google AdSense</strong> puede instalar cookies para mostrar y medir anuncios, incluida la personalización. <strong>Google Fonts</strong> carga las tipografías del sitio y puede registrar tu dirección IP.</li>
+      <li style="${LI}"><strong>De terceros / publicidad</strong> (requieren tu consentimiento): <strong>Adsterra</strong>, la red que muestra los anuncios <strong>en las guías</strong>, y sus anunciantes pueden instalar cookies e identificadores para mostrar y medir esos anuncios, incluida la personalización. En el resto de la aplicación no se carga publicidad. <strong>Google Fonts</strong> carga las tipografías del sitio y puede registrar tu dirección IP.</li>
     </ul>
 
     <h2 style="${H}">3. Cómo gestionarlas</h2>

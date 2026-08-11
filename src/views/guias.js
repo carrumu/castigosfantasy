@@ -15,6 +15,7 @@
  */
 
 import { PUNISHMENT_IDEAS } from '../utils/punishments-catalog.js';
+import { adSlotHtml, mountAd } from '../utils/ads.js';
 
 const H2 = 'font-family:var(--font-display);font-weight:900;font-size:1.5rem;text-transform:uppercase;line-height:1.1;margin:2.25rem 0 0.5rem;color:var(--text-light);scroll-margin-top:90px;';
 const H3 = 'font-family:var(--font-display);font-weight:800;font-size:1.05rem;text-transform:uppercase;margin:1.5rem 0 0.5rem;color:var(--accent-gold,#deed00);';
@@ -699,6 +700,10 @@ function renderArticle(container, guide) {
         </div>
       </article>
 
+      <!-- El anuncio va DESPUÉS del artículo: quien llega de Google viene a
+           leer, y meterlo antes es perder al lector en la primera pantalla. -->
+      ${adSlotHtml()}
+
       <div style="border-top:1px solid var(--border-color);margin-top:2.5rem;padding-top:1.5rem;">
         <h2 style="${H2}margin-top:0;">Sigue leyendo</h2>
         <ul style="${UL}font-size:0.95rem;line-height:1.7;">${related}</ul>
@@ -714,6 +719,8 @@ export function renderGuias(container, { onNavigate, slug } = {}) {
 
   if (guide) {
     renderArticle(container, guide);
+    // Solo en los artículos: en el índice de guías no hay anuncio.
+    mountAd(container);
   } else {
     renderHub(container);
   }

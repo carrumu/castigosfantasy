@@ -32,7 +32,7 @@
         },
         {
           "key": "Content-Security-Policy-Report-Only",
-          "value": "default-src 'self'; script-src 'self' https://pagead2.googlesyndication.com https://*.googlesyndication.com https://*.doubleclick.net https://*.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https:; connect-src 'self' https://cizvuouhrmppreigoosp.supabase.co wss://cizvuouhrmppreigoosp.supabase.co https://v3.football.api-sports.io https://*.googlesyndication.com https://*.google.com; frame-src https://googleads.g.doubleclick.net https://*.google.com https://*.doubleclick.net; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none'"
+          "value": "default-src 'self'; script-src 'self' https://*.effectivecpmnetwork.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https:; connect-src 'self' https://cizvuouhrmppreigoosp.supabase.co wss://cizvuouhrmppreigoosp.supabase.co https://v3.football.api-sports.io https://*.effectivecpmnetwork.com; frame-src https://*.effectivecpmnetwork.com; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none'"
         }
       ]
     }

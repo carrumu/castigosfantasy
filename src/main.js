@@ -1,6 +1,7 @@
 import './style.css';
 import { supabase, isConfigured, clearSupabaseConfig } from './supabase';
 import { setSEO } from './utils/seo';
+import { mountAd } from './utils/ads.js';
 import { checkAndNotifyNewUser } from './utils/email';
 import { renderAuth } from './views/auth';
 import { renderDashboard } from './views/dashboard';
@@ -699,26 +700,17 @@ window.addEventListener('popstate', handleRouting);
 handleRouting();
 
 // --- Cookie consent + consent-gated advertising ---
+//
+// La publicidad ya no se carga desde aqui. Se paso de Google AdSense a Adsterra
+// y, con el cambio, el anuncio dejo de ser global: ahora vive solo en los
+// articulos de /guias/ y lo monta `utils/ads.js` cuando toca. Este fichero se
+// limita a recoger el consentimiento, que es lo que decide si aquel carga algo.
 const COOKIE_CONSENT_KEY = 'CF_COOKIE_CONSENT';
-const ADSENSE_CLIENT = 'ca-pub-7549006958989496';
-
-function loadAdSense() {
-  if (document.querySelector('script[data-adsense]')) return;
-  const s = document.createElement('script');
-  s.async = true;
-  s.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`;
-  s.crossOrigin = 'anonymous';
-  s.setAttribute('data-adsense', 'true');
-  document.head.appendChild(s);
-}
 
 function initCookieConsent() {
   const consent = localStorage.getItem(COOKIE_CONSENT_KEY);
-  if (consent === 'accepted') {
-    loadAdSense();
-    return;
-  }
-  if (consent === 'rejected') return;
+  // Contestado ya, en un sentido u otro: no hay banner que enseñar.
+  if (consent === 'accepted' || consent === 'rejected') return;
 
   const banner = document.createElement('div');
   banner.id = 'cookie-consent-banner';
@@ -731,7 +723,7 @@ function initCookieConsent() {
   banner.innerHTML = `
     <p style="margin:0;font-size:0.82rem;line-height:1.45;color:#e8e8e8;max-width:620px;flex:1;min-width:240px;">
       Usamos cookies técnicas necesarias y, con tu permiso, cookies de terceros
-      (Google) para publicidad. Consulta la
+      (Adsterra y sus anunciantes) para la publicidad de las guías. Consulta la
       <a href="/cookies" id="cookie-policy-link" style="color:var(--accent,#deed00);font-weight:700;">Política de Cookies</a>.
     </p>
     <div style="display:flex;gap:0.5rem;flex-shrink:0;">
@@ -752,7 +744,9 @@ function initCookieConsent() {
   banner.querySelector('#cookie-accept').addEventListener('click', () => {
     localStorage.setItem(COOKIE_CONSENT_KEY, 'accepted');
     banner.remove();
-    loadAdSense();
+    // Si acepta estando ya dentro de una guía, se le carga el anuncio sin
+    // esperar a que navegue a otra.
+    mountAd(document);
   });
   banner.querySelector('#cookie-reject').addEventListener('click', () => {
     localStorage.setItem(COOKIE_CONSENT_KEY, 'rejected');
