@@ -62,15 +62,30 @@ export function renderChallenges(container, callbacks) {
     renderView();
 
     if (isGuest || !activeLeagueId || !isConfigured) {
-      // Local Guest fallback mode
-      const defaultDares = pickRandomChallenges(3).map((d, idx) => ({
-        id: `guest-${idx + 1}`,
-        title: d.title,
-        desc: d.description,
-        votes: 0
-      }));
-      challenges = defaultDares;
-      userVotedId = localStorage.getItem('CF_USER_VOTED_CHALLENGE_ID') || null;
+      // Local Guest fallback mode. Challenges and the user's vote are
+      // persisted per matchday so they stay fixed while voting is open,
+      // and only get regenerated once a new matchday starts.
+      const challengesKey = `CF_GUEST_CHALLENGES_MD_${currentMatchday}`;
+      const votedKey = `CF_USER_VOTED_CHALLENGE_ID_MD_${currentMatchday}`;
+
+      let storedChallenges = null;
+      try {
+        storedChallenges = JSON.parse(localStorage.getItem(challengesKey) || 'null');
+      } catch (_) {}
+
+      if (Array.isArray(storedChallenges) && storedChallenges.length > 0) {
+        challenges = storedChallenges;
+      } else {
+        challenges = pickRandomChallenges(3).map((d, idx) => ({
+          id: `guest-${idx + 1}`,
+          title: d.title,
+          desc: d.description,
+          votes: 0
+        }));
+        localStorage.setItem(challengesKey, JSON.stringify(challenges));
+      }
+
+      userVotedId = localStorage.getItem(votedKey) || null;
       isLoading = false;
       renderView();
       return;
@@ -180,7 +195,7 @@ export function renderChallenges(container, callbacks) {
 
     if (!isConfigured) {
       userVotedId = challengeId;
-      localStorage.setItem('CF_USER_VOTED_CHALLENGE_ID', challengeId);
+      localStorage.setItem(`CF_USER_VOTED_CHALLENGE_ID_MD_${currentMatchday}`, challengeId);
       callbacks.showToast('Voto local registrado (Demo)', 'success');
       loadData();
       return;
