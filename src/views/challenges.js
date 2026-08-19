@@ -94,12 +94,16 @@ export function renderChallenges(container, callbacks) {
     try {
       const currentUser = supabase.auth.user ? supabase.auth.user() : (await supabase.auth.getUser()).data.user;
 
-      // 1. Fetch challenges from Supabase for this matchday
+      // 1. Fetch challenges from Supabase for this matchday. Ordered by
+      // created_at so that, combined with the slice(0, 3) below, every
+      // client converges on the same 3 challenges even if a race condition
+      // ever left extra rows for this matchday (see seeding step below).
       let { data: remoteChallenges, error: chalErr } = await supabase
         .from('weekly_challenges')
         .select('*')
         .eq('league_id', activeLeagueId)
-        .eq('matchday_number', currentMatchday);
+        .eq('matchday_number', currentMatchday)
+        .order('created_at', { ascending: true });
 
       if (chalErr) throw chalErr;
 
@@ -132,11 +136,26 @@ export function renderChallenges(container, callbacks) {
           .select();
 
         if (!insertErr && inserted) {
-          remoteChallenges = inserted;
+          // Another tab/teammate may have seeded at the exact same moment
+          // (two clients both saw 0 rows and both inserted 3). Re-fetch
+          // instead of trusting our own insert, so every client ends up
+          // looking at the same set instead of a random half of 6 rows.
+          const { data: afterInsert } = await supabase
+            .from('weekly_challenges')
+            .select('*')
+            .eq('league_id', activeLeagueId)
+            .eq('matchday_number', currentMatchday)
+            .order('created_at', { ascending: true });
+          remoteChallenges = (afterInsert && afterInsert.length > 0) ? afterInsert : inserted;
+        } else if (insertErr) {
+          console.error('Error seeding weekly challenges:', insertErr);
+          callbacks.showToast('No se pudieron generar los retos de esta jornada. Inténtalo de nuevo en unos minutos.', 'error');
         }
       }
 
-      challenges = remoteChallenges || [];
+      // Always exactly 3, deterministically (oldest first), even if a past
+      // race condition left extra rows behind for this matchday.
+      challenges = (remoteChallenges || []).slice(0, 3);
 
       // 2. Fetch all votes for these challenges
       if (challenges.length > 0) {
@@ -170,6 +189,7 @@ export function renderChallenges(container, callbacks) {
       }
     } catch (e) {
       console.error('Error fetching challenges from Supabase:', e);
+      callbacks.showToast('No se pudieron cargar los retos de la semana. Revisa tu conexión o inténtalo de nuevo.', 'error');
     } finally {
       isLoading = false;
       renderView();
@@ -330,7 +350,11 @@ export function renderChallenges(container, callbacks) {
                     </div>
                   </div>
                 `;
-              }).join('')}
+              }).join('') || `
+                <p style="font-size: 0.85rem; color: var(--text-muted); text-align: center; padding: 1.5rem 0;">
+                  No se han podido cargar los retos de esta jornada. Recarga la página o inténtalo de nuevo en unos minutos.
+                </p>
+              `}
             </div>
           </div>
 

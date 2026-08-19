@@ -22,6 +22,7 @@ export function renderBufon(container, callbacks) {
   let history = [];
   let currentMatchday = 5;
   let userVotedId = null;
+  let userNominatedId = null;
   let votingStartTime = null;
   let userNickname = "Tú";
   let activeLeagueId = null;
@@ -53,6 +54,8 @@ export function renderBufon(container, callbacks) {
     history = demoHistory;
 
     userVotedId = localStorage.getItem('CF_DEMO_JESTER_USER_VOTE');
+    const myDemoNomination = nominees.find(n => n.nominated_by === 'd-member-guest');
+    userNominatedId = myDemoNomination ? myDemoNomination.id : null;
     userNickname = "Invitado";
     renderLeagueView();
   }
@@ -174,6 +177,7 @@ export function renderBufon(container, callbacks) {
       await loadLeagueData();
     } catch (err) {
       console.error("Error al inicializar la base de datos de El Bufón, activando modo Demo:", err);
+      callbacks.showToast('No se pudo cargar El Bufón de tu liga. Mostrando una vista de demostración: recarga la página para reintentarlo.', 'error');
       forceDemoMode = true;
       loadDemoData();
     }
@@ -259,6 +263,10 @@ export function renderBufon(container, callbacks) {
           // Check if user voted
           const userVote = votesData.find(v => v.profile_id === currentUser.id);
           userVotedId = userVote ? userVote.nominee_id : null;
+
+          // Check if user already nominated someone this matchday
+          const userNomination = nomineesData.find(n => n.nominated_by === currentUser.id);
+          userNominatedId = userNomination ? userNomination.id : null;
         }
       }
 
@@ -273,6 +281,7 @@ export function renderBufon(container, callbacks) {
       renderLeagueView();
     } catch (err) {
       console.error("Error loading league data, falling back to Demo Mode:", err);
+      callbacks.showToast('No se pudieron cargar los nominados de tu liga. Mostrando una vista de demostración: recarga la página para reintentarlo.', 'error');
       forceDemoMode = true;
       loadDemoData();
     }
@@ -339,6 +348,10 @@ export function renderBufon(container, callbacks) {
       if (existing) {
         return handleVote(existing.id);
       }
+      if (userNominatedId) {
+        callbacks.showToast("Ya has nominado un jugador esta jornada", "warning");
+        return;
+      }
       const newNom = {
         id: 'd-nom-' + Date.now(),
         name,
@@ -349,6 +362,7 @@ export function renderBufon(container, callbacks) {
         created_at: new Date().toISOString()
       };
       nominees.push(newNom);
+      userNominatedId = newNom.id;
       localStorage.setItem('CF_DEMO_JESTER_NOMINEES', JSON.stringify(nominees));
       callbacks.showToast("Nominado añadido en modo Demo", "success");
       renderLeagueView();
@@ -363,6 +377,11 @@ export function renderBufon(container, callbacks) {
     if (existing) {
       callbacks.showToast("El jugador ya está nominado. Registrando tu voto...", "info");
       return handleVote(existing.id);
+    }
+
+    if (userNominatedId) {
+      callbacks.showToast("Ya has nominado un jugador esta jornada", "warning");
+      return;
     }
 
     try {
@@ -380,7 +399,14 @@ export function renderBufon(container, callbacks) {
           nominated_by: currentUser.id
         });
 
-      if (nomErr) throw nomErr;
+      if (nomErr) {
+        if (nomErr.code === '23505') {
+          callbacks.showToast("Ya has nominado un jugador esta jornada", "warning");
+          await loadData();
+          return;
+        }
+        throw nomErr;
+      }
 
       // 2. If it's the first nominee of the matchday, update voting start time in leagues table
       if (nominees.length === 0 && !votingStartTime) {
@@ -627,6 +653,11 @@ export function renderBufon(container, callbacks) {
                   ¿Algún futbolista la ha liado en la jornada? Añádelo al escarnio público global.
                 </p>
 
+                ${(!isGuest && (userVotedId || userNominatedId)) ? `
+                  <p style="font-size: 0.8rem; color: var(--text-muted); text-align: center; padding: 0.75rem; border: 1px dashed var(--border-color-glow); border-radius: 8px;">
+                    ${userVotedId ? 'Ya has votado esta jornada. Ahora solo puedes observar cómo evoluciona la votación.' : 'Ya has nominado un candidato esta jornada. Podrás proponer otro en la próxima.'}
+                  </p>
+                ` : `
                 <form id="nominate-form" style="display: flex; flex-direction: column; gap: 1rem;">
                   <div class="form-group">
                     <label for="nom-name" style="font-size: 0.75rem; margin-bottom: 0.35rem; display: block; color: var(--text-muted);">Nombre del Futbolista</label>
@@ -638,6 +669,7 @@ export function renderBufon(container, callbacks) {
                     Añadir Candidato a Votación
                   </button>
                 </form>
+                `}
               </div>
           </div>
 
