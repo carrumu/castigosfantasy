@@ -22,6 +22,9 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import * as cheerio from 'cheerio';
 import { GUIDES, CATEGORIES, GUIDE_CATEGORY } from '../src/views/guias.js';
+import { aboutPageHTML, contactoPageHTML } from '../src/views/about.js';
+import { legalPageHTML } from '../src/views/legal.js';
+import { seoMap } from '../src/utils/seo.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DIST_DIR = path.join(__dirname, '..', 'dist');
@@ -124,6 +127,36 @@ function main() {
       console.log(`[prerender] /guias/${g.id}`);
     } catch (err) {
       console.warn(`[prerender] Aviso: no se pudo generar /guias/${g.id}:`, err.message);
+    }
+  }
+
+  // --- Páginas de confianza: sobre-nosotros, contacto, privacidad, cookies,
+  // terminos. Antes no se prerenderizaban, así que Google recibía en todas
+  // ellas el mismo HTML de la home (título, descripción y canonical de la
+  // home, sin el contenido real, que solo lo añadía el JS del cliente).
+  // Search Console las trataba como duplicados de la home y no las indexaba.
+  const trustPages = [
+    { view: 'sobre-nosotros', dir: 'sobre-nosotros', html: aboutPageHTML() },
+    { view: 'contacto', dir: 'contacto', html: contactoPageHTML() },
+    { view: 'privacidad', dir: 'privacidad', html: legalPageHTML('privacidad') },
+    { view: 'cookies', dir: 'cookies', html: legalPageHTML('cookies') },
+    { view: 'terminos', dir: 'terminos', html: legalPageHTML('terminos') }
+  ];
+  for (const page of trustPages) {
+    try {
+      const seo = seoMap[page.view];
+      const $ = cheerio.load(template);
+      applySeo($, {
+        title: seo.title,
+        description: seo.description,
+        canonicalPath: page.dir
+      });
+      $('#app').html(page.html);
+      writePage(page.dir, $.html());
+      ok++;
+      console.log(`[prerender] /${page.dir}/`);
+    } catch (err) {
+      console.warn(`[prerender] Aviso: no se pudo generar /${page.dir}/:`, err.message);
     }
   }
 

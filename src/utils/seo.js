@@ -3,7 +3,10 @@
  * Actualiza el Título, Meta Descripción y OpenGraph en tiempo real al navegar.
  */
 
-const seoMap = {
+// Exported (not just used internally) so scripts/prerender.mjs can pull the
+// same title/description it uses at runtime, instead of a second hardcoded
+// copy that could quietly drift out of sync.
+export const seoMap = {
   'inicio': {
     title: 'Gestor de Castigos y Ligas Fantasy | CastigosFantasy',
     description: 'Organiza tu liga de Biwenger, Comunio o LaLiga Fantasy, gestiona el bote y aplica castigos aleatorios con la ruleta de morosos. Disfruta con tus amigos.',
@@ -103,6 +106,21 @@ const seoMap = {
     title: 'Contacto | CastigosFantasy',
     description: 'Contacta con el equipo de Castigos Fantasy en soporte@castigosfantasy.com para soporte, sugerencias o cualquier duda sobre tu liga.',
     schemaType: 'ContactPage'
+  },
+  'privacidad': {
+    title: 'Política de Privacidad | CastigosFantasy',
+    description: 'Qué datos personales trata Castigos Fantasy, con qué finalidad y qué derechos tienes sobre ellos, conforme al RGPD y la LOPDGDD.',
+    schemaType: 'WebPage'
+  },
+  'cookies': {
+    title: 'Política de Cookies | CastigosFantasy',
+    description: 'Qué cookies y tecnologías de almacenamiento utiliza Castigos Fantasy, para qué sirven y cómo puedes gestionarlas o rechazarlas.',
+    schemaType: 'WebPage'
+  },
+  'terminos': {
+    title: 'Términos y Condiciones | CastigosFantasy',
+    description: 'Condiciones de uso de Castigos Fantasy: qué es el servicio, qué no cubre (no gestiona dinero real) y las normas de la comunidad.',
+    schemaType: 'WebPage'
   },
   'guias': {
     // Barra final: es la URL que sirve el HTML prerenderizado (ver prerender.mjs).

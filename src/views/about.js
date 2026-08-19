@@ -37,8 +37,20 @@ function hookBack(container, onNavigate) {
   });
 }
 
-export function renderAbout(container, { onNavigate } = {}) {
-  const body = `
+// Exported so scripts/prerender.mjs can bake this same markup into a real
+// static dist/sobre-nosotros/index.html — without it, Google was indexing
+// this route as a byte-identical duplicate of the homepage (no distinct
+// title/content in the crawled HTML, only added client-side after JS runs).
+export function aboutPageHTML() {
+  return pageShell(
+    'Sobre nosotros',
+    'Unos chavales de Sevilla mejorando la comunidad fantasy desde 2026.',
+    aboutBody()
+  );
+}
+
+function aboutBody() {
+  return `
     <p style="${P}">Castigos Fantasy es una aplicación web gratuita que le añade a tu liga de fútbol fantasy la parte que las apps oficiales no cubren: la social. No sustituye a Biwenger, Comunio ni LaLiga Fantasy; se conecta por encima para gestionar los castigos, el bote común y los piques de cada jornada, sin depender de un Excel ni de perseguir a nadie por WhatsApp.</p>
 
     <h2 style="${H}">Quiénes somos</h2>
@@ -62,16 +74,24 @@ export function renderAbout(container, { onNavigate } = {}) {
     <h2 style="${H}">Hablemos</h2>
     <p style="${P}">¿Tienes una idea, una sugerencia o has encontrado un fallo? Nos encanta escuchar a la comunidad. Escríbenos a <a href="mailto:${EMAIL}" style="color:var(--accent);">${EMAIL}</a> o visita nuestra página de <a href="/contacto" class="legal-link" data-page="contacto" style="color:var(--accent);">Contacto</a>.</p>
   `;
-  container.innerHTML = pageShell(
-    'Sobre nosotros',
-    'Unos chavales de Sevilla mejorando la comunidad fantasy desde 2026.',
-    body
-  );
+}
+
+export function renderAbout(container, { onNavigate } = {}) {
+  container.innerHTML = aboutPageHTML();
   hookBack(container, onNavigate);
 }
 
-export function renderContacto(container, { onNavigate } = {}) {
-  const body = `
+// Same reasoning as aboutPageHTML() above.
+export function contactoPageHTML() {
+  return pageShell(
+    'Contacto',
+    `Escríbenos a ${EMAIL} — respondemos a todo.`,
+    contactoBody()
+  );
+}
+
+function contactoBody() {
+  return `
     <p style="${P}">¿Necesitas ayuda, quieres proponernos una mejora o reportar un problema? Estamos encantados de leerte. Somos un equipo pequeño, así que respondemos personalmente cada mensaje lo antes posible.</p>
 
     <h2 style="${H}">Correo de contacto</h2>
@@ -93,10 +113,9 @@ export function renderContacto(container, { onNavigate } = {}) {
     <h2 style="${H}">Redes sociales</h2>
     <p style="${P}">También puedes seguirnos en Instagram en <a href="https://www.instagram.com/castigosfantasyy.__/" target="_blank" rel="noopener" style="color:var(--accent);">@castigosfantasyy.__</a> para novedades y sorteos.</p>
   `;
-  container.innerHTML = pageShell(
-    'Contacto',
-    `Escríbenos a ${EMAIL} — respondemos a todo.`,
-    body
-  );
+}
+
+export function renderContacto(container, { onNavigate } = {}) {
+  container.innerHTML = contactoPageHTML();
   hookBack(container, onNavigate);
 }

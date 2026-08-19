@@ -11,20 +11,26 @@ const OWNER = 'Carlos Rubio Muriel';
 const EMAIL = 'castigosfantasy2005@gmail.com';
 const SITE = 'castigosfantasy.com';
 
-export function renderLegal(container, { page = 'privacidad', onNavigate } = {}) {
-  const bodies = {
-    privacidad: privacyBody(),
-    cookies: cookiesBody(),
-    terminos: termsBody()
-  };
-  const titles = {
-    privacidad: 'Política de Privacidad',
-    cookies: 'Política de Cookies',
-    terminos: 'Términos y Condiciones'
-  };
-  const current = bodies[page] ? page : 'privacidad';
+const LEGAL_BODIES = {
+  privacidad: privacyBody,
+  cookies: cookiesBody,
+  terminos: termsBody
+};
+const LEGAL_TITLES = {
+  privacidad: 'Política de Privacidad',
+  cookies: 'Política de Cookies',
+  terminos: 'Términos y Condiciones'
+};
 
-  container.innerHTML = `
+// Exported so scripts/prerender.mjs can bake each of these into a real
+// static dist/<page>/index.html — see the matching note in about.js for why
+// that matters for indexing (Google was seeing all three as duplicates of
+// the homepage, since only client-side JS ever gave them their own content).
+export function legalPageHTML(page = 'privacidad') {
+  const current = LEGAL_BODIES[page] ? page : 'privacidad';
+  const titles = LEGAL_TITLES;
+  const currentBody = LEGAL_BODIES[current]();
+  return `
     <div class="legal-page" style="max-width: 820px; margin: 0 auto; padding: 1rem 0 3rem;">
       <a id="legal-back" style="display:inline-flex;align-items:center;gap:0.4rem;color:var(--text-muted);font-size:0.85rem;font-weight:700;cursor:pointer;margin-bottom:1.25rem;">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
@@ -47,10 +53,14 @@ export function renderLegal(container, { page = 'privacidad', onNavigate } = {})
       </nav>
 
       <div class="legal-body" style="font-size:0.9rem;line-height:1.65;color:var(--text-light);">
-        ${bodies[current]}
+        ${currentBody}
       </div>
     </div>
   `;
+}
+
+export function renderLegal(container, { page = 'privacidad', onNavigate } = {}) {
+  container.innerHTML = legalPageHTML(page);
 
   container.querySelector('#legal-back')?.addEventListener('click', () => {
     if (window.history.length > 1) window.history.back();
