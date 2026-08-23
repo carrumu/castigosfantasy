@@ -52,6 +52,7 @@ export function renderDashboard(container, callbacks) {
   let misterLoadError = false;
   let misterErrorMsg = '';
   let misterLeagueName = '';
+  let misterFinishedMatchdays = []; // [{key, timestamp}], mas antigua primero
 
   // Default Mock Data for Guest / Demo Mode
   const DEFAULT_DEMO_MEMBERS = [
@@ -333,7 +334,7 @@ export function renderDashboard(container, callbacks) {
 
       // El calendario de jornadas (finishedMatchdays) no depende de si la
       // temporada tiene ya clasificacion, asi que se comprueba siempre.
-      detectAndCacheComunioFinishedMatchday();
+      detectAndCacheSyncFinishedMatchday('comunio');
     } catch (err) {
       console.error('Error loading Comunio standings:', err);
       comunioLoadError = true;
@@ -361,6 +362,7 @@ export function renderDashboard(container, callbacks) {
       misterStandings = syncData.standings || [];
       misterJornadaStandings = syncData.matchdayStandings || [];
       misterLeagueName = syncData.league?.name || '';
+      misterFinishedMatchdays = syncData.finishedMatchdays || [];
       misterLoaded = true;
       misterLoadError = false;
       if (!syncData.seasonStarted) {
@@ -368,6 +370,10 @@ export function renderDashboard(container, callbacks) {
         misterErrorMsg = 'La temporada de Mister aun no ha empezado: no hay clasificación que mostrar todavía.';
       }
       updateLeaderboardView();
+
+      // El calendario de jornadas (finishedMatchdays) no depende de si la
+      // temporada tiene ya clasificacion, asi que se comprueba siempre.
+      detectAndCacheSyncFinishedMatchday('mister');
     } catch (err) {
       console.error('Error loading Mister standings:', err);
       misterLoadError = true;
@@ -643,28 +649,36 @@ export function renderDashboard(container, callbacks) {
   }
   // --- End Round-End Detection ---
 
-  // --- Comunio Matchday-End Detection ---
-  // Mismo concepto que el bloque de Biwenger de arriba, pero mas simple: la
-  // API de Comunio no da puntos por jornada (solo el acumulado), asi que no
-  // hay forma real de adivinar quien quedo ultimo -- el aviso solo dice QUE
-  // jornada ha terminado (dato real, ver finishedMatchdays en
-  // comunio-sync/index.ts) y el admin elige a mano quien paga.
-  async function detectAndCacheComunioFinishedMatchday() {
-    if (!currentLeague || currentLeague.sync_source !== 'comunio') return;
-    if (comunioFinishedMatchdays.length === 0) return;
+  // --- Comunio/Mister Matchday-End Detection ---
+  // Mismo concepto que el bloque de Biwenger de arriba, pero mas simple y
+  // compartido entre las dos: ninguna da puntos por jornada de forma
+  // confirmada, asi que no hay colista automatico -- el aviso solo dice QUE
+  // jornada ha terminado (calendario real de LaLiga, ver
+  // _shared/laligaCalendar.ts, usado por ambas porque es la misma liga de
+  // fútbol española) y el admin elige a mano quien paga.
+  const SYNC_JORNADA_CONFIG = {
+    comunio: { label: 'Comunio', cachePrefix: 'CF_PENDING_COMUNIO_MD_', dbColumn: 'comunio_matchday_key' },
+    mister: { label: 'Mister', cachePrefix: 'CF_PENDING_MISTER_MD_', dbColumn: 'mister_matchday_key' }
+  };
 
+  async function detectAndCacheSyncFinishedMatchday(source) {
+    if (!currentLeague || currentLeague.sync_source !== source) return;
+    const finishedMatchdays = source === 'comunio' ? comunioFinishedMatchdays : misterFinishedMatchdays;
+    if (finishedMatchdays.length === 0) return;
+
+    const cfg = SYNC_JORNADA_CONFIG[source];
     const { data: recorded } = await supabase
       .from('matchday_records')
-      .select('comunio_matchday_key')
+      .select(cfg.dbColumn)
       .eq('league_id', currentLeague.id);
     const recordedKeys = new Set(
-      (recorded || []).filter(r => r.comunio_matchday_key != null).map(r => String(r.comunio_matchday_key))
+      (recorded || []).filter(r => r[cfg.dbColumn] != null).map(r => String(r[cfg.dbColumn]))
     );
 
     // finishedMatchdays viene ordenada de mas antigua a mas reciente.
-    const unclosed = comunioFinishedMatchdays.filter(md => !recordedKeys.has(String(md.key)));
+    const unclosed = finishedMatchdays.filter(md => !recordedKeys.has(String(md.key)));
 
-    const cacheKey = `CF_PENDING_COMUNIO_MD_${currentLeague.id}`;
+    const cacheKey = `${cfg.cachePrefix}${currentLeague.id}`;
     if (unclosed.length === 0) {
       localStorage.removeItem(cacheKey);
       return;
@@ -677,11 +691,12 @@ export function renderDashboard(container, callbacks) {
       remaining: unclosed.length
     }));
 
-    if (isAdmin) showComunioJornadaBanner();
+    if (isAdmin) showSyncJornadaBanner(source);
   }
 
-  function showComunioJornadaBanner() {
-    const cacheKey = `CF_PENDING_COMUNIO_MD_${currentLeague.id}`;
+  function showSyncJornadaBanner(source) {
+    const cfg = SYNC_JORNADA_CONFIG[source];
+    const cacheKey = `${cfg.cachePrefix}${currentLeague.id}`;
     const cached = localStorage.getItem(cacheKey);
     if (!cached) return;
     const pending = JSON.parse(cached);
@@ -704,10 +719,10 @@ export function renderDashboard(container, callbacks) {
     banner.innerHTML = `
       <div style="min-width:0;">
         <div style="font-weight:800;font-size:0.9rem;color:var(--text-light);margin-bottom:0.25rem;line-height:1.3;">
-          Comunio: ha terminado la <span style="color:#f87171">${pending.roundName}</span>
+          ${cfg.label}: ha terminado la <span style="color:#f87171">${pending.roundName}</span>
         </div>
         <div style="font-size:0.82rem;color:var(--text-muted);line-height:1.4;">
-          Comunio no da puntos por jornada, así que elige a mano quién quedó último.
+          ${cfg.label} no da puntos por jornada, así que elige a mano quién quedó último.
           ${pending.remaining > 1 ? `<span style="color:#f87171;display:block;margin-top:0.2rem;font-weight:700;">Quedan ${pending.remaining} jornadas por cerrar</span>` : ''}
         </div>
       </div>
@@ -729,11 +744,12 @@ export function renderDashboard(container, callbacks) {
 
     banner.querySelector('#btn-dismiss-jornada').addEventListener('click', () => banner.remove());
     banner.querySelector('#btn-confirm-jornada').addEventListener('click', () => {
-      openComunioJornadaConfirmModal(pending);
+      openSyncJornadaConfirmModal(source, pending);
     });
   }
 
-  function openComunioJornadaConfirmModal(pending) {
+  function openSyncJornadaConfirmModal(source, pending) {
+    const cfg = SYNC_JORNADA_CONFIG[source];
     const old = document.querySelector('#jornada-confirm-modal');
     if (old) old.remove();
 
@@ -755,7 +771,7 @@ export function renderDashboard(container, callbacks) {
         border-radius: 14px; padding: 1.75rem; max-width: 440px; width: 100%;
       ">
         <h3 style="font-weight:900;font-size:1.1rem;margin-bottom:0.25rem;">Cerrar Jornada</h3>
-        <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:1.25rem;">${pending.roundName} (Comunio)</p>
+        <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:1.25rem;">${pending.roundName} (${cfg.label})</p>
 
         <div style="display:grid;gap:0.75rem;">
           <div>
@@ -817,7 +833,7 @@ export function renderDashboard(container, callbacks) {
           league_id: currentLeague.id,
           matchday_number: matchday,
           amount_owed: amount,
-          comunio_matchday_key: pending.matchdayKey,
+          [cfg.dbColumn]: pending.matchdayKey,
           trash_talk_phrase: trashPhrase
         };
         if (loserId.startsWith('roster-')) {
@@ -831,7 +847,7 @@ export function renderDashboard(container, callbacks) {
         const { error: insertErr } = await supabase.from('matchday_records').insert(insertObj);
         if (insertErr) throw insertErr;
 
-        localStorage.removeItem(`CF_PENDING_COMUNIO_MD_${currentLeague.id}`);
+        localStorage.removeItem(`${cfg.cachePrefix}${currentLeague.id}`);
         container.querySelector('#jornada-close-banner')?.remove();
         modal.remove();
         callbacks.showToast(`¡Jornada cerrada! ${loserProfile?.display_name} queda registrado como moroso.`, 'success');
@@ -845,7 +861,7 @@ export function renderDashboard(container, callbacks) {
       }
     });
   }
-  // --- End Comunio Matchday-End Detection ---
+  // --- End Comunio/Mister Matchday-End Detection ---
 
   /**
    * Fila de clasificacion en vivo para Comunio/Mister, con el mismo aspecto
@@ -1592,6 +1608,13 @@ export function renderDashboard(container, callbacks) {
           insertObj.comunio_matchday_key = pendingComunio.matchdayKey;
         }
 
+        const pendingMisterKey = `CF_PENDING_MISTER_MD_${currentLeague.id}`;
+        const pendingMisterRaw = localStorage.getItem(pendingMisterKey);
+        const pendingMister = pendingMisterRaw ? JSON.parse(pendingMisterRaw) : null;
+        if (pendingMister && pendingMister.matchdayKey != null) {
+          insertObj.mister_matchday_key = pendingMister.matchdayKey;
+        }
+
         const { data: recordData, error: insertErr } = await supabase
           .from('matchday_records')
           .insert(insertObj)
@@ -1606,6 +1629,10 @@ export function renderDashboard(container, callbacks) {
         }
         if (pendingComunio) {
           localStorage.removeItem(pendingComunioKey);
+          container.querySelector('#jornada-close-banner')?.remove();
+        }
+        if (pendingMister) {
+          localStorage.removeItem(pendingMisterKey);
           container.querySelector('#jornada-close-banner')?.remove();
         }
 

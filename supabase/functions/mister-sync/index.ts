@@ -22,6 +22,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { buildCorsHeaders } from "../_shared/cors.ts";
 import { isValidUUID } from "../_shared/validate.ts";
 import { checkRateLimit, rateLimitResponse } from "../_shared/rateLimit.ts";
+import { fetchFinishedMatchdays } from "../_shared/laligaCalendar.ts";
 
 const MISTER = "https://mister.mundodeportivo.com";
 const UA = "Mozilla/5.0 (Linux; Android 15; Pixel 9) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Mobile Safari/537.36";
@@ -202,6 +203,12 @@ serve(async (req: Request) => {
     // La temporada no ha empezado si nadie ha puntuado todavia.
     const seasonStarted = general.some((m: any) => (m.points ?? 0) !== 0);
 
+    // Calendario de LaLiga (ver _shared/laligaCalendar.ts): Mister no expone
+    // en publico que jornada ha cerrado, asi que se usa el mismo calendario
+    // real que ya sirve para Comunio -- es la misma liga de fútbol española,
+    // el calendario no depende de la plataforma de fantasy.
+    const finishedMatchdays = await fetchFinishedMatchdays();
+
     return json({
       ok: true,
       league: { name: leagueName || "Tu liga de Mister" },
@@ -211,6 +218,7 @@ serve(async (req: Request) => {
       standings: general,
       matchdayStandings: jornada,
       seasonStarted,
+      finishedMatchdays,
     }, 200);
   } catch (e) {
     console.error("mister-sync error:", e);
