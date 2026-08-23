@@ -19,6 +19,20 @@ const ADSTERRA_SRC = `https://pl30802281.effectivecpmnetwork.com/${ADSTERRA_KEY}
 
 export const AD_CONTAINER_ID = `container-${ADSTERRA_KEY}`;
 
+// Unidad "320x50_1". Formato clásico de Adsterra (atOptions + invoke.js), que
+// pinta el anuncio con document.write en el punto donde se ejecuta el script.
+// Eso es seguro en una página estática, pero no en una SPA: si se reinyecta
+// tras la carga inicial (como hacemos en cada render de ruta), document.write
+// borra la página entera en vez de escribir solo el anuncio. Por eso este va
+// dentro de un <iframe> propio: su document.write solo afecta al documento
+// del iframe, nunca al de la app.
+const BANNER_KEY = '9fc59475b4073c1a36a8c58d0faa4a4a';
+const BANNER_SRC = `https://www.highrevenueformat.com/${BANNER_KEY}/invoke.js`;
+const BANNER_WIDTH = 320;
+const BANNER_HEIGHT = 50;
+
+export const BANNER_CONTAINER_ID = `banner-${BANNER_KEY}`;
+
 /** ¿Ha aceptado el usuario las cookies de publicidad? */
 export function hasAdConsent() {
   try {
@@ -40,6 +54,7 @@ export function adSlotHtml() {
     <div class="ad-slot" aria-hidden="true">
       <span class="ad-slot-label">Publicidad</span>
       <div id="${AD_CONTAINER_ID}"></div>
+      <div id="${BANNER_CONTAINER_ID}" class="ad-slot-banner"></div>
     </div>`;
 }
 
@@ -75,10 +90,15 @@ export function mountAd(root) {
   s.setAttribute('data-adsterra', 'true');
   document.body.appendChild(s);
 
+  mountBannerAd(root);
+
   // Adsterra puede no devolver anuncio: unidad recién creada, sin demanda para
   // ese país, o un bloqueador de por medio. En ese caso el contenedor se queda
   // vacío y, sin esto, el lector ve un "PUBLICIDAD" encabezando la nada. Se
   // comprueba pasado un margen y, si no ha llegado nada, el bloque desaparece.
+  // Nota: esta comprobación solo mira el Native Banner (el principal); el
+  // banner 320x50 va dentro de un iframe propio cuyo contenido no podemos
+  // inspeccionar desde fuera, así que no entra en la cuenta.
   if (slot) {
     slot.hidden = false;
     setTimeout(() => {
@@ -86,4 +106,42 @@ export function mountAd(root) {
       if (vacio) slot.hidden = true;
     }, 4000);
   }
+}
+
+/**
+ * Monta el banner 320x50 dentro de su propio iframe (ver comentario de
+ * BANNER_KEY más arriba: su document.write debe quedar aislado del documento
+ * de la app). Se recrea el iframe en cada llamada porque el contenedor mismo
+ * se destruye y se vuelve a crear en cada render de ruta.
+ */
+function mountBannerAd(root) {
+  const contenedor = root.querySelector(`#${BANNER_CONTAINER_ID}`);
+  if (!contenedor) return;
+
+  const iframe = document.createElement('iframe');
+  iframe.width = String(BANNER_WIDTH);
+  iframe.height = String(BANNER_HEIGHT);
+  iframe.scrolling = 'no';
+  iframe.title = 'Publicidad';
+  iframe.style.cssText = `width:${BANNER_WIDTH}px;height:${BANNER_HEIGHT}px;border:0;display:block;`;
+  contenedor.innerHTML = '';
+  contenedor.appendChild(iframe);
+
+  const doc = iframe.contentWindow.document;
+  doc.open();
+  doc.write(`
+    <!doctype html><html><head><style>body{margin:0;padding:0;}</style></head><body>
+    <script>
+      atOptions = {
+        'key': '${BANNER_KEY}',
+        'format': 'iframe',
+        'height': ${BANNER_HEIGHT},
+        'width': ${BANNER_WIDTH},
+        'params': {}
+      };
+    </script>
+    <script src="${BANNER_SRC}"></script>
+    </body></html>
+  `);
+  doc.close();
 }

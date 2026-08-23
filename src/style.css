@@ -5499,3 +5499,12 @@ h1, h2, h3, h4, h5, h6, .card-title {
 }
 
 .ad-slot[hidden] { display: none; }
+
+/* Banner 320x50: centrado, separado del Native Banner de encima. */
+.ad-slot-banner {
+  margin: 1rem auto 0;
+  width: 320px;
+  max-width: 100%;
+  display: flex;
+  justify-content: center;
+}
