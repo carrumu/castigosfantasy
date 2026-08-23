@@ -6,7 +6,7 @@
  * Responsable: Carlos Rubio Muriel · carrumu05@gmail.com · castigosfantasy.com
  */
 
-const LAST_UPDATED = '11 de julio de 2026';
+const LAST_UPDATED = '23 de agosto de 2026';
 const OWNER = 'Carlos Rubio Muriel';
 const EMAIL = 'castigosfantasy2005@gmail.com';
 const SITE = 'castigosfantasy.com';
@@ -86,15 +86,16 @@ function privacyBody() {
 
     <h2 style="${H}">2. Qué datos tratamos</h2>
     <ul style="${UL}">
-      <li style="${LI}"><strong>Datos de cuenta:</strong> tu correo electrónico, contraseña (gestionada y cifrada por nuestro proveedor de autenticación; nunca la almacenamos ni la vemos en texto claro), nombre para mostrar, apodo y avatar (opcional).</li>
+      <li style="${LI}"><strong>Datos de cuenta:</strong> tu correo electrónico, contraseña (gestionada y cifrada por nuestro proveedor de autenticación; nunca la almacenamos ni la vemos en texto claro), nombre para mostrar, apodo y avatar (opcional). Si te registras con Google, recibimos tu correo, nombre y foto de perfil de tu cuenta de Google.</li>
       <li style="${LI}"><strong>Datos de uso del servicio:</strong> ligas a las que perteneces, registros de castigos y deudas simbólicas, votaciones y mensajes que publiques en el foro o el muro.</li>
-      <li style="${LI}"><strong>Sincronización con Biwenger (opcional):</strong> si el administrador de una liga la activa, se almacenan sus credenciales de Biwenger de forma restringida, usadas únicamente para leer la clasificación de esa liga.</li>
+      <li style="${LI}"><strong>Sincronización con Biwenger, Comunio o Mister (opcional):</strong> si el administrador de una liga la activa, se almacenan sus credenciales de esa plataforma de forma restringida, usadas únicamente para leer la clasificación de esa liga.</li>
       <li style="${LI}"><strong>Datos técnicos:</strong> dirección IP, tipo de dispositivo y navegador, e información almacenada en tu dispositivo (ver la <a href="/cookies" style="color:var(--accent);">Política de Cookies</a>).</li>
     </ul>
 
     <h2 style="${H}">3. Finalidades y base jurídica</h2>
     <ul style="${UL}">
-      <li style="${LI}"><strong>Prestar el servicio y gestionar tu cuenta:</strong> ejecución de la relación contractual que aceptas al registrarte.</li>
+      <li style="${LI}"><strong>Prestar el servicio y gestionar tu cuenta</strong> (incluido el inicio de sesión con Google, si lo eliges): ejecución de la relación contractual que aceptas al registrarte.</li>
+      <li style="${LI}"><strong>Notificarnos internamente de altas nuevas:</strong> interés legítimo en detectar problemas de registro, con el mínimo dato necesario.</li>
       <li style="${LI}"><strong>Publicidad (Adsterra) y fuentes de terceros (Google Fonts):</strong> tu consentimiento, que puedes retirar en cualquier momento.</li>
       <li style="${LI}"><strong>Atender tus consultas de soporte:</strong> tu consentimiento al contactarnos.</li>
     </ul>
@@ -103,10 +104,11 @@ function privacyBody() {
     <p style="${P}">No vendemos tus datos. Compartimos la información estrictamente necesaria con proveedores que nos prestan servicio:</p>
     <ul style="${UL}">
       <li style="${LI}"><strong>Supabase, Inc.</strong> — autenticación y base de datos.</li>
-      <li style="${LI}"><strong>Nominalia</strong> — proveedor de dominio y alojamiento.</li>
-      <li style="${LI}"><strong>Biwenger</strong> — únicamente si activas la sincronización de una liga.</li>
+      <li style="${LI}"><strong>Render</strong> — alojamiento de la aplicación. <strong>Cloudflare</strong> — red de distribución de contenido y protección frente a abuso. <strong>Nominalia</strong> — registro del dominio.</li>
+      <li style="${LI}"><strong>Biwenger, Comunio y Mister</strong> — únicamente si activas la sincronización de una liga con esa plataforma.</li>
+      <li style="${LI}"><strong>Google</strong> — inicio de sesión con tu cuenta de Google (si lo usas) y tipografías del sitio (Google Fonts).</li>
+      <li style="${LI}"><strong>Resend</strong> — envío del correo interno que nos avisa cuando alguien se registra.</li>
       <li style="${LI}"><strong>Adsterra</strong> — red publicitaria que muestra los anuncios del sitio, junto con sus anunciantes y socios de medición.</li>
-      <li style="${LI}"><strong>Google</strong> — tipografías (Google Fonts).</li>
     </ul>
 
     <h2 style="${H}">5. Transferencias internacionales</h2>
