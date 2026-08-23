@@ -5466,7 +5466,17 @@ h1, h2, h3, h4, h5, h6, .card-title {
   }
 }
 
-/* ── Hueco de publicidad (solo en los artículos de guías) ─────────────────── */
+/* ── Hueco de publicidad (global, debajo de cada vista) ─────────────────── */
+.ad-slot-wrap {
+  /* Igual que .container: dentro de .main-content (flex column, stretch por
+     defecto), un margin:auto sin width:100% absorbe el stretch y el bloque
+     se encoge al contenido en vez de ocupar el ancho disponible. */
+  width: 100%;
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 0 1.25rem;
+}
+
 .ad-slot {
   margin: 2.5rem 0 0;
   padding-top: 1.25rem;

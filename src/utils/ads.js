@@ -1,11 +1,8 @@
 /**
- * Publicidad: Adsterra Native Banner, solo en las guías.
+ * Publicidad: Adsterra Native Banner, en todas las vistas.
  *
- * DÓNDE Y POR QUÉ. El anuncio va únicamente en los artículos de /guias/, que
- * es tráfico que llega de Google, lee y se va. La home, la ruleta, los juegos,
- * el generador y todo el alta de liga se quedan limpios: ahí la persona está a
- * un clic de registrarse, y cambiar un usuario por medio céntimo es mal
- * negocio. Si algún día se amplía, que sea con esa regla en la cabeza.
+ * DÓNDE. Un único hueco global, montado por src/main.js en cada render de
+ * ruta (ver renderMainLayout), debajo del contenido de la vista activa.
  *
  * CONSENTIMIENTO. No se carga nada hasta que el usuario acepta las cookies.
  * Si rechaza, o si todavía no ha contestado, aquí no se pide ni un byte a
@@ -33,9 +30,9 @@ export function hasAdConsent() {
 
 /**
  * Hueco donde Adsterra pintará el anuncio. Se devuelve como HTML para poder
- * incrustarlo en la plantilla del artículo.
+ * incrustarlo en el layout global.
  *
- * Va siempre en el marcado, aunque no haya consentimiento: así el artículo no
+ * Va siempre en el marcado, aunque no haya consentimiento: así la página no
  * cambia de tamaño según lo que el usuario haya contestado.
  */
 export function adSlotHtml() {
@@ -47,13 +44,12 @@ export function adSlotHtml() {
 }
 
 /**
- * Carga el anuncio dentro del hueco. Se llama cada vez que se pinta un
- * artículo.
+ * Carga el anuncio dentro del hueco. Se llama en cada render de ruta.
  *
  * El script se reinyecta en cada llamada a propósito: `invoke.js` busca su
- * contenedor cuando se ejecuta, y en una SPA el contenedor se destruye y se
- * vuelve a crear al cambiar de guía. Si el script solo se cargara una vez, a
- * partir de la segunda guía el hueco se quedaría vacío.
+ * contenedor cuando se ejecuta, y en una SPA el layout se vuelve a pintar en
+ * cada navegación. Si el script solo se cargara una vez, a partir de la
+ * segunda vista el hueco se quedaría vacío.
  */
 export function mountAd(root) {
   const slot = root.querySelector('.ad-slot');

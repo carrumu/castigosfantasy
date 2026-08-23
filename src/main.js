@@ -1,7 +1,7 @@
 import './style.css';
 import { supabase, isConfigured, clearSupabaseConfig } from './supabase';
 import { setSEO } from './utils/seo';
-import { mountAd } from './utils/ads.js';
+import { adSlotHtml, mountAd } from './utils/ads.js';
 import { checkAndNotifyNewUser } from './utils/email';
 import { renderAuth } from './views/auth';
 import { renderDashboard } from './views/dashboard';
@@ -152,6 +152,10 @@ function renderMainLayout(isGuest, currentUser = null) {
 
         <!-- Contenedor de la Vista Activa -->
         <main id="view-container" class="container"></main>
+
+        <!-- Anuncio (Adsterra): un único hueco global, debajo de la vista
+             activa, en todas las páginas. Ver utils/ads.js. -->
+        <div class="ad-slot-wrap">${adSlotHtml()}</div>
 
         <!-- Pie de página con enlaces legales (visible en todas las vistas) -->
         <footer class="site-footer" style="border-top: 1px solid var(--border-color); margin-top: 2rem; padding: 1.5rem 1rem ${isGuest ? '1.5rem' : 'calc(1.5rem + 70px)'}; text-align: center; color: var(--text-muted); font-size: 0.78rem; line-height: 1.6;">
@@ -367,6 +371,10 @@ function renderMainLayout(isGuest, currentUser = null) {
   } else if (currentView === 'guias') {
     renderGuias(viewContainer, { onNavigate: navigate, slug: currentGuideSlug });
   }
+
+  // El hueco de anuncio vive en el layout, no en la vista: se (re)monta en
+  // cada render de ruta, independientemente de qué vista se acabe de pintar.
+  mountAd(app);
 
   // Hook Navigation Elements
   const headerHomeBtn = app.querySelector('#header-logo-home');
@@ -701,10 +709,10 @@ handleRouting();
 
 // --- Cookie consent + consent-gated advertising ---
 //
-// La publicidad ya no se carga desde aqui. Se paso de Google AdSense a Adsterra
-// y, con el cambio, el anuncio dejo de ser global: ahora vive solo en los
-// articulos de /guias/ y lo monta `utils/ads.js` cuando toca. Este fichero se
-// limita a recoger el consentimiento, que es lo que decide si aquel carga algo.
+// La publicidad ya no se carga desde aqui. Se paso de Google AdSense a
+// Adsterra; el hueco vive en el layout global (renderMainLayout) y lo monta
+// `utils/ads.js` en cada render de ruta. Este fichero se limita a recoger el
+// consentimiento, que es lo que decide si aquel carga algo.
 const COOKIE_CONSENT_KEY = 'CF_COOKIE_CONSENT';
 
 function initCookieConsent() {
@@ -723,7 +731,7 @@ function initCookieConsent() {
   banner.innerHTML = `
     <p style="margin:0;font-size:0.82rem;line-height:1.45;color:#e8e8e8;max-width:620px;flex:1;min-width:240px;">
       Usamos cookies técnicas necesarias y, con tu permiso, cookies de terceros
-      (Adsterra y sus anunciantes) para la publicidad de las guías. Consulta la
+      (Adsterra y sus anunciantes) para mostrar publicidad. Consulta la
       <a href="/cookies" id="cookie-policy-link" style="color:var(--accent,#deed00);font-weight:700;">Política de Cookies</a>.
     </p>
     <div style="display:flex;gap:0.5rem;flex-shrink:0;">
@@ -744,8 +752,8 @@ function initCookieConsent() {
   banner.querySelector('#cookie-accept').addEventListener('click', () => {
     localStorage.setItem(COOKIE_CONSENT_KEY, 'accepted');
     banner.remove();
-    // Si acepta estando ya dentro de una guía, se le carga el anuncio sin
-    // esperar a que navegue a otra.
+    // Si acepta estando ya dentro de la app, se le carga el anuncio sin
+    // esperar a que navegue a otra vista.
     mountAd(document);
   });
   banner.querySelector('#cookie-reject').addEventListener('click', () => {
