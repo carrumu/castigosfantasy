@@ -35,13 +35,16 @@ export function renderDashboard(container, callbacks) {
   let biwengerSeasonRounds = []; // all season rounds from the competition
 
   // Comunio y Mister: mismo patron que Biwenger (clasificacion en vivo por
-  // pestañas), pero sin la deteccion de "jornada terminada" -- ninguna de las
-  // dos exposicion todavia que ronda ha cerrado, asi que ese banner sigue
-  // siendo exclusivo de Biwenger.
+  // pestañas). Comunio SI tiene ya deteccion de "jornada terminada" (ver
+  // comunioFinishedMatchdays mas abajo), pero sin colista automatico: su API
+  // no da puntos por jornada, solo el acumulado, asi que el admin elige a
+  // mano quien quedo ultimo. Mister se queda sin este banner por ahora: no
+  // se ha encontrado un endpoint publico que diga que jornada ha cerrado.
   let comunioStandings = [];
   let comunioLoaded = false;
   let comunioLoadError = false;
   let comunioErrorMsg = '';
+  let comunioFinishedMatchdays = []; // [{key, timestamp}], mas antigua primero
 
   let misterStandings = [];
   let misterJornadaStandings = [];
@@ -319,6 +322,7 @@ export function renderDashboard(container, callbacks) {
       // que el normalizador del backend no ha sabido leer. En ambos casos no
       // hay clasificacion real que enseñar todavia.
       comunioStandings = (syncData.standings || []).filter(s => s.points != null);
+      comunioFinishedMatchdays = syncData.finishedMatchdays || [];
       comunioLoaded = true;
       comunioLoadError = false;
       if (!syncData.seasonStarted) {
@@ -326,6 +330,10 @@ export function renderDashboard(container, callbacks) {
         comunioErrorMsg = 'La temporada de Comunio aun no ha empezado: no hay clasificación que mostrar todavía.';
       }
       updateLeaderboardView();
+
+      // El calendario de jornadas (finishedMatchdays) no depende de si la
+      // temporada tiene ya clasificacion, asi que se comprueba siempre.
+      detectAndCacheComunioFinishedMatchday();
     } catch (err) {
       console.error('Error loading Comunio standings:', err);
       comunioLoadError = true;
@@ -634,6 +642,210 @@ export function renderDashboard(container, callbacks) {
     });
   }
   // --- End Round-End Detection ---
+
+  // --- Comunio Matchday-End Detection ---
+  // Mismo concepto que el bloque de Biwenger de arriba, pero mas simple: la
+  // API de Comunio no da puntos por jornada (solo el acumulado), asi que no
+  // hay forma real de adivinar quien quedo ultimo -- el aviso solo dice QUE
+  // jornada ha terminado (dato real, ver finishedMatchdays en
+  // comunio-sync/index.ts) y el admin elige a mano quien paga.
+  async function detectAndCacheComunioFinishedMatchday() {
+    if (!currentLeague || currentLeague.sync_source !== 'comunio') return;
+    if (comunioFinishedMatchdays.length === 0) return;
+
+    const { data: recorded } = await supabase
+      .from('matchday_records')
+      .select('comunio_matchday_key')
+      .eq('league_id', currentLeague.id);
+    const recordedKeys = new Set(
+      (recorded || []).filter(r => r.comunio_matchday_key != null).map(r => String(r.comunio_matchday_key))
+    );
+
+    // finishedMatchdays viene ordenada de mas antigua a mas reciente.
+    const unclosed = comunioFinishedMatchdays.filter(md => !recordedKeys.has(String(md.key)));
+
+    const cacheKey = `CF_PENDING_COMUNIO_MD_${currentLeague.id}`;
+    if (unclosed.length === 0) {
+      localStorage.removeItem(cacheKey);
+      return;
+    }
+
+    const target = unclosed[0];
+    localStorage.setItem(cacheKey, JSON.stringify({
+      matchdayKey: target.key,
+      roundName: `Jornada ${target.key}`,
+      remaining: unclosed.length
+    }));
+
+    if (isAdmin) showComunioJornadaBanner();
+  }
+
+  function showComunioJornadaBanner() {
+    const cacheKey = `CF_PENDING_COMUNIO_MD_${currentLeague.id}`;
+    const cached = localStorage.getItem(cacheKey);
+    if (!cached) return;
+    const pending = JSON.parse(cached);
+
+    if (container.querySelector('#jornada-close-banner')) return; // ya hay una (Biwenger u otra)
+
+    const banner = document.createElement('div');
+    banner.id = 'jornada-close-banner';
+    banner.style.cssText = `
+      background: linear-gradient(135deg, rgba(239,68,68,0.12), rgba(239,68,68,0.05));
+      border: 2px solid rgba(239,68,68,0.5);
+      border-radius: 10px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.85rem;
+    `;
+    banner.innerHTML = `
+      <div style="min-width:0;">
+        <div style="font-weight:800;font-size:0.9rem;color:var(--text-light);margin-bottom:0.25rem;line-height:1.3;">
+          Comunio: ha terminado la <span style="color:#f87171">${pending.roundName}</span>
+        </div>
+        <div style="font-size:0.82rem;color:var(--text-muted);line-height:1.4;">
+          Comunio no da puntos por jornada, así que elige a mano quién quedó último.
+          ${pending.remaining > 1 ? `<span style="color:#f87171;display:block;margin-top:0.2rem;font-weight:700;">Quedan ${pending.remaining} jornadas por cerrar</span>` : ''}
+        </div>
+      </div>
+      <div style="display:flex;gap:0.5rem;">
+        <button id="btn-confirm-jornada" style="
+          flex:1;background: var(--danger); color: #fff; border: none; border-radius: 6px;
+          padding: 0.65rem 1rem; font-weight: 800; font-size: 0.8rem; cursor: pointer;
+          text-transform: uppercase; letter-spacing: 0.5px;
+        ">Cerrar Jornada</button>
+        <button id="btn-dismiss-jornada" style="
+          background: none; color: var(--text-muted); border: 1px solid var(--border-color);
+          border-radius: 6px; padding: 0.65rem 0.9rem; font-size: 0.75rem; cursor: pointer; white-space:nowrap;
+        ">Ignorar</button>
+      </div>
+    `;
+
+    const grid = container.querySelector('.dashboard-grid');
+    if (grid) grid.parentNode.insertBefore(banner, grid);
+
+    banner.querySelector('#btn-dismiss-jornada').addEventListener('click', () => banner.remove());
+    banner.querySelector('#btn-confirm-jornada').addEventListener('click', () => {
+      openComunioJornadaConfirmModal(pending);
+    });
+  }
+
+  function openComunioJornadaConfirmModal(pending) {
+    const old = document.querySelector('#jornada-confirm-modal');
+    if (old) old.remove();
+
+    const nextMatchday = Number(pending.matchdayKey) || suggestedMatchday;
+
+    const memberOptions = members.map(m =>
+      `<option value="${m.profile_id}">${escapeHTML(m.display_name)}</option>`
+    ).join('');
+
+    const modal = document.createElement('div');
+    modal.id = 'jornada-confirm-modal';
+    modal.style.cssText = `
+      position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 9999;
+      display: flex; align-items: center; justify-content: center; padding: 1rem;
+    `;
+    modal.innerHTML = `
+      <div style="
+        background: var(--bg-card); border: 2px solid rgba(239,68,68,0.4);
+        border-radius: 14px; padding: 1.75rem; max-width: 440px; width: 100%;
+      ">
+        <h3 style="font-weight:900;font-size:1.1rem;margin-bottom:0.25rem;">Cerrar Jornada</h3>
+        <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:1.25rem;">${pending.roundName} (Comunio)</p>
+
+        <div style="display:grid;gap:0.75rem;">
+          <div>
+            <label style="font-size:0.78rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.35rem;display:block;">El Farolillo Rojo</label>
+            <select id="jornada-loser-select" style="width:100%;padding:0.6rem 0.75rem;background:var(--bg-input);border:1.5px solid var(--border-color-glow);border-radius:6px;color:var(--text-light);font-size:0.9rem;">
+              <option value="">-- Selecciona el Perdedor --</option>
+              ${memberOptions}
+            </select>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+            <div>
+              <label style="font-size:0.78rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.35rem;display:block;">Jornada #</label>
+              <input type="number" id="jornada-num" value="${nextMatchday}" min="1" style="width:100%;padding:0.6rem 0.75rem;background:var(--bg-input);border:1.5px solid var(--border-color-glow);border-radius:6px;color:var(--text-light);font-size:0.9rem;" />
+            </div>
+            <div>
+              <label style="font-size:0.78rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.35rem;display:block;">Deuda (€)</label>
+              <input type="number" id="jornada-amount" value="2.00" min="0" step="0.5" style="width:100%;padding:0.6rem 0.75rem;background:var(--bg-input);border:1.5px solid var(--border-color-glow);border-radius:6px;color:var(--text-light);font-size:0.9rem;" />
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:0.75rem;margin-top:1.25rem;">
+          <button id="btn-jornada-save" style="
+            flex:1;background:var(--danger);color:#fff;border:none;border-radius:8px;
+            padding:0.75rem;font-weight:800;font-size:0.9rem;cursor:pointer;
+            text-transform:uppercase;letter-spacing:0.5px;
+          ">Confirmar y Guardar</button>
+          <button id="btn-jornada-cancel" style="
+            background:none;color:var(--text-muted);border:1px solid var(--border-color);
+            border-radius:8px;padding:0.75rem 1rem;font-size:0.85rem;cursor:pointer;
+          ">Cancelar</button>
+        </div>
+        <div id="jornada-save-error" style="display:none;color:#f87171;font-size:0.8rem;margin-top:0.5rem;"></div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+
+    modal.querySelector('#btn-jornada-cancel').addEventListener('click', () => modal.remove());
+    modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+
+    modal.querySelector('#btn-jornada-save').addEventListener('click', async () => {
+      const btn = modal.querySelector('#btn-jornada-save');
+      const errorEl = modal.querySelector('#jornada-save-error');
+      const loserId = modal.querySelector('#jornada-loser-select').value;
+      const matchday = Number(modal.querySelector('#jornada-num').value);
+      const amount = Number(modal.querySelector('#jornada-amount').value);
+
+      if (!loserId) { errorEl.style.display = 'block'; errorEl.textContent = 'Selecciona quién paga.'; return; }
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span>';
+      errorEl.style.display = 'none';
+
+      try {
+        const loserProfile = members.find(m => m.profile_id === loserId);
+        const trashPhrase = getRandomPhrase(loserProfile?.display_name || '', amount);
+
+        const insertObj = {
+          league_id: currentLeague.id,
+          matchday_number: matchday,
+          amount_owed: amount,
+          comunio_matchday_key: pending.matchdayKey,
+          trash_talk_phrase: trashPhrase
+        };
+        if (loserId.startsWith('roster-')) {
+          insertObj.loser_roster_id = loserId.replace('roster-', '');
+          insertObj.loser_profile_id = null;
+        } else {
+          insertObj.loser_profile_id = loserId;
+          insertObj.loser_roster_id = null;
+        }
+
+        const { error: insertErr } = await supabase.from('matchday_records').insert(insertObj);
+        if (insertErr) throw insertErr;
+
+        localStorage.removeItem(`CF_PENDING_COMUNIO_MD_${currentLeague.id}`);
+        container.querySelector('#jornada-close-banner')?.remove();
+        modal.remove();
+        callbacks.showToast(`¡Jornada cerrada! ${loserProfile?.display_name} queda registrado como moroso.`, 'success');
+        loadData();
+      } catch (err) {
+        console.error(err);
+        errorEl.style.display = 'block';
+        errorEl.textContent = `Error al guardar: ${err.message}`;
+        btn.disabled = false;
+        btn.innerHTML = 'Confirmar y Guardar';
+      }
+    });
+  }
+  // --- End Comunio Matchday-End Detection ---
 
   /**
    * Fila de clasificacion en vivo para Comunio/Mister, con el mismo aspecto
@@ -1363,14 +1575,21 @@ export function renderDashboard(container, callbacks) {
           insertObj.loser_roster_id = null;
         }
 
-        // If a Biwenger round is pending its punishment, registering here also
-        // closes it: stamp the round id so the "Cerrar Jornada" banner won't
-        // reappear and let the admin charge the same round twice.
+        // If a Biwenger round or Comunio matchday is pending its punishment,
+        // registering here also closes it: stamp the id so the "Cerrar
+        // Jornada" banner won't reappear and let the admin charge it twice.
         const pendingKey = `CF_PENDING_BW_ROUND_${currentLeague.id}`;
         const pendingRaw = localStorage.getItem(pendingKey);
         const pendingRound = pendingRaw ? JSON.parse(pendingRaw) : null;
         if (pendingRound && pendingRound.roundId != null) {
           insertObj.biwenger_round_id = pendingRound.roundId;
+        }
+
+        const pendingComunioKey = `CF_PENDING_COMUNIO_MD_${currentLeague.id}`;
+        const pendingComunioRaw = localStorage.getItem(pendingComunioKey);
+        const pendingComunio = pendingComunioRaw ? JSON.parse(pendingComunioRaw) : null;
+        if (pendingComunio && pendingComunio.matchdayKey != null) {
+          insertObj.comunio_matchday_key = pendingComunio.matchdayKey;
         }
 
         const { data: recordData, error: insertErr } = await supabase
@@ -1383,6 +1602,10 @@ export function renderDashboard(container, callbacks) {
 
         if (pendingRound) {
           localStorage.removeItem(pendingKey);
+          container.querySelector('#jornada-close-banner')?.remove();
+        }
+        if (pendingComunio) {
+          localStorage.removeItem(pendingComunioKey);
           container.querySelector('#jornada-close-banner')?.remove();
         }
 

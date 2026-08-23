@@ -154,6 +154,38 @@ serve(async (req: Request) => {
       };
     });
 
+    // --- 4. Jornadas terminadas (calendario publico, sin credenciales) ---
+    // /matchdays no necesita login: es el calendario de Comunio, igual para
+    // todo el mundo. Da lo que Biwenger no expone aqui todavia: cuando una
+    // jornada ha cerrado de verdad. Lo que NO da son puntos por jornada (solo
+    // el acumulado en /standings), asi que esto sirve para avisar "ha
+    // terminado la Jornada X", no para adivinar solo quien quedo ultimo.
+    //
+    // Una misma matchdayKey puede tener varias entradas (p.ej. una alineacion
+    // aplazada de un partido de esa jornada, type "matchday_shifted"). Solo
+    // se cuenta como terminada si TODAS sus entradas lo estan -- mejor tarde
+    // que anunciar cerrada una jornada con un partido aun pendiente.
+    let finishedMatchdays: { key: string; timestamp: string }[] = [];
+    try {
+      const mdRes = await fetch(`${COMUNIO_API}/matchdays`, { headers: jsonHeaders });
+      const mdJson = await mdRes.json().catch(() => []);
+      const byKey = new Map<string, { allFinished: boolean; latestTimestamp: string }>();
+      for (const md of Array.isArray(mdJson) ? mdJson : []) {
+        const key = String(md.matchdayKey);
+        const prev = byKey.get(key);
+        const allFinished = (prev?.allFinished ?? true) && !!md.finished;
+        const latestTimestamp = prev && prev.latestTimestamp > md.timestamp ? prev.latestTimestamp : md.timestamp;
+        byKey.set(key, { allFinished, latestTimestamp });
+      }
+      finishedMatchdays = Array.from(byKey.entries())
+        .filter(([, v]) => v.allFinished)
+        .map(([key, v]) => ({ key, timestamp: v.latestTimestamp }))
+        .sort((a, b) => a.timestamp.localeCompare(b.timestamp));
+      console.log(`[comunio] matchdays finished=${finishedMatchdays.length}`);
+    } catch (e) {
+      console.log(`[comunio] no se pudo leer /matchdays: ${e instanceof Error ? e.message : String(e)}`);
+    }
+
     console.log(`[comunio] community=${communityId} members=${members.length} standings=${standings.length}`);
 
     return json({
@@ -162,6 +194,7 @@ serve(async (req: Request) => {
       members,
       standings,
       seasonStarted,
+      finishedMatchdays,
       standingsRaw: seasonStarted ? undefined : standingsRaw, // keep raw only when unexpected
     }, 200);
   } catch (e) {
