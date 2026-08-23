@@ -4,6 +4,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { buildCorsHeaders } from "../_shared/cors.ts";
+import { checkRateLimit, rateLimitResponse } from "../_shared/rateLimit.ts";
 
 // Block obvious internal / private hostnames to limit SSRF.
 function isBlockedHost(host: string): boolean {
@@ -83,6 +84,12 @@ serve(async (req: Request) => {
     if (!userData?.user) return json({ error: "No autorizado" }, 401);
 
     const admin = createClient(supabaseUrl, serviceRoleKey);
+
+    // This fetches an arbitrary external URL server-side on every miss —
+    // generous enough for normal forum use (one paste = one call), tight
+    // enough to stop someone using it as a free scraping/SSRF proxy.
+    const allowed = await checkRateLimit(admin, `link-preview:${userData.user.id}`, 20, 60);
+    if (!allowed) return rateLimitResponse(corsHeaders);
 
     // Cache hit (refresh after 7 days)
     const { data: cached } = await admin.from("link_previews").select("*").eq("url", url).maybeSingle();

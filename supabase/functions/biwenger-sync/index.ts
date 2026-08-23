@@ -3,6 +3,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { buildCorsHeaders } from "../_shared/cors.ts";
 import { isValidUUID } from "../_shared/validate.ts";
+import { checkRateLimit, rateLimitResponse } from "../_shared/rateLimit.ts";
 
 serve(async (req: Request) => {
   const corsHeaders = buildCorsHeaders(req);
@@ -64,6 +65,12 @@ serve(async (req: Request) => {
 
     // Service-role client bypasses RLS for the membership check + secret read.
     const admin = createClient(supabaseUrl, serviceRoleKey);
+
+    // Logging into Biwenger is expensive and hammering it risks our own
+    // server IP getting rate-limited or blocked by them — 5 tries/minute
+    // per user is plenty for a real "connect my league" flow.
+    const allowed = await checkRateLimit(admin, `biwenger-sync:${caller.id}`, 5, 60);
+    if (!allowed) return rateLimitResponse(corsHeaders);
 
     const { data: membership, error: memberErr } = await admin
       .from("league_members")

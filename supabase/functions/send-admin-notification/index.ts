@@ -2,6 +2,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { buildCorsHeaders } from "../_shared/cors.ts";
+import { checkRateLimit, rateLimitResponse } from "../_shared/rateLimit.ts";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 
@@ -47,7 +48,8 @@ serve(async (req: Request) => {
     // ============================================================
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
     const anonKey = Deno.env.get("SUPABASE_ANON_KEY");
-    if (!supabaseUrl || !anonKey) {
+    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    if (!supabaseUrl || !anonKey || !serviceRoleKey) {
       return new Response(JSON.stringify({ error: "Server is not configured (missing Supabase env vars)." }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -66,6 +68,13 @@ serve(async (req: Request) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
+    // This is meant to fire once per signup — the client already guards
+    // that with a localStorage flag, but that's not a real boundary, so
+    // enforce it server-side too.
+    const admin = createClient(supabaseUrl, serviceRoleKey);
+    const allowed = await checkRateLimit(admin, `send-admin-notification:${caller.id}`, 3, 300);
+    if (!allowed) return rateLimitResponse(corsHeaders);
 
     const { username, apodo } = await req.json();
     const email = caller.email || "desconocido";

@@ -7,6 +7,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { buildCorsHeaders } from "../_shared/cors.ts";
 import { isValidUUID } from "../_shared/validate.ts";
+import { checkRateLimit, rateLimitResponse } from "../_shared/rateLimit.ts";
 
 const COMUNIO_API = "https://api.comunio.es";
 const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
@@ -35,6 +36,10 @@ serve(async (req: Request) => {
     if (userErr || !userData?.user) return json({ error: "No autorizado: se requiere una sesion valida." }, 401);
 
     const admin = createClient(supabaseUrl, serviceRoleKey);
+
+    const allowed = await checkRateLimit(admin, `comunio-sync:${userData.user.id}`, 5, 60);
+    if (!allowed) return rateLimitResponse(corsHeaders);
+
     const { data: membership } = await admin
       .from("league_members").select("profile_id")
       .eq("league_id", appLeagueId).eq("profile_id", userData.user.id).maybeSingle();
