@@ -135,13 +135,32 @@ serve(async (req: Request) => {
       : Array.isArray(standingsRaw) ? standingsRaw : [];
     const seasonStarted = standingsArr.length > 0;
 
-    console.log(`[comunio] community=${communityId} members=${members.length} standings=${standingsArr.length}`);
+    // Normaliza cada fila a {id, name, points, position}. La forma exacta de
+    // una fila de /standings no se habia visto con datos reales (la preseason
+    // la deja vacia) -- se prueban varias claves plausibles, y si no aparece
+    // un numero de puntos en ninguna se deja `points: null` en vez de un 0
+    // que parezca un dato real cuando no lo es. El nombre sale de `members`
+    // (ya confirmado) cuando el id casa; si no, se cae a lo que traiga la fila.
+    const standings = standingsArr.map((row: any) => {
+      const rowId = row.id ?? row.userId ?? row.user_id ?? row.managerId ?? row.manager?.id ?? null;
+      const pointsRaw = row.points ?? row.score ?? row.totalPoints ?? row.total_points ?? null;
+      const positionRaw = row.position ?? row.rank ?? row.place ?? null;
+      const member = rowId != null ? members.find((m: any) => String(m.id) === String(rowId)) : null;
+      return {
+        id: rowId,
+        name: member?.name || row.name || row.managerName || "Mánager",
+        points: typeof pointsRaw === "number" ? pointsRaw : null,
+        position: typeof positionRaw === "number" ? positionRaw : null,
+      };
+    });
+
+    console.log(`[comunio] community=${communityId} members=${members.length} standings=${standings.length}`);
 
     return json({
       ok: true,
       community: { id: communityId, name: commJson?.name || "Comunio" },
       members,
-      standings: standingsArr,
+      standings,
       seasonStarted,
       standingsRaw: seasonStarted ? undefined : standingsRaw, // keep raw only when unexpected
     }, 200);

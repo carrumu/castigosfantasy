@@ -3,6 +3,8 @@ import { escapeHTML } from '../utils/security';
 import { getRandomPhrase } from '../utils/phrases';
 import { openLeagueSettings } from '../utils/league-options';
 import { openBiwengerLinkModal } from '../utils/biwenger-link-modal';
+import { openComunioLinkModal } from '../utils/comunio-link-modal';
+import { openMisterLinkModal } from '../utils/mister-link-modal';
 import { openJornadaExpressModal } from '../utils/jornada-express-modal';
 import { getSuggestedMatchdayNumber } from '../utils/calendar';
 
@@ -31,6 +33,22 @@ export function renderDashboard(container, callbacks) {
   let biwengerErrorMsg = '';
   let biwengerRoundName = '';
   let biwengerSeasonRounds = []; // all season rounds from the competition
+
+  // Comunio y Mister: mismo patron que Biwenger (clasificacion en vivo por
+  // pestañas), pero sin la deteccion de "jornada terminada" -- ninguna de las
+  // dos exposicion todavia que ronda ha cerrado, asi que ese banner sigue
+  // siendo exclusivo de Biwenger.
+  let comunioStandings = [];
+  let comunioLoaded = false;
+  let comunioLoadError = false;
+  let comunioErrorMsg = '';
+
+  let misterStandings = [];
+  let misterJornadaStandings = [];
+  let misterLoaded = false;
+  let misterLoadError = false;
+  let misterErrorMsg = '';
+  let misterLeagueName = '';
 
   // Default Mock Data for Guest / Demo Mode
   const DEFAULT_DEMO_MEMBERS = [
@@ -113,6 +131,10 @@ export function renderDashboard(container, callbacks) {
           profile_id,
           is_admin,
           biwenger_user_name,
+          comunio_manager_id,
+          comunio_manager_name,
+          mister_manager_id,
+          mister_manager_name,
           profiles (
             apodo,
             display_name,
@@ -122,12 +144,16 @@ export function renderDashboard(container, callbacks) {
         .eq('league_id', currentLeague.id);
 
       if (listErr) throw listErr;
-      
+
       members = membersList.map(m => ({
         profile_id: m.profile_id,
         display_name: m.profiles?.apodo || m.profiles?.display_name || 'Desconocido',
         avatar_url: m.profiles?.avatar_url || '',
-        biwenger_user_name: m.biwenger_user_name || ''
+        biwenger_user_name: m.biwenger_user_name || '',
+        comunio_manager_id: m.comunio_manager_id ?? null,
+        comunio_manager_name: m.comunio_manager_name || '',
+        mister_manager_id: m.mister_manager_id ?? null,
+        mister_manager_name: m.mister_manager_name || ''
       }));
 
       // 5.5. Get unclaimed roster slots
@@ -165,8 +191,12 @@ export function renderDashboard(container, callbacks) {
       // a partir del calendario real, no sumando 1 a la última registrada.
       suggestedMatchday = await getSuggestedMatchdayNumber(records);
 
-      // Start fetching Biwenger standings asynchronously
+      // Start fetching live standings asynchronously. Each fetch function
+      // no-ops unless it matches currentLeague.sync_source, same guard as
+      // fetchBiwengerStandings always had.
       fetchBiwengerStandings();
+      fetchComunioStandings();
+      fetchMisterStandings();
 
       renderMainDashboard();
     } catch (err) {
@@ -246,6 +276,94 @@ export function renderDashboard(container, callbacks) {
       console.error('Error loading Biwenger standings:', err);
       biwengerLoadError = true;
       biwengerErrorMsg = err.message || 'Error de conexión con Biwenger.';
+      updateLeaderboardView();
+    }
+  }
+
+  /** Token + headers comunes a las tres funciones de sincronizacion. */
+  async function syncAuthHeaders() {
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || localStorage.getItem('CF_SUPABASE_URL') || '';
+    const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || localStorage.getItem('CF_SUPABASE_ANON_KEY') || '';
+    let token = supabaseAnonKey;
+    try {
+      const sessionData = await supabase.auth.getSession();
+      if (sessionData.data?.session?.access_token) token = sessionData.data.session.access_token;
+    } catch (_) {}
+    return {
+      supabaseUrl,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+        'apikey': supabaseAnonKey
+      }
+    };
+  }
+
+  async function fetchComunioStandings() {
+    if (!currentLeague || currentLeague.sync_source !== 'comunio') return;
+
+    try {
+      const { supabaseUrl, headers } = await syncAuthHeaders();
+      const res = await fetch(`${supabaseUrl}/functions/v1/comunio-sync`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ appLeagueId: currentLeague.id })
+      });
+
+      const syncData = await res.json();
+      if (!res.ok || syncData.error) {
+        throw new Error(syncData.error || `Error de conexión (Status ${res.status})`);
+      }
+
+      // Puntos aun null: temporada sin empezar (ver seasonStarted) o una fila
+      // que el normalizador del backend no ha sabido leer. En ambos casos no
+      // hay clasificacion real que enseñar todavia.
+      comunioStandings = (syncData.standings || []).filter(s => s.points != null);
+      comunioLoaded = true;
+      comunioLoadError = false;
+      if (!syncData.seasonStarted) {
+        comunioLoadError = true;
+        comunioErrorMsg = 'La temporada de Comunio aun no ha empezado: no hay clasificación que mostrar todavía.';
+      }
+      updateLeaderboardView();
+    } catch (err) {
+      console.error('Error loading Comunio standings:', err);
+      comunioLoadError = true;
+      comunioErrorMsg = err.message || 'Error de conexión con Comunio.';
+      updateLeaderboardView();
+    }
+  }
+
+  async function fetchMisterStandings() {
+    if (!currentLeague || currentLeague.sync_source !== 'mister') return;
+
+    try {
+      const { supabaseUrl, headers } = await syncAuthHeaders();
+      const res = await fetch(`${supabaseUrl}/functions/v1/mister-sync`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ appLeagueId: currentLeague.id })
+      });
+
+      const syncData = await res.json();
+      if (!res.ok || syncData.error) {
+        throw new Error(syncData.error || `Error de conexión (Status ${res.status})`);
+      }
+
+      misterStandings = syncData.standings || [];
+      misterJornadaStandings = syncData.matchdayStandings || [];
+      misterLeagueName = syncData.league?.name || '';
+      misterLoaded = true;
+      misterLoadError = false;
+      if (!syncData.seasonStarted) {
+        misterLoadError = true;
+        misterErrorMsg = 'La temporada de Mister aun no ha empezado: no hay clasificación que mostrar todavía.';
+      }
+      updateLeaderboardView();
+    } catch (err) {
+      console.error('Error loading Mister standings:', err);
+      misterLoadError = true;
+      misterErrorMsg = err.message || 'Error de conexión con Mister.';
       updateLeaderboardView();
     }
   }
@@ -517,6 +635,116 @@ export function renderDashboard(container, callbacks) {
   }
   // --- End Round-End Detection ---
 
+  /**
+   * Fila de clasificacion en vivo para Comunio/Mister, con el mismo aspecto
+   * que ya usa Biwenger, pero vinculando por id de mánager en vez de por
+   * nombre: las dos exponen un id estable (Biwenger no, por eso su bloque
+   * hace el match por nombre y se ha dejado tal cual).
+   */
+  function buildSyncStandingsRows({ standings, linkField, statsLabel, highlightMinPoints, platformName, linkBtnClass }) {
+    const sorted = [...standings].sort((a, b) => (b.points ?? 0) - (a.points ?? 0));
+    let minPoints = Infinity;
+    if (highlightMinPoints) {
+      minPoints = Math.min(...standings.map(s => s.points ?? Infinity));
+    }
+
+    const linkedMemberIds = new Set();
+    const rows = sorted.map(s => {
+      const matchedMember = members.find(m => m[linkField] != null && String(m[linkField]) === String(s.id));
+      if (matchedMember) linkedMemberIds.add(matchedMember.profile_id);
+      return {
+        linked: !!matchedMember,
+        remoteName: s.name,
+        localName: matchedMember?.display_name || null,
+        score: s.points ?? 0,
+        isColista: highlightMinPoints && (s.points ?? Infinity) === minPoints
+      };
+    });
+
+    const unlinkedMembers = members.filter(m => !linkedMemberIds.has(m.profile_id) && !m.isUnclaimedRoster);
+
+    let html = '';
+    rows.forEach((row, idx) => {
+      const rank = idx + 1;
+      let rowClass = `leaderboard-item rank-${rank}`;
+      if (row.isColista) rowClass += ' colista-highlight';
+
+      const nameHtml = row.linked ? `
+        <div class="leaderboard-name" style="display: flex; align-items: center; flex-wrap: wrap;">
+          ${escapeHTML(row.localName)}
+          <span style="font-size: 0.72rem; color: var(--text-muted); font-weight: normal; margin-left: 0.35rem;">(${escapeHTML(row.remoteName)})</span>
+        </div>
+      ` : `
+        <div class="leaderboard-name" style="display: flex; align-items: center; flex-wrap: wrap; color: var(--text-muted);">
+          ${escapeHTML(row.remoteName)}
+          <span style="font-size: 0.72rem; color: var(--accent-gold); font-weight: normal; margin-left: 0.35rem;">(Sin mánager vinculado - ¡vincúlate!)</span>
+        </div>
+      `;
+
+      html += `
+        <div class="${rowClass}">
+          <div class="leaderboard-rank">${rank}</div>
+          <div class="leaderboard-info">
+            ${nameHtml}
+            <div class="leaderboard-stats">${statsLabel}</div>
+          </div>
+          <div class="leaderboard-debt">
+            <div class="debt-amount" style="font-size: 1.1rem; font-weight: 800;">${row.score} pts</div>
+          </div>
+        </div>
+      `;
+    });
+
+    unlinkedMembers.forEach(m => {
+      const isSelf = m.profile_id === currentUserId;
+      const linkActionHtml = isSelf
+        ? `<button class="${linkBtnClass}" style="background: none; border: none; color: var(--accent); font-weight: bold; cursor: pointer; text-decoration: underline; font-size: 0.72rem; padding: 0; margin-left: 0.35rem;">¡Vincúlate aquí!</button>`
+        : `(Pídele que se vincule)`;
+
+      html += `
+        <div class="leaderboard-item" style="border: 1.5px dashed var(--border-color); background: rgba(255, 255, 255, 0.01); opacity: 0.85;">
+          <div class="leaderboard-rank" style="background: rgba(255,255,255,0.03); color: var(--text-muted);">--</div>
+          <div class="leaderboard-info">
+            <div class="leaderboard-name" style="display: flex; align-items: center; flex-wrap: wrap;">
+              ${escapeHTML(m.display_name)}
+              <span style="font-size: 0.72rem; color: var(--accent-gold); font-weight: 500; margin-left: 0.35rem;">Sin vincular ${linkActionHtml}</span>
+            </div>
+            <div class="leaderboard-stats">Mánager de CastigosFantasy no asociado a ${platformName}</div>
+          </div>
+          <div class="leaderboard-debt">
+            <div class="debt-amount" style="font-size: 0.8rem; color: var(--text-muted); font-weight: normal;">-</div>
+          </div>
+        </div>
+      `;
+    });
+
+    return html;
+  }
+
+  /** Estado de carga/error compartido por las pestañas de Comunio y Mister. */
+  function renderSyncLoadingOrError(contentArea, { loaded, loadError, errorMsg, platformName, retryId, onRetry }) {
+    if (loadError) {
+      contentArea.innerHTML = `
+        <div style="text-align: center; color: var(--danger); padding: 1.5rem 0; font-size: 0.85rem;">
+          ${errorMsg}<br>
+          <button id="${retryId}" class="btn-secondary" style="margin-top: 0.75rem; font-size: 0.75rem; padding: 0.4rem 0.75rem; width: auto; display: inline-block;">Reintentar</button>
+        </div>
+      `;
+      contentArea.querySelector(`#${retryId}`)?.addEventListener('click', onRetry);
+      return true;
+    }
+    if (!loaded) {
+      contentArea.innerHTML = `
+        <div style="text-align: center; padding: 2rem 0;">
+          <span class="spinner" style="width:32px;height:32px;display:inline-block;"></span>
+          <p style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--text-muted);">Cargando clasificación de ${platformName}...</p>
+        </div>
+      `;
+      return true;
+    }
+    return false;
+  }
+
   function updateLeaderboardView() {
     const contentArea = container.querySelector('#leaderboard-content-area');
     if (!contentArea) return;
@@ -548,8 +776,13 @@ export function renderDashboard(container, callbacks) {
 
       contentArea.innerHTML = leaderboard.map((item, idx) => {
         const memberObj = members.find(m => m.profile_id === item.profile_id);
-        const biwengerPart = (currentLeague?.sync_source === 'biwenger' && memberObj?.biwenger_user_name) 
-          ? `<span style="font-size: 0.72rem; color: var(--text-muted); font-weight: normal; margin-left: 0.35rem;">(${memberObj.biwenger_user_name})</span>`
+        const syncSource = currentLeague?.sync_source;
+        const linkedRemoteName = syncSource === 'biwenger' ? memberObj?.biwenger_user_name
+          : syncSource === 'comunio' ? memberObj?.comunio_manager_name
+          : syncSource === 'mister' ? memberObj?.mister_manager_name
+          : '';
+        const biwengerPart = linkedRemoteName
+          ? `<span style="font-size: 0.72rem; color: var(--text-muted); font-weight: normal; margin-left: 0.35rem;">(${escapeHTML(linkedRemoteName)})</span>`
           : '';
 
         return `
@@ -713,6 +946,53 @@ export function renderDashboard(container, callbacks) {
       });
 
       contentArea.innerHTML = rowsHtml;
+
+    } else if (activeTab === 'comunio-general') {
+      const busy = renderSyncLoadingOrError(contentArea, {
+        loaded: comunioLoaded, loadError: comunioLoadError, errorMsg: comunioErrorMsg,
+        platformName: 'Comunio', retryId: 'btn-retry-comunio',
+        onRetry: () => { comunioLoadError = false; comunioErrorMsg = ''; updateLeaderboardView(); fetchComunioStandings(); }
+      });
+      if (busy) return;
+
+      if (comunioStandings.length === 0) {
+        contentArea.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 1.5rem 0;">No hay datos disponibles en la liga de Comunio.</div>`;
+        return;
+      }
+
+      contentArea.innerHTML = buildSyncStandingsRows({
+        standings: comunioStandings,
+        linkField: 'comunio_manager_id',
+        statsLabel: 'Puntuación Total',
+        highlightMinPoints: false,
+        platformName: 'Comunio',
+        linkBtnClass: 'btn-link-comunio-inline'
+      });
+
+    } else if (activeTab === 'mister-general' || activeTab === 'mister-jornada') {
+      const busy = renderSyncLoadingOrError(contentArea, {
+        loaded: misterLoaded, loadError: misterLoadError, errorMsg: misterErrorMsg,
+        platformName: 'Mister', retryId: 'btn-retry-mister',
+        onRetry: () => { misterLoadError = false; misterErrorMsg = ''; updateLeaderboardView(); fetchMisterStandings(); }
+      });
+      if (busy) return;
+
+      const isGeneral = activeTab === 'mister-general';
+      const standings = isGeneral ? misterStandings : misterJornadaStandings;
+
+      if (standings.length === 0) {
+        contentArea.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 1.5rem 0;">No hay datos disponibles en la liga de Mister.</div>`;
+        return;
+      }
+
+      contentArea.innerHTML = buildSyncStandingsRows({
+        standings,
+        linkField: 'mister_manager_id',
+        statsLabel: isGeneral ? 'Puntuación Total' : 'Puntos en la última jornada',
+        highlightMinPoints: !isGeneral,
+        platformName: 'Mister',
+        linkBtnClass: 'btn-link-mister-inline'
+      });
     }
   }
 
@@ -797,7 +1077,22 @@ export function renderDashboard(container, callbacks) {
                 <button class="btn-select-league ${activeTab === 'biwenger-jornada' ? 'is-active' : ''}" id="tab-biwenger-jornada" style="font-size: 0.72rem; padding: 0.4rem 0.65rem; width: auto; flex-grow: 1; text-transform: uppercase; font-weight: 800;">B. Jornada</button>
               </div>
             ` : ''}
-            
+
+            ${(currentLeague && currentLeague.sync_source === 'comunio') ? `
+              <div class="biwenger-tabs" style="display: flex; gap: 0.5rem; margin-bottom: 1.25rem; background: rgba(0, 0, 0, 0.2); padding: 0.25rem; border-radius: 8px; border: 1.5px solid var(--border-color);">
+                <button class="btn-select-league ${activeTab === 'deudas' ? 'is-active' : ''}" id="tab-deudas" style="font-size: 0.72rem; padding: 0.4rem 0.65rem; width: auto; flex-grow: 1; text-transform: uppercase; font-weight: 800;">Deudas</button>
+                <button class="btn-select-league ${activeTab === 'comunio-general' ? 'is-active' : ''}" id="tab-comunio-general" style="font-size: 0.72rem; padding: 0.4rem 0.65rem; width: auto; flex-grow: 1; text-transform: uppercase; font-weight: 800;">C. General</button>
+              </div>
+            ` : ''}
+
+            ${(currentLeague && currentLeague.sync_source === 'mister') ? `
+              <div class="biwenger-tabs" style="display: flex; gap: 0.5rem; margin-bottom: 1.25rem; background: rgba(0, 0, 0, 0.2); padding: 0.25rem; border-radius: 8px; border: 1.5px solid var(--border-color);">
+                <button class="btn-select-league ${activeTab === 'deudas' ? 'is-active' : ''}" id="tab-deudas" style="font-size: 0.72rem; padding: 0.4rem 0.65rem; width: auto; flex-grow: 1; text-transform: uppercase; font-weight: 800;">Deudas</button>
+                <button class="btn-select-league ${activeTab === 'mister-general' ? 'is-active' : ''}" id="tab-mister-general" style="font-size: 0.72rem; padding: 0.4rem 0.65rem; width: auto; flex-grow: 1; text-transform: uppercase; font-weight: 800;">M. General</button>
+                <button class="btn-select-league ${activeTab === 'mister-jornada' ? 'is-active' : ''}" id="tab-mister-jornada" style="font-size: 0.72rem; padding: 0.4rem 0.65rem; width: auto; flex-grow: 1; text-transform: uppercase; font-weight: 800;">M. Jornada</button>
+              </div>
+            ` : ''}
+
             <div class="leaderboard-list" id="leaderboard-content-area">
               <!-- Cargado dinámicamente -->
             </div>
@@ -893,13 +1188,66 @@ export function renderDashboard(container, callbacks) {
       tabJornada?.addEventListener('click', () => setTabActive('biwenger-jornada'));
     }
 
+    // Hook Comunio Tabs click events
+    if (currentLeague && currentLeague.sync_source === 'comunio') {
+      const tabDeudas = container.querySelector('#tab-deudas');
+      const tabGeneral = container.querySelector('#tab-comunio-general');
+
+      const setTabActive = (tabId) => {
+        activeTab = tabId;
+        [tabDeudas, tabGeneral].forEach(btn => { if (btn) btn.classList.remove('is-active'); });
+        if (tabId === 'deudas' && tabDeudas) tabDeudas.classList.add('is-active');
+        if (tabId === 'comunio-general' && tabGeneral) tabGeneral.classList.add('is-active');
+        updateLeaderboardView();
+      };
+
+      tabDeudas?.addEventListener('click', () => setTabActive('deudas'));
+      tabGeneral?.addEventListener('click', () => setTabActive('comunio-general'));
+    }
+
+    // Hook Mister Tabs click events
+    if (currentLeague && currentLeague.sync_source === 'mister') {
+      const tabDeudas = container.querySelector('#tab-deudas');
+      const tabGeneral = container.querySelector('#tab-mister-general');
+      const tabJornada = container.querySelector('#tab-mister-jornada');
+
+      const setTabActive = (tabId) => {
+        activeTab = tabId;
+        [tabDeudas, tabGeneral, tabJornada].forEach(btn => { if (btn) btn.classList.remove('is-active'); });
+        if (tabId === 'deudas' && tabDeudas) tabDeudas.classList.add('is-active');
+        if (tabId === 'mister-general' && tabGeneral) tabGeneral.classList.add('is-active');
+        if (tabId === 'mister-jornada' && tabJornada) tabJornada.classList.add('is-active');
+        updateLeaderboardView();
+      };
+
+      tabDeudas?.addEventListener('click', () => setTabActive('deudas'));
+      tabGeneral?.addEventListener('click', () => setTabActive('mister-general'));
+      tabJornada?.addEventListener('click', () => setTabActive('mister-jornada'));
+    }
+
     // Hook inline link click delegation
     const contentArea = container.querySelector('#leaderboard-content-area');
     contentArea?.addEventListener('click', (e) => {
-      const linkBtn = e.target.closest('.btn-link-biwenger-inline');
-      if (linkBtn) {
+      const biwengerLinkBtn = e.target.closest('.btn-link-biwenger-inline');
+      if (biwengerLinkBtn) {
         e.preventDefault();
         openBiwengerLinkModal(currentLeague.id, currentUserId, callbacks, () => {
+          loadData();
+        });
+        return;
+      }
+      const comunioLinkBtn = e.target.closest('.btn-link-comunio-inline');
+      if (comunioLinkBtn) {
+        e.preventDefault();
+        openComunioLinkModal(currentLeague.id, currentUserId, callbacks, () => {
+          loadData();
+        });
+        return;
+      }
+      const misterLinkBtn = e.target.closest('.btn-link-mister-inline');
+      if (misterLinkBtn) {
+        e.preventDefault();
+        openMisterLinkModal(currentLeague.id, currentUserId, callbacks, () => {
           loadData();
         });
       }
