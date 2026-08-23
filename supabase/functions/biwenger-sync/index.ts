@@ -1,14 +1,12 @@
 // @ts-nocheck
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-};
+import { buildCorsHeaders } from "../_shared/cors.ts";
+import { isValidUUID } from "../_shared/validate.ts";
 
 serve(async (req: Request) => {
+  const corsHeaders = buildCorsHeaders(req);
+
   // Handle CORS preflight request with explicit 200 OK status
   if (req.method === "OPTIONS") {
     return new Response("ok", {
@@ -27,8 +25,8 @@ serve(async (req: Request) => {
 
     const { appLeagueId } = await req.json();
 
-    if (!appLeagueId) {
-      return new Response(JSON.stringify({ error: "Missing required field: appLeagueId" }), {
+    if (!isValidUUID(appLeagueId)) {
+      return new Response(JSON.stringify({ error: "Missing or invalid field: appLeagueId must be a UUID" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });

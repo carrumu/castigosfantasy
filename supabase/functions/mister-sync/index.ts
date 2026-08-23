@@ -19,14 +19,8 @@
 //    liga detectada, para que la UI pida confirmación al usuario.
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-};
-const json = (b: unknown, s = 200) =>
-  new Response(JSON.stringify(b), { status: s, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+import { buildCorsHeaders } from "../_shared/cors.ts";
+import { isValidUUID } from "../_shared/validate.ts";
 
 const MISTER = "https://mister.mundodeportivo.com";
 const UA = "Mozilla/5.0 (Linux; Android 15; Pixel 9) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Mobile Safari/537.36";
@@ -73,12 +67,16 @@ function parseLeagueName(html: string): string | null {
 }
 
 serve(async (req: Request) => {
+  const corsHeaders = buildCorsHeaders(req);
+  const json = (b: unknown, s = 200) =>
+    new Response(JSON.stringify(b), { status: s, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+
   if (req.method === "OPTIONS") return new Response("ok", { status: 200, headers: corsHeaders });
   if (req.method !== "POST") return json({ error: "Method not allowed" }, 405);
 
   try {
     const { appLeagueId } = await req.json();
-    if (!appLeagueId) return json({ error: "Missing required field: appLeagueId" }, 400);
+    if (!isValidUUID(appLeagueId)) return json({ error: "Missing or invalid field: appLeagueId must be a UUID" }, 400);
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");

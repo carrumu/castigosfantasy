@@ -1,25 +1,33 @@
 // @ts-nocheck
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { buildCorsHeaders } from "../_shared/cors.ts";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+// Minimal HTML-escaping so a malicious apodo/username can't inject markup
+// or links into the email this sends to the site owner's inbox.
+function escapeHtml(value: unknown): string {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
 
 serve(async (req: Request) => {
+  const corsHeaders = buildCorsHeaders(req);
+
   // Handle CORS preflight request
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
 
   try {
-    const { email, username, apodo } = await req.json();
-
-    if (!email) {
-      return new Response(JSON.stringify({ error: "Missing email" }), {
-        status: 400,
+    if (req.method !== "POST") {
+      return new Response(JSON.stringify({ error: "Method not allowed" }), {
+        status: 405,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
@@ -30,6 +38,43 @@ serve(async (req: Request) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
+    // ============================================================
+    // AUTHZ: this endpoint used to accept anonymous POSTs, which let
+    // anyone spam Resend / the admin inbox. Require a real session, the
+    // same as every other function, and take the email straight from the
+    // verified JWT instead of trusting whatever the client claims it is.
+    // ============================================================
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const anonKey = Deno.env.get("SUPABASE_ANON_KEY");
+    if (!supabaseUrl || !anonKey) {
+      return new Response(JSON.stringify({ error: "Server is not configured (missing Supabase env vars)." }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const authHeader = req.headers.get("Authorization") || "";
+    const jwt = authHeader.replace(/^Bearer\s+/i, "").trim();
+    const authClient = createClient(supabaseUrl, anonKey);
+    const { data: userData, error: userErr } = await authClient.auth.getUser(jwt);
+    const caller = userData?.user;
+
+    if (userErr || !caller) {
+      return new Response(JSON.stringify({ error: "No autorizado: se requiere una sesion valida." }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const { username, apodo } = await req.json();
+    const email = caller.email || "desconocido";
+
+    // Cosmetic fields only (shown in the notification, never used for
+    // routing/auth) — still capped so a huge payload can't bloat the email.
+    const safeUsername = escapeHtml(String(username ?? "").slice(0, 120)) || "Sin nombre";
+    const safeApodo = escapeHtml(String(apodo ?? "").slice(0, 60)) || "Sin apodo";
+    const safeEmail = escapeHtml(email);
 
     // Format date to CET (Europe/Madrid)
     const date = new Date();
@@ -66,15 +111,15 @@ serve(async (req: Request) => {
               <table style="width: 100%; border-collapse: collapse;">
                 <tr>
                   <td style="padding: 10px 0; color: #94a3b8; font-size: 11px; font-weight: 800; border-bottom: 2px solid #000000; text-transform: uppercase; letter-spacing: 0.5px;">Nombre Completo</td>
-                  <td style="padding: 10px 0; color: #ffffff; font-size: 13px; font-weight: 800; text-align: right; border-bottom: 2px solid #000000;">${username || 'Sin nombre'}</td>
+                  <td style="padding: 10px 0; color: #ffffff; font-size: 13px; font-weight: 800; text-align: right; border-bottom: 2px solid #000000;">${safeUsername}</td>
                 </tr>
                 <tr>
                   <td style="padding: 10px 0; color: #94a3b8; font-size: 11px; font-weight: 800; border-bottom: 2px solid #000000; text-transform: uppercase; letter-spacing: 0.5px;">Apodo / Liga</td>
-                  <td style="padding: 10px 0; color: #e2b13c; font-size: 13px; font-weight: 900; text-align: right; border-bottom: 2px solid #000000;">${apodo || 'Sin apodo'}</td>
+                  <td style="padding: 10px 0; color: #e2b13c; font-size: 13px; font-weight: 900; text-align: right; border-bottom: 2px solid #000000;">${safeApodo}</td>
                 </tr>
                 <tr>
                   <td style="padding: 10px 0; color: #94a3b8; font-size: 11px; font-weight: 800; border-bottom: 2px solid #000000; text-transform: uppercase; letter-spacing: 0.5px;">Correo Electrónico</td>
-                  <td style="padding: 10px 0; color: #10b981; font-size: 13px; font-weight: 800; text-align: right; border-bottom: 2px solid #000000;">${email}</td>
+                  <td style="padding: 10px 0; color: #10b981; font-size: 13px; font-weight: 800; text-align: right; border-bottom: 2px solid #000000;">${safeEmail}</td>
                 </tr>
                 <tr>
                   <td style="padding: 10px 0; color: #94a3b8; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Fecha y Hora</td>
@@ -104,7 +149,7 @@ serve(async (req: Request) => {
       body: JSON.stringify({
         from: "CastigoFantasy <noreply@castigosfantasy.com>",
         to: "castigosfantasy2005@gmail.com",
-        subject: `Nuevo Registro de Entrenador: ${apodo || 'Sin apodo'}`,
+        subject: `Nuevo Registro de Entrenador: ${String(apodo ?? "").replace(/[\r\n]+/g, " ").slice(0, 60) || "Sin apodo"}`,
         html: html,
       }),
     });
