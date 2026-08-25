@@ -1,3 +1,4 @@
+import { supabase } from '../supabase';
 import { setupAutocomplete } from '../utils/autocomplete';
 import { LALIGA_TOPICS_DB } from '../utils/topics-db';
 import { LALIGA_PLAYERS_DB } from '../utils/players-db';
@@ -101,6 +102,57 @@ export async function renderTop10(container, callbacks) {
     return `${yyyy}-${mm}-${dd}`;
   };
 
+  // Pick today's topic avoiding anything shown in the last 180 days. The
+  // old logic (diffDays % combinedTopics.length) was a fixed cycle no
+  // longer than the topic count itself — with ~105 static topics that's
+  // under 180 days, so the same Top 10 was guaranteed to repeat well before
+  // the window was up. This checks real history in daily_challenges
+  // instead: pick uniformly among topics never shown in the window, and
+  // only fall back to the least-recently-shown one if every topic has
+  // already appeared in the last 180 days (with ~105 topics total, that
+  // fallback WILL eventually kick in during a 180-day span — there just
+  // aren't enough distinct topics for a hard no-repeat guarantee that long;
+  // this still guarantees never repeating the same one twice in a row and
+  // always picking whichever has gone longest without being shown).
+  async function pickNonRepeatingTopic(gameDateStr) {
+    const windowStart = new Date(gameDateStr + 'T00:00:00Z');
+    windowStart.setUTCDate(windowStart.getUTCDate() - 180);
+    const windowStartStr = windowStart.toISOString().slice(0, 10);
+
+    let lastUsed = new Map(); // title -> most recent game_date it was shown
+    try {
+      const { data: recentRows } = await supabase
+        .from('daily_challenges')
+        .select('payload, game_date')
+        .eq('game', 'top10')
+        .gte('game_date', windowStartStr)
+        .lt('game_date', gameDateStr);
+
+      (recentRows || []).forEach(row => {
+        const title = row.payload?.title;
+        if (!title) return;
+        const prev = lastUsed.get(title);
+        if (!prev || row.game_date > prev) lastUsed.set(title, row.game_date);
+      });
+    } catch (err) {
+      console.error('Error checking recent Top 10 history, picking without it:', err);
+    }
+
+    const fresh = combinedTopics.filter(t => !lastUsed.has(t.title));
+    if (fresh.length > 0) {
+      return fresh[Math.floor(Math.random() * fresh.length)];
+    }
+
+    // Every topic has been shown in the last 180 days: reuse whichever one
+    // was shown longest ago, instead of repeating something recent.
+    const byOldestUse = [...combinedTopics].sort((a, b) => {
+      const dateA = lastUsed.get(a.title) || '';
+      const dateB = lastUsed.get(b.title) || '';
+      return dateA.localeCompare(dateB);
+    });
+    return byOldestUse[0];
+  }
+
   // Initialize Daily Game State. The topic is pinned in Supabase the first
   // time anyone loads it that day (see resolveDailyChallenge), so every
   // player gets the same Top 10 even if their own combinedTopics list
@@ -114,8 +166,10 @@ export async function renderTop10(container, callbacks) {
     const diffDays = Math.floor((gameDate.getTime() - epoch.getTime()) / (1000 * 60 * 60 * 24));
     dailyNumber = diffDays + 1;
 
-    const localIndex = Math.abs(diffDays) % combinedTopics.length;
-    activeTopic = await resolveDailyChallenge('top10', gameDateStr, dailyNumber, () => combinedTopics[localIndex]);
+    // pickNonRepeatingTopic queries recent history, so it's only actually
+    // invoked by resolveDailyChallenge on the "nobody's picked today's yet"
+    // path, not on every normal page load.
+    activeTopic = await resolveDailyChallenge('top10', gameDateStr, dailyNumber, () => pickNonRepeatingTopic(gameDateStr));
 
     if (savedState && savedState.date === gameDateStr) {
       guessedIndices = new Set(savedState.guessedIndices || []);

@@ -11,7 +11,11 @@ import { supabase } from '../supabase';
  * @param {string} game - stable key, e.g. 'wordle' or 'top10'
  * @param {string} gameDateStr - YYYY-MM-DD, already resolved to the game's own reset timezone
  * @param {number} dailyNumber
- * @param {() => any} computeFn - returns the JSON-serializable payload to use/store
+ * @param {() => any} computeFn - returns (optionally as a Promise) the
+ *   JSON-serializable payload to use/store. Only invoked when there's no
+ *   existing row for the day, so an expensive computeFn (e.g. one that
+ *   queries other tables first) never runs on the common "already pinned"
+ *   path.
  */
 export async function resolveDailyChallenge(game, gameDateStr, dailyNumber, computeFn) {
   try {
@@ -24,7 +28,7 @@ export async function resolveDailyChallenge(game, gameDateStr, dailyNumber, comp
 
     if (existing) return existing.payload;
 
-    const computed = computeFn();
+    const computed = await computeFn();
 
     const { data: inserted, error: insertErr } = await supabase
       .from('daily_challenges')
