@@ -142,6 +142,52 @@ export async function renderMinigame(container, callbacks) {
   let dailyNumber = 0;
   let activeModal = null;
 
+  // Pick today's secret player avoiding anyone shown in the last 180 days.
+  // The old logic (diffDays % LALIGA_PLAYERS.length) was a fixed cycle no
+  // longer than the player-name pool itself — with only the top 200
+  // market-value players deduped down to unique Wordle-safe surnames, that
+  // pool can end up well under 180, so the cycle could repeat before 180
+  // days were up (same bug fixed in top10.js). This checks real history in
+  // daily_challenges instead, same approach: prefer a name never shown in
+  // the window, falling back to whichever has gone longest without being
+  // shown if the whole pool has already appeared.
+  async function pickNonRepeatingPlayer(todayStr) {
+    const windowStart = new Date(todayStr + 'T00:00:00Z');
+    windowStart.setUTCDate(windowStart.getUTCDate() - 180);
+    const windowStartStr = windowStart.toISOString().slice(0, 10);
+
+    let lastUsed = new Map(); // secretPlayer -> most recent game_date it was shown
+    try {
+      const { data: recentRows } = await supabase
+        .from('daily_challenges')
+        .select('payload, game_date')
+        .eq('game', 'wordle')
+        .gte('game_date', windowStartStr)
+        .lt('game_date', todayStr);
+
+      (recentRows || []).forEach(row => {
+        const name = row.payload?.secretPlayer;
+        if (!name) return;
+        const prev = lastUsed.get(name);
+        if (!prev || row.game_date > prev) lastUsed.set(name, row.game_date);
+      });
+    } catch (err) {
+      console.error('Error checking recent Wordle history, picking without it:', err);
+    }
+
+    const fresh = LALIGA_PLAYERS.filter(name => !lastUsed.has(name));
+    if (fresh.length > 0) {
+      return fresh[Math.floor(Math.random() * fresh.length)];
+    }
+
+    const byOldestUse = [...LALIGA_PLAYERS].sort((a, b) => {
+      const dateA = lastUsed.get(a) || '';
+      const dateB = lastUsed.get(b) || '';
+      return dateA.localeCompare(dateB);
+    });
+    return byOldestUse[0];
+  }
+
   // Initialize Daily Game State. The secret word is pinned in Supabase the
   // first time anyone loads it that day (see resolveDailyChallenge), so
   // every player gets the same word even if their own LALIGA_PLAYERS list
@@ -156,9 +202,10 @@ export async function renderMinigame(container, callbacks) {
     const diffDays = Math.floor((today.getTime() - epoch) / (1000 * 60 * 60 * 24));
     dailyNumber = diffDays + 1;
 
-    const localIndex = Math.abs(diffDays) % LALIGA_PLAYERS.length;
-    const payload = await resolveDailyChallenge('wordle', todayStr, dailyNumber, () => ({
-      secretPlayer: LALIGA_PLAYERS[localIndex]
+    // pickNonRepeatingPlayer queries recent history, so resolveDailyChallenge
+    // only actually invokes it on the "nobody's picked today's yet" path.
+    const payload = await resolveDailyChallenge('wordle', todayStr, dailyNumber, async () => ({
+      secretPlayer: await pickNonRepeatingPlayer(todayStr)
     }));
     secretPlayer = payload.secretPlayer;
 
