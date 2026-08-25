@@ -27,7 +27,28 @@ function pickRandomChallenges(count, excludeTitles = []) {
  */
 export function renderChallenges(container, callbacks) {
   const isGuest = callbacks.isGuest;
-  const activeLeagueId = localStorage.getItem('CF_ACTIVE_LEAGUE_ID');
+  // Reto Semanal es global: un único trío de retos para toda la comunidad,
+  // no por liga (antes usaba la liga activa del navegador, CF_ACTIVE_LEAGUE_ID,
+  // lo que fragmentaba las votaciones entre ligas y podía "cambiar" según
+  // cuál tuviera cada uno marcada como activa). Se resuelve con el mismo
+  // ancla global que usa El Bufón (get_global_content_league_id): una liga
+  // "sistema" fija que sirve solo de contenedor técnico para la FK de la
+  // tabla. Consultar `leagues` directamente no vale para esto -- su RLS
+  // solo deja ver las ligas propias, así que cada usuario "resolvía" una
+  // liga distinta y el reto nunca fue de verdad global hasta este cambio.
+  let anchorLeagueId = null;
+
+  async function resolveAnchorLeagueId() {
+    if (anchorLeagueId) return anchorLeagueId;
+    try {
+      const { data, error } = await supabase.rpc('get_global_content_league_id');
+      if (error || !data) return null;
+      anchorLeagueId = data;
+      return anchorLeagueId;
+    } catch (_) {
+      return null;
+    }
+  }
 
   let challenges = [];
   let userVotedId = null;
@@ -61,12 +82,13 @@ export function renderChallenges(container, callbacks) {
     isLoading = true;
     renderView();
 
-    if (isGuest || !activeLeagueId || !isConfigured) {
-      // Local Guest fallback mode. Challenges and the user's vote are
-      // persisted per matchday so they stay fixed while voting is open,
-      // and only get regenerated once a new matchday starts.
-      const challengesKey = `CF_GUEST_CHALLENGES_MD_${currentMatchday}`;
-      const votedKey = `CF_USER_VOTED_CHALLENGE_ID_MD_${currentMatchday}`;
+    if (!isConfigured) {
+      // Solo cuando Supabase ni siquiera está configurado (entorno local sin
+      // claves): retos falsos guardados en el propio navegador, para poder
+      // ver algo en desarrollo. Un visitante real en producción nunca pasa
+      // por aquí -- eso es justo lo que causaba el fallo original.
+      const challengesKey = `CF_LOCAL_CHALLENGES_MD_${currentMatchday}`;
+      const votedKey = `CF_LOCAL_VOTED_CHALLENGE_ID_MD_${currentMatchday}`;
 
       let storedChallenges = null;
       try {
@@ -77,7 +99,7 @@ export function renderChallenges(container, callbacks) {
         challenges = storedChallenges;
       } else {
         challenges = pickRandomChallenges(3).map((d, idx) => ({
-          id: `guest-${idx + 1}`,
+          id: `local-${idx + 1}`,
           title: d.title,
           desc: d.description,
           votes: 0
@@ -92,31 +114,40 @@ export function renderChallenges(container, callbacks) {
     }
 
     try {
-      const currentUser = supabase.auth.user ? supabase.auth.user() : (await supabase.auth.getUser()).data.user;
+      const leagueId = await resolveAnchorLeagueId();
+      if (!leagueId) {
+        challenges = [];
+        callbacks.showToast('No se pudieron cargar los retos de la semana. Inténtalo de nuevo en unos minutos.', 'error');
+        return;
+      }
 
-      // 1. Fetch challenges from Supabase for this matchday. Ordered by
-      // created_at so that, combined with the slice(0, 3) below, every
-      // client converges on the same 3 challenges even if a race condition
-      // ever left extra rows for this matchday (see seeding step below).
+      const currentUser = isGuest ? null : (supabase.auth.user ? supabase.auth.user() : (await supabase.auth.getUser()).data.user);
+
+      // 1. Fetch this matchday's global challenges. Ordered by created_at so
+      // that, combined with the slice(0, 3) below, every client converges on
+      // the same 3 challenges even if a race condition ever left extra rows
+      // behind (see seeding step below).
       let { data: remoteChallenges, error: chalErr } = await supabase
         .from('weekly_challenges')
         .select('*')
-        .eq('league_id', activeLeagueId)
+        .eq('league_id', leagueId)
         .eq('matchday_number', currentMatchday)
         .order('created_at', { ascending: true });
 
       if (chalErr) throw chalErr;
 
       // Seed random challenges from the pool if empty for this matchday,
-      // avoiding whatever this league picked last matchday so it doesn't
-      // repeat back-to-back.
-      if (!remoteChallenges || remoteChallenges.length === 0) {
+      // avoiding last matchday's picks so the same trio doesn't repeat
+      // back-to-back. Only logged-in users can seed (RLS requires
+      // authenticated) -- a guest who's first to arrive just sees an empty
+      // state until any real user's visit seeds it.
+      if ((!remoteChallenges || remoteChallenges.length === 0) && !isGuest) {
         let previousTitles = [];
         try {
           const { data: previous } = await supabase
             .from('weekly_challenges')
             .select('title')
-            .eq('league_id', activeLeagueId)
+            .eq('league_id', leagueId)
             .eq('matchday_number', currentMatchday - 1);
           previousTitles = (previous || []).map(p => p.title);
         } catch (_) {}
@@ -124,7 +155,7 @@ export function renderChallenges(container, callbacks) {
         const seedDares = pickRandomChallenges(3, previousTitles);
 
         const insertList = seedDares.map(d => ({
-          league_id: activeLeagueId,
+          league_id: leagueId,
           matchday_number: currentMatchday,
           title: d.title,
           description: d.description
@@ -136,14 +167,14 @@ export function renderChallenges(container, callbacks) {
           .select();
 
         if (!insertErr && inserted) {
-          // Another tab/teammate may have seeded at the exact same moment
-          // (two clients both saw 0 rows and both inserted 3). Re-fetch
-          // instead of trusting our own insert, so every client ends up
-          // looking at the same set instead of a random half of 6 rows.
+          // Another visitor may have seeded at the exact same moment (two
+          // clients both saw 0 rows and both inserted 3). Re-fetch instead
+          // of trusting our own insert, so every client ends up looking at
+          // the same set instead of a random half of 6 rows.
           const { data: afterInsert } = await supabase
             .from('weekly_challenges')
             .select('*')
-            .eq('league_id', activeLeagueId)
+            .eq('league_id', leagueId)
             .eq('matchday_number', currentMatchday)
             .order('created_at', { ascending: true });
           remoteChallenges = (afterInsert && afterInsert.length > 0) ? afterInsert : inserted;
@@ -157,7 +188,7 @@ export function renderChallenges(container, callbacks) {
       // race condition left extra rows behind for this matchday.
       challenges = (remoteChallenges || []).slice(0, 3);
 
-      // 2. Fetch all votes for these challenges
+      // 2. Fetch all votes for these challenges (global, across every user)
       if (challenges.length > 0) {
         const challengeIds = challenges.map(c => c.id);
         const { data: votesList, error: votesErr } = await supabase
@@ -215,7 +246,7 @@ export function renderChallenges(container, callbacks) {
 
     if (!isConfigured) {
       userVotedId = challengeId;
-      localStorage.setItem(`CF_USER_VOTED_CHALLENGE_ID_MD_${currentMatchday}`, challengeId);
+      localStorage.setItem(`CF_LOCAL_VOTED_CHALLENGE_ID_MD_${currentMatchday}`, challengeId);
       callbacks.showToast('Voto local registrado (Demo)', 'success');
       loadData();
       return;

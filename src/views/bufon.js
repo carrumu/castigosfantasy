@@ -117,50 +117,19 @@ export function renderBufon(container, callbacks) {
     }
 
     try {
-      if (!isGuest) {
-        // 1. Resolve a single global league container in the database (ordered by created_at)
-        const { data: leagues, error: leagueErr } = await supabase
-          .from('leagues')
-          .select('id, name, jester_voting_start')
-          .order('created_at', { ascending: true })
-          .limit(1);
+      // Resolve the global content anchor: a dedicated system league nobody
+      // belongs to, used only so these tables have a real league_id to
+      // satisfy their FK. It used to be "whichever league is oldest",
+      // queried straight from `leagues` -- but that table's own RLS only
+      // lets each user see leagues THEY belong to, so every user's "oldest
+      // league I can see" silently pointed at a DIFFERENT row and El Bufón
+      // was never actually shared across everyone. This RPC just hands back
+      // a fixed id, unaffected by leagues' membership-gated RLS.
+      const { data: anchorId, error: anchorErr } = await supabase.rpc('get_global_content_league_id');
+      if (anchorErr || !anchorId) throw anchorErr || new Error('No se pudo resolver el ancla global');
 
-        if (leagueErr) throw leagueErr;
-
-        if (!leagues || leagues.length === 0) {
-          forceDemoMode = true;
-          loadDemoData();
-          return;
-        }
-
-        activeLeagueId = leagues[0].id;
-        currentLeagueName = leagues[0].name;
-        votingStartTime = leagues[0].jester_voting_start;
-      } else {
-        const { data: histData } = await supabase
-          .from('jester_history')
-          .select('league_id')
-          .order('matchday_number', { ascending: false })
-          .limit(1);
-
-        const { data: nomData } = await supabase
-          .from('jester_nominees')
-          .select('league_id, created_at')
-          .order('created_at', { ascending: true });
-
-        if (nomData && nomData.length > 0) {
-          activeLeagueId = nomData[0].league_id;
-          votingStartTime = nomData[0].created_at;
-        } else if (histData && histData.length > 0) {
-          activeLeagueId = histData[0].league_id;
-          votingStartTime = null;
-        } else {
-          forceDemoMode = true;
-          loadDemoData();
-          return;
-        }
-        currentLeagueName = 'Global';
-      }
+      activeLeagueId = anchorId;
+      currentLeagueName = 'Global';
 
       // Resolve the real current LaLiga matchday from the shared calendar
       // (the same source Retos/challenges use) instead of Bufón's own
@@ -229,6 +198,16 @@ export function renderBufon(container, callbacks) {
         nominated_by: n.nominated_by,
         created_at: n.created_at
       }));
+
+      // La votación empieza con la primera nominación de la jornada. Antes
+      // se guardaba aparte en leagues.jester_voting_start, pero esa columna
+      // solo la puede actualizar quien creó la liga -- y la liga ancla
+      // global no la creó nadie (created_by es NULL a propósito), así que
+      // ese UPDATE jamás habría funcionado. Se deriva del propio dato real
+      // en vez de mantener un timestamp aparte que podía desincronizarse.
+      votingStartTime = nominees.length > 0
+        ? nominees.reduce((min, n) => (!min || n.created_at < min) ? n.created_at : min, null)
+        : null;
 
       // 3. Load history
       const { data: historyData, error: historyErr } = await supabase
@@ -408,18 +387,9 @@ export function renderBufon(container, callbacks) {
         throw nomErr;
       }
 
-      // 2. If it's the first nominee of the matchday, update voting start time in leagues table
-      if (nominees.length === 0 && !votingStartTime) {
-        const start = new Date().toISOString();
-        const { error: leagueErr } = await supabase
-          .from('leagues')
-          .update({ jester_voting_start: start })
-          .eq('id', activeLeagueId);
-        
-        if (leagueErr) {
-          console.warn("Could not update voting start time:", leagueErr);
-        }
-      }
+      // votingStartTime ya no se guarda aparte: loadLeagueData() la deriva
+      // de la propia nominación que se acaba de insertar (created_at de la
+      // más antigua de la jornada), así que no hace falta tocar `leagues`.
 
       callbacks.showToast("Nominado añadido a la jornada", "success");
       await loadData();
@@ -437,59 +407,14 @@ export function renderBufon(container, callbacks) {
   // knows to reload.
   async function maybeAutoCloseMatchday() {
     try {
-      if (nominees.length === 0) {
-        // Nothing to crown — just clear the stale window so the next
-        // nomination opens a fresh one anchored to the following Monday.
-        await supabase.from('leagues').update({ jester_voting_start: null }).eq('id', activeLeagueId);
-        return true;
-      }
-
-      let winner = nominees[0];
-      nominees.forEach(n => {
-        if (n.votes > winner.votes) {
-          winner = n;
-        }
-      });
-
-      // 1. Add winner to history. Unique (league_id, matchday_number) means
-      // that if another visitor's browser already closed this matchday,
-      // this insert fails and we back off instead of double-closing.
-      const { error: histErr } = await supabase
-        .from('jester_history')
-        .insert({
-          league_id: activeLeagueId,
-          matchday_number: currentMatchday,
-          name: winner.name,
-          team: winner.team,
-          reason: winner.reason,
-          raffle_winner: null,
-          raffle_player: null
-        });
-
-      if (histErr) {
-        if (histErr.code === '23505') return true;
-        throw histErr;
-      }
-
-      // 2. Delete nominees for this matchday (which cascades to votes)
-      const { error: delErr } = await supabase
-        .from('jester_nominees')
-        .delete()
-        .eq('league_id', activeLeagueId)
-        .eq('matchday_number', currentMatchday);
-
-      if (delErr) throw delErr;
-
-      // 3. Reset voting start time — the next matchday number resolves on
-      // its own from the shared calendar on the next load, nothing to
-      // increment here anymore.
-      const { error: leagueErr } = await supabase
-        .from('leagues')
-        .update({ jester_voting_start: null })
-        .eq('id', activeLeagueId);
-
-      if (leagueErr) throw leagueErr;
-
+      // Cualquier visitante puede ser quien dispare este cierre (no un
+      // admin), y con las nominaciones globales cada uno solo puede borrar
+      // las suyas -- no las de los demás. Por eso el cierre entero vive en
+      // una función del servidor (close_global_jester_matchday): calcula el
+      // ganador real a partir de los votos y borra TODOS los nominados de
+      // la jornada de una vez, sin depender de los permisos de quien llama.
+      const { error } = await supabase.rpc('close_global_jester_matchday', { p_matchday: currentMatchday });
+      if (error) throw error;
       return true;
     } catch (err) {
       console.error("Error auto-closing Bufón matchday:", err);

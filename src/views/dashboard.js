@@ -83,11 +83,18 @@ export function renderDashboard(container, callbacks) {
       const currentUser = supabase.auth.user ? supabase.auth.user() : (await supabase.auth.getUser()).data.user;
       currentUserId = currentUser ? currentUser.id : null;
 
-      // 1. Fetch user's leagues memberships
+      // 1. Fetch user's leagues memberships. Ordered so the "first" league
+      // (the fallback below, when there's no stored active league) is
+      // deterministic instead of whatever order Postgres feels like handing
+      // back — otherwise a user in 2+ leagues could land on a different one
+      // each time this runs unordered, and every league-scoped view
+      // (Reto Semanal included) would look like its data "changes" for no
+      // reason.
       const { data: userLeagues, error: leaguesErr } = await supabase
         .from('league_members')
         .select('league_id')
-        .eq('profile_id', currentUser.id);
+        .eq('profile_id', currentUser.id)
+        .order('league_id', { ascending: true });
 
       if (leaguesErr) throw leaguesErr;
 
