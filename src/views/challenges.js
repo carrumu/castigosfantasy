@@ -51,12 +51,64 @@ export function renderChallenges(container, callbacks) {
   }
 
   let challenges = [];
+  let history = [];
   let userVotedId = null;
   let currentMatchday = 5;
   let isLoading = true;
   let matchdayClosingTime = null;
   let isVotingClosed = false;
   let countdownInterval = null;
+
+  /**
+   * Retos ganadores de jornadas ya cerradas. No hace falta una tabla propia
+   * de historial (como jester_history): weekly_challenges nunca se borra,
+   * así que basta con mirar las jornadas anteriores a la actual y, de cada
+   * una, quedarse con el reto más votado.
+   */
+  async function loadChallengeHistory(leagueId) {
+    try {
+      const { data: pastChallenges, error } = await supabase
+        .from('weekly_challenges')
+        .select('id, matchday_number, title, description')
+        .eq('league_id', leagueId)
+        .lt('matchday_number', currentMatchday)
+        .order('matchday_number', { ascending: false });
+
+      if (error || !pastChallenges || pastChallenges.length === 0) {
+        history = [];
+        return;
+      }
+
+      const ids = pastChallenges.map(c => c.id);
+      const { data: votesList } = await supabase
+        .from('challenge_votes')
+        .select('challenge_id')
+        .in('challenge_id', ids);
+
+      const voteCounts = {};
+      (votesList || []).forEach(v => {
+        voteCounts[v.challenge_id] = (voteCounts[v.challenge_id] || 0) + 1;
+      });
+
+      const byMatchday = new Map();
+      pastChallenges.forEach(c => {
+        const withVotes = { ...c, votes: voteCounts[c.id] || 0 };
+        const bucket = byMatchday.get(c.matchday_number) || [];
+        bucket.push(withVotes);
+        byMatchday.set(c.matchday_number, bucket);
+      });
+
+      history = Array.from(byMatchday.entries())
+        .map(([matchday, list]) => {
+          const winner = [...list].sort((a, b) => b.votes - a.votes)[0];
+          return { matchday, title: winner.title, desc: winner.description, votes: winner.votes };
+        })
+        .sort((a, b) => b.matchday - a.matchday);
+    } catch (e) {
+      console.error('Error loading challenge history:', e);
+      history = [];
+    }
+  }
 
   async function loadMatchday() {
     if (isConfigured) {
@@ -120,6 +172,10 @@ export function renderChallenges(container, callbacks) {
         callbacks.showToast('No se pudieron cargar los retos de la semana. Inténtalo de nuevo en unos minutos.', 'error');
         return;
       }
+
+      // No bloquea la carga de los retos de esta jornada: si falla, el
+      // historial simplemente se queda vacío.
+      loadChallengeHistory(leagueId).then(() => renderView());
 
       const currentUser = isGuest ? null : (supabase.auth.user ? supabase.auth.user() : (await supabase.auth.getUser()).data.user);
 
@@ -420,11 +476,29 @@ export function renderChallenges(container, callbacks) {
               </p>
             </div>
 
-            <!-- Historial de Retos (Predefined fallback) -->
+            <!-- Historial de Retos: el más votado de cada jornada ya cerrada -->
             <div class="card glass">
               <h3 class="card-title" style="font-size: 1.05rem; margin-bottom: 1rem;">Historial de Penitencias</h3>
               <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-                <p style="color: var(--text-muted); font-size: 0.85rem; font-style: italic; padding: 0.5rem 0;">No hay retos pasados todavía.</p>
+                ${history.length === 0 ? `
+                  <p style="color: var(--text-muted); font-size: 0.85rem; font-style: italic; padding: 0.5rem 0;">No hay retos pasados todavía.</p>
+                ` : history.map(h => `
+                  <div style="
+                    border: 1px solid var(--border-color);
+                    background: rgba(0,0,0,0.15);
+                    border-left: 3px solid var(--accent);
+                    border-radius: 0 10px 10px 0;
+                    padding: 0.85rem 1rem;
+                    font-size: 0.85rem;
+                  ">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                      <strong style="color: var(--accent);">Jornada ${h.matchday}</strong>
+                      <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700;">${h.votes} voto${h.votes === 1 ? '' : 's'}</span>
+                    </div>
+                    <h4 style="font-size: 0.95rem; font-weight: 800; margin-bottom: 0.15rem; color: var(--text-light);">${escapeHTML(h.title)}</h4>
+                    <p style="font-size: 0.78rem; color: var(--text-muted); margin: 0;">${escapeHTML(h.desc)}</p>
+                  </div>
+                `).join('')}
               </div>
             </div>
           </div>
