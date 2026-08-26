@@ -1,6 +1,5 @@
 import { LALIGA_TOPICS_DB } from '../utils/topics-db.js';
 import { escapeHTML } from '../utils/security.js';
-import { buildMarketValueTopics } from '../utils/dynamic-value-topics.js';
 
 const STATS_KEY = 'CF_DUELO_STATS';
 const REVEAL_MS = 1600;
@@ -54,13 +53,20 @@ function toRankingTopic(t) {
 }
 
 /**
- * Combines the static topic set with live market-value rankings (same source
- * "LaLiga Top 10" uses), filtered down to genuine numeric rankings.
+ * Builds the ranking topic set, filtered down to genuine numeric rankings.
  * Deduplicates by the actual set of names in each topic — not just by
  * title — since the bundled dataset has some topics repeated under
  * slightly different titles/badges with identical content.
+ *
+ * Deliberately static-only: this used to also mix in live market-value
+ * rankings (same source "LaLiga Top 10" uses), but football_players is a
+ * one-off manual import with no refresh process behind it (see the
+ * 20260824210000 migration) — good enough for "top N right now" lists
+ * where staleness barely shows, but a duel states a number as fact and
+ * asking "¿más o menos?" about a market value from weeks ago, mid transfer
+ * window, risks being flat wrong.
  */
-async function buildTopics() {
+function buildTopics() {
   const out = [];
   const seenSignatures = new Set();
 
@@ -74,13 +80,6 @@ async function buildTopics() {
   };
 
   LALIGA_TOPICS_DB.forEach(addIfNew);
-
-  try {
-    const { topics: dynamicTopics } = await buildMarketValueTopics();
-    dynamicTopics.forEach(addIfNew);
-  } catch (_) {
-    // Live data unavailable — the static topics are still enough to play.
-  }
 
   return out;
 }
@@ -126,7 +125,7 @@ export async function renderDuelo(container, callbacks) {
     </div>
   `;
 
-  const topics = await buildTopics();
+  const topics = buildTopics();
   let stats = loadStats();
 
   let streak = 0;
