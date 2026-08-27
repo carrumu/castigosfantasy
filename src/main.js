@@ -3,28 +3,14 @@ import { supabase, isConfigured, clearSupabaseConfig } from './supabase';
 import { setSEO } from './utils/seo';
 import { adSlotHtml, mountAd } from './utils/ads.js';
 import { checkAndNotifyNewUser } from './utils/email';
-import { renderAuth } from './views/auth';
-import { renderDashboard } from './views/dashboard';
-import { renderRoulette } from './views/roulette';
-import { renderChallenges } from './views/challenges';
-import { renderMinigame } from './views/minigame';
-import { renderJuegos } from './views/juegos';
-import { renderBufon } from './views/bufon';
-import { renderLanding } from './views/landing';
-import { renderSelectLeague } from './views/select-league';
-import { renderLeagueHub } from './views/league-hub';
-import { renderGenerator } from './views/generator';
-import { renderComunidad } from './views/comunidad';
-import { renderForo } from './views/foro';
-import { renderHerramientas } from './views/herramientas';
-import { renderTop10 } from './views/top10';
-import { renderDuelo } from './views/duelo';
-import { renderOnce11 } from './views/once11';
-import { renderMuro } from './views/muro';
-import { renderPlayersHub } from './views/players_hub';
-import { renderLegal } from './views/legal';
+// El resto de vistas se cargan bajo demanda (import() dinamico) dentro del
+// dispatch de renderMainLayout, para no meter el bundle entero (juegos,
+// foro, ligas...) en la carga inicial de cualquier ruta -- ver el aviso de
+// build "Some chunks are larger than 500 kB". guias y seo-home se quedan
+// estaticas: son la home real (SEO) y el hub de guias, el primer contenido
+// que ve la mayoria de las visitas nuevas, asi que no hay nada que ganar
+// retrasandolas.
 import { renderSeoHome, removeFaqSchema } from './views/seo-home';
-import { renderAbout, renderContacto } from './views/about';
 import { renderGuias, getGuideBySlug } from './views/guias';
 import { getAuthIntent, setAuthIntent, clearAuthIntent, INTENT_CREATE_LEAGUE } from './utils/auth-intent';
 
@@ -95,10 +81,10 @@ async function checkAuthAndRender() {
     return;
   }
 
-  renderMainLayout(isGuest, user);
+  await renderMainLayout(isGuest, user);
 }
 
-function renderMainLayout(isGuest, currentUser = null) {
+async function renderMainLayout(isGuest, currentUser = null) {
   app.innerHTML = `
     <div class="app-layout">
       <!-- Contenedor de Contenido Principal -->
@@ -246,6 +232,7 @@ function renderMainLayout(isGuest, currentUser = null) {
   if (currentView === 'inicio') {
     if (currentUser) {
       // Logged-in users get the app landing.
+      const { renderLanding } = await import('./views/landing');
       renderLanding(viewContainer, {
         onNavigate: navigate,
         showToast
@@ -260,6 +247,7 @@ function renderMainLayout(isGuest, currentUser = null) {
     // Quien llegó pulsando "Crea tu liga gratis" no tiene cuenta: se le abre el
     // registro y, al terminar, se le lleva a crear la liga que vino a crear.
     const wantsLeague = getAuthIntent() === INTENT_CREATE_LEAGUE;
+    const { renderAuth } = await import('./views/auth');
     renderAuth(viewContainer, {
       initialMode: wantsLeague ? 'signup' : 'login',
       intentNote: wantsLeague
@@ -269,84 +257,100 @@ function renderMainLayout(isGuest, currentUser = null) {
       showToast
     });
   } else if (currentView === 'mis-ligas') {
+    const { renderSelectLeague } = await import('./views/select-league');
     renderSelectLeague(viewContainer, {
       isGuest,
       onNavigate: navigate,
       showToast
     });
   } else if (currentView === 'menu-liga') {
+    const { renderLeagueHub } = await import('./views/league-hub');
     renderLeagueHub(viewContainer, {
       isGuest,
       onNavigate: navigate,
       showToast
     });
   } else if (currentView === 'muro') {
+    const { renderDashboard } = await import('./views/dashboard');
     renderDashboard(viewContainer, {
       isGuest,
       onNavigate: navigate,
       showToast
     });
   } else if (currentView === 'herramientas') {
+    const { renderHerramientas } = await import('./views/herramientas');
     renderHerramientas(viewContainer, {
       onNavigate: navigate
     });
   } else if (currentView === 'ruleta') {
+    const { renderRoulette } = await import('./views/roulette');
     renderRoulette(viewContainer, {
       isGuest,
       onNavigate: navigate,
       showToast
     });
   } else if (currentView === 'retos') {
+    const { renderChallenges } = await import('./views/challenges');
     renderChallenges(viewContainer, {
       isGuest,
       onNavigate: navigate,
       showToast
     });
   } else if (currentView === 'juegos') {
+    const { renderJuegos } = await import('./views/juegos');
     renderJuegos(viewContainer, {
       onNavigate: navigate
     });
   } else if (currentView === 'adivina-jugador') {
+    const { renderMinigame } = await import('./views/minigame');
     renderMinigame(viewContainer, {
       showToast
     });
   } else if (currentView === 'top-10') {
+    const { renderTop10 } = await import('./views/top10');
     renderTop10(viewContainer, {
       onNavigate: navigate,
       showToast
     });
   } else if (currentView === 'duelo') {
+    const { renderDuelo } = await import('./views/duelo');
     renderDuelo(viewContainer, {
       onNavigate: navigate,
       showToast
     });
   } else if (currentView === 'once-del-dia') {
+    const { renderOnce11 } = await import('./views/once11');
     renderOnce11(viewContainer, {
       onNavigate: navigate,
       showToast
     });
   } else if (currentView === 'jugadores') {
+    const { renderPlayersHub } = await import('./views/players_hub');
     renderPlayersHub(viewContainer, {
       onNavigate: navigate,
       showToast
     });
   } else if (currentView === 'bufon') {
+    const { renderBufon } = await import('./views/bufon');
     renderBufon(viewContainer, {
       isGuest,
       onNavigate: navigate,
       showToast
     });
   } else if (currentView === 'generador') {
+    const { renderGenerator } = await import('./views/generator');
     renderGenerator(viewContainer, {
       onNavigate: navigate,
       showToast
     });
   } else if (currentView === 'comunidad') {
+    const { renderComunidad } = await import('./views/comunidad');
     renderComunidad(viewContainer, {
       onNavigate: navigate,
       showToast
     });
   } else if (currentView === 'foro') {
+    const { renderForo } = await import('./views/foro');
     renderForo(viewContainer, {
       isGuest,
       currentUser: currentUser,
@@ -354,19 +358,23 @@ function renderMainLayout(isGuest, currentUser = null) {
       showToast
     });
   } else if (currentView === 'muro-verguenza') {
+    const { renderMuro } = await import('./views/muro');
     renderMuro(viewContainer, {
       isGuest,
       onNavigate: navigate,
       showToast
     });
   } else if (currentView === 'privacidad' || currentView === 'cookies' || currentView === 'terminos') {
+    const { renderLegal } = await import('./views/legal');
     renderLegal(viewContainer, {
       page: currentView,
       onNavigate: navigate
     });
   } else if (currentView === 'sobre-nosotros') {
+    const { renderAbout } = await import('./views/about');
     renderAbout(viewContainer, { onNavigate: navigate });
   } else if (currentView === 'contacto') {
+    const { renderContacto } = await import('./views/about');
     renderContacto(viewContainer, { onNavigate: navigate });
   } else if (currentView === 'guias') {
     renderGuias(viewContainer, { onNavigate: navigate, slug: currentGuideSlug });
