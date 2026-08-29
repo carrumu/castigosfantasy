@@ -369,15 +369,17 @@ export async function renderMinigame(container, callbacks) {
     if (key === 'ENTER') {
       if (currentGuess.length < secretPlayer.length) {
         callbacks.showToast(`El nombre debe tener ${secretPlayer.length} letras`, 'info');
+        showInlineMessage(`El nombre debe tener ${secretPlayer.length} letras`);
         shakeActiveRow();
         return;
       }
 
-      if (currentGuess !== secretPlayer && !LALIGA_PLAYERS.includes(currentGuess)) {
-        callbacks.showToast('Ese nombre no está en la lista', 'info');
-        shakeActiveRow();
-        return;
-      }
+      // Se acepta cualquier combinación de letras de la longitud correcta,
+      // como en un Wordle normal -- antes solo se admitía un nombre exacto
+      // de LALIGA_PLAYERS (el top 200 por valor de mercado del momento), y
+      // cualquier jugador real fuera de esa lista concreta (uno menos
+      // valioso, uno ya retirado...) se rechazaba sin más explicación que
+      // una sacudida de 0.25s.
 
       // Submit guess
       guesses.push(currentGuess);
@@ -416,6 +418,21 @@ export async function renderMinigame(container, callbacks) {
         updateActiveRowHTML();
       }
     }
+  }
+
+  // Aviso inline de intento rechazado. No usa callbacks.showToast: los toasts
+  // estan desactivados globalmente, y sin un aviso propio aqui el rechazo no
+  // tenia ninguna señal visible salvo la sacudida de la fila.
+  let inlineMsgTimeout = null;
+  function showInlineMessage(text) {
+    const el = container.querySelector('#wordle-inline-msg');
+    if (!el) return;
+    el.textContent = text;
+    el.style.opacity = '1';
+    clearTimeout(inlineMsgTimeout);
+    inlineMsgTimeout = setTimeout(() => {
+      el.style.opacity = '0';
+    }, 2200);
   }
 
   // Animation: shake the current row if input length is too short
@@ -730,6 +747,16 @@ export async function renderMinigame(container, callbacks) {
             </div>
           </div>
         </div>
+
+        <!-- Aviso de intento rechazado (nombre corto o no reconocido). Los
+             toasts globales estan desactivados en toda la app, asi que sin
+             esto un intento rechazado no daba ninguna señal visible mas
+             alla de una sacudida de 0.25s facil de no ver -- parecia que
+             "no pasaba nada" al darle a Enter. -->
+        <p id="wordle-inline-msg" style="
+          min-height: 1.1rem; text-align: center; font-size: 0.85rem; font-weight: 800;
+          color: var(--danger); margin: 0 0 0.5rem; opacity: 0; transition: opacity 0.15s ease;
+        "></p>
 
         <!-- Banner de partida terminada -->
         ${gameStatus !== 'IN_PROGRESS' ? `
