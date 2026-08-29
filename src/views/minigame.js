@@ -78,20 +78,39 @@ export async function renderMinigame(container, callbacks) {
     <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>
   `;
 
+  // Los 20 equipos reales de LaLiga EA Sports 2026/27 (temporada que empezó
+  // el 15 de agosto de 2026), no la lista mas amplia de "clubes de LaLiga en
+  // temporadas recientes" que se usa en otros sitios de la app (top10.js,
+  // autocompletado...) para busquedas. football_players no distingue
+  // temporada ni "activo ahora mismo", asi que sin este filtro el secreto
+  // del dia podia salir de un club ya descendido (Oviedo, Mallorca, Girona)
+  // -- un jugador real, pero "retro" para quien juega pensando en esta
+  // temporada. Ascendidos esta temporada: Deportivo, Racing de Santander,
+  // Malaga. Fuente: es.wikipedia.org/wiki/Primera_División_de_España_2026-27
+  const CURRENT_LALIGA_CLUBS_2026_27 = [
+    'Deportivo Alavés', 'Athletic Club', 'Atlético de Madrid', 'FC Barcelona',
+    'Real Betis Balompié', 'RC Celta de Vigo', 'RC Deportivo de La Coruña',
+    'Elche CF', 'RCD Espanyol', 'Getafe CF', 'Levante UD', 'Málaga CF',
+    'CA Osasuna', 'Real Racing Club de Santander', 'Rayo Vallecano',
+    'Real Madrid CF', 'Real Sociedad', 'Sevilla FC', 'Valencia CF', 'Villarreal CF'
+  ];
+
   let dynamicPlayers = [];
 
   try {
-    const { data, error } = await supabase.from('football_players').select('name, market_value');
+    const { data, error } = await supabase.from('football_players').select('name, market_value, club');
     if (!error && data && data.length > 0) {
-      // 1. Parse market value
-      const parsedData = data.map(p => ({
-        ...p,
-        valNum: parseMarketValue(p.market_value)
-      }));
-      
+      // 1. Solo clubes de la LaLiga actual, y parseo del valor de mercado
+      const parsedData = data
+        .filter(p => CURRENT_LALIGA_CLUBS_2026_27.includes(p.club))
+        .map(p => ({
+          ...p,
+          valNum: parseMarketValue(p.market_value)
+        }));
+
       // 2. Sort by market value desc
       parsedData.sort((a, b) => b.valNum - a.valNum);
-      
+
       // 3. Take top 200 players and extract Wordle names
       const top200 = parsedData.slice(0, 200);
       
