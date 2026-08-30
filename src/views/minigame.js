@@ -2,6 +2,7 @@ import { supabase } from '../supabase';
 import { resolveDailyChallenge } from '../utils/daily-challenge';
 import { SITE_URL } from '../utils/site';
 import { adSlotHtml, mountAd } from '../utils/ads.js';
+import { fetchAllFootballPlayers, parseMarketValue } from '../utils/dynamic-value-topics.js';
 
 /**
  * Helper to remove accents and special characters
@@ -15,18 +16,6 @@ function normalizeString(str) {
     .replace(/Ø/g, "O")
     .toUpperCase()
     .trim();
-}
-
-/**
- * Helper to parse market value strings like "€150.00m" or "€500k" to numbers
- */
-function parseMarketValue(valStr) {
-  if (!valStr || valStr === '-') return 0;
-  let numStr = valStr.replace('€', '').replace('m', '').replace('k', '').trim();
-  let num = parseFloat(numStr);
-  if (valStr.includes('m')) return num * 1000000;
-  if (valStr.includes('k')) return num * 1000;
-  return num;
 }
 
 /**
@@ -99,8 +88,8 @@ export async function renderMinigame(container, callbacks) {
   let dynamicPlayers = [];
 
   try {
-    const { data, error } = await supabase.from('football_players').select('name, market_value, club');
-    if (!error && data && data.length > 0) {
+    const data = await fetchAllFootballPlayers('name, market_value, club');
+    if (data && data.length > 0) {
       // 1. Solo clubes de la LaLiga actual, y parseo del valor de mercado
       const parsedData = data
         .filter(p => CURRENT_LALIGA_CLUBS_2026_27.includes(p.club))

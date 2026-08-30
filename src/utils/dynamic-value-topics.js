@@ -1,12 +1,50 @@
 ﻿import { supabase } from '../supabase';
 
-function parseMarketValue(valStr) {
+/**
+ * football_players.market_value viene en formato español de Transfermarkt:
+ * "80,00 mill. €" (millones, coma decimal) o "700 mil €" (miles). Antes se
+ * decidía la unidad mirando si el texto contenía la letra "m" -- pero "mil"
+ * también la tiene, así que un jugador de "700 mil €" (700.000) se leía
+ * como 700 millones, mil veces su valor real, y colaba a jugadores baratos
+ * como si fueran los más valiosos de la liga. Ahora se busca la palabra
+ * completa: "mill" para millones, "mil" como palabra suelta para miles.
+ */
+export function parseMarketValue(valStr) {
   if (!valStr || valStr === '-') return 0;
-  let numStr = valStr.replace('€', '').replace('m', '').replace('k', '').trim();
-  let num = parseFloat(numStr);
-  if (valStr.includes('m')) return num * 1000000;
-  if (valStr.includes('k')) return num * 1000;
+  const cleaned = valStr.replace('€', '').trim();
+  const num = parseFloat(cleaned.replace(',', '.'));
+  if (!Number.isFinite(num)) return 0;
+  if (/mill/i.test(cleaned)) return num * 1000000;
+  if (/\bmil\b/i.test(cleaned)) return num * 1000;
   return num;
+}
+
+/**
+ * football_players tiene 7773 filas, pero PostgREST corta cualquier
+ * select() sin paginar en 1000 -- un simple .select('*') se quedaba con
+ * las primeras 1000 (en el orden que sea, no por valor), así que jugadores
+ * reales como Cubarsí o Varane ni llegaban a cargarse, y el "top 10 más
+ * valioso" salía de ese trozo incompleto en vez de la tabla entera. Se pide
+ * en páginas de 1000 hasta agotar la tabla. Compartida para que
+ * minigame.js (el secreto diario del Wordle también sale de esta tabla) no
+ * duplique el mismo fallo por su cuenta.
+ */
+export async function fetchAllFootballPlayers(columns = '*') {
+  const pageSize = 1000;
+  let all = [];
+  let from = 0;
+  while (true) {
+    const { data, error } = await supabase
+      .from('football_players')
+      .select(columns)
+      .range(from, from + pageSize - 1);
+    if (error) throw error;
+    if (!data || data.length === 0) break;
+    all = all.concat(data);
+    if (data.length < pageSize) break;
+    from += pageSize;
+  }
+  return all;
 }
 
 function normalizeStr(str) {
@@ -25,8 +63,8 @@ function normalizeStr(str) {
  */
 export async function buildMarketValueTopics() {
   try {
-    const { data, error } = await supabase.from('football_players').select('*');
-    if (error || !data || data.length === 0) return { topics: [], players: [] };
+    const data = await fetchAllFootballPlayers();
+    if (!data || data.length === 0) return { topics: [], players: [] };
 
     const parsedData = data.map(p => ({
       ...p,
