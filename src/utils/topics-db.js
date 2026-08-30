@@ -1,6 +1,86 @@
 // Automatically generated topics database with 105 tests
 export const LALIGA_TOPICS_DB = [
   {
+    "title": "Traspasos Más Caros de la Historia del Fútbol",
+    "badgeTitle": "TRASPASOS DEL MUNDO",
+    "answers": [
+      { "name": "Neymar", "info": "€222M — de FC Barcelona a PSG (2017)", "flag": "🇧🇷", "matches": ["neymar", "neymar jr", "neymar da silva"] },
+      { "name": "Kylian Mbappé", "info": "€180M — de AS Mónaco a PSG (2018)", "flag": "🇫🇷", "matches": ["kylian mbappe", "mbappe", "k. mbappe"] },
+      { "name": "Alexander Isak", "info": "€144,5M — de Newcastle a Liverpool (2025)", "flag": "🇸🇪", "matches": ["alexander isak", "isak"] },
+      { "name": "Philippe Coutinho", "info": "€135M — de Liverpool a FC Barcelona (2018)", "flag": "🇧🇷", "matches": ["philippe coutinho", "coutinho"] },
+      { "name": "Ousmane Dembélé", "info": "€135M — del Borussia Dortmund a FC Barcelona (2017)", "flag": "🇫🇷", "matches": ["ousmane dembele", "dembele", "dembélé"] },
+      { "name": "João Félix", "info": "€127,2M — del Benfica al Atlético de Madrid (2019)", "flag": "🇵🇹", "matches": ["joao felix", "joão félix", "felix"] },
+      { "name": "Yan Diomandé", "info": "€125M — del RB Leipzig al Real Madrid (2026)", "flag": "🇨🇮", "matches": ["yan diomande", "diomande", "diomandé"] },
+      { "name": "Eden Hazard", "info": "€121M — del Chelsea al Real Madrid (2019)", "flag": "🇧🇪", "matches": ["eden hazard", "hazard"] },
+      { "name": "Antoine Griezmann", "info": "€120M — del Atlético de Madrid a FC Barcelona (2019)", "flag": "🇫🇷", "matches": ["antoine griezmann", "griezmann"] },
+      { "name": "Jude Bellingham", "info": "€113M — del Borussia Dortmund al Real Madrid (2023)", "flag": "🇬🇧", "matches": ["jude bellingham", "bellingham"] }
+    ]
+  },
+  {
+    "title": "Traspasos Más Caros de la Historia de LaLiga",
+    "badgeTitle": "TRASPASOS DE LALIGA",
+    "answers": [
+      { "name": "Ousmane Dembélé", "info": "€135M — del Borussia Dortmund a FC Barcelona (2017)", "flag": "🇫🇷", "matches": ["ousmane dembele", "dembele", "dembélé"] },
+      { "name": "Philippe Coutinho", "info": "€135M — de Liverpool a FC Barcelona (2018)", "flag": "🇧🇷", "matches": ["philippe coutinho", "coutinho"] },
+      { "name": "João Félix", "info": "€127,2M — del Benfica al Atlético de Madrid (2019)", "flag": "🇵🇹", "matches": ["joao felix", "joão félix", "felix"] },
+      { "name": "Yan Diomandé", "info": "€125M — del RB Leipzig al Real Madrid (2026)", "flag": "🇨🇮", "matches": ["yan diomande", "diomande", "diomandé"] },
+      { "name": "Eden Hazard", "info": "€121M — del Chelsea al Real Madrid (2019)", "flag": "🇧🇪", "matches": ["eden hazard", "hazard"] },
+      { "name": "Antoine Griezmann", "info": "€120M — del Atlético de Madrid a FC Barcelona (2019)", "flag": "🇫🇷", "matches": ["antoine griezmann", "griezmann"] },
+      { "name": "Jude Bellingham", "info": "€113M — del Borussia Dortmund al Real Madrid (2023)", "flag": "🇬🇧", "matches": ["jude bellingham", "bellingham"] },
+      { "name": "Gareth Bale", "info": "€101M — del Tottenham al Real Madrid (2013)", "flag": "🇬🇧", "matches": ["gareth bale", "bale"] },
+      { "name": "Cristiano Ronaldo", "info": "€94M — del Manchester United al Real Madrid (2009)", "flag": "🇵🇹", "matches": ["cristiano ronaldo", "cristiano", "ronaldo", "cr7"] },
+      { "name": "Neymar", "info": "€88M — del Santos a FC Barcelona (2013)", "flag": "🇧🇷", "matches": ["neymar", "neymar jr", "neymar da silva"] }
+    ]
+  },
+  {
+    "title": "Traspasos Más Caros del Real Madrid",
+    "badgeTitle": "TRASPASOS R. MADRID",
+    "answers": [
+      { "name": "Yan Diomandé", "info": "€125M — del RB Leipzig (2026)", "flag": "🇨🇮", "matches": ["yan diomande", "diomande", "diomandé"] },
+      { "name": "Eden Hazard", "info": "€121M — del Chelsea (2019)", "flag": "🇧🇪", "matches": ["eden hazard", "hazard"] },
+      { "name": "Jude Bellingham", "info": "€113M — del Borussia Dortmund (2023)", "flag": "🇬🇧", "matches": ["jude bellingham", "bellingham"] },
+      { "name": "Gareth Bale", "info": "€101M — del Tottenham (2013)", "flag": "🇬🇧", "matches": ["gareth bale", "bale"] },
+      { "name": "Cristiano Ronaldo", "info": "€94M — del Manchester United (2009)", "flag": "🇵🇹", "matches": ["cristiano ronaldo", "cristiano", "ronaldo", "cr7"] },
+      { "name": "Aurélien Tchouaméni", "info": "€80M — del AS Mónaco (2022)", "flag": "🇫🇷", "matches": ["aurelien tchouameni", "tchouameni"] },
+      { "name": "Zinedine Zidane", "info": "€77,5M — de la Juventus (2001)", "flag": "🇫🇷", "matches": ["zinedine zidane", "zidane"] },
+      { "name": "James Rodríguez", "info": "€75M — del AS Mónaco (2014)", "flag": "🇨🇴", "matches": ["james rodriguez", "james"] },
+      { "name": "Kaká", "info": "€67M — del AC Milan (2009)", "flag": "🇧🇷", "matches": ["kaka"] },
+      { "name": "Luka Jović", "info": "€63M — del Eintracht Fráncfort (2019)", "flag": "🇷🇸", "matches": ["luka jovic", "jovic"] }
+    ]
+  },
+  {
+    "title": "Traspasos Más Caros del FC Barcelona",
+    "badgeTitle": "TRASPASOS BARÇA",
+    "answers": [
+      { "name": "Ousmane Dembélé", "info": "€135M — del Borussia Dortmund (2017)", "flag": "🇫🇷", "matches": ["ousmane dembele", "dembele", "dembélé"] },
+      { "name": "Philippe Coutinho", "info": "€135M — de Liverpool (2018)", "flag": "🇧🇷", "matches": ["philippe coutinho", "coutinho"] },
+      { "name": "Antoine Griezmann", "info": "€120M — del Atlético de Madrid (2019)", "flag": "🇫🇷", "matches": ["antoine griezmann", "griezmann"] },
+      { "name": "Neymar", "info": "€88M — del Santos (2013)", "flag": "🇧🇷", "matches": ["neymar", "neymar jr", "neymar da silva"] },
+      { "name": "Frenkie de Jong", "info": "€86M — del Ajax (2019)", "flag": "🇳🇱", "matches": ["frenkie de jong", "de jong"] },
+      { "name": "Luis Suárez", "info": "€81,7M — de Liverpool (2014)", "flag": "🇺🇾", "matches": ["luis suarez", "suarez"] },
+      { "name": "Zlatan Ibrahimović", "info": "€69,5M — del Inter de Milán (2009)", "flag": "🇸🇪", "matches": ["zlatan ibrahimovic", "ibrahimovic", "ibra"] },
+      { "name": "Dani Olmo", "info": "€61M — del RB Leipzig (2024)", "flag": "🇪🇸", "matches": ["dani olmo", "olmo"] },
+      { "name": "Miralem Pjanić", "info": "€60M — de la Juventus (2020)", "flag": "🇧🇦", "matches": ["miralem pjanic", "pjanic"] },
+      { "name": "Raphinha", "info": "€58M — del Leeds United (2022)", "flag": "🇧🇷", "matches": ["raphinha"] }
+    ]
+  },
+  {
+    "title": "Traspasos Más Caros del Atlético de Madrid",
+    "badgeTitle": "TRASPASOS ATLETI",
+    "answers": [
+      { "name": "João Félix", "info": "€127,2M — del Benfica (2019)", "flag": "🇵🇹", "matches": ["joao felix", "joão félix", "felix"] },
+      { "name": "Julián Álvarez", "info": "€75M — del Manchester City (2024)", "flag": "🇦🇷", "matches": ["julian alvarez", "alvarez"] },
+      { "name": "Thomas Lemar", "info": "€72M — del AS Mónaco (2018)", "flag": "🇫🇷", "matches": ["thomas lemar", "lemar"] },
+      { "name": "Diego Costa", "info": "€55M — del Chelsea, su regreso (2017)", "flag": "🇪🇸", "matches": ["diego costa", "costa"] },
+      { "name": "Conor Gallagher", "info": "€42M — del Chelsea (2024)", "flag": "🇬🇧", "matches": ["conor gallagher", "gallagher"] },
+      { "name": "Álex Baena", "info": "€40M — del Villarreal (2024)", "flag": "🇪🇸", "matches": ["alex baena", "baena"] },
+      { "name": "Radamel Falcao", "info": "€40M — del Porto (2011)", "flag": "🇨🇴", "matches": ["radamel falcao", "falcao"] },
+      { "name": "Vitolo", "info": "€35,6M — del Sevilla (2017)", "flag": "🇪🇸", "matches": ["vitolo"] },
+      { "name": "Rodrigo De Paul", "info": "€35M — del Udinese (2021)", "flag": "🇦🇷", "matches": ["rodrigo de paul", "de paul"] },
+      { "name": "Antoine Griezmann", "info": "€30M — de la Real Sociedad (2014)", "flag": "🇫🇷", "matches": ["antoine griezmann", "griezmann"] }
+    ]
+  },
+  {
     "title": "Máximos Goleadores Históricos de LaLiga",
     "badgeTitle": "GOLEADORES DE LALIGA",
     "answers": [

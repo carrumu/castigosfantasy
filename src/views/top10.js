@@ -4,7 +4,6 @@ import { LALIGA_TOPICS_DB } from '../utils/topics-db';
 import { LALIGA_PLAYERS_DB } from '../utils/players-db';
 import { escapeHTML } from '../utils/security';
 import { resolveDailyChallenge } from '../utils/daily-challenge';
-import { buildMarketValueTopics } from '../utils/dynamic-value-topics';
 import { SITE_URL } from '../utils/site';
 import { adSlotHtml, mountAd } from '../utils/ads.js';
 
@@ -74,15 +73,13 @@ export async function renderTop10(container, callbacks) {
     const title = (t.title || "").toLowerCase();
     return !title.includes("selección") && !title.includes("seleccion") && !title.includes("mundial") && !title.includes("eurocopa");
   });
+  // Antes esto sumaba topics generados en caliente a partir del valor de
+  // mercado (más valiosos de LaLiga, por posición, por club) usando
+  // football_players. A petición del usuario, esos topics de VALOR se han
+  // quitado; en su lugar los "Traspasos Más Caros..." son topics estáticos
+  // curados a mano dentro de LALIGA_TOPICS_DB (traspasos reales con su
+  // cuantía, no valor de mercado).
   let fetchedPlayers = [];
-
-  try {
-    const { topics: dynamicTopics, players } = await buildMarketValueTopics();
-    fetchedPlayers = players;
-    combinedTopics = [...combinedTopics, ...dynamicTopics];
-  } catch (err) {
-    console.error("Error generating dynamic topics:", err);
-  }
 
   let activeTopic = null; // Topic object from LALIGA_TOPICS_DB or dynamic
   let guessedIndices = new Set();
