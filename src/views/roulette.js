@@ -1,4 +1,5 @@
 import { supabase } from '../supabase';
+import { adSlotHtml, mountAd } from '../utils/ads.js';
 
 /**
  * Renders the Roulette screen (Wheel, Punishments list, Spin history).
@@ -553,6 +554,11 @@ export function renderRoulette(container, callbacks) {
               </p>
               <button class="btn-primary" id="confirm-result-btn">Aceptar Sentencia</button>
             </div>
+
+            <!-- Anuncio: aparece justo al terminar la tirada, aqui y no en
+                 cualquier parte de la pagina, porque girar la ruleta es con
+                 diferencia lo que mas interaccion tiene de toda la web. -->
+            ${adSlotHtml('ruleta-resultado')}
           </div>
         </div>
       </div>
@@ -952,6 +958,7 @@ export function renderRoulette(container, callbacks) {
         resModal.querySelector('#result-desc').innerText = winningPunishment.description || 'Cumple con el castigo en tu próxima cita.';
         resModal.querySelector('#result-loser').innerText = isCasualSpin ? 'Tirada Casual (Amigos)' : targetName;
         resModal.classList.add('active');
+        mountAd(resModal, 'ruleta-resultado');
       }
 
       setTimeout(() => {

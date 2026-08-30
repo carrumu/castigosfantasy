@@ -17,7 +17,22 @@ const CONSENT_KEY = 'CF_COOKIE_CONSENT';
 const ADSTERRA_KEY = '4bc03d4ff4ec8dcbc4ff1a912db0e38f';
 const ADSTERRA_SRC = `https://pl30802281.effectivecpmnetwork.com/${ADSTERRA_KEY}/invoke.js`;
 
-export const AD_CONTAINER_ID = `container-${ADSTERRA_KEY}`;
+/**
+ * El hueco global de main.js y el de dentro del modal de la Ruleta pueden
+ * coexistir en el DOM a la vez (el modal es una capa encima de la vista,
+ * no la sustituye), así que cada uno necesita su propio id de contenedor
+ * -- dos elementos con el mismo id es HTML invalido y hace que
+ * querySelector('#id') encuentre el que no toca. `instanceId` distingue
+ * uno de otro; solo el anuncio montado más recientemente queda con script
+ * activo (ver mountAd), pero eso no es un problema aquí: el hueco global
+ * queda tapado por el modal mientras este abierto.
+ */
+function adContainerId(instanceId) {
+  return `container-${ADSTERRA_KEY}${instanceId ? `-${instanceId}` : ''}`;
+}
+function bannerContainerId(instanceId) {
+  return `banner-${BANNER_KEY}${instanceId ? `-${instanceId}` : ''}`;
+}
 
 // Unidad "320x50_1". Formato clásico de Adsterra (atOptions + invoke.js), que
 // pinta el anuncio con document.write en el punto donde se ejecuta el script.
@@ -30,8 +45,6 @@ const BANNER_KEY = '9fc59475b4073c1a36a8c58d0faa4a4a';
 const BANNER_SRC = `https://www.highrevenueformat.com/${BANNER_KEY}/invoke.js`;
 const BANNER_WIDTH = 320;
 const BANNER_HEIGHT = 50;
-
-export const BANNER_CONTAINER_ID = `banner-${BANNER_KEY}`;
 
 /** ¿Ha aceptado el usuario las cookies de publicidad? */
 export function hasAdConsent() {
@@ -49,12 +62,12 @@ export function hasAdConsent() {
  * Va siempre en el marcado, aunque no haya consentimiento: así la página no
  * cambia de tamaño según lo que el usuario haya contestado.
  */
-export function adSlotHtml() {
+export function adSlotHtml(instanceId = '') {
   return `
     <div class="ad-slot" aria-hidden="true">
       <span class="ad-slot-label">Publicidad</span>
-      <div id="${AD_CONTAINER_ID}"></div>
-      <div id="${BANNER_CONTAINER_ID}" class="ad-slot-banner"></div>
+      <div id="${adContainerId(instanceId)}"></div>
+      <div id="${bannerContainerId(instanceId)}" class="ad-slot-banner"></div>
     </div>`;
 }
 
@@ -66,7 +79,7 @@ export function adSlotHtml() {
  * cada navegación. Si el script solo se cargara una vez, a partir de la
  * segunda vista el hueco se quedaría vacío.
  */
-export function mountAd(root) {
+export function mountAd(root, instanceId = '') {
   const slot = root.querySelector('.ad-slot');
 
   if (!hasAdConsent()) {
@@ -76,10 +89,13 @@ export function mountAd(root) {
     return;
   }
 
-  const hueco = root.querySelector(`#${AD_CONTAINER_ID}`);
+  const hueco = root.querySelector(`#${adContainerId(instanceId)}`);
   if (!hueco) return;
 
-  // Fuera el script de la guía anterior, para no acumular uno por navegación.
+  // Fuera el script del hueco anterior, para no acumular uno por navegación
+  // ni tener dos peticiones activas del mismo anuncio a la vez (el hueco
+  // global y el del modal de la Ruleta comparten unidad de Adsterra, y
+  // solo uno de los dos puede estar realmente activo en cada momento).
   document.querySelectorAll('script[data-adsterra]').forEach(s => s.remove());
 
   const s = document.createElement('script');
@@ -90,7 +106,7 @@ export function mountAd(root) {
   s.setAttribute('data-adsterra', 'true');
   document.body.appendChild(s);
 
-  mountBannerAd(root);
+  mountBannerAd(root, instanceId);
 
   // Adsterra puede no devolver anuncio: unidad recién creada, sin demanda para
   // ese país, o un bloqueador de por medio. En ese caso el contenedor se queda
@@ -114,8 +130,8 @@ export function mountAd(root) {
  * de la app). Se recrea el iframe en cada llamada porque el contenedor mismo
  * se destruye y se vuelve a crear en cada render de ruta.
  */
-function mountBannerAd(root) {
-  const contenedor = root.querySelector(`#${BANNER_CONTAINER_ID}`);
+function mountBannerAd(root, instanceId = '') {
+  const contenedor = root.querySelector(`#${bannerContainerId(instanceId)}`);
   if (!contenedor) return;
 
   const iframe = document.createElement('iframe');
