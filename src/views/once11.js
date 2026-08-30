@@ -3,6 +3,7 @@ import { SITE_URL } from '../utils/site';
 import { HISTORIC_ELEVENS, FORMATIONS } from '../utils/historic-elevens';
 import { setupAutocomplete } from '../utils/autocomplete';
 import { LALIGA_PLAYERS_DB } from '../utils/players-db';
+import { adSlotHtml, mountAd } from '../utils/ads.js';
 
 // Pool para el autocompletado: TODOS los jugadores que tenemos, para poder
 // intentar cualquiera. Une los jugadores de los onces históricos con toda la
@@ -194,8 +195,14 @@ export function renderOnce11(container, callbacks = {}) {
 
   function renderActions() {
     if (finished) {
-      els.actions.innerHTML = `<button id="once-share" style="width:100%;padding:0.85rem;font-family:var(--font-display);font-weight:900;text-transform:uppercase;background:var(--accent);color:#000;border:3px solid #000;box-shadow:4px 4px 0 #000;cursor:pointer;">Compartir resultado</button>`;
+      // Anuncio: aparece con el resultado, mismo momento en que se ofrece
+      // compartirlo fuera de la web.
+      els.actions.innerHTML = `
+        <button id="once-share" style="width:100%;padding:0.85rem;font-family:var(--font-display);font-weight:900;text-transform:uppercase;background:var(--accent);color:#000;border:3px solid #000;box-shadow:4px 4px 0 #000;cursor:pointer;">Compartir resultado</button>
+        ${adSlotHtml('once11-resultado')}
+      `;
       els.actions.querySelector('#once-share').addEventListener('click', share);
+      mountAd(els.actions, 'once11-resultado');
     } else {
       els.actions.innerHTML = `<button id="once-surrender" style="width:100%;padding:0.7rem;font-family:var(--font-display);font-weight:800;text-transform:uppercase;background:transparent;color:var(--text-muted);border:2px solid var(--border-color);border-radius:6px;cursor:pointer;">Rendirse y ver el once</button>`;
       els.actions.querySelector('#once-surrender').addEventListener('click', () => {

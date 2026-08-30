@@ -2,6 +2,7 @@ import { supabase } from '../supabase';
 import { getRandomBufonLine } from './bufon-lines';
 import { escapeHTML } from './security';
 import { generateStoryCardBlob } from './story-card';
+import { adSlotHtml, mountAd } from './ads.js';
 
 /**
  * Opens the "Modo Jornada Express" summary modal: last place, the
@@ -184,4 +185,12 @@ function renderBufonAndShare(body, loserName, punishment, points) {
     }
   });
   body.appendChild(shareBtn);
+
+  // Anuncio: aparece con el resultado, mismo momento en que se ofrece
+  // compartirlo fuera de la web.
+  const adWrap = document.createElement('div');
+  adWrap.style.cssText = 'width: 100%;';
+  adWrap.innerHTML = adSlotHtml('jornada-express');
+  body.appendChild(adWrap);
+  mountAd(adWrap, 'jornada-express');
 }

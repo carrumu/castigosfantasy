@@ -6,6 +6,7 @@ import { escapeHTML } from '../utils/security';
 import { resolveDailyChallenge } from '../utils/daily-challenge';
 import { buildMarketValueTopics } from '../utils/dynamic-value-topics';
 import { SITE_URL } from '../utils/site';
+import { adSlotHtml, mountAd } from '../utils/ads.js';
 
 function normalizeStr(str) {
   if (!str) return '';
@@ -661,6 +662,10 @@ Juega gratis en ${SITE_URL}/top-10`;
                 Volver a Juegos
               </button>
             </div>
+
+            <!-- Anuncio: aparece con el resultado, mismo momento en que se
+                 ofrece compartirlo fuera de la web. -->
+            ${adSlotHtml('top10-resultado')}
           </div>
         `}
       </div>
@@ -723,6 +728,7 @@ Juega gratis en ${SITE_URL}/top-10`;
       container.querySelector('#btn-back-hub').addEventListener('click', () => {
         callbacks.onNavigate('juegos');
       });
+      mountAd(container, 'top10-resultado');
     }
   }
 

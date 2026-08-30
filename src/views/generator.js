@@ -3,6 +3,7 @@ import { escapeHTML } from '../utils/security.js';
 import { PUNISHMENT_IDEAS } from '../utils/punishments-catalog.js';
 import { howItWorks } from '../utils/how-it-works.js';
 import { logPunishmentGeneration } from '../utils/punishment-counter.js';
+import { adSlotHtml, mountAd } from '../utils/ads.js';
 
 /**
  * Renders the interactive public Punishment Generator.
@@ -236,6 +237,10 @@ export function renderGenerator(container, callbacks) {
                       </button>
                     </div>
                   </div>
+
+                  <!-- Anuncio: aparece con el castigo generado, mismo
+                       momento en que se ofrece compartirlo fuera de la web. -->
+                  ${adSlotHtml('generador-resultado')}
                 </div>
               `}
 
@@ -542,6 +547,7 @@ export function renderGenerator(container, callbacks) {
         window.open(`https://api.whatsapp.com/send?text=${shareText}`, '_blank');
       });
     }
+    mountAd(container, 'generador-resultado');
 
     // Slots Machine Mode (Ruleta Rápida)
     const slotsBtn = container.querySelector('#btn-slots-punishment');

@@ -1,6 +1,7 @@
 import { supabase } from '../supabase';
 import { resolveDailyChallenge } from '../utils/daily-challenge';
 import { SITE_URL } from '../utils/site';
+import { adSlotHtml, mountAd } from '../utils/ads.js';
 
 /**
  * Helper to remove accents and special characters
@@ -511,6 +512,12 @@ export async function renderMinigame(container, callbacks) {
   }
 
   function handleShareClick() {
+    // Compartir es la señal de "he terminado y me llevo el resultado fuera
+    // de la web" -- se asegura de que el modal de estadísticas (con el
+    // anuncio) esté abierto tanto si se comparte desde ahí como desde el
+    // botón de la franja inferior, que no lo abre por sí solo.
+    showStatsModal(gameStatus === 'WON');
+
     const shareText = getShareText();
 
     if (navigator.share) {
@@ -663,11 +670,16 @@ export async function renderMinigame(container, callbacks) {
             Cerrar
           </button>
         </div>
+
+        <!-- Anuncio: aparece con el resultado, mismo momento en que se
+             ofrece compartirlo fuera de la web. -->
+        ${adSlotHtml('wordle-resultado')}
       </div>
     `;
 
     activeModal = modal;
     document.body.appendChild(modal);
+    mountAd(modal, 'wordle-resultado');
 
     modal.querySelector('#modal-share-btn').addEventListener('click', handleShareClick);
     modal.querySelector('#modal-close-btn').addEventListener('click', () => {
