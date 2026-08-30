@@ -251,7 +251,27 @@ export async function renderTop10(container, callbacks) {
     });
   };
 
+  // Algunos topics de clubes usan un emoji de colores/escudo en vez de una
+  // bandera real (p. ej. "👑" o "🔴⚪") para distinguir cada equipo. Antes
+  // getCountryCode no reconocía esos casos y caía siempre en "es", así que
+  // las 10 filas de esos topics mostraban la misma bandera de España en vez
+  // del emoji pensado para cada club. Si no es un emoji de bandera real
+  // (regional-indicator) ni una palabra del diccionario de países, se pinta
+  // el emoji tal cual en vez de forzar una bandera.
+  const REGIONAL_FLAG_REGEX = /[\uD83C][\uDDE6-\uDDFF][\uD83C][\uDDE6-\uDDFF]/;
+  const COUNTRY_WORDS = ["es", "esp", "ar", "arg", "pt", "por", "fr", "fra", "mx", "mex", "uy", "uru", "br", "bra", "hr", "cro", "it", "ita", "be", "bel", "hu", "hun", "si", "slo", "cl", "chi", "ph", "fil"];
+  const isRealCountryFlag = (flag) => {
+    if (!flag) return false;
+    if (REGIONAL_FLAG_REGEX.test(flag)) return true;
+    const flagLower = flag.toLowerCase();
+    return COUNTRY_WORDS.some(w => flagLower.includes(w));
+  };
+
   const getFlagHtml = (flag) => {
+    if (!isRealCountryFlag(flag)) {
+      const safeFlag = flag ? flag.replace(/'/g, '&#39;').replace(/"/g, '&quot;') : '';
+      return `<span style="font-size: 1.25rem; display: inline-block; vertical-align: middle;">${safeFlag}</span>`;
+    }
     const code = getCountryCode(flag);
     const safeFlag = flag ? flag.replace(/'/g, '&#39;').replace(/"/g, '&quot;') : '';
     // El fallback a emoji se engancha con addEventListener tras renderizar
